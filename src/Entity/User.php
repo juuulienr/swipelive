@@ -15,8 +15,8 @@ use JsonSerializable;
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(
- *  fields={"pseudo"},
- *  message="Il existe déjà un compte associé avec ce pseudo !"
+ *  fields={"email"},
+ *  message="Il existe un compte associé à cette adresse mail !"
  * )
  */
 class User implements UserInterface, JsonSerializable
@@ -30,9 +30,9 @@ class User implements UserInterface, JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank(message="Vous devez renseigner un pseudo")
+     * @Assert\Email(message="Veuillez renseigner une adresse mail valide !")
      */
-    private $pseudo;
+    private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -49,25 +49,10 @@ class User implements UserInterface, JsonSerializable
      */
     private $createdAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Reseller::class, inversedBy="users")
-     */
-    private $reseller;
-
     
     public function __construct()
     {
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
-    }
-
-    public function jsonSerialize()
-    {
-       return array(
-             'id'        => $this->id,
-             'pseudo'        => $this->pseudo,
-             'createdAt'        => $this->createdAt,
-             'reseller'        => $this->reseller,
-        );
     }
 
     public function getId()
@@ -75,14 +60,14 @@ class User implements UserInterface, JsonSerializable
         return $this->id;
     }
 
-    public function getPseudo(): ?string
+    public function getEmail(): ?string
     {
-        return $this->pseudo;
+        return $this->email;
     }
 
-    public function setPseudo(string $pseudo): self
+    public function setEmail(string $email): self
     {
-        $this->pseudo = $pseudo;
+        $this->email = $email;
 
         return $this;
     }
@@ -137,18 +122,6 @@ class User implements UserInterface, JsonSerializable
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getReseller(): ?Reseller
-    {
-        return $this->reseller;
-    }
-
-    public function setReseller(?Reseller $reseller): self
-    {
-        $this->reseller = $reseller;
 
         return $this;
     }

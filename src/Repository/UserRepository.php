@@ -19,14 +19,7 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
-    public function findUsersLimit($limit){
-        return $this->createQueryBuilder('u')
-                    ->orderBy('u.createdAt', 'DESC')
-                    ->setMaxResults($limit) 
-                    ->getQuery()
-                    ->getResult();
-    }
-
+    
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */
