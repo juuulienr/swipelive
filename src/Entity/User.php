@@ -9,7 +9,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use JsonSerializable;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -19,7 +18,7 @@ use JsonSerializable;
  *  message="Il existe un compte associé à cette adresse mail !"
  * )
  */
-class User implements UserInterface, JsonSerializable
+class User implements UserInterface
 {
     /**
      * @ORM\Id()
@@ -96,7 +95,7 @@ class User implements UserInterface, JsonSerializable
     public function getSalt() {}
     
     public function getUsername() {
-        return $this->pseudo;
+        return $this->email;
     }
 
     public function eraseCredentials() {}
