@@ -12,20 +12,20 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\VendorRepository")
  * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(
  *  fields={"email"},
  *  message="Un compte est associé à cette adresse e-mail"
  * )
  */
-class User implements UserInterface
+class Vendor implements UserInterface
 {
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups("user:read")
+     * @Groups("vendor:read")
      * @Groups("clip:read")
      */
     private $id;
@@ -33,7 +33,7 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Email(message="L'adresse mail est invalide !")
-     * @Groups("user:read")
+     * @Groups("vendor:read")
      */
     private $email;
 
@@ -44,26 +44,39 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("user:read")
+     * @Groups("vendor:read")
      */
     private $pushToken;
 
+
     /**
      * @ORM\Column(type="datetime")
-     * @Groups("user:read")
+     * @Groups("vendor:read")
      */
     private $createdAt;
 
     /**
-     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Live::class, mappedBy="vendor")
+     */
+    private $lives;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="vendor")
      */
     private $messages;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="vendor")
+     */
+    private $clips;
 
     
     public function __construct()
     {
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
+        $this->lives = new ArrayCollection();
         $this->messages = new ArrayCollection();
+        $this->clips = new ArrayCollection();
     }
 
     public function getId()
@@ -97,7 +110,7 @@ class User implements UserInterface
 
     public function getRoles() {
 
-        return ['ROLE_USER'];
+        return ['ROLE_VENDOR'];
     }
 
     public function getPassword() {
@@ -138,6 +151,36 @@ class User implements UserInterface
     }
 
     /**
+     * @return Collection|Live[]
+     */
+    public function getLives(): Collection
+    {
+        return $this->lives;
+    }
+
+    public function addLife(Live $life): self
+    {
+        if (!$this->lives->contains($life)) {
+            $this->lives[] = $life;
+            $life->setVendor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLife(Live $life): self
+    {
+        if ($this->lives->removeElement($life)) {
+            // set the owning side to null (unless already changed)
+            if ($life->getVendor() === $this) {
+                $life->setVendor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * @return Collection|Message[]
      */
     public function getMessages(): Collection
@@ -149,7 +192,7 @@ class User implements UserInterface
     {
         if (!$this->messages->contains($message)) {
             $this->messages[] = $message;
-            $message->setUser($this);
+            $message->setVendor($this);
         }
 
         return $this;
@@ -159,8 +202,38 @@ class User implements UserInterface
     {
         if ($this->messages->removeElement($message)) {
             // set the owning side to null (unless already changed)
-            if ($message->getUser() === $this) {
-                $message->setUser(null);
+            if ($message->getVendor() === $this) {
+                $message->setVendor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Clip[]
+     */
+    public function getClips(): Collection
+    {
+        return $this->clips;
+    }
+
+    public function addClip(Clip $clip): self
+    {
+        if (!$this->clips->contains($clip)) {
+            $this->clips[] = $clip;
+            $clip->setVendor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClip(Clip $clip): self
+    {
+        if ($this->clips->removeElement($clip)) {
+            // set the owning side to null (unless already changed)
+            if ($clip->getVendor() === $this) {
+                $clip->setVendor(null);
             }
         }
 

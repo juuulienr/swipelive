@@ -13,7 +13,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Cookie;
 
 
-class HomeController extends Controller {
+class WebController extends Controller {
 
     /**
      * @Route("/", name="index")
