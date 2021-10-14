@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Vendor;
 use App\Repository\VendorRepository;
+use App\Repository\ClipRepository;
+use App\Repository\LiveRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -75,8 +77,38 @@ class VendorAPIController extends Controller {
   /**
    * @Route("/vendor/api/profile", name="vendor_api_profile", methods={"GET"})
    */
-  public function profile(Request $request, ObjectManager $manager)
-  {
+  public function profile(Request $request, ObjectManager $manager) {
     return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:edit']);
   }
+
+
+  /**
+   * Edition du vendeur
+   *
+  * @Route("/vendor/api/profile/edit", name="vendor_api_profile_edit")
+  */
+  public function editProfile(Request $request, ObjectManager $manager, VendorRepository $vendorRepo , UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
+
+    if ($json = $request->getContent()) {
+      $vendor = $serializer->deserialize($json, Vendor::class, "json");
+      $manager->flush();
+
+      return $this->json($vendor, 200);
+    }
+
+    return $this->json([ "error" => "Une erreur est survenue"], 404);
+  }
+
+
+  /**
+   * @Route("/vendor/api/clips", name="vendor_api_clips", methods={"GET"})
+   */
+  public function clips(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
+    $clips = $clipRepo->findByVendor($this->getUser());
+
+    return $this->json($clips, 200, [], ['groups' => 'clip:read']);
+  }
+
+
+
 }

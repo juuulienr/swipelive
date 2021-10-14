@@ -151,6 +151,11 @@ class Vendor implements UserInterface
      */
     private $pinterest;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Product::class, mappedBy="vendor")
+     */
+    private $products;
+
     
     public function __construct()
     {
@@ -160,6 +165,7 @@ class Vendor implements UserInterface
         $this->clips = new ArrayCollection();
         $this->followers = 0;
         $this->following = 0;
+        $this->products = new ArrayCollection();
     }
 
     public function getId()
@@ -451,6 +457,36 @@ class Vendor implements UserInterface
     public function setPinterest(?string $pinterest): self
     {
         $this->pinterest = $pinterest;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Product[]
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): self
+    {
+        if (!$this->products->contains($product)) {
+            $this->products[] = $product;
+            $product->setVendor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): self
+    {
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getVendor() === $this) {
+                $product->setVendor(null);
+            }
+        }
 
         return $this;
     }
