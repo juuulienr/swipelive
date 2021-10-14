@@ -53,6 +53,7 @@ class Clip
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("clip:read")
+     * @Groups("vendor:read")
      */
     private $filename;
 

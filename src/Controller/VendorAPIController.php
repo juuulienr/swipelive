@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Vendor;
+use App\Repository\VendorRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -10,8 +11,43 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class VendorAPIController extends Controller {
+
+
+  /**
+   * Inscription vendeur
+   *
+  * @Route("/api/vendor/register", name="vendor_api_register")
+  */
+  public function register(Request $request, ObjectManager $manager, VendorRepository $vendorRepo , UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
+
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
+
+      if ($param) {
+        $vendor = $vendorRepo->findOneByEmail($param['email']);
+
+        if (!$vendor) {
+          $vendor = $serializer->deserialize($json, Vendor::class, "json");
+          $hash = $encoder->encodePassword($vendor, $param['password']);
+          $vendor->setHash($hash);
+
+          $manager->persist($vendor);
+          $manager->flush();
+
+          return $this->json($vendor, 200);
+
+        } else {
+          return $this->json("Un compte est associé à cette adresse mail", 404);
+        }
+      }
+    }
+
+    return $this->json([ "error" => "Une erreur est survenue"], 404);
+  }
 
 
   /**
@@ -23,9 +59,9 @@ class VendorAPIController extends Controller {
 
     // récupérer le push token
     if ($content = $request->getContent()) {
-      $token = json_decode($content, true);
-      if ($token) {
-        $vendor->setPushToken($token['token']);
+      $result = json_decode($content, true);
+      if ($result) {
+        $vendor->setPushToken($result['pushToken']);
         $manager->flush();
 
         return $this->json(true, 200);
@@ -41,6 +77,6 @@ class VendorAPIController extends Controller {
    */
   public function profile(Request $request, ObjectManager $manager)
   {
-    return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:read']);
+    return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:edit']);
   }
 }

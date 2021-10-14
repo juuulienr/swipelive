@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(
  *  fields={"email"},
- *  message="Un compte est associé à cette adresse e-mail"
+ *  message="Un compte est associé à cette adresse mail"
  * )
  */
 class Vendor implements UserInterface
@@ -26,6 +26,7 @@ class Vendor implements UserInterface
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * @Groups("vendor:read")
+     * @Groups("vendor:edit")
      * @Groups("clip:read")
      */
     private $id;
@@ -33,7 +34,7 @@ class Vendor implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Email(message="L'adresse mail est invalide !")
-     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
      */
     private $email;
 
@@ -44,14 +45,12 @@ class Vendor implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("vendor:read")
      */
     private $pushToken;
 
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups("vendor:read")
      */
     private $createdAt;
 
@@ -67,8 +66,90 @@ class Vendor implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="vendor")
+     * @Groups("vendor:read")
      */
     private $clips;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     * @Groups("clip:read")
+     */
+    private $company;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     * @Groups("clip:read")
+     */
+    private $firstname;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     * @Groups("clip:read")
+     */
+    private $lastname;
+
+    /**
+     * @ORM\Column(type="integer")
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     * @Groups("clip:edit")
+     */
+    private $followers;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $following;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     * @Groups("clip:edit")
+     */
+    private $summary;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     * @Groups("clip:read")
+     */
+    private $picture;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     */
+    private $facebook;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     */
+    private $instagram;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     */
+    private $snapchat;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     */
+    private $pinterest;
 
     
     public function __construct()
@@ -77,6 +158,8 @@ class Vendor implements UserInterface
         $this->lives = new ArrayCollection();
         $this->messages = new ArrayCollection();
         $this->clips = new ArrayCollection();
+        $this->followers = 0;
+        $this->following = 0;
     }
 
     public function getId()
@@ -236,6 +319,138 @@ class Vendor implements UserInterface
                 $clip->setVendor(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCompany(): ?string
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?string $company): self
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
+    public function getFirstname(): ?string
+    {
+        return $this->firstname;
+    }
+
+    public function setFirstname(string $firstname): self
+    {
+        $this->firstname = $firstname;
+
+        return $this;
+    }
+
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
+
+    public function setLastname(string $lastname): self
+    {
+        $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    public function getFollowers(): ?int
+    {
+        return $this->followers;
+    }
+
+    public function setFollowers(int $followers): self
+    {
+        $this->followers = $followers;
+
+        return $this;
+    }
+
+    public function getFollowing(): ?int
+    {
+        return $this->following;
+    }
+
+    public function setFollowing(int $following): self
+    {
+        $this->following = $following;
+
+        return $this;
+    }
+
+    public function getSummary(): ?string
+    {
+        return $this->summary;
+    }
+
+    public function setSummary(?string $summary): self
+    {
+        $this->summary = $summary;
+
+        return $this;
+    }
+
+    public function getPicture(): ?string
+    {
+        return $this->picture;
+    }
+
+    public function setPicture(?string $picture): self
+    {
+        $this->picture = $picture;
+
+        return $this;
+    }
+
+    public function getFacebook(): ?string
+    {
+        return $this->facebook;
+    }
+
+    public function setFacebook(?string $facebook): self
+    {
+        $this->facebook = $facebook;
+
+        return $this;
+    }
+
+    public function getInstagram(): ?string
+    {
+        return $this->instagram;
+    }
+
+    public function setInstagram(?string $instagram): self
+    {
+        $this->instagram = $instagram;
+
+        return $this;
+    }
+
+    public function getSnapchat(): ?string
+    {
+        return $this->snapchat;
+    }
+
+    public function setSnapchat(?string $snapchat): self
+    {
+        $this->snapchat = $snapchat;
+
+        return $this;
+    }
+
+    public function getPinterest(): ?string
+    {
+        return $this->pinterest;
+    }
+
+    public function setPinterest(?string $pinterest): self
+    {
+        $this->pinterest = $pinterest;
 
         return $this;
     }

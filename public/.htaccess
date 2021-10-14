@@ -1,11 +1,11 @@
 # Redirection vers HTTPS
 # RewriteCond %{SERVER_PORT} ^80$ [OR]
 # RewriteCond %{HTTPS} =off
-# RewriteRule ^(.*)$ https://eventsia.fr/$1 [R=301,L]
+# RewriteRule ^(.*)$ https://wizz.live/$1 [R=301,L]
 
 # Redirection du www vers non-www en HTTPS
 # RewriteCond %{HTTP_HOST} ^www\.eventsia\.fr [NC]
-# RewriteRule ^(.*)$ https://eventsia.fr/$1 [R=301,L]
+# RewriteRule ^(.*)$ https://wizz.live/$1 [R=301,L]
 
 
 
