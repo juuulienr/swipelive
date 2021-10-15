@@ -20,7 +20,6 @@ class Follow
 
     /**
      * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="followers")
-     * @Groups("vendor:read")
      */
     private $following;
 
