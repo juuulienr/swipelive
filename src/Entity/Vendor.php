@@ -67,6 +67,7 @@ class Vendor implements UserInterface
     /**
      * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="vendor")
      * @Groups("vendor:read")
+     * @Groups("vendor:edit")
      */
     private $clips;
 
