@@ -84,7 +84,7 @@ class VendorAPIController extends Controller {
 
 
   /**
-   * Edition du vendeur
+   * Récupérer le profil
    *
    * @Route("/vendor/api/profile", name="vendor_api_profile", methods={"GET"})
    */
@@ -94,7 +94,7 @@ class VendorAPIController extends Controller {
 
 
   /**
-   * Edition du vendeur
+   * Edition du profil
    *
   * @Route("/vendor/api/profile/edit", name="vendor_api_profile_edit")
   */
@@ -112,7 +112,7 @@ class VendorAPIController extends Controller {
 
 
   /**
-   * Edition du vendeur
+   * Récupérer les clips
    *
    * @Route("/vendor/api/clips", name="vendor_api_clips", methods={"GET"})
    */

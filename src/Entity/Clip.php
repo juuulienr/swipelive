@@ -60,8 +60,16 @@ class Clip
     /**
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="clips")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("clip:read")
      */
     private $product;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("clip:read")
+     * @Groups("vendor:read")
+     */
+    private $thumbnail;
 
     public function getId(): ?int
     {
@@ -148,6 +156,18 @@ class Clip
     public function setProduct(?Product $product): self
     {
         $this->product = $product;
+
+        return $this;
+    }
+
+    public function getThumbnail(): ?string
+    {
+        return $this->thumbnail;
+    }
+
+    public function setThumbnail(?string $thumbnail): self
+    {
+        $this->thumbnail = $thumbnail;
 
         return $this;
     }

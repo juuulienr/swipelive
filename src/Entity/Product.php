@@ -17,7 +17,10 @@ class Product
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("product:read")
      * @Groups("vendor:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
      */
     private $id;
 
@@ -25,6 +28,8 @@ class Product
      * @ORM\Column(type="string", length=255)
      * @Groups("product:read")
      * @Groups("vendor:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
      */
     private $name;
 
@@ -32,6 +37,7 @@ class Product
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="products")
      * @ORM\JoinColumn(nullable=false)
      * @Groups("product:read")
+     * @Groups("clip:read")
      */
     private $category;
 
@@ -51,6 +57,8 @@ class Product
      * @ORM\Column(type="boolean")
      * @Groups("product:read")
      * @Groups("vendor:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
      */
     private $online;
 
@@ -58,6 +66,8 @@ class Product
      * @ORM\Column(type="float")
      * @Groups("product:read")
      * @Groups("vendor:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
      */
     private $price;
 
@@ -65,6 +75,8 @@ class Product
      * @ORM\Column(type="float", nullable=true)
      * @Groups("product:read")
      * @Groups("vendor:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
      */
     private $compareAtPrice;
 
@@ -86,6 +98,8 @@ class Product
      * @ORM\OneToMany(targetEntity=Upload::class, mappedBy="product")
      * @Groups("product:read")
      * @Groups("vendor:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
      */
     private $uploads;
 

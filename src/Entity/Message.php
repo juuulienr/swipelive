@@ -46,6 +46,7 @@ class Message
 
     /**
      * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="messages")
+     * @Groups("clip:read")
      */
     private $vendor;
 

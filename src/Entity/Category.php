@@ -17,11 +17,13 @@ class Category
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("category:read")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("category:read")
      * @Groups("product:read")
      * @Groups("vendor:read")
      */
@@ -29,8 +31,15 @@ class Category
 
     /**
      * @ORM\OneToMany(targetEntity=Product::class, mappedBy="category")
+     * @Groups("category:read")
      */
     private $products;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("category:read")
+     */
+    private $picture;
 
     public function __construct()
     {
@@ -80,6 +89,18 @@ class Category
                 $product->setCategory(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPicture(): ?string
+    {
+        return $this->picture;
+    }
+
+    public function setPicture(?string $picture): self
+    {
+        $this->picture = $picture;
 
         return $this;
     }

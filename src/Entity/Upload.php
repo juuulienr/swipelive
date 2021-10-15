@@ -15,6 +15,9 @@ class Upload
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("product:read")
+     * @Groups("vendor:read")
+     * @Groups("clip:read")
      */
     private $id;
 
@@ -22,6 +25,8 @@ class Upload
      * @ORM\Column(type="string", length=255)
      * @Groups("product:read")
      * @Groups("vendor:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
      */
     private $filename;
 
@@ -29,6 +34,8 @@ class Upload
      * @ORM\Column(type="datetime_immutable")
      * @Groups("product:read")
      * @Groups("vendor:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
      */
     private $createdAt;
 
