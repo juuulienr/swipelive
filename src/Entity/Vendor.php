@@ -95,19 +95,6 @@ class Vendor implements UserInterface
     private $lastname;
 
     /**
-     * @ORM\Column(type="integer")
-     * @Groups("vendor:read")
-     * @Groups("vendor:edit")
-     * @Groups("clip:edit")
-     */
-    private $followers;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $following;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("vendor:read")
      * @Groups("vendor:edit")
@@ -157,6 +144,17 @@ class Vendor implements UserInterface
      */
     private $products;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="following")
+     * @Groups("vendor:read")
+     */
+    private $followers;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="vendor")
+     */
+    private $following;
+
     
     public function __construct()
     {
@@ -164,9 +162,9 @@ class Vendor implements UserInterface
         $this->lives = new ArrayCollection();
         $this->messages = new ArrayCollection();
         $this->clips = new ArrayCollection();
-        $this->followers = 0;
-        $this->following = 0;
         $this->products = new ArrayCollection();
+        $this->followers = new ArrayCollection();
+        $this->following = new ArrayCollection();
     }
 
     public function getId()
@@ -366,30 +364,6 @@ class Vendor implements UserInterface
         return $this;
     }
 
-    public function getFollowers(): ?int
-    {
-        return $this->followers;
-    }
-
-    public function setFollowers(int $followers): self
-    {
-        $this->followers = $followers;
-
-        return $this;
-    }
-
-    public function getFollowing(): ?int
-    {
-        return $this->following;
-    }
-
-    public function setFollowing(int $following): self
-    {
-        $this->following = $following;
-
-        return $this;
-    }
-
     public function getSummary(): ?string
     {
         return $this->summary;
@@ -486,6 +460,66 @@ class Vendor implements UserInterface
             // set the owning side to null (unless already changed)
             if ($product->getVendor() === $this) {
                 $product->setVendor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Follow[]
+     */
+    public function getFollowers(): Collection
+    {
+        return $this->followers;
+    }
+
+    public function addFollower(Follow $follower): self
+    {
+        if (!$this->followers->contains($follower)) {
+            $this->followers[] = $follower;
+            $follower->setFollowing($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollower(Follow $follower): self
+    {
+        if ($this->followers->removeElement($follower)) {
+            // set the owning side to null (unless already changed)
+            if ($follower->getFollowing() === $this) {
+                $follower->setFollowing(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Follow[]
+     */
+    public function getFollowing(): Collection
+    {
+        return $this->following;
+    }
+
+    public function addFollowing(Follow $following): self
+    {
+        if (!$this->following->contains($following)) {
+            $this->following[] = $following;
+            $following->setVendor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollowing(Follow $following): self
+    {
+        if ($this->following->removeElement($following)) {
+            // set the owning side to null (unless already changed)
+            if ($following->getVendor() === $this) {
+                $following->setVendor(null);
             }
         }
 

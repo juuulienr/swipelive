@@ -69,11 +69,17 @@ class User implements UserInterface
      */
     private $lastname;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="user")
+     */
+    private $following;
+
     
     public function __construct()
     {
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->messages = new ArrayCollection();
+        $this->following = new ArrayCollection();
     }
 
     public function getId()
@@ -197,6 +203,36 @@ class User implements UserInterface
     public function setLastname(string $lastname): self
     {
         $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Follow[]
+     */
+    public function getFollowing(): Collection
+    {
+        return $this->following;
+    }
+
+    public function addFollowing(Follow $following): self
+    {
+        if (!$this->following->contains($following)) {
+            $this->following[] = $following;
+            $following->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollowing(Follow $following): self
+    {
+        if ($this->following->removeElement($following)) {
+            // set the owning side to null (unless already changed)
+            if ($following->getUser() === $this) {
+                $following->setUser(null);
+            }
+        }
 
         return $this;
     }

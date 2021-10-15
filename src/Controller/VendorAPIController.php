@@ -6,7 +6,9 @@ use App\Entity\Vendor;
 use App\Entity\Clip;
 use App\Entity\Live;
 use App\Entity\Category;
+use App\Entity\Follow;
 use App\Entity\Product;
+use App\Repository\FollowRepository;
 use App\Repository\VendorRepository;
 use App\Repository\ClipRepository;
 use App\Repository\ProductRepository;
@@ -140,8 +142,31 @@ class VendorAPIController extends Controller {
    *
    * @Route("/vendor/api/products/{id}", name="vendor_api_product", methods={"GET"})
    */
-  public function product(Product $product, Request $request, ObjectManager $manager, ProductRepository $productRepo) {
+  public function product(Product $product) {
     return $this->json($product, 200, [], ['groups' => 'product:read']);
+  }
+
+
+  /**
+   * Suivre une personne
+   *
+   * @Route("/vendor/api/follow/vendor/{id}", name="vendor_api_follow", methods={"GET"})
+   */
+  public function follow(Vendor $vendor, Request $request, ObjectManager $manager, FollowRepository $followRepo) {
+    $follow = $followRepo->findOneBy(['following' => $vendor, 'vendor' => $this->getUser() ]);
+
+    if (!$follow) {
+      $follow = new Follow();
+      $follow->setVendor($this->getUser());
+      $follow->setFollowing($vendor);
+
+      $manager->persist($follow);
+      $manager->flush();
+
+      return $this->json(true, 200);
+    }
+
+    return $this->json(false, 404);
   }
 
 }
