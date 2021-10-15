@@ -147,12 +147,14 @@ class Vendor implements UserInterface
     /**
      * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="following")
      * @Groups("vendor:read")
+     * @Groups("vendor:edit")
      */
     private $followers;
 
     /**
      * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="vendor")
      * @Groups("vendor:read")
+     * @Groups("vendor:edit")
      */
     private $following;
 
