@@ -48,13 +48,19 @@ class Live
      */
     private $clips;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Product::class, inversedBy="lives")
+     */
+    private $products;
+
     
     public function __construct()
     {
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
-        $this->views = 0;
         $this->messages = new ArrayCollection();
         $this->clips = new ArrayCollection();
+        $this->products = new ArrayCollection();
+        $this->views = 0;
     }
 
 
@@ -155,6 +161,30 @@ class Live
                 $clip->setLive(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Product[]
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): self
+    {
+        if (!$this->products->contains($product)) {
+            $this->products[] = $product;
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): self
+    {
+        $this->products->removeElement($product);
 
         return $this;
     }

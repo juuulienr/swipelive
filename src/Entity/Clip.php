@@ -57,6 +57,12 @@ class Clip
      */
     private $filename;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="clips")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $product;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -130,6 +136,18 @@ class Clip
     public function setFilename(string $filename): self
     {
         $this->filename = $filename;
+
+        return $this;
+    }
+
+    public function getProduct(): ?Product
+    {
+        return $this->product;
+    }
+
+    public function setProduct(?Product $product): self
+    {
+        $this->product = $product;
 
         return $this;
     }

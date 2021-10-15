@@ -3,7 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
@@ -14,17 +17,21 @@ class Product
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("vendor:read")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("product:read")
+     * @Groups("vendor:read")
      */
     private $name;
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="products")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("product:read")
      */
     private $category;
 
@@ -36,38 +43,68 @@ class Product
 
     /**
      * @ORM\Column(type="text")
+     * @Groups("product:read")
      */
     private $description;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups("product:read")
+     * @Groups("vendor:read")
      */
     private $online;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups("product:read")
+     * @Groups("vendor:read")
      */
     private $price;
 
     /**
      * @ORM\Column(type="float", nullable=true)
+     * @Groups("product:read")
+     * @Groups("vendor:read")
      */
     private $compareAtPrice;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $unitCost;
-
-    /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups("product:read")
+     * @Groups("vendor:read")
      */
     private $quantity;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups("product:read")
+     * @Groups("vendor:read")
      */
     private $tracking;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Upload::class, mappedBy="product")
+     * @Groups("product:read")
+     * @Groups("vendor:read")
+     */
+    private $uploads;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="product")
+     */
+    private $clips;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Live::class, mappedBy="products")
+     */
+    private $lives;
+
+    public function __construct()
+    {
+        $this->uploads = new ArrayCollection();
+        $this->clips = new ArrayCollection();
+        $this->lives = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -158,18 +195,6 @@ class Product
         return $this;
     }
 
-    public function getUnitCost(): ?float
-    {
-        return $this->unitCost;
-    }
-
-    public function setUnitCost(?float $unitCost): self
-    {
-        $this->unitCost = $unitCost;
-
-        return $this;
-    }
-
     public function getQuantity(): ?int
     {
         return $this->quantity;
@@ -190,6 +215,93 @@ class Product
     public function setTracking(bool $tracking): self
     {
         $this->tracking = $tracking;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Upload[]
+     */
+    public function getUploads(): Collection
+    {
+        return $this->uploads;
+    }
+
+    public function addUpload(Upload $upload): self
+    {
+        if (!$this->uploads->contains($upload)) {
+            $this->uploads[] = $upload;
+            $upload->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUpload(Upload $upload): self
+    {
+        if ($this->uploads->removeElement($upload)) {
+            // set the owning side to null (unless already changed)
+            if ($upload->getProduct() === $this) {
+                $upload->setProduct(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Clip[]
+     */
+    public function getClips(): Collection
+    {
+        return $this->clips;
+    }
+
+    public function addClip(Clip $clip): self
+    {
+        if (!$this->clips->contains($clip)) {
+            $this->clips[] = $clip;
+            $clip->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClip(Clip $clip): self
+    {
+        if ($this->clips->removeElement($clip)) {
+            // set the owning side to null (unless already changed)
+            if ($clip->getProduct() === $this) {
+                $clip->setProduct(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Live[]
+     */
+    public function getLives(): Collection
+    {
+        return $this->lives;
+    }
+
+    public function addLife(Live $life): self
+    {
+        if (!$this->lives->contains($life)) {
+            $this->lives[] = $life;
+            $life->addProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLife(Live $life): self
+    {
+        if ($this->lives->removeElement($life)) {
+            $life->removeProduct($this);
+        }
 
         return $this;
     }

@@ -3,8 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Vendor;
+use App\Entity\Clip;
+use App\Entity\Live;
+use App\Entity\Category;
+use App\Entity\Product;
 use App\Repository\VendorRepository;
 use App\Repository\ClipRepository;
+use App\Repository\ProductRepository;
 use App\Repository\LiveRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +20,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+
 
 class VendorAPIController extends Controller {
 
@@ -53,6 +60,8 @@ class VendorAPIController extends Controller {
 
 
   /**
+   * Ajouter le push token
+   *
    * @Route("/vendor/api/push/add", name="vendor_push_add")
    */
   public function addPush(Request $request, ObjectManager $manager)
@@ -75,6 +84,8 @@ class VendorAPIController extends Controller {
 
 
   /**
+   * Edition du vendeur
+   *
    * @Route("/vendor/api/profile", name="vendor_api_profile", methods={"GET"})
    */
   public function profile(Request $request, ObjectManager $manager) {
@@ -90,10 +101,10 @@ class VendorAPIController extends Controller {
   public function editProfile(Request $request, ObjectManager $manager, VendorRepository $vendorRepo , UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
 
     if ($json = $request->getContent()) {
-      $vendor = $serializer->deserialize($json, Vendor::class, "json");
+      $serializer->deserialize($json, Vendor::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $this->getUser()]);
       $manager->flush();
 
-      return $this->json($vendor, 200);
+      return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:edit'], 200);
     }
 
     return $this->json([ "error" => "Une erreur est survenue"], 404);
@@ -101,6 +112,8 @@ class VendorAPIController extends Controller {
 
 
   /**
+   * Edition du vendeur
+   *
    * @Route("/vendor/api/clips", name="vendor_api_clips", methods={"GET"})
    */
   public function clips(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
@@ -110,5 +123,25 @@ class VendorAPIController extends Controller {
   }
 
 
+  /**
+   * Récupérer les produits
+   *
+   * @Route("/vendor/api/products", name="vendor_api_products", methods={"GET"})
+   */
+  public function products(Request $request, ObjectManager $manager, ProductRepository $productRepo) {
+    $products = $productRepo->findByVendor($this->getUser());
+
+    return $this->json($products, 200, [], ['groups' => 'product:read']);
+  }
+
+
+  /**
+   * Récupérer un produit
+   *
+   * @Route("/vendor/api/products/{id}", name="vendor_api_product", methods={"GET"})
+   */
+  public function product(Product $product, Request $request, ObjectManager $manager, ProductRepository $productRepo) {
+    return $this->json($product, 200, [], ['groups' => 'product:read']);
+  }
 
 }

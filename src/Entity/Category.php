@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -21,6 +22,8 @@ class Category
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("product:read")
+     * @Groups("vendor:read")
      */
     private $name;
 
