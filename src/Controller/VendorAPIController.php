@@ -15,6 +15,7 @@ use App\Repository\ClipRepository;
 use App\Repository\ProductRepository;
 use App\Repository\LiveRepository;
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -178,7 +179,7 @@ class VendorAPIController extends Controller {
       $file = $request->files->get('picture');
 
       if (!$file) {
-        return $this->json("Le fichier est introuvable !", 404);
+        return $this->json("L'image est introuvable !", 404);
       }
 
       $filename = md5(time().uniqid()). "." . $file->guessExtension(); 
@@ -194,7 +195,29 @@ class VendorAPIController extends Controller {
       return $this->json($upload, 200);
     }
 
-    return $this->json("Une erreur est survenue pendant le téléchargement du fichier", 404);
+    return $this->json("L'image est introuvable !", 404);
+  }
+
+
+  /**
+   * Supprimer une image
+   *
+   * @Route("/vendor/api/products/upload/delete/{id}", name="vendor_api_upload_delete", methods={"GET"})
+   */
+  public function deleteUpload(Upload $upload, Request $request, ObjectManager $manager) {
+    $filePath = $this->getParameter('uploads_directory') . '/' . $upload->getFilename();
+
+    if (file_exists($filePath)) {
+      $filesystem = new Filesystem();
+      $filesystem->remove($filePath);
+
+      $manager->remove($upload);
+      $manager->flush();
+
+      return $this->json(true, 200);
+    }
+
+    return $this->json("L'image n'existe pas !", 404);
   }
 
 
