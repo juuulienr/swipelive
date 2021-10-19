@@ -31,7 +31,7 @@ class Product
      * @Groups("clip:read")
      * @Groups("category:read")
      */
-    private $name;
+    private $title;
 
     /**
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="products")
@@ -125,14 +125,14 @@ class Product
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getTitle(): ?string
     {
-        return $this->name;
+        return $this->title;
     }
 
-    public function setName(string $name): self
+    public function setTitle(string $title): self
     {
-        $this->name = $name;
+        $this->title = $title;
 
         return $this;
     }
@@ -301,20 +301,20 @@ class Product
         return $this->lives;
     }
 
-    public function addLife(Live $life): self
+    public function addLive(Live $live): self
     {
-        if (!$this->lives->contains($life)) {
-            $this->lives[] = $life;
-            $life->addProduct($this);
+        if (!$this->lives->contains($live)) {
+            $this->lives[] = $live;
+            $live->addProduct($this);
         }
 
         return $this;
     }
 
-    public function removeLife(Live $life): self
+    public function removeLive(Live $live): self
     {
-        if ($this->lives->removeElement($life)) {
-            $life->removeProduct($this);
+        if ($this->lives->removeElement($live)) {
+            $live->removeProduct($this);
         }
 
         return $this;

@@ -8,6 +8,7 @@ use App\Entity\Live;
 use App\Entity\Category;
 use App\Entity\Follow;
 use App\Entity\Product;
+use App\Entity\Upload;
 use App\Repository\FollowRepository;
 use App\Repository\VendorRepository;
 use App\Repository\ClipRepository;
@@ -98,9 +99,9 @@ class VendorAPIController extends Controller {
   /**
    * Edition du profil
    *
-  * @Route("/vendor/api/profile/edit", name="vendor_api_profile_edit")
+  * @Route("/vendor/api/profile/edit", name="vendor_api_profile_edit", methods={"POST"})
   */
-  public function editProfile(Request $request, ObjectManager $manager, VendorRepository $vendorRepo , UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
+  public function editProfile(Request $request, ObjectManager $manager, VendorRepository $vendorRepo, SerializerInterface $serializer) {
 
     if ($json = $request->getContent()) {
       $serializer->deserialize($json, Vendor::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $this->getUser()]);
@@ -144,6 +145,56 @@ class VendorAPIController extends Controller {
    */
   public function product(Product $product) {
     return $this->json($product, 200, [], ['groups' => 'product:read']);
+  }
+
+
+  /**
+   * Ajouter un produit
+   *
+   * @Route("/vendor/api/products/add", name="vendor_api_product_add", methods={"POST"})
+   */
+  public function addProduct(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $product = $serializer->deserialize($json, Product::class, "json");
+      $product->setVendor($this->getUser());
+
+      $manager->persist($product);
+      $manager->flush();
+
+      return $this->json($product, 200, [], ['groups' => 'product:read'], 200);
+    }
+
+    return $this->json([ "error" => "Une erreur est survenue"], 404);
+  }
+
+
+  /**
+   * Ajouter une image
+   *
+   * @Route("/vendor/api/products/upload/add", name="vendor_api_upload_add", methods={"POST"})
+   */
+  public function addUpload(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($request->files->get('picture')) {
+      $file = $request->files->get('picture');
+
+      if (!$file) {
+        return $this->json("Le fichier est introuvable !", 404);
+      }
+
+      $filename = md5(time().uniqid()). "." . $file->guessExtension(); 
+      $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
+      file_put_contents($filepath, file_get_contents($file));
+
+      $upload = new Upload();
+      $upload->setFilename($filename);
+
+      $manager->persist($upload);
+      $manager->flush();
+
+      return $this->json($upload, 200);
+    }
+
+    return $this->json("Une erreur est survenue pendant le téléchargement du fichier", 404);
   }
 
 

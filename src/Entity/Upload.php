@@ -15,6 +15,7 @@ class Upload
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("upload:read")
      * @Groups("product:read")
      * @Groups("vendor:read")
      * @Groups("clip:read")
@@ -23,6 +24,7 @@ class Upload
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("upload:read")
      * @Groups("product:read")
      * @Groups("vendor:read")
      * @Groups("clip:read")
@@ -31,7 +33,8 @@ class Upload
     private $filename;
 
     /**
-     * @ORM\Column(type="datetime_immutable")
+     * @ORM\Column(type="datetime")
+     * @Groups("upload:read")
      * @Groups("product:read")
      * @Groups("vendor:read")
      * @Groups("clip:read")
@@ -43,6 +46,12 @@ class Upload
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="uploads")
      */
     private $product;
+
+    
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
+    }
 
     public function getId(): ?int
     {
@@ -61,12 +70,12 @@ class Upload
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    public function setCreatedAt(\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
 
