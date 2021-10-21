@@ -19,6 +19,7 @@ class Upload
      * @Groups("product:read")
      * @Groups("vendor:read")
      * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $id;
 
@@ -29,6 +30,7 @@ class Upload
      * @Groups("vendor:read")
      * @Groups("clip:read")
      * @Groups("category:read")
+     * @Groups("live:read")
      */
     private $filename;
 

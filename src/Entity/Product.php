@@ -21,6 +21,7 @@ class Product
      * @Groups("vendor:read")
      * @Groups("clip:read")
      * @Groups("category:read")
+     * @Groups("live:read")
      */
     private $id;
 
@@ -30,6 +31,7 @@ class Product
      * @Groups("vendor:read")
      * @Groups("clip:read")
      * @Groups("category:read")
+     * @Groups("live:read")
      */
     private $title;
 
@@ -100,6 +102,7 @@ class Product
      * @Groups("vendor:read")
      * @Groups("clip:read")
      * @Groups("category:read")
+     * @Groups("live:read")
      */
     private $uploads;
 
@@ -109,15 +112,15 @@ class Product
     private $clips;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Live::class, mappedBy="products")
+     * @ORM\OneToMany(targetEntity=LiveProducts::class, mappedBy="product")
      */
-    private $lives;
+    private $liveProducts;
 
     public function __construct()
     {
         $this->uploads = new ArrayCollection();
         $this->clips = new ArrayCollection();
-        $this->lives = new ArrayCollection();
+        $this->liveProducts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -294,27 +297,30 @@ class Product
     }
 
     /**
-     * @return Collection|Live[]
+     * @return Collection|LiveProducts[]
      */
-    public function getLives(): Collection
+    public function getLiveProducts(): Collection
     {
-        return $this->lives;
+        return $this->liveProducts;
     }
 
-    public function addLive(Live $live): self
+    public function addLiveProduct(LiveProducts $liveProduct): self
     {
-        if (!$this->lives->contains($live)) {
-            $this->lives[] = $live;
-            $live->addProduct($this);
+        if (!$this->liveProducts->contains($liveProduct)) {
+            $this->liveProducts[] = $liveProduct;
+            $liveProduct->setProduct($this);
         }
 
         return $this;
     }
 
-    public function removeLive(Live $live): self
+    public function removeLiveProduct(LiveProducts $liveProduct): self
     {
-        if ($this->lives->removeElement($live)) {
-            $live->removeProduct($this);
+        if ($this->liveProducts->removeElement($liveProduct)) {
+            // set the owning side to null (unless already changed)
+            if ($liveProduct->getProduct() === $this) {
+                $liveProduct->setProduct(null);
+            }
         }
 
         return $this;

@@ -17,41 +17,54 @@ class Live
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("live:read")
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="lives")
+     * @Groups("live:read")
      */
     private $vendor;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups("live:read")
      * @Groups("clip:read")
      */
     private $views;
 
     /**
      * @ORM\OneToMany(targetEntity=Message::class, mappedBy="live", orphanRemoval=true)
+     * @Groups("live:read")
      * @Groups("clip:read")
      */
     private $messages;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("live:read")
      * @Groups("clip:read")
      */
     private $broadcastId;
 
     /**
      * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="live", orphanRemoval=true)
+     * @Groups("live:read")
      */
     private $clips;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Product::class, inversedBy="lives")
+     * @ORM\OneToMany(targetEntity=LiveProducts::class, mappedBy="live", cascade={"persist"})
+     * @Groups("live:read")
      */
-    private $products;
+    private $liveProducts;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups("live:read")
+     */
+    private $status;
 
     
     public function __construct()
@@ -59,8 +72,9 @@ class Live
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->messages = new ArrayCollection();
         $this->clips = new ArrayCollection();
-        $this->products = new ArrayCollection();
         $this->views = 0;
+        $this->status = 0;
+        $this->liveProducts = new ArrayCollection();
     }
 
 
@@ -128,7 +142,7 @@ class Live
         return $this->broadcastId;
     }
 
-    public function setBroadcastId(string $broadcastId): self
+    public function setBroadcastId(?string $broadcastId): self
     {
         $this->broadcastId = $broadcastId;
 
@@ -166,25 +180,43 @@ class Live
     }
 
     /**
-     * @return Collection|Product[]
+     * @return Collection|LiveProducts[]
      */
-    public function getProducts(): Collection
+    public function getLiveProducts(): Collection
     {
-        return $this->products;
+        return $this->liveProducts;
     }
 
-    public function addProduct(Product $product): self
+    public function addLiveProduct(LiveProducts $liveProduct): self
     {
-        if (!$this->products->contains($product)) {
-            $this->products[] = $product;
+        if (!$this->liveProducts->contains($liveProduct)) {
+            $this->liveProducts[] = $liveProduct;
+            $liveProduct->setLive($this);
         }
 
         return $this;
     }
 
-    public function removeProduct(Product $product): self
+    public function removeLiveProduct(LiveProducts $liveProduct): self
     {
-        $this->products->removeElement($product);
+        if ($this->liveProducts->removeElement($liveProduct)) {
+            // set the owning side to null (unless already changed)
+            if ($liveProduct->getLive() === $this) {
+                $liveProduct->setLive(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getStatus(): ?int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?int $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

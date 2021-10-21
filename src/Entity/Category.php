@@ -17,7 +17,9 @@ class Category
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("product:read")
      * @Groups("category:read")
+     * @Groups("vendor:read")
      */
     private $id;
 

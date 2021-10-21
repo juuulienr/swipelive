@@ -8,6 +8,7 @@ use App\Entity\Live;
 use App\Entity\Category;
 use App\Entity\Follow;
 use App\Entity\Product;
+use App\Entity\LiveProducts;
 use App\Entity\Upload;
 use App\Repository\FollowRepository;
 use App\Repository\VendorRepository;
@@ -103,7 +104,6 @@ class VendorAPIController extends Controller {
   * @Route("/vendor/api/profile/edit", name="vendor_api_profile_edit", methods={"POST"})
   */
   public function editProfile(Request $request, ObjectManager $manager, VendorRepository $vendorRepo, SerializerInterface $serializer) {
-
     if ($json = $request->getContent()) {
       $serializer->deserialize($json, Vendor::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $this->getUser()]);
       $manager->flush();
@@ -170,6 +170,54 @@ class VendorAPIController extends Controller {
 
 
   /**
+   * Editer un produit
+   *
+   * @Route("/vendor/api/products/edit/{id}", name="vendor_api_product_edit", methods={"POST"})
+   */
+  public function editProduct(Product $product, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $serializer->deserialize($json, Product::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $product]);
+      $manager->flush();
+
+      return $this->json($product, 200, [], ['groups' => 'product:read'], 200);
+    }
+
+    return $this->json([ "error" => "Une erreur est survenue"], 404);
+  }
+
+
+  /**
+   * Editer un produit
+   *
+   * @Route("/vendor/api/products/delete/{id}", name="vendor_api_product_delete", methods={"GET"})
+   */
+  public function deleteProduct(Product $product, Request $request, ObjectManager $manager) {
+    if ($product) {
+      if ($product->getUploads()->toArray()) {
+        foreach ($product->getUploads()->toArray() as $upload) {
+          $filePath = $this->getParameter('uploads_directory') . '/' . $upload->getFilename();
+
+          if (file_exists($filePath)) {
+            $filesystem = new Filesystem();
+            $filesystem->remove($filePath);
+
+            $manager->remove($upload);
+            $manager->flush();
+          }
+        }
+      }
+
+      $manager->remove($product);
+      $manager->flush();
+
+      return $this->json(true, 200);
+    }
+
+    return $this->json([ "error" => "Le produit est introuvable"], 404);
+  }
+
+
+  /**
    * Ajouter une image
    *
    * @Route("/vendor/api/products/upload/add", name="vendor_api_upload_add", methods={"POST"})
@@ -222,7 +270,74 @@ class VendorAPIController extends Controller {
 
 
   /**
-   * Suivre une personne
+   * Préparer un live
+   *
+   * @Route("/vendor/api/prelive", name="vendor_api_prelive_step1", methods={"POST"})
+   */
+  public function prelive(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $live = $serializer->deserialize($json, Live::class, "json");
+      $live->setVendor($this->getUser());
+
+      $manager->persist($live);
+      $manager->flush();
+
+      return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+    }
+
+    return $this->json([ "error" => "Une erreur est survenue"], 404);
+  }
+
+
+  /**
+   * Editer un liveproduct   
+   * 
+   * @Route("/vendor/api/liveproducts/edit/{id}", name="vendor_api_liveproducts_edit", methods={"PUT"})
+   */
+  public function prelive2(LiveProducts $liveProduct, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $serializer->deserialize($json, LiveProducts::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $liveProduct]);
+      $manager->flush();
+
+      return $this->json(true, 200);
+    }
+
+    return $this->json(false, 404);
+  }
+
+
+  // /**
+  //  * Préparer un live (Etape 2)
+  //  *
+  //  * @Route("/vendor/api/prelive/product", name="vendor_api_prelive_step2", methods={"POST"})
+  //  */
+  // public function liveProducts(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  //   if ($json = $request->getContent()) {
+  //     $live = $serializer->deserialize($json, Live::class, "json");
+  //     $live->setVendor($this->getUser());
+
+  //     $manager->persist($live);
+  //     $manager->flush();
+
+  //     return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+  //   }
+
+  //   return $this->json([ "error" => "Une erreur est survenue"], 404);
+  // }
+
+
+  /**
+   * Récupérer un live
+   *
+   * @Route("/vendor/api/live/{id}", name="vendor_api_live", methods={"GET"})
+   */
+  public function live(Live $live, Request $request, ObjectManager $manager) {
+    return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+  }
+
+
+  /**
+   * Follow/Unfollow un vendeur
    *
    * @Route("/vendor/api/follow/vendor/{id}", name="vendor_api_follow", methods={"GET"})
    */
