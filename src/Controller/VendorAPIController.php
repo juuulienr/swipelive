@@ -355,7 +355,7 @@ class VendorAPIController extends Controller {
    */
   public function stopLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
-      $serializer->deserialize($json, Live::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $live]);
+      $live->setStatus(2);
       $manager->flush();
 
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
