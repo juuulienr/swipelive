@@ -334,8 +334,8 @@ class VendorAPIController extends Controller {
     $result = json_decode($result);
     curl_close($ch);
 
-    if (sizeof($result->results) > 0) {
-      $broadcastId = $result->results[0]->id;
+    // if (sizeof($result->results) > 0) {
+      // $broadcastId = $result->results[0]->id;
       $channel = "channel" . $live->getId();
       $event = "event" . $live->getId();
 
@@ -349,7 +349,7 @@ class VendorAPIController extends Controller {
 
       $live->setChannel($channel);
       $live->setEvent($event);
-      $live->setBroadcastId($broadcastId);
+      // $live->setBroadcastId($broadcastId);
       $live->setStatus(1);
       $manager->flush();
 
