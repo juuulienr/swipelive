@@ -6,6 +6,7 @@ use App\Entity\Vendor;
 use App\Entity\Clip;
 use App\Entity\Live;
 use App\Entity\Category;
+use App\Entity\Message;
 use App\Entity\Follow;
 use App\Entity\Product;
 use App\Entity\LiveProducts;
@@ -306,26 +307,6 @@ class VendorAPIController extends Controller {
   }
 
 
-  // /**
-  //  * Préparer un live (Etape 2)
-  //  *
-  //  * @Route("/vendor/api/prelive/product", name="vendor_api_prelive_step2", methods={"POST"})
-  //  */
-  // public function liveProducts(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-  //   if ($json = $request->getContent()) {
-  //     $live = $serializer->deserialize($json, Live::class, "json");
-  //     $live->setVendor($this->getUser());
-
-  //     $manager->persist($live);
-  //     $manager->flush();
-
-  //     return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
-  //   }
-
-  //   return $this->json([ "error" => "Une erreur est survenue"], 404);
-  // }
-
-
   /**
    * Récupérer un live
    *
@@ -334,6 +315,83 @@ class VendorAPIController extends Controller {
   public function live(Live $live, Request $request, ObjectManager $manager) {
     return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
   }
+
+
+  /**
+   * Mettre à jour un live
+   *
+   * @Route("/vendor/api/live/update/{id}", name="vendor_api_live_update", methods={"PUT"})
+   */
+  public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $serializer->deserialize($json, Live::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $live]);
+      $channel = "channel" . $live->getId();
+      $event = "event" . $live->getId();
+
+      $options = [
+        'cluster' => 'eu',
+        'useTLS' => true
+      ];
+
+      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', $options);
+      $pusher->trigger($channel, $event, "Début du live");
+
+      $live->setChannel($channel);
+      $live->setEvent($event);
+      $live->setStatus(1);
+      $manager->flush();
+
+      return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+    }
+
+    return $this->json(false, 404);
+  }
+
+
+  /**
+   * Arreter un live
+   *
+   * @Route("/vendor/api/live/stop/{id}", name="vendor_api_live_stop", methods={"PUT"})
+   */
+  public function stopLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $serializer->deserialize($json, Live::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $live]);
+      $manager->flush();
+
+      return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+    }
+
+    return $this->json(false, 404);
+  }
+
+
+
+  /**
+   * Ajouter un message pendant le live
+   *
+   * @Route("/vendor/api/live/{id}/message/add", name="vendor_api_live_message_add", methods={"GET"})
+   */
+  public function addMessage(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
+
+      $message = new Message();
+      $message->setContent($param["content"]);
+      $message->setVendor($vendor);
+      $message->setLive($live);
+
+      $options = [
+        'cluster' => 'eu',
+        'useTLS' => true
+      ];
+
+      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', $options);
+      $pusher->trigger($channel, $event, $param["content"]);
+
+      return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+    }
+  }
+
 
 
   /**

@@ -24,6 +24,12 @@
         <!-- ###+ nelmio/cors-bundle ### -->
         <env name="CORS_ALLOW_ORIGIN" value="^http?://(localhost|127\.0\.0\.1)(:[0-9]+)?$"/>
         <!-- ###- nelmio/cors-bundle ### -->
+
+        <!-- ###+ pusher/pusher-php-server ### -->
+        <env name="PUSHER_APP_ID" value=""/>
+        <env name="PUSHER_KEY" value=""/>
+        <env name="PUSHER_SECRET" value=""/>
+        <!-- ###- pusher/pusher-php-server ### -->
     </php>
 
     <testsuites>

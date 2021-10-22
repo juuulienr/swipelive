@@ -66,6 +66,24 @@ class Live
      */
     private $status;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("live:read")
+     */
+    private $channel;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("live:read")
+     */
+    private $event;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups("live:read")
+     */
+    private $display;
+
     
     public function __construct()
     {
@@ -74,6 +92,7 @@ class Live
         $this->clips = new ArrayCollection();
         $this->views = 0;
         $this->status = 0;
+        $this->display = 0;
         $this->liveProducts = new ArrayCollection();
     }
 
@@ -217,6 +236,42 @@ class Live
     public function setStatus(?int $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getChannel(): ?string
+    {
+        return $this->channel;
+    }
+
+    public function setChannel(?string $channel): self
+    {
+        $this->channel = $channel;
+
+        return $this;
+    }
+
+    public function getEvent(): ?string
+    {
+        return $this->event;
+    }
+
+    public function setEvent(?string $event): self
+    {
+        $this->event = $event;
+
+        return $this;
+    }
+
+    public function getDisplay(): ?int
+    {
+        return $this->display;
+    }
+
+    public function setDisplay(?int $display): self
+    {
+        $this->display = $display;
 
         return $this;
     }
