@@ -323,8 +323,19 @@ class VendorAPIController extends Controller {
    * @Route("/vendor/api/live/update/{id}", name="vendor_api_live_update", methods={"PUT"})
    */
   public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    if ($json = $request->getContent()) {
-      $serializer->deserialize($json, Live::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $live]);
+    $url = "https://api.bambuser.com/broadcasts?limit=1&titleContains=Live" . $live->getId();
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+    curl_setopt($ch, CURLOPT_URL, $url);
+
+    $result = curl_exec($ch);
+    $result = json_decode($result);
+    curl_close($ch);
+
+    if (sizeof($result->results) > 0) {
+      $broadcastId = $result->results[0]->id;
       $channel = "channel" . $live->getId();
       $event = "event" . $live->getId();
 
@@ -338,13 +349,14 @@ class VendorAPIController extends Controller {
 
       $live->setChannel($channel);
       $live->setEvent($event);
+      $live->setBroadcastId($broadcastId);
       $live->setStatus(1);
       $manager->flush();
 
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+    } else {
+      return $this->json(false, 404);
     }
-
-    return $this->json(false, 404);
   }
 
 
