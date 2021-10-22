@@ -85,6 +85,7 @@ class Vendor implements UserInterface
      * @Groups("vendor:read")
      * @Groups("vendor:edit")
      * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $firstname;
 
@@ -93,6 +94,7 @@ class Vendor implements UserInterface
      * @Groups("vendor:read")
      * @Groups("vendor:edit")
      * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $lastname;
 

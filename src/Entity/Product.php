@@ -61,6 +61,7 @@ class Product
      * @Groups("vendor:read")
      * @Groups("clip:read")
      * @Groups("category:read")
+     * @Groups("live:read")
      */
     private $online;
 
@@ -70,6 +71,7 @@ class Product
      * @Groups("vendor:read")
      * @Groups("clip:read")
      * @Groups("category:read")
+     * @Groups("live:read")
      */
     private $price;
 
@@ -79,6 +81,7 @@ class Product
      * @Groups("vendor:read")
      * @Groups("clip:read")
      * @Groups("category:read")
+     * @Groups("live:read")
      */
     private $compareAtPrice;
 
@@ -86,6 +89,7 @@ class Product
      * @ORM\Column(type="integer", nullable=true)
      * @Groups("product:read")
      * @Groups("vendor:read")
+     * @Groups("live:read")
      */
     private $quantity;
 
