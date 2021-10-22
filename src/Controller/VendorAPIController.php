@@ -354,9 +354,9 @@ class VendorAPIController extends Controller {
       $manager->flush();
 
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
-    } else {
-      return $this->json(false, 404);
-    }
+    // } else {
+      // return $this->json(false, 404);
+    // }
   }
 
 
