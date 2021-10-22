@@ -28,6 +28,7 @@ class Message
      * @ORM\Column(type="integer")
      * @Groups("clip:read")
      * @Groups("message:read")
+     * @Groups("live:read")
      */
     private $type;
 
@@ -35,18 +36,21 @@ class Message
      * @ORM\Column(type="datetime")
      * @Groups("clip:read")
      * @Groups("message:read")
+     * @Groups("live:read")
      */
     private $createdAt;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="messages")
      * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="messages")
      * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $vendor;
 
@@ -54,6 +58,7 @@ class Message
      * @ORM\Column(type="string", length=255)
      * @Groups("clip:read")
      * @Groups("message:read")
+     * @Groups("live:read")
      */
     private $content;
 
