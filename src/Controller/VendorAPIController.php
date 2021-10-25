@@ -338,6 +338,7 @@ class VendorAPIController extends Controller {
       // $broadcastId = $result->results[0]->id;
       $channel = "channel" . $live->getId();
       $event = "event" . $live->getId();
+      $vendor = $this->getUser();
 
       $options = [
         'cluster' => 'eu',
@@ -345,7 +346,8 @@ class VendorAPIController extends Controller {
       ];
 
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', $options);
-      $pusher->trigger($channel, $event, "Début du live");
+      $data = [ "content" => "Début du live", "user" => "", "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), "picture" => $vendor->getPicture() ];
+      $pusher->trigger($channel, $event, $data);
 
       $live->setChannel($channel);
       $live->setEvent($event);
@@ -381,16 +383,20 @@ class VendorAPIController extends Controller {
   /**
    * Ajouter un message pendant le live
    *
-   * @Route("/vendor/api/live/{id}/message/add", name="vendor_api_live_message_add", methods={"GET"})
+   * @Route("/vendor/api/live/{id}/message/add", name="vendor_api_live_message_add", methods={"POST"})
    */
   public function addMessage(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
+      $content = $param["content"];
+      $vendor = $this->getUser();
 
       $message = new Message();
-      $message->setContent($param["content"]);
+      $message->setContent($content);
       $message->setVendor($vendor);
       $message->setLive($live);
+      $manager->persist($message);
+      $manager->flush();
 
       $options = [
         'cluster' => 'eu',
@@ -398,7 +404,8 @@ class VendorAPIController extends Controller {
       ];
 
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', $options);
-      $pusher->trigger($channel, $event, $param["content"]);
+      $data = [ "content" => $content, "user" => "", "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), "picture" => $vendor->getPicture() ];
+      $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
     }

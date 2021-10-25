@@ -19,6 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class APIController extends Controller {
 
@@ -26,11 +27,18 @@ class APIController extends Controller {
   /**
    * @Route("/api/feed", name="api_feed", methods={"GET"})
    */
-  public function feed(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
+  public function feed(Request $request, ObjectManager $manager, ClipRepository $clipRepo, LiveRepository $liveRepo, SerializerInterface $serializer)
   {
-    $clips = $clipRepo->findAll();
+    $lives = $liveRepo->findByLive();
+    $clips = $clipRepo->findByClip();
 
-    return $this->json($clips, 200, [], ['groups' => 'clip:read']);
+    $array = [
+      'clips' => $serializer->serialize($clips, "json", ['groups' => 'clip:read']),
+      'lives' => $serializer->serialize($lives, "json", ['groups' => 'live:read'])
+    ];
+// return new JsonResponse($array, 200, [], true);
+
+    return $this->json($array, 200);
   }
 
 

@@ -19,6 +19,18 @@ class LiveRepository extends ServiceEntityRepository
         parent::__construct($registry, Live::class);
     }
 
+
+    public function findByLive(){
+        return $this->createQueryBuilder('l')
+                    ->andWhere('l.broadcastId IS NOT NULL')
+                    ->andWhere('l.status = 1')
+                    // ->orderBy('RAND()')
+                    // ->setMaxResults($limit)
+                    ->getQuery()
+                    ->getResult();
+    }
+
+
     // /**
     //  * @return Live[] Returns an array of Live objects
     //  */

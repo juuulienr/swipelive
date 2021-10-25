@@ -19,6 +19,13 @@ class ClipRepository extends ServiceEntityRepository
         parent::__construct($registry, Clip::class);
     }
 
+
+    public function findByClip(){
+        return $this->createQueryBuilder('c')
+                    // ->orderBy('RAND()')
+                    ->getQuery()
+                    ->getResult();
+    }
     // /**
     //  * @return Clip[] Returns an array of Clip objects
     //  */
