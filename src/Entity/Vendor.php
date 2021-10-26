@@ -77,6 +77,7 @@ class Vendor implements UserInterface
      * @Groups("vendor:read")
      * @Groups("vendor:edit")
      * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $company;
 
@@ -111,6 +112,7 @@ class Vendor implements UserInterface
      * @Groups("vendor:read")
      * @Groups("vendor:edit")
      * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $picture;
 
@@ -152,6 +154,8 @@ class Vendor implements UserInterface
      * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="following")
      * @Groups("vendor:read")
      * @Groups("vendor:edit")
+     * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $followers;
 

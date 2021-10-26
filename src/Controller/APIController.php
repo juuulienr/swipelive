@@ -30,15 +30,24 @@ class APIController extends Controller {
   public function feed(Request $request, ObjectManager $manager, ClipRepository $clipRepo, LiveRepository $liveRepo, SerializerInterface $serializer)
   {
     $lives = $liveRepo->findByLive();
-    $clips = $clipRepo->findByClip();
+    $array = [];
 
-    $array = [
-      'clips' => $serializer->serialize($clips, "json", ['groups' => 'clip:read']),
-      'lives' => $serializer->serialize($lives, "json", ['groups' => 'live:read'])
-    ];
-// return new JsonResponse($array, 200, [], true);
+    if ($lives) {
+      foreach ($lives as $live) {
+        $array[] = [ "type" => "live", "value" => $serializer->serialize($live, "json", ['groups' => 'live:read']) ];
+      }
+    }
 
-    return $this->json($array, 200);
+    if (sizeof($lives) != 10) {
+      $clips = $clipRepo->findByClip(10 - sizeof($lives));
+      if ($clips) {
+        foreach ($clips as $clip) {
+          $array[] = [ "type" => "clip", "value" => $serializer->serialize($clip, "json", ['groups' => 'clip:read']) ];
+        }
+      }
+    }
+
+    return $this->json($array);
   }
 
 
