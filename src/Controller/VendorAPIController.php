@@ -334,8 +334,10 @@ class VendorAPIController extends Controller {
     $result = json_decode($result);
     curl_close($ch);
 
-    // if (sizeof($result->results) > 0) {
-      // $broadcastId = $result->results[0]->id;
+    if (sizeof($result->results) > 0) {
+      $broadcastId = $result->results[0]->id;
+      $resourceUri = $result->results[0]->resourceUri;
+      $thumbnail = $result->results[0]->preview;
       $channel = "channel" . $live->getId();
       $event = "event" . $live->getId();
       $vendor = $this->getUser();
@@ -351,14 +353,16 @@ class VendorAPIController extends Controller {
 
       $live->setChannel($channel);
       $live->setEvent($event);
-      // $live->setBroadcastId($broadcastId);
+      $live->setBroadcastId($broadcastId);
+      $live->setResourceUri($resourceUri);
+      $live->setThumbnail($thumbnail);
       $live->setStatus(1);
       $manager->flush();
 
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
-    // } else {
-      // return $this->json(false, 404);
-    // }
+    } else {
+      return $this->json(false, 404);
+    }
   }
 
 

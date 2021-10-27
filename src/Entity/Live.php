@@ -84,6 +84,17 @@ class Live
      */
     private $display;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Groups("live:read")
+     */
+    private $resourceUri;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $thumbnail;
+
     
     public function __construct()
     {
@@ -272,6 +283,30 @@ class Live
     public function setDisplay(?int $display): self
     {
         $this->display = $display;
+
+        return $this;
+    }
+
+    public function getResourceUri(): ?string
+    {
+        return $this->resourceUri;
+    }
+
+    public function setResourceUri(?string $resourceUri): self
+    {
+        $this->resourceUri = $resourceUri;
+
+        return $this;
+    }
+
+    public function getThumbnail(): ?string
+    {
+        return $this->thumbnail;
+    }
+
+    public function setThumbnail(?string $thumbnail): self
+    {
+        $this->thumbnail = $thumbnail;
 
         return $this;
     }

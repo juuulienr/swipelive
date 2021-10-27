@@ -24,7 +24,8 @@ class LiveRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('l')
                     ->andWhere('l.broadcastId IS NOT NULL')
                     // ->andWhere('l.status = 1')
-                    ->orderBy('RAND()')
+                    // ->orderBy('RAND()')
+                    ->orderBy('l.status = 1')
                     ->setMaxResults(10)
                     ->getQuery()
                     ->getResult();
