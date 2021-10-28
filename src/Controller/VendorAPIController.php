@@ -323,6 +323,33 @@ class VendorAPIController extends Controller {
    * @Route("/vendor/api/live/update/{id}", name="vendor_api_live_update", methods={"PUT"})
    */
   public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    $channel = "channel" . $live->getId();
+    $event = "event" . $live->getId();
+    $vendor = $this->getUser();
+
+    $options = [
+      'cluster' => 'eu',
+      'useTLS' => true
+    ];
+
+    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', $options);
+    $data = [ "content" => "Début du live", "user" => "", "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), "picture" => $vendor->getPicture() ];
+    $pusher->trigger($channel, $event, $data);
+
+    $live->setChannel($channel);
+    $live->setEvent($event);
+    $manager->flush();
+
+    return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+  }
+
+
+  /**
+   * Mettre à jour le live avec bambuser
+   *
+   * @Route("/vendor/api/live/bambuser/{id}", name="vendor_api_live_bambuser", methods={"PUT"})
+   */
+  public function updateBambuser(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     $url = "https://api.bambuser.com/broadcasts?limit=1&titleContains=Live" . $live->getId();
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
@@ -338,28 +365,15 @@ class VendorAPIController extends Controller {
       $broadcastId = $result->results[0]->id;
       $resourceUri = $result->results[0]->resourceUri;
       $thumbnail = $result->results[0]->preview;
-      $channel = "channel" . $live->getId();
-      $event = "event" . $live->getId();
       $vendor = $this->getUser();
 
-      $options = [
-        'cluster' => 'eu',
-        'useTLS' => true
-      ];
-
-      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', $options);
-      $data = [ "content" => "Début du live", "user" => "", "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), "picture" => $vendor->getPicture() ];
-      $pusher->trigger($channel, $event, $data);
-
-      $live->setChannel($channel);
-      $live->setEvent($event);
       $live->setBroadcastId($broadcastId);
       $live->setResourceUri($resourceUri);
       $live->setThumbnail($thumbnail);
       $live->setStatus(1);
       $manager->flush();
 
-      return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+      return $this->json(true, 200);
     } else {
       return $this->json(false, 404);
     }
