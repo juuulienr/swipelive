@@ -56,6 +56,7 @@ class Live
 
     /**
      * @ORM\OneToMany(targetEntity=LiveProducts::class, mappedBy="live", cascade={"persist"})
+     * @ORM\OrderBy({"priority" = "ASC"})
      * @Groups("live:read")
      */
     private $liveProducts;
@@ -92,8 +93,15 @@ class Live
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("live:read")
      */
     private $thumbnail;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups("live:read")
+     */
+    private $createdAt;
 
     
     public function __construct()
@@ -103,7 +111,7 @@ class Live
         $this->clips = new ArrayCollection();
         $this->views = 0;
         $this->status = 0;
-        $this->display = 0;
+        $this->display = 1;
         $this->liveProducts = new ArrayCollection();
     }
 
@@ -307,6 +315,18 @@ class Live
     public function setThumbnail(?string $thumbnail): self
     {
         $this->thumbnail = $thumbnail;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }
