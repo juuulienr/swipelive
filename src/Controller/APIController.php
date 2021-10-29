@@ -25,6 +25,8 @@ class APIController extends Controller {
 
 
   /**
+   * Afficher le feed
+   *
    * @Route("/api/feed", name="api_feed", methods={"GET"})
    */
   public function feed(Request $request, ObjectManager $manager, ClipRepository $clipRepo, LiveRepository $liveRepo, SerializerInterface $serializer)
@@ -50,8 +52,21 @@ class APIController extends Controller {
     return $this->json($array);
   }
 
+  /**
+   * Afficher les 10 derniers clips
+   *
+   * @Route("/api/clips/last", name="api_clips_last", methods={"GET"})
+   */
+  public function lastClips(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
+  {
+    $clips = $clipRepo->findByClip(10);
+
+    return $this->json($clips, 200, [], ['groups' => 'clip:read']);
+  }
 
   /**
+   * Afficher les messages
+   *
    * @Route("/api/live/{id}/messages", name="api_live_messages", methods={"GET"})
    */
   public function messages(Live $live, Request $request, ObjectManager $manager)
@@ -62,6 +77,8 @@ class APIController extends Controller {
   }
 
   /**
+   * Afficher le profil
+   *
    * @Route("/api/profile/{id}", name="api_profile", methods={"GET"})
    */
   public function profile(Vendor $vendor, Request $request, ObjectManager $manager)

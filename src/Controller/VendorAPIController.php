@@ -340,7 +340,6 @@ class VendorAPIController extends Controller {
         "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), 
         "picture" => $vendor->getPicture()
       ], 
-      "display" => []
     ];
     $pusher->trigger($channel, $event, $data);
 
@@ -366,6 +365,8 @@ class VendorAPIController extends Controller {
       $live->setDisplay($display);
       $manager->flush();
 
+      // enregistrer la durée pour créer et récupérer le clip
+
       $options = [
         'cluster' => 'eu',
         'useTLS' => true
@@ -373,8 +374,37 @@ class VendorAPIController extends Controller {
 
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', $options);
       $data = [
-        "message" => [], 
         "display" => $display
+      ];
+      $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
+
+      return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+    }
+  }
+
+
+  /**
+   * Mettre à jour les views
+   *
+   * @Route("/vendor/api/live/{id}/update/views", name="vendor_api_live_update_views", methods={"PUT"})
+   */
+  public function updateViews(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
+      $views = $param["views"];
+      $vendor = $this->getUser();
+
+      $live->setViews($views);
+      $manager->flush();
+
+      $options = [
+        'cluster' => 'eu',
+        'useTLS' => true
+      ];
+
+      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', $options);
+      $data = [
+        "views" => $views 
       ];
       $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
@@ -467,8 +497,7 @@ class VendorAPIController extends Controller {
           "user" => "", 
           "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), 
           "picture" => $vendor->getPicture()
-        ], 
-        "display" => []
+        ]
       ];
       $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
