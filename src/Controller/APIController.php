@@ -137,43 +137,41 @@ class APIController extends Controller {
     return $this->json($products, 200, [], ['groups' => 'product:read']);
   }
 
+  // /**
+  //  * Ajouter un message pendant le live
+  //  *
+  //  * @Route("/api/live/{id}/message/add", name="api_live_message_add", methods={"POST"})
+  //  */
+  // public function addMessage(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  //   if ($json = $request->getContent()) {
+  //     $param = json_decode($json, true);
+  //     $content = $param["content"];
+  //     $vendor = $this->getUser();
 
+  //     $message = new Message();
+  //     $message->setContent($content);
+  //     $message->setVendor($vendor);
+  //     $message->setLive($live);
+  //     $manager->persist($message);
+  //     $manager->flush();
 
-  /**
-   * Ajouter un message pendant le live
-   *
-   * @Route("/api/live/{id}/message/add", name="api_live_message_add", methods={"POST"})
-   */
-  public function addMessage(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    if ($json = $request->getContent()) {
-      $param = json_decode($json, true);
-      $content = $param["content"];
-      $vendor = $this->getUser();
+  //     $options = [
+  //       'cluster' => 'eu',
+  //       'useTLS' => true
+  //     ];
 
-      $message = new Message();
-      $message->setContent($content);
-      $message->setVendor($vendor);
-      $message->setLive($live);
-      $manager->persist($message);
-      $manager->flush();
+  //     $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', $options);
+  //     $data = [
+  //       "message" => [
+  //         "content" => $content, 
+  //         "user" => "", 
+  //         "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), 
+  //         "picture" => $vendor->getPicture()
+  //       ]
+  //     ];
+  //     $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
-      $options = [
-        'cluster' => 'eu',
-        'useTLS' => true
-      ];
-
-      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', $options);
-      $data = [
-        "message" => [
-          "content" => $content, 
-          "user" => "", 
-          "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), 
-          "picture" => $vendor->getPicture()
-        ]
-      ];
-      $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
-
-      return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
-    }
-  }
+  //     return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+  //   }
+  // }
 }
