@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : mer. 27 oct. 2021 à 15:32
+-- Généré le : ven. 29 oct. 2021 à 14:56
 -- Version du serveur :  5.7.32
 -- Version de PHP : 7.4.12
 
@@ -105,17 +105,18 @@ CREATE TABLE `live` (
   `event` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `display` int(11) DEFAULT NULL,
   `resource_uri` longtext COLLATE utf8mb4_unicode_ci,
-  `thumbnail` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `thumbnail` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `live`
 --
 
-INSERT INTO `live` (`id`, `vendor_id`, `broadcast_id`, `views`, `status`, `channel`, `event`, `display`, `resource_uri`, `thumbnail`) VALUES
-(32, 1, '3c4f77dc-71ee-4190-b2af-afc6edfb54c6', 0, 2, 'channel32', 'event32', 0, 'https://cdn.bambuser.net/broadcasts/5ba0bee3-94e8-4120-a804-3a1ecbfef417?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328744&da_static=1&da_ttl=0&da_signature=cc1a826dbcb71986ef8c6c613d9b1d2680682514be15a58ffbaba02b6278778e', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg'),
-(35, 1, 'fff9859f-5da3-42fc-b941-0bb1484dd88f', 0, 2, 'channel35', 'event35', 0, 'https://cdn.bambuser.net/broadcasts/fff9859f-5da3-42fc-b941-0bb1484dd88f?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328744&da_static=1&da_ttl=0&da_signature=66aa05df995765d594455a05448651979a642ae088b330205eba292a8b002e3a', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg'),
-(36, 2, '00e507b9-f8a5-4226-9a49-26168d9bec24', 0, 2, 'channel36', 'event36', 0, 'https://cdn.bambuser.net/broadcasts/00e507b9-f8a5-4226-9a49-26168d9bec24?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328759&da_static=1&da_ttl=0&da_signature=87038f000ef54cdd1afbe4d8451cd269fc896204ececaff49ba8eda8402eef47', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg');
+INSERT INTO `live` (`id`, `vendor_id`, `broadcast_id`, `views`, `status`, `channel`, `event`, `display`, `resource_uri`, `thumbnail`, `created_at`) VALUES
+(32, 1, '3c4f77dc-71ee-4190-b2af-afc6edfb54c6', 0, 2, 'channel32', 'event32', 1, 'https://cdn.bambuser.net/broadcasts/5ba0bee3-94e8-4120-a804-3a1ecbfef417?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328744&da_static=1&da_ttl=0&da_signature=cc1a826dbcb71986ef8c6c613d9b1d2680682514be15a58ffbaba02b6278778e', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg', NULL),
+(35, 1, 'fff9859f-5da3-42fc-b941-0bb1484dd88f', 0, 2, 'channel35', 'event35', 1, 'https://cdn.bambuser.net/broadcasts/fff9859f-5da3-42fc-b941-0bb1484dd88f?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328744&da_static=1&da_ttl=0&da_signature=66aa05df995765d594455a05448651979a642ae088b330205eba292a8b002e3a', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg', NULL),
+(36, 2, '00e507b9-f8a5-4226-9a49-26168d9bec24', 0, 2, 'channel36', 'event36', 1, 'https://cdn.bambuser.net/broadcasts/00e507b9-f8a5-4226-9a49-26168d9bec24?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635410286&da_static=1&da_ttl=0&da_signature=2897c28e4ee0ab5f776a61426b473e5c7e5809f07e9e843c18a237d3c13fb9e5', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8wMGU1MDdiOS1mOGE1LTQyMjYtOWE0OS0yNjE2OGQ5YmVjMjQifQ==/preview.jpg', NULL);
 
 -- --------------------------------------------------------
 
@@ -191,7 +192,9 @@ CREATE TABLE `product` (
 INSERT INTO `product` (`id`, `category_id`, `vendor_id`, `description`, `online`, `price`, `compare_at_price`, `quantity`, `tracking`, `title`) VALUES
 (1, 8, 1, 'Un tapis léger et au toucher velours, vous pouvez emmener ce tapis dans tous vos cours de yoga\r\n\r\nLa douceur de ce tapis vous invite à un rendez-vous régulier avec votre pratique. Léger, il vous accompagne de la maison au studio. Ses marquages discrets vous guident vers une meilleure posture.', 1, 25, 30, 50, 1, 'Tapis de yoga'),
 (2, 1, 1, 'Laissez-vous envoûter par les pouvoirs revitalisants et protecteurs de l’huile de Figue de Barbarie ! \r\n\r\nLa gamme à l’huile de Figue de Barbarie de Youarda.C est un véritable concentré de bienfaits pour vos cheveux, elle nourrit votre cuir chevelu en profondeur, favorise la micro-circulation et hydrate le cheveu.\r\n\r\n', 1, 39.9, 49.9, 23, 1, 'Gamme Ricin'),
-(8, 6, 1, 'Test', 1, 79.99, 99.99, 10, 1, 'Veste sandro');
+(8, 6, 1, 'Test', 1, 79.99, 99.99, 10, 1, 'Veste sandro'),
+(9, 9, 2, 'Rehaussez vos séances de jeu avec des chargements à la vitesse de l’éclair grâce au disque SSD ultrarapide, une meilleure immersion grâce au retour haptique, aux gâchettes adaptatives et à la technologie audio 3D, et l’incroyable catalogue de jeux PlayStation® nouvelle génération.\r\n\r\n', 1, 500, 600, 100, 1, 'Playstation 5'),
+(10, 9, 2, 'Les invitations sont lancées ! Réunissez famille et amis pour vous affronter sur le jeu de plateau le plus déjanté avec Mario Party Superstars dès le 29 octobre sur Nintendo Switch.\r\n\r\nMario, Peach et tous leurs amis sont prêts à faire la fête avec vous sur 5 plateaux issus des versions Nintendo 64. Au début de chaque tour, lancez votre dé pour avancer. Votre but : réunir le plus de pièces possible pour acheter des étoiles et gagner la partie ! Comment ? Affrontez-vous autour de mini-jeux à la fin de chaque tour pour tenter de ramasser le plus de pièces possible. Courses, jeux d’agilité ou de réflexe… 100 mini-jeux issus de toute la série vont vous permettre de défier vos proches.\r\n\r\nAttention sur votre chemin… chaque plateau comporte son lot de surprises et les renversements de situation sont de la partie. Gare aux Roi Boo dans le Pays de l’horreur. Il peut vous voler vos étoiles à tout moment et sans prévenir ! Sur l’Île tropicale de Yoshi, Bowser peut remplacer Toadette n’importe quand et l’étoile peut vous passer sous le nez.\r\n\r\n', 1, 49, 59, 1000, 1, 'Mario party superstars');
 
 -- --------------------------------------------------------
 
@@ -214,7 +217,9 @@ INSERT INTO `upload` (`id`, `product_id`, `filename`, `created_at`) VALUES
 (2, 1, 'pe35c803603d997aed6d236ca.jpeg', '2021-10-15 09:36:18'),
 (3, 2, 'untitled-project-copy-copy-copy_2x_6_2000x.png', '2021-10-15 11:30:22'),
 (4, 2, 'kit-soins-figue-de-barbarie-1_2000x.jpeg', '2021-10-15 11:30:25'),
-(5, 8, '76234632ec0531e3e927584f48d00446.jpeg', '2021-10-15 09:36:18');
+(5, 8, '76234632ec0531e3e927584f48d00446.jpeg', '2021-10-15 09:36:18'),
+(6, 9, '105642.jpeg', '2021-10-28 11:45:15'),
+(7, 10, '113085.jpeg', '2021-10-28 11:48:45');
 
 -- --------------------------------------------------------
 
@@ -260,8 +265,8 @@ CREATE TABLE `vendor` (
 --
 
 INSERT INTO `vendor` (`id`, `email`, `hash`, `push_token`, `created_at`, `company`, `firstname`, `lastname`, `summary`, `picture`, `facebook`, `instagram`, `snapchat`, `pinterest`) VALUES
-(1, 'julienreignierr@gmail.com', '$2y$13$3kA7Taz29ojRAQ3Fc48w0uGJGi6/r70zH5v1sP4euOsJ6VWNQyQP2', NULL, '2021-10-06 11:11:06', 'Julien SAS', 'Julien', 'REIGNIER', 'Boutique de jeux vidéos et accessoires', '1a058cfb9ea95f0acd4fedd647d5bb40.jpg', 'juuulienr', 'juuulienr', 'juuulienr', 'juuulienr'),
-(2, 'c.cheklat@yahoo.fr', '$2y$13$3kA7Taz29ojRAQ3Fc48w0uGJGi6/r70zH5v1sP4euOsJ6VWNQyQP2', NULL, '2021-10-13 13:53:21', 'CHEMS SAS', 'Chems eddine', 'Cheklat', 'Boutique dans la vente de cigarette electronique et cbd et drogue', 'ad5c0d1afe40f225779afda26ff9d4a6.jpg', 'kabyleluxe', 'kabyleluxe', 'kabyleluxe', 'kabyleluxe');
+(1, 'julienreignierr@gmail.com', '$2y$13$3kA7Taz29ojRAQ3Fc48w0uGJGi6/r70zH5v1sP4euOsJ6VWNQyQP2', NULL, '2021-10-06 11:11:06', 'Julien SAS', 'Julien', 'REIGNIER', 'Boutique de vêtements et accessoires', '1a058cfb9ea95f0acd4fedd647d5bb40.jpg', 'juuulienr', 'juuulienr', 'juuulienr', 'juuulienr'),
+(2, 'c.cheklat@yahoo.fr', '$2y$13$3kA7Taz29ojRAQ3Fc48w0uGJGi6/r70zH5v1sP4euOsJ6VWNQyQP2', NULL, '2021-10-13 13:53:21', 'CHEMS SAS', 'Chems eddine', 'Cheklat', 'Boutique de jeux vidéos et accessoires', 'ad5c0d1afe40f225779afda26ff9d4a6.jpg', 'kabyleluxe', 'kabyleluxe', 'kabyleluxe', 'kabyleluxe');
 
 --
 -- Index pour les tables déchargées
@@ -368,31 +373,31 @@ ALTER TABLE `follow`
 -- AUTO_INCREMENT pour la table `live`
 --
 ALTER TABLE `live`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
 
 --
 -- AUTO_INCREMENT pour la table `live_products`
 --
 ALTER TABLE `live_products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=211;
 
 --
 -- AUTO_INCREMENT pour la table `message`
 --
 ALTER TABLE `message`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT pour la table `product`
 --
 ALTER TABLE `product`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT pour la table `upload`
 --
 ALTER TABLE `upload`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT pour la table `user`
