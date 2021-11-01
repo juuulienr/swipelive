@@ -16,24 +16,45 @@ use Symfony\Component\HttpFoundation\Cookie;
 class WebController extends Controller {
 
     /**
-     * @Route("/", name="index")
+     * @Route("/", name="home")
      */
-    public function index(){
+    public function home(){
         return $this->render('web/home.html.twig');
     }
 
     /**
      * @Route("/vendeur", name="vendor")
      */
-    public function vendeur(){
+    public function vendor(){
         return $this->render('web/vendor.html.twig');
     }
 
     /**
      * @Route("/influenceur", name="influencer")
      */
-    public function influenceur(){
+    public function influencer(){
         return $this->render('web/influencer.html.twig');
+    }
+
+    /**
+     * @Route("/termes-et-conditions", name="terms")
+     */
+    public function terms(){
+        return $this->render('web/terms.html.twig');
+    }
+
+    /**
+     * @Route("/politique-de-confidentialite", name="privacy")
+     */
+    public function privacy(){
+        return $this->render('web/privacy.html.twig');
+    }
+
+    /**
+     * @Route("/politique-de-cookies", name="cookies")
+     */
+    public function cookies(){
+        return $this->render('web/cookies.html.twig');
     }
 }
 

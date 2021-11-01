@@ -5,177 +5,31 @@
 {% block metadata %}{% endblock %}
     
 {% block stylesheets %}
-    <link rel="stylesheet" href="css/vendors_app.9cc7dbd1.chunk.css">
-    <link rel="stylesheet" href="css/app.69ec2d8a.css">
-    <link rel="stylesheet" href="css/39.fbd70a22.chunk.css">
-    <link rel="stylesheet" href="css/66.af842e76.chunk.css">
-    <link rel="stylesheet" href="css/41.74ab6540.chunk.css">
+    <link rel="stylesheet" href="css/style.css">
 {% endblock %}
 
 
 {% block body %}
-    <div class="app">
-        <div class="home-page app__contents" style="padding-top: 0;">
-            <section class="home-page__top">
-                <div class="home-page__banner-details">
-                    <div class="home-page__container">
-                        <div class="home-page__row">
-                            <div class="home-page__details">
-                                <h2 class="home-page__header"><span>Swipe </span>  est le shopping en ligne, (re)pensé.</h2>
-                                <div class="home-page__store-buttons-holder">
-                                    <div class="home-page__get-apps">Téléchargez l'application Swipe Live</div>
-                                    <div class="store-buttons home-page__store-buttons store-buttons--responsive">
-                                        <a id="apple-button" href="https://apps.apple.com/us/app/spin-live/id1519146498" target="_blank" class="store-buttons__button" style="padding: 0px;">
-                                            <span class="icon icon--app-store-download">
-                                                <img src="./img/ios.png" style="width: 200px;">
-                                            </span>
-                                        </a>
-                                        <a id="google-play-button" href="https://play.google.com/store/apps/details?id=live.spin.android" target="_blank" class="store-buttons__button" style="padding: 0px;">
-                                            <span class="icon icon--app-store-download">
-                                                <img src="./img/android.png" style="width: 200px;">
-                                            </span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="home-page__phone">
-                                <video src="img/phone-9.mp4" autoplay="autoplay" loop="loop" playsinline muted="muted"></video>
-                                <img src="https://assets.spin.live/9a2220fe-08dd-4c4c-b7c1-1246f83808e4" />
-                                <span class="icon icon--play">
-                                    <svg id="My_Streams" data-name="My Streams" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-                                        <rect id="Container" width="64" height="64" transform="translate(0)" fill="none"></rect>
-                                        <g id="Circle" transform="translate(6 6)" fill="rgba(255,255,255,0.3)" stroke="#fff" stroke-width="3">
-                                            <circle cx="26.5" cy="26.5" r="26.5" stroke="none"></circle>
-                                            <circle cx="26.5" cy="26.5" r="28" fill="none"></circle>
-                                        </g>
-                                        <path
-                                                id="Play_Triangle"
-                                                data-name="Play Triangle"
-                                                d="M8.869,4.8a3,3,0,0,1,5.263,0l6.437,11.754A3,3,0,0,1,17.937,21H5.063a3,3,0,0,1-2.631-4.441Z"
-                                                transform="translate(46 22) rotate(90)"
-                                                fill="#fff"
-                                        ></path>
-                                    </svg>
-                                </span>
-                            </div>
-                        </div>
+    <div id="header" >
+        <img id="logo" height="100" src="img/favicon.png" alt="" />
+    </div>
+    <div id="root">
+        <div id="main">
+            <div class="headline">
+                <h1 class="txt-rotate" data-period="1500" data-rotate='[ "Le shopping (ré)inventé", "Une expérience shopping unique !"]'></h1>
+                <div class="flex" id="download">
+                    <div class="dl-btn">
+                        <a href="#">
+                            <img height="64" src="img/ios.svg" alt="">
+                        </a>
                     </div>
-                </div>
-            </section>
-            <div class="influencer-page__perks">
-                <div class="influencer-page__container">
-                    <h3 class="influencer-page__heading" style="text-align: center"> 👋 Hello les shoppers !</h3>
-                    <div class="influencer-page__row" style="padding:35px 0px" >
-                        <div class="influencer-page__perk-col influencer-page__perk-col--money">
-                            <div class="influencer-page__perk-icon">
-                                <span class="icon icon--stack-of-dollars">
-                                    <img src="img/popcorn.gif" style="width:64px">
-                                </span>
-                            </div>
-                            <div class="influencer-page__perk-details">
-                                <div class="influencer-page__perk-title"> Lives 24/24h</div>
-                                <div class="influencer-page__perk-desc"> Vous regarder, vous achetez, vous êtes livré. C'est aussi simple. </div>
-                            </div>
-                        </div>
-                        <div class="influencer-page__perk-col  influencer-page__perk-col--brands-galore">
-                            <div class="influencer-page__perk-icon">
-                                <span class="icon icon--stack-of-boxes">
-                                    <img src="img/direct.gif" style="width:64px">
-                                </span>
-                            </div>
-                            <div class="influencer-page__perk-details">
-                                <div class="influencer-page__perk-title"> Des marques à volonté </div>
-                                <div class="influencer-page__perk-desc"> Découvrez des centaines de marques au meme endroit. </div>
-                            </div>
-                        </div>
-                        <div class="influencer-page__perk-col  influencer-page__perk-col--live-on">
-                            <div class="influencer-page__perk-icon">
-                                <span class="icon icon--clap-board">
-                                    <img src="img/pouce.gif" style="width:64px">
-                                </span>
-                            </div>
-                            <div class="influencer-page__perk-details">
-                                <div class="influencer-page__perk-title"> Suivez la livraison </div>
-                                <div class="influencer-page__perk-desc"> Détendez-vous et suivez votre colis en direct. Votre colis arrive. </div>
-                            </div>
-                        </div>
-                        <div class="influencer-page__perk-col influencer-page__perk-col--be-famous">
-                            <div class="influencer-page__perk-icon">
-                                <span class="icon icon--group-of-stars">
-                                    <img src="img/trophy.gif" style="width:64px">
-                                </span>
-                            </div>
-                            <div class="influencer-page__perk-details">
-                                <div class="influencer-page__perk-title"> Une experience unique </div>
-                                <div class="influencer-page__perk-desc"> Grace à la puissance du direct, vous avez votre propre vendeur.</div>
-                            </div>
-                        </div>
+                    <div class="dl-btn">
+                        <a href="#">
+                            <img height="64" src="img/android.svg" alt="">
+                        </a>
                     </div>
                 </div>
             </div>
-            <section class="home-page__merchants">
-                <div class="home-page__container">
-                    <div class="home-page__row">
-                        <div class="home-page__merchants-details">
-                            <h2 class="home-page__merchants-header">👋 Hello les vendeurs !</h2>
-                            <div class="home-page__merchants-description">
-                                👉 Présentez vos produits en live. <br />
-                                <br />
-                                👉 Expérience de marque unique. <br />
-                                <br />
-                                👉 Une boutique prêt à l'emploi avec étiquette d'expédition intégrée. <br />
-                                <br />
-                                👉 Fini les algorithmes des réseaux sociaux à maitriser et aucun budgets publicitaires à dépenser.
-                            </div>
-                            <a href="{{ path('vendor')}}">
-                                <button type="button" class="default-button default-button--outline-light default-button--tall default-button--beefed" style="background: #fff;color:#ed6844;box-shadow: 0px 0px 9px -2px rgb(0 0 0 / 50%);">
-                                    <div class="default-button__text" style="font-weight: 500;">
-                                        En savoir plus
-                                    </div>
-                                </button>
-                            </a>
-                        </div>
-                        <div data-500="transform: translate3d(-600px, 0px, 0px); opacity: 0" data-700="transform: translate3d(0px, 0px, 0px); opacity: 1" class="home-page__phone">
-                            <video src="img/full-product-card.mp4" autoplay="autoplay" loop="loop" playsinline muted="muted"></video><img src="https://assets.spin.live/9a2220fe-08dd-4c4c-b7c1-1246f83808e4" />
-                            <div data-700="transform: scale(0.8); opacity: 0" data-900="transform: scale(1); opacity: 1" class="home-page__phone-circle"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section class="home-page__quotes">
-                <div class="home-page__container">
-                    <h2 class="home-page__quotes-header">📱 + 🎬  = <span style="color:#e62d87">Swipe Live</span></h2>
-                </div>
-            </section>
-            <section class="home-page__influencers">
-                <div class="home-page__container">
-                    <div class="home-page__row">
-                        <div class="home-page__influencers-details" style="padding-right: 5rem;">
-                            <h2 class="home-page__influencers-header">❤️ Hello les influencers !</h2>
-                            <div class="home-page__influencers-description">
-                                👉 Un large choix d'articles gratuits. <br />
-                                <br />
-                                👉 Soyez rémunérés pour mettre en scène les produits des marques que vous voulez. <br />
-                                <br />
-                                👉 Plus besoin de jongler avec plusieurs programmes d'affiliation. <br />
-                                <br />
-                                👉 Créér de vrais partenariats avec les marques.
-                            </div>
-                            <a href="{{ path('influencer')}}">
-                                <button type="button" class="default-button default-button--outline-light default-button--tall default-button--beefed" style="background: #fff;color:#ed6844;box-shadow: 0px 0px 9px -2px rgb(0 0 0 / 50%);">
-                                    <div class="default-button__text" style="font-weight: 500;">
-                                        En savoir plus
-                                    </div>
-                                </button>
-                            </a>
-                        </div>
-                        <div data-1300="transform: translate3d(400px, 0px, 0px); opacity: 0" data-1600="transform: translate3d(0px, 0px, 0px); opacity: 1" class="home-page__phone">
-                            <img alt="Hey Influencers!" src="https://assets.spin.live/e5da364b-ffb2-4224-8a97-f45c7bc3f072" />
-                            <div data-700="transform: scale(0.8); opacity: 0" data-900="transform: scale(1); opacity: 1" class="home-page__phone-circle"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-
+        </div>
+    </div>
 {% endblock %}

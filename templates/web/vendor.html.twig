@@ -5,201 +5,31 @@
 {% block metadata %}{% endblock %}
     
 {% block stylesheets %}
-    <link rel="stylesheet" href="css/vendors_app.9cc7dbd1.chunk.css">
-    <link rel="stylesheet" href="css/app.69ec2d8a.css">
-    <link rel="stylesheet" href="css/39.fbd70a22.chunk.css">
-    <link rel="stylesheet" href="css/66.af842e76.chunk.css">
-    <link rel="stylesheet" href="css/19.81df5bf6.chunk.css">
-    <link rel="stylesheet" href="css/41.74ab6540.chunk.css">
+    <link rel="stylesheet" href="css/style.css">
 {% endblock %}
 
 
 {% block body %}
- <div class="app">
-    <div class="home-page app__contents" style="padding-top: 0;">
-        <section class="home-page__top">
-            <div class="home-page__banner-details">
-                <div class="home-page__container">
-                    <div class="home-page__row">
-                        <div class="home-page__details">
-                            <h2 class="home-page__header">Vendeur, détaillant ou marque ?</h2>
-                            <div class="home-page__store-buttons-holder">
-                                <div class="home-page__get-apps" style="font-size:1.7em">Swipe Live rend la découverte de vos produits amusante et aide les marques et les détaillants à accroître leur audience grâce à des expériences réelles et fiables.</div>
-                                <div class="store-buttons home-page__store-buttons store-buttons--responsive">
-                                    <a id="apple-button" href="https://apps.apple.com/us/app/spin-live/id1519146498" target="_blank" class="store-buttons__button" style="padding: 0px;">
-                                        <span class="icon icon--app-store-download">
-                                            <img src="./img/ios.png" style="width: 200px;">
-                                        </span>
-                                    </a>
-                                    <a id="google-play-button" href="https://play.google.com/store/apps/details?id=live.spin.android" target="_blank" class="store-buttons__button" style="padding: 0px;">
-                                        <span class="icon icon--app-store-download">
-                                            <img src="./img/android.png" style="width: 200px;">
-                                        </span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="home-page__phone">
-                            <video src="img/merchant-demo-s.mp4" autoplay="autoplay" loop="loop" playsinline muted="muted"></video>
-                            <img src="https://assets.spin.live/9a2220fe-08dd-4c4c-b7c1-1246f83808e4" />
-                            <span class="icon icon--play">
-                                <svg id="My_Streams" data-name="My Streams" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-                                    <rect id="Container" width="64" height="64" transform="translate(0)" fill="none"></rect>
-                                    <g id="Circle" transform="translate(6 6)" fill="rgba(255,255,255,0.3)" stroke="#fff" stroke-width="3">
-                                        <circle cx="26.5" cy="26.5" r="26.5" stroke="none"></circle>
-                                        <circle cx="26.5" cy="26.5" r="28" fill="none"></circle>
-                                    </g>
-                                    <path
-                                    id="Play_Triangle"
-                                    data-name="Play Triangle"
-                                    d="M8.869,4.8a3,3,0,0,1,5.263,0l6.437,11.754A3,3,0,0,1,17.937,21H5.063a3,3,0,0,1-2.631-4.441Z"
-                                    transform="translate(46 22) rotate(90)"
-                                    fill="#fff"
-                                    ></path>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <div id="header" >
+        <img id="logo" height="100" src="img/favicon.png" alt="" />
     </div>
-     <section class="fact-one">
-            <div class="container">
-                <div class="block-title text-center">
-                    <h2 class="block-title__title">🤔 Pourquoi Vendre sur <span style="color:#e62d87">Swipe Live</span> ?</h2>
-                </div>
-                <div class="row">
-                    <div class="col-lg-3 col-md-6 col-sm-12 wow fadeInUp" data-wow-duration="1500ms">
-                        <div class="fact-one__single">
-                            <div class="fact-one__inner">
-                                <h3 class="fact-one__count counter">+70%</h3>
-                                <p class="fact-one__text">Ventes</p>
-                            </div>
-                        </div>
+    <div id="root">
+        <div id="main">
+            <div class="headline">
+                <h1 class="txt-rotate" data-period="1500" data-rotate='[ "Présentez vos produits en live", "Une boutique intégrée et gratuite", "70% de vente supplémentaire", "Une expérience extraordinaire", "3,2,1... Go Live !"]'></h1>
+                <div class="flex" id="download">
+                    <div class="dl-btn">
+                        <a href="#">
+                            <img height="64" src="img/ios.svg" alt="">
+                        </a>
                     </div>
-                    <div class="col-lg-3 col-md-6 col-sm-12 wow fadeInUp" data-wow-duration="1500ms">
-                        <div class="fact-one__single">
-                            <div class="fact-one__inner">
-                                <h3 class="fact-one__count counter">+67%</h3>
-                                <p class="fact-one__text">Engagements</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-12 wow fadeInUp" data-wow-duration="1500ms">
-                        <div class="fact-one__single">
-                            <div class="fact-one__inner">
-                                <h3 class="fact-one__count counter">X10</h3>
-                                <p class="fact-one__text">Conversions</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 col-sm-12 wow fadeInUp" data-wow-duration="1500ms">
-                        <div class="fact-one__single">
-                            <div class="fact-one__inner">
-                                <h3 class="fact-one__count counter">+96%</h3>
-                                <p class="fact-one__text">Satisfactions</p>
-                            </div>
-                        </div>
+                    <div class="dl-btn">
+                        <a href="#">
+                            <img height="64" src="img/android.svg" alt="">
+                        </a>
                     </div>
                 </div>
             </div>
-        </section>
-        <div class="merchant-page app__contents" style="padding-top:0;">
-            <section class="merchant-page__grow-sales">
-                <div class="merchant-page__container">
-                    <span class="icon merchant-page__triangles icon--triangles">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200.234 200.234"><g id="Triangles" transform="translate(-442 -2189.945)" opacity="0.15"><path id="Path_1517" data-name="Path 1517" d="M0-21.055,100.117,79.063H0Z" transform="translate(442 2311.117)" fill="#46b1cd"></path><path id="Path_1519" data-name="Path 1519" d="M0-21.055,100.117,79.063H0Z" transform="translate(442 2211)" fill="#46b1cd"></path><path id="Path_1518" data-name="Path 1518" d="M0-21.055,100.117,79.063H0Z" transform="translate(542.117 2311.117)" fill="#46b1cd"></path></g></svg>
-                    </span>
-                    <div class="merchant-page__row">
-                        <div class="merchant-page__grow-sales__details merchant-page__details--odd">
-                            <h2 class="merchant-page__header">💰 Augmentez vos ventes </h2>
-                            <div class="merchant-page__grow-sales-description"> Exploitez le nouveau média émergent qu'est le shopping vidéo en direct et créez des expériences d'achat riches et interactives avec des taux de conversion 10X supérieurs à ceux des sites de commerce électronique traditionnels. </div>
-                            <div class="merchant-page__quote"> La flexibilité de diffuser à tout moment, de choisir des collaborateurs influenceurs et de créer des promotions spéciales sur la plateforme a déjà permis d'augmenter mes ventes de 20% </div>
-                        </div>
-                        <div data-700="transform: translate3d(-600px, 0px, 0px); opacity: 0" data-900="transform: translate3d(0px, 0px, 0px); opacity: 1" class="merchant-page__phone">
-                            <video src="img/full-product-card.mp4" autoplay="autoplay" loop="loop" playsinline muted="muted"></video>
-                            <img src="https://assets.spin.live/9a2220fe-08dd-4c4c-b7c1-1246f83808e4">
-                            <div data-900="transform: scale(0.8); opacity: 0" data-1100="transform: scale(1); opacity: 1" class="merchant-page__phone-circle"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section class="merchant-page__influencers-live">
-                <div class="merchant-page__container">
-                    <div class="merchant-page__row">
-                        <div class="merchant-page__details">
-                            <h2 class="merchant-page__header">❤️ Live Influenceurs </h2>
-                            <div class="merchant-page__influencers-live-description"> Vous ne savez pas vendre en live ? Laissez notre réseau d'influenceurs créer le contenu pour vous et exploitez directement leurs followers. Dites adieu aux frais et aux contrats compliqués, car les commissions des influenceurs sont payées automatiquement par Swipe Live.</div>
-                        </div>
-                        <div data-1500="transform: translate3d(0px, -90px, 0px); opacity: 0" data-1600="transform: translate3d(0px, 0px, 0px); opacity: 1" class="merchant-page__image-in-section">
-                            <img src="img/live.jpg" style="max-width: 430px;">
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section class="merchant-page__works-shopify">
-                <div class="merchant-page__container">
-                    <div class="merchant-page__row">
-                        <div class="merchant-page__details merchant-page__details--odd">
-                            <h2 class="merchant-page__header">⚙️ Intégration facile avec Shopify </h2>
-                            <div class="merchant-page__works-shopify-description"> Connectez votre boutique en ligne à Swipe Live en quelques clics et synchronisez vos produits de votre boutique shopify à notre application. L'intégration, la gestion des commandes et l'exécution des commandes ce fait en temps réel. </div>
-                            <a href="/" class="merchant-page__shopify-btn">
-                                <button type="button" class="default-button default-button--dark default-button--tall">
-                                    <div class="default-button__text">
-                                        <span class="icon merchant-page__shopify-icon icon--shopify">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 292" preserveAspectRatio="xMidYMid"><path d="M223.774 57.34c-.201-1.46-1.48-2.268-2.537-2.357-1.055-.088-23.383-1.743-23.383-1.743s-15.507-15.395-17.209-17.099c-1.703-1.703-5.029-1.185-6.32-.805-.19.056-3.388 1.043-8.678 2.68-5.18-14.906-14.322-28.604-30.405-28.604-.444 0-.901.018-1.358.044C129.31 3.407 123.644.779 118.75.779c-37.465 0-55.364 46.835-60.976 70.635-14.558 4.511-24.9 7.718-26.221 8.133-8.126 2.549-8.383 2.805-9.45 10.462C21.3 95.806.038 260.235.038 260.235l165.678 31.042 89.77-19.42S223.973 58.8 223.775 57.34zM156.49 40.848l-14.019 4.339c.005-.988.01-1.96.01-3.023 0-9.264-1.286-16.723-3.349-22.636 8.287 1.04 13.806 10.469 17.358 21.32zm-27.638-19.483c2.304 5.773 3.802 14.058 3.802 25.238 0 .572-.005 1.095-.01 1.624-9.117 2.824-19.024 5.89-28.953 8.966 5.575-21.516 16.025-31.908 25.161-35.828zm-11.131-10.537c1.617 0 3.246.549 4.805 1.622-12.007 5.65-24.877 19.88-30.312 48.297l-22.886 7.088C75.694 46.16 90.81 10.828 117.72 10.828z" fill="#95BF46"></path><path d="M221.237 54.983c-1.055-.088-23.383-1.743-23.383-1.743s-15.507-15.395-17.209-17.099c-.637-.634-1.496-.959-2.394-1.099l-12.527 256.233 89.762-19.418S223.972 58.8 223.774 57.34c-.201-1.46-1.48-2.268-2.537-2.357" fill="#5E8E3E"></path><path d="M135.242 104.585l-11.069 32.926s-9.698-5.176-21.586-5.176c-17.428 0-18.305 10.937-18.305 13.693 0 15.038 39.2 20.8 39.2 56.024 0 27.713-17.577 45.558-41.277 45.558-28.44 0-42.984-17.7-42.984-17.7l7.615-25.16s14.95 12.835 27.565 12.835c8.243 0 11.596-6.49 11.596-11.232 0-19.616-32.16-20.491-32.16-52.724 0-27.129 19.472-53.382 58.778-53.382 15.145 0 22.627 4.338 22.627 4.338" fill="#FFF"></path></svg>
-                                        </span> Connecter avec Shopify
-                                    </div>
-                                </button>
-                            </a>
-                            <a href="/" class="merchant-page__link">
-                                <button type="button" class="default-button default-button--text">
-                                    <div class="default-button__text"> J'utilise une autre plateforme e-commerce</div>
-                                </button>
-                            </a>
-                        </div>
-                        <div data-2000="transform: translate3d(0px, -90px, 0px); opacity: 0" data-2200="transform: translate3d(0px, 0px, 0px); opacity: 1" class="merchant-page__image-in-section"><img src="img/shopify1.png"></div>
-                    </div>
-                </div>
-            </section>
-            <section class="merchant-page__risk-free">
-                <div class="merchant-page__container">
-                    <div class="merchant-page__row">
-                        <div class="merchant-page__details">
-                            <h2 class="merchant-page__header">😇 Aucun risque pour vous </h2>
-                            <div class="merchant-page__risk-free-description"> Swipe Live est gratuit ! aucun forfait ou frais caché. Vous ne payez qu'une petite commission que lorsque vous vendez quelque chose. Commencez dès aujourd'hui. </div>
-                        </div>
-                        <div data-2300="transform: translate3d(0px, -90px, 0px); opacity: 0" data-2500="transform: translate3d(0px, 0px, 0px); opacity: 1" class="merchant-page__image-in-section">
-                            <img src="img/pouce.gif" style="max-width: 300px;">
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section>
-                <img src="img/bgvendor.png" style="width: 54%; margin-left: 504px">
-                </section>
-            <div class="influencer-page__your-spin" style="background-color: #f05b5c";>
-                    <div class="influencer-page__container influencer-page__container--your-spin" style="text-align: center;">
-                        <div class="influencer-page__your-spin-details">
-                            <h2 class="influencer-page__heading" style="color: #fff;"> Nous aimons nos vendeurs,<br> et ils nous aiment. </h2>
-                            <p class="influencer-page__heading" style="color: #fff;font-size: 25px; margin-bottom: 35px;"> Rejoignez dès maintenant la communauté Swipe Live et généré vos premiers revenus !</p>
-                            <a href="/">
-                                <div class="store-buttons home-page__store-buttons store-buttons--responsive">
-                                        <a id="apple-button" href="https://apps.apple.com/us/app/spin-live/id1519146498" target="_blank" class="store-buttons__button" style="padding: 0px;">
-                                            <span class="icon icon--app-store-download">
-                                                <img src="./img/ios.png" style="width: 200px;">
-                                            </span>
-                                        </a>
-                                        <a id="google-play-button" href="https://play.google.com/store/apps/details?id=live.spin.android" target="_blank" class="store-buttons__button" style="padding: 0px;">
-                                            <span class="icon icon--app-store-download">
-                                                <img src="./img/android.png" style="width: 200px;">
-                                            </span>
-                                        </a>
-                                    </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
+        </div>
+    </div>
 {% endblock %}

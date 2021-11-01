@@ -1,101 +1,65 @@
-            <div class="home-footer">
-                <div class="home-footer__container">
-                    <div class="home-footer__row">
-                        <div class="home-footer__col home-footer__logo-col">
-                            <a href="/" aria-current="page" class="router-link-exact-active router-link-active">
-                                <span class="icon home-footer__logo icon--spin-logo-tm">
-                                    <img src="./img/logo.png" style="width: 200px;">
-                                </span>
-                            </a>
-                        </div>
-                        <div class="home-footer__col">
-                            <div class="home-footer__title">Informations</div>
-                            <div class="home-footer__links">
-                                <a href="{{ path('index') }}" aria-current="page" class="router-link-exact-active router-link-active"> Accueil </a>
-                                <a href="{{ path('vendor') }}"> Vendeurs </a>
-                                <a href="{{ path('influencer') }}"> Influenceurs </a>
-                            </div>
-                        </div>
-                        <div class="home-footer__col">
-                            <div class="home-footer__title">Suivez-nous</div>
-                            <div class="home-footer__links">
-                                <a href="https://www.facebook.com/swipelive.fr" target="_blank" rel="noopener"> Facebook </a>
-                                <a href="https://www.instagram.com/swipelive.fr" target="_blank" rel="noopener"> Instagram </a>
-                            </div>
-                        </div>
-                        <div class="home-footer__col home-footer__logo-col">
-                            <div class="home-footer__title">Applications</div>
-                            <div class="home-footer__links">
-                                <div class="home-footer__store-buttons">
-                                    <div class="store-buttons store-buttons--responsive">
-                                        <a id="apple-button" href="https://apps.apple.com/us/app/spin-live/id1519146498" target="_blank" class="store-buttons__button" style="padding: 0px;margin-bottom: 0px;">
-                                        <span class="icon icon--app-store-download">
-                                            <img src="./img/ios.png" style="width: 150px;">
-                                        </span>
-                                        </a>
-                                        <a id="google-play-button" href="https://play.google.com/store/apps/details?id=live.spin.android" target="_blank" class="store-buttons__button" style="padding: 0px;">
-                                        <span class="icon icon--google-play-download">
-                                            <img src="./img/android.png" style="width: 150px;">
-                                        </span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="home-footer__row" style="justify-content: center;">
-                        <div class="col-12" style="margin-top: 25px;">
-                            <p class="text-center mb-2" style="color: #222; font-weight: 500; font-size: 13px; margin: 0px; line-height: 22px;"><span class="full_year">2021</span> © Swipe Live - Tous droits réservés.<span> Réalisé avec ❤️ </span><span class="show-span-mobile" style="display: none;"></p> 
-                        </div>
-                    </div>
-                </div>
+    <div class="flex" id="footer">
+        <div id="scroll-indicator"></div>
+        <div class="nav">
+{#             <div>
+                <a href="{{ path('home') }}">FAQ</a>
+            </div> #}
+            <div>
+                <a href="{{ path('terms') }}">Termes et Conditions</a>
+            </div>
+            <div>
+                <a href="{{ path('privacy') }}">Confidentialité</a>
+            </div>
+            <div>
+                <a href="{{ path('cookies') }}">Cookies</a>
+            </div>
+            <div>
+                <a href="mailto:contact@swipelive.fr">Contact</a>
             </div>
         </div>
-        <div class="app__fixed-header">
-            <div class="masthead">
-                <div class="masthead__content">
-                    <a href="/" aria-current="page" class="router-link-exact-active router-link-active">
-                    <span class="icon masthead__logo icon--spin-logo-tm">
-                        <img src="./img/logo.png" style="width: 200px;">
-                    </span>
-                    </a>
-                    <nav class="home-page-navigation masthead__nav">
-                        <button type="button" aria-label="Toggle navigation" class="default-button home-page-navigation__navbar-toggler default-button--grey" style="padding: 0px 0px 0px 1em;">
-                            <div class="default-button__text">
-                                <span class="home-page-navigation__navbar-toggler-line home-page-navigation__navbar-toggler-line--line-1"></span>
-                                <span class="home-page-navigation__navbar-toggler-line home-page-navigation__navbar-toggler-line--line-2"></span>
-                                <span class="home-page-navigation__navbar-toggler-line home-page-navigation__navbar-toggler-line--line-3"></span>
-                            </div>
-                        </button>
-                        <ul class="home-page-navigation__navbar-nav">
-                            <li class="home-page-navigation__nav-item home-page-navigation--active">
-                                <a href="{{ path('index') }}" aria-current="page" class="home-page-navigation__nav-link router-link-exact-active router-link-active"> Accueil </a>
-                            </li>
-                            <li class="home-page-navigation__nav-item">
-                                <a href="{{ path('vendor') }}" class="home-page-navigation__nav-link"> Vendeurs </a>
-                            </li>
-                            <li class="home-page-navigation__nav-item">
-                                <a href="{{ path('influencer') }}" class="home-page-navigation__nav-link"> Influenceurs </a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
+        <div id="team">
+            <a href="{{ path('home') }}" data-tooltip="Acheteurs">
+                <img height="80" src="img/2.png" alt="">
+            </a>
+            <a href="{{ path('vendor') }}" data-tooltip="Vendeurs">
+                <img height="80" src="img/3.png" alt="">
+            </a>
+            <a href="{{ path('influencer') }}" data-tooltip="Influenceurs">
+                <img height="80" src="img/1.png" alt="">
+            </a>
         </div>
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script> $('.full_year').append(new Date().getFullYear()); </script>
-        <script>
-            $('.home-page-navigation__navbar-toggler').click(function () {
-                if ($(this).hasClass('home-page-navigation__navbar-toggler--active')) {
-                    $(this).removeClass('home-page-navigation__navbar-toggler--active');
-                    $('.home-page-navigation__navbar-nav').removeClass('home-page-navigation__navbar-nav--active');
-                } else {
-                    $(this).addClass('home-page-navigation__navbar-toggler--active');
-                    $('.home-page-navigation__navbar-nav').addClass('home-page-navigation__navbar-nav--active');
-                }
-            })
-        </script>
+        <div class="legals">
+            <span class="full_year"></span> © Swipe Live - Tous droits réservés - Réalisé avec ❤️
+        </div>
     </div>
+
+    <script>
+        document.getElementsByClassName('full_year')[0].append(new Date().getFullYear());
+
+        var txtRotate = function (t, e, i) {
+            (this.toRotate = e), (this.el = t), (this.loopNum = 0), (this.period = parseInt(i, 10) || 2e3), (this.txt = ""), this.tick(), (this.isDeleting = !1);
+        };
+        (txtRotate.prototype.tick = function () {
+            var t = this.loopNum % this.toRotate.length,
+                e = this.toRotate[t];
+            this.isDeleting ? (this.txt = e.substring(0, this.txt.length - 1)) : (this.txt = e.substring(0, this.txt.length + 1)), (this.el.innerHTML = '<span class="wrap">' + this.txt + "</span>");
+            var i = this,
+                s = 200 - 100 * Math.random();
+            this.isDeleting && (s /= 2),
+                this.isDeleting || this.txt !== e ? this.isDeleting && "" === this.txt && ((this.isDeleting = !1), this.loopNum++, (s = 500)) : ((s = this.period), (this.isDeleting = !0)),
+                setTimeout(function () {
+                    i.tick();
+                }, s);
+        }),
+        (window.onload = function () {
+            for (var t = document.getElementsByClassName("txt-rotate"), e = 0; e < t.length; e++) {
+                var i = t[e].getAttribute("data-rotate"),
+                    s = t[e].getAttribute("data-period");
+                i && new txtRotate(t[e], JSON.parse(i), s);
+            }
+            var o = document.createElement("style");
+            (o.type = "text/css"), (o.innerHTML = ".txt-rotate > .wrap { border-right: 0.08em solid #FF37B0 }"), document.body.appendChild(o);
+        });
+    </script>
   </body>
 </html>
