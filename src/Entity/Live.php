@@ -36,6 +36,7 @@ class Live
 
     /**
      * @ORM\OneToMany(targetEntity=Message::class, mappedBy="live", orphanRemoval=true)
+     * @ORM\OrderBy({"createdAt" = "ASC"})
      * @Groups("live:read")
      * @Groups("clip:read")
      */

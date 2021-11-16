@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\User;
 
 use App\Entity\User;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -11,7 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class UserAPIController extends Controller {
+class AccountAPIController extends Controller {
 
   // /**
   //  * @Route("/user/api/push/add", name="user_api_push_add")

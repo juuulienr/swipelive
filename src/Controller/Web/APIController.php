@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Web;
 
 use App\Entity\Live;
 use App\Entity\User;
@@ -22,7 +22,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class APIController extends Controller {
-
 
   /**
    * Afficher le feed
@@ -52,6 +51,7 @@ class APIController extends Controller {
     return $this->json($array);
   }
 
+
   /**
    * Afficher les 10 derniers clips
    *
@@ -63,6 +63,7 @@ class APIController extends Controller {
 
     return $this->json($clips, 200, [], ['groups' => 'clip:read']);
   }
+
 
   /**
    * Afficher les messages
@@ -76,6 +77,7 @@ class APIController extends Controller {
     return $this->json($messages, 200, [], ['groups' => 'message:read']);
   }
 
+
   /**
    * Afficher le profil
    *
@@ -85,6 +87,7 @@ class APIController extends Controller {
   {
     return $this->json($vendor, 200, [], ['groups' => 'vendor:read']);
   }
+
 
   /**
    * Afficher les produits du vendeur
@@ -97,6 +100,7 @@ class APIController extends Controller {
     return $this->json($products, 200, [], ['groups' => 'product:read']);
   }
 
+
   /**
    * Récupérer un produit
    *
@@ -105,6 +109,7 @@ class APIController extends Controller {
   public function product(Product $product, Request $request, ObjectManager $manager) {
     return $this->json($product, 200, [], ['groups' => 'product:read']);
   }
+
 
   /**
    * Afficher les catégories
@@ -117,6 +122,7 @@ class APIController extends Controller {
     return $this->json($categories, 200, [], ['groups' => 'category:read']);
   }
 
+
   /**
    * Récupérer une catégorie
    *
@@ -125,6 +131,7 @@ class APIController extends Controller {
   public function category(Category $category, Request $request, ObjectManager $manager) {
     return $this->json($category, 200, [], ['groups' => 'category:read']);
   }
+
 
   /**
    * Récupérer les produits dans une catégorie
@@ -165,42 +172,4 @@ class APIController extends Controller {
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
     }
   }
-
-  // /**
-  //  * Ajouter un message pendant le live
-  //  *
-  //  * @Route("/api/live/{id}/message/add", name="api_live_message_add", methods={"POST"})
-  //  */
-  // public function addMessage(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-  //   if ($json = $request->getContent()) {
-  //     $param = json_decode($json, true);
-  //     $content = $param["content"];
-  //     $vendor = $this->getUser();
-
-  //     $message = new Message();
-  //     $message->setContent($content);
-  //     $message->setVendor($vendor);
-  //     $message->setLive($live);
-  //     $manager->persist($message);
-  //     $manager->flush();
-
-  //     $options = [
-  //       'cluster' => 'eu',
-  //       'useTLS' => true
-  //     ];
-
-  //     $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', $options);
-  //     $data = [
-  //       "message" => [
-  //         "content" => $content, 
-  //         "user" => "", 
-  //         "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), 
-  //         "picture" => $vendor->getPicture()
-  //       ]
-  //     ];
-  //     $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
-
-  //     return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
-  //   }
-  // }
 }

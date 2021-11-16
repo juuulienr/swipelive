@@ -62,6 +62,14 @@ class Message
      */
     private $content;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups("clip:read")
+     * @Groups("message:read")
+     * @Groups("live:read")
+     */
+    private $time;
+
     
     public function __construct()
     {
@@ -142,6 +150,18 @@ class Message
     public function setContent(string $content): self
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function getTime(): ?int
+    {
+        return $this->time;
+    }
+
+    public function setTime(?int $time): self
+    {
+        $this->time = $time;
 
         return $this;
     }

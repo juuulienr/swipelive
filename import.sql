@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : ven. 29 oct. 2021 à 14:56
+-- Généré le : ven. 12 nov. 2021 à 18:35
 -- Version du serveur :  5.7.32
 -- Version de PHP : 7.4.12
 
@@ -67,7 +67,9 @@ CREATE TABLE `clip` (
 
 INSERT INTO `clip` (`id`, `vendor_id`, `live_id`, `start`, `end`, `duration`, `filename`, `product_id`, `thumbnail`) VALUES
 (5, 1, 32, 0, 8, 8, '1c8311f0-13bd-bec5-3073-757cfd-9c0ab3b07e54591904a0ac447321ee79.mp4', 2, 'thumbnail.png'),
-(6, 1, 32, 9, 18, 8, '1c8311f0-13bd-bec5-3073-757cfd-3c115b544603538f2d66f13aa1bf029e.mp4', 1, 'thumbnail2.png');
+(6, 1, 32, 9, 18, 8, '1c8311f0-13bd-bec5-3073-757cfd-3c115b544603538f2d66f13aa1bf029e.mp4', 1, 'thumbnail2.png'),
+(7, 2, 36, 0, 34, 34, '1c8311f0-13bd-bec5-3073-757cfd-20d6bc697bd6327518e8ae4ada50d44f.mp4', 10, 'c8a24b07-df04-4919-a3a2-748221b55dcc.jpg'),
+(8, 2, 38, 0, 9, 9, '1c8311f0-13bd-bec5-3073-757cfd-a2369850f1cff9187ead37995bc8668d.mp4', 9, '4653f0ac-5042-4c11-992f-c664dd200c05.jpg');
 
 -- --------------------------------------------------------
 
@@ -114,9 +116,10 @@ CREATE TABLE `live` (
 --
 
 INSERT INTO `live` (`id`, `vendor_id`, `broadcast_id`, `views`, `status`, `channel`, `event`, `display`, `resource_uri`, `thumbnail`, `created_at`) VALUES
-(32, 1, '3c4f77dc-71ee-4190-b2af-afc6edfb54c6', 0, 2, 'channel32', 'event32', 1, 'https://cdn.bambuser.net/broadcasts/5ba0bee3-94e8-4120-a804-3a1ecbfef417?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328744&da_static=1&da_ttl=0&da_signature=cc1a826dbcb71986ef8c6c613d9b1d2680682514be15a58ffbaba02b6278778e', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg', NULL),
-(35, 1, 'fff9859f-5da3-42fc-b941-0bb1484dd88f', 0, 2, 'channel35', 'event35', 1, 'https://cdn.bambuser.net/broadcasts/fff9859f-5da3-42fc-b941-0bb1484dd88f?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328744&da_static=1&da_ttl=0&da_signature=66aa05df995765d594455a05448651979a642ae088b330205eba292a8b002e3a', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg', NULL),
-(36, 2, '00e507b9-f8a5-4226-9a49-26168d9bec24', 0, 2, 'channel36', 'event36', 1, 'https://cdn.bambuser.net/broadcasts/00e507b9-f8a5-4226-9a49-26168d9bec24?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635410286&da_static=1&da_ttl=0&da_signature=2897c28e4ee0ab5f776a61426b473e5c7e5809f07e9e843c18a237d3c13fb9e5', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8wMGU1MDdiOS1mOGE1LTQyMjYtOWE0OS0yNjE2OGQ5YmVjMjQifQ==/preview.jpg', NULL);
+(32, 1, '3c4f77dc-71ee-4190-b2af-afc6edfb54c6', 0, 2, 'channel32', 'event32', 1, 'https://cdn.bambuser.net/broadcasts/5ba0bee3-94e8-4120-a804-3a1ecbfef417?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328744&da_static=1&da_ttl=0&da_signature=cc1a826dbcb71986ef8c6c613d9b1d2680682514be15a58ffbaba02b6278778e', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg', '2021-10-26 16:31:42'),
+(35, 1, 'fff9859f-5da3-42fc-b941-0bb1484dd88f', 1, 2, 'channel35', 'event35', 1, 'https://cdn.bambuser.net/broadcasts/fff9859f-5da3-42fc-b941-0bb1484dd88f?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328744&da_static=1&da_ttl=0&da_signature=66aa05df995765d594455a05448651979a642ae088b330205eba292a8b002e3a', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg', '2021-10-26 16:31:37'),
+(36, 2, 'c8a24b07-df04-4919-a3a2-542693b55dccv', 4, 2, 'channel36', 'event36', 1, 'https://cdn.bambuser.net/broadcasts/c8a24b07-df04-4919-a3a2-542693b55dcc?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1636630747&da_static=1&da_ttl=0&da_signature=b299b180652570f451efb273ad09fe930ae3e0b365b58d9560ed9c7f408b83d4', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC9jOGEyNGIwNy1kZjA0LTQ5MTktYTNhMi01NDI2OTNiNTVkY2MifQ==/preview.jpg', '2021-11-01 16:31:40'),
+(38, 2, '4653f0ac-5042-4c11-992f-3393f7200c05', 1, 2, 'channel123', 'event123', 1, 'https://cdn.bambuser.net/broadcasts/4653f0ac-5042-4c11-992f-3393f7200c05?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1636713299&da_static=1&da_ttl=0&da_signature=7c81f82a6b73506fa9f4cffa2c0a4173c317f9b21777882c90cc2c0a4de11c6f', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC80NjUzZjBhYy01MDQyLTRjMTEtOTkyZi0zMzkzZjcyMDBjMDUifQ==/preview.jpg', '2021-11-12 11:34:51');
 
 -- --------------------------------------------------------
 
@@ -137,9 +140,9 @@ CREATE TABLE `live_products` (
 
 INSERT INTO `live_products` (`id`, `product_id`, `live_id`, `priority`) VALUES
 (64, 8, 32, 1),
-(67, 8, 35, 1),
-(68, 8, 36, 1),
-(69, 2, 36, 2);
+(67, 1, 35, 1),
+(68, 2, 36, 1),
+(73, 9, 38, 1);
 
 -- --------------------------------------------------------
 
@@ -164,7 +167,38 @@ CREATE TABLE `message` (
 INSERT INTO `message` (`id`, `live_id`, `user_id`, `vendor_id`, `type`, `created_at`, `content`) VALUES
 (14, 32, NULL, 1, 0, '2021-10-26 11:44:10', 'j\'adore'),
 (15, 32, NULL, 2, 0, '2021-10-26 11:45:07', 'c\'est de la bombe'),
-(16, 35, NULL, 1, 0, '2021-10-26 11:45:27', 'test');
+(16, 35, NULL, 1, 0, '2021-10-26 11:45:27', 'test'),
+(19, 35, NULL, 1, 0, '2021-11-02 15:33:08', 'test 2'),
+(20, 35, NULL, 1, 0, '2021-11-02 16:22:05', 'test 3'),
+(21, 35, NULL, 1, 0, '2021-11-03 17:47:14', 'njhjhjhjhjhjh'),
+(22, 35, NULL, 1, 0, '2021-11-04 14:58:23', 'test'),
+(23, 35, NULL, 1, 0, '2021-11-04 15:00:15', 'au top'),
+(24, 35, NULL, 1, 0, '2021-11-04 15:00:30', 'dffdfd'),
+(25, 35, NULL, 1, 0, '2021-11-04 15:05:00', 'test'),
+(26, 35, NULL, 1, 0, '2021-11-04 15:05:03', 'fgfgfgf'),
+(27, 35, NULL, 1, 0, '2021-11-04 15:06:01', 'dfdfdfdf'),
+(28, 35, NULL, 1, 0, '2021-11-04 15:06:12', 'test'),
+(29, 35, NULL, 1, 0, '2021-11-04 15:06:18', 'au top du top'),
+(30, 32, NULL, 2, 0, '2021-11-12 12:07:11', 'test'),
+(31, 38, NULL, 2, 0, '2021-11-12 12:09:59', 'test'),
+(32, 38, NULL, 2, 0, '2021-11-12 12:10:04', 'hello'),
+(33, 38, NULL, 2, 0, '2021-11-12 12:10:12', 'c\'est de la bombe'),
+(34, 38, NULL, 2, 0, '2021-11-12 12:10:14', 'fdfdfdfdd'),
+(35, 38, NULL, 2, 0, '2021-11-12 12:10:17', 'dfdfdf'),
+(36, 38, NULL, 2, 0, '2021-11-12 12:10:19', 'fdfdf'),
+(37, 32, NULL, 2, 0, '2021-11-12 12:10:48', 'a vie'),
+(38, 32, NULL, 2, 0, '2021-11-12 12:15:49', 'test'),
+(39, 38, NULL, 2, 0, '2021-11-12 12:15:58', 'hello'),
+(40, 38, NULL, 2, 0, '2021-11-12 12:16:05', 'hello'),
+(41, 36, NULL, 2, 0, '2021-11-12 12:20:35', 'reis'),
+(42, 38, NULL, 2, 0, '2021-11-12 12:20:51', 'au top'),
+(43, 36, NULL, 2, 0, '2021-11-12 12:21:53', 'test'),
+(44, 32, NULL, 2, 0, '2021-11-12 12:22:09', 'j\'aime'),
+(45, 32, NULL, 2, 0, '2021-11-12 12:24:07', 'j\'aime apprendre'),
+(46, 38, NULL, 2, 0, '2021-11-12 12:24:38', 'coucou les loulous'),
+(47, 32, NULL, 2, 0, '2021-11-12 13:01:53', 'test'),
+(48, 36, NULL, 2, 0, '2021-11-12 13:01:58', 'au top'),
+(49, 36, NULL, 2, 0, '2021-11-12 13:16:20', 'de la bombe');
 
 -- --------------------------------------------------------
 
@@ -361,7 +395,7 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT pour la table `clip`
 --
 ALTER TABLE `clip`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT pour la table `follow`
@@ -373,19 +407,19 @@ ALTER TABLE `follow`
 -- AUTO_INCREMENT pour la table `live`
 --
 ALTER TABLE `live`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT pour la table `live_products`
 --
 ALTER TABLE `live_products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=211;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- AUTO_INCREMENT pour la table `message`
 --
 ALTER TABLE `message`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT pour la table `product`
