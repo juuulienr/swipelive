@@ -88,12 +88,6 @@ class LiveAPIController extends Controller {
     $event = "event" . $live->getId();
     $vendor = $this->getUser();
 
-    $options = [
-      'cluster' => 'eu',
-      'useTLS' => true
-    ];
-
-    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', $options);
     $data = [
       "message" => [
         "content" => "Début du live", 
@@ -102,6 +96,8 @@ class LiveAPIController extends Controller {
         "picture" => $vendor->getPicture()
       ], 
     ];
+
+    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $pusher->trigger($channel, $event, $data);
 
     $live->setChannel($channel);
@@ -127,18 +123,10 @@ class LiveAPIController extends Controller {
       $manager->flush();
 
       // enregistrer la durée pour créer et récupérer le clip
-
-      $options = [
-        'cluster' => 'eu',
-        'useTLS' => true
-      ];
-
-      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', $options);
-      $data = [
-        "display" => $display
-      ];
+      $data = [ "display" => $display ];
+      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
-
+    
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
     }
   }
@@ -216,12 +204,6 @@ class LiveAPIController extends Controller {
       $manager->persist($message);
       $manager->flush();
 
-      $options = [
-        'cluster' => 'eu',
-        'useTLS' => true
-      ];
-
-      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', $options);
       $data = [
         "message" => [
           "content" => $content, 
@@ -230,6 +212,8 @@ class LiveAPIController extends Controller {
           "picture" => $vendor->getPicture()
         ]
       ];
+      
+      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
