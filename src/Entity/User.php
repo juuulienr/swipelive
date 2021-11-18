@@ -82,6 +82,10 @@ class User implements UserInterface
         $this->following = new ArrayCollection();
     }
 
+    public function getClassName() {
+        return (new \ReflectionClass($this))->getShortName();
+    }
+
     public function getId()
     {
         return $this->id;

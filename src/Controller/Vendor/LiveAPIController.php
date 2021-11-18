@@ -97,7 +97,7 @@ class LiveAPIController extends Controller {
       ], 
     ];
 
-    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $pusher->trigger($channel, $event, $data);
 
     $live->setChannel($channel);
@@ -124,7 +124,7 @@ class LiveAPIController extends Controller {
 
       // enregistrer la durée pour créer et récupérer le clip
       $data = [ "display" => $display ];
-      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
     
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
@@ -213,10 +213,42 @@ class LiveAPIController extends Controller {
         ]
       ];
       
-      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
     }
   }
+
+
+  /**
+   * Mettre à jour les vues sur un live
+   *
+   * @Route("/vendor/api/live/{id}/update/viewers", name="vendor_api_live_update_viewers", methods={"PUT"})
+   */
+  public function updateViewers(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
+      $viewers = $param["viewers"];
+      $vendor = $this->getUser();
+
+      $live->setViewers($viewers);
+      $manager->flush();
+
+      $data = [ 
+        "viewers" => $viewers,
+        "entrances" => [
+          "user" => null, 
+          "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), 
+          "picture" => $vendor->getPicture() ? $vendor->getPicture() : null, 
+        ]
+      ];
+
+      $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
+
+      return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+    }
+  }
+
 }

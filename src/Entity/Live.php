@@ -28,13 +28,6 @@ class Live
     private $vendor;
 
     /**
-     * @ORM\Column(type="integer")
-     * @Groups("live:read")
-     * @Groups("clip:read")
-     */
-    private $views;
-
-    /**
      * @ORM\OneToMany(targetEntity=Message::class, mappedBy="live", orphanRemoval=true)
      * @ORM\OrderBy({"createdAt" = "ASC"})
      * @Groups("live:read")
@@ -104,13 +97,18 @@ class Live
      */
     private $createdAt;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $viewers;
+
     
     public function __construct()
     {
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->messages = new ArrayCollection();
         $this->clips = new ArrayCollection();
-        $this->views = 0;
+        $this->viewers = 0;
         $this->status = 0;
         $this->display = 1;
         $this->liveProducts = new ArrayCollection();
@@ -130,18 +128,6 @@ class Live
     public function setVendor(?Vendor $vendor): self
     {
         $this->vendor = $vendor;
-
-        return $this;
-    }
-
-    public function getViews(): ?int
-    {
-        return $this->views;
-    }
-
-    public function setViews(int $views): self
-    {
-        $this->views = $views;
 
         return $this;
     }
@@ -328,6 +314,18 @@ class Live
     public function setCreatedAt(?\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getViewers(): ?int
+    {
+        return $this->viewers;
+    }
+
+    public function setViewers(?int $viewers): self
+    {
+        $this->viewers = $viewers;
 
         return $this;
     }

@@ -49,7 +49,6 @@ class Vendor implements UserInterface
      */
     private $pushToken;
 
-
     /**
      * @ORM\Column(type="datetime")
      */
@@ -176,6 +175,10 @@ class Vendor implements UserInterface
         $this->products = new ArrayCollection();
         $this->followers = new ArrayCollection();
         $this->following = new ArrayCollection();
+    }
+
+    public function getClassName() {
+        return (new \ReflectionClass($this))->getShortName();
     }
 
     public function getId()
