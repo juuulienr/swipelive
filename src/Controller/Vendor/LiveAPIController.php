@@ -125,10 +125,10 @@ class LiveAPIController extends Controller {
         $result = json_decode($result);
         curl_close($ch);
 
-        if (sizeof($result->results) > 0) {
+        if ($result && $result->id) {
           $live->setBroadcastId($broadcastId);
-          $live->setResourceUri($result->results[0]->resourceUri);
-          $live->setThumbnail($result->results[0]->preview);
+          $live->setResourceUri($result->resourceUri);
+          $live->setThumbnail($result->preview);
           $live->setStatus(1);
           $manager->flush();
 
