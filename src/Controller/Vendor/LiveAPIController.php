@@ -79,36 +79,6 @@ class LiveAPIController extends Controller {
 
 
   /**
-   * Mettre à jour un live
-   *
-   * @Route("/vendor/api/live/update/{id}", name="vendor_api_live_update", methods={"PUT"})
-   */
-  public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    $channel = "channel" . $live->getId();
-    $event = "event" . $live->getId();
-    $vendor = $this->getUser();
-
-    $data = [
-      "message" => [
-        "content" => "Début du live", 
-        "user" => "", 
-        "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), 
-        "picture" => $vendor->getPicture()
-      ], 
-    ];
-
-    $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
-    $pusher->trigger($channel, $event, $data);
-
-    $live->setChannel($channel);
-    $live->setEvent($event);
-    $manager->flush();
-
-    return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
-  }
-
-
-  /**
    * Mettre à jour le produit pendant le live
    *
    * @Route("/vendor/api/live/{id}/update/display", name="vendor_api_live_update_display", methods={"PUT"})
@@ -133,11 +103,11 @@ class LiveAPIController extends Controller {
 
 
   /**
-   * Mettre à jour le live avec bambuser
+   * Mettre à jour un live
    *
-   * @Route("/vendor/api/live/bambuser/{id}", name="vendor_api_live_bambuser", methods={"PUT"})
+   * @Route("/vendor/api/live/update/{id}", name="vendor_api_live_update", methods={"PUT"})
    */
-  public function updateBambuser(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
       $broadcastId = $param["broadcastId"];
@@ -145,7 +115,7 @@ class LiveAPIController extends Controller {
       if ($broadcastId) {
         $url = "https://api.bambuser.com/broadcasts/" . $broadcastId;
         $ch = curl_init();
-        
+
         curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
@@ -162,7 +132,27 @@ class LiveAPIController extends Controller {
           $live->setStatus(1);
           $manager->flush();
 
-          return $this->json(true, 200);
+          $channel = "channel" . $live->getId();
+          $event = "event" . $live->getId();
+          $vendor = $this->getUser();
+
+          $data = [
+            "message" => [
+              "content" => "Début du live", 
+              "user" => "", 
+              "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), 
+              "picture" => $vendor->getPicture()
+            ], 
+          ];
+
+          $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
+          $pusher->trigger($channel, $event, $data);
+
+          $live->setChannel($channel);
+          $live->setEvent($event);
+          $manager->flush();
+
+          return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
         } else {
           return $this->json(false, 404);
         }
