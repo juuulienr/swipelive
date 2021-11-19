@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : ven. 12 nov. 2021 à 18:35
+-- Généré le : jeu. 18 nov. 2021 à 11:43
 -- Version du serveur :  5.7.32
 -- Version de PHP : 7.4.12
 
@@ -101,25 +101,25 @@ CREATE TABLE `live` (
   `id` int(11) NOT NULL,
   `vendor_id` int(11) DEFAULT NULL,
   `broadcast_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `views` int(11) NOT NULL,
   `status` int(11) DEFAULT NULL,
   `channel` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `event` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `display` int(11) DEFAULT NULL,
   `resource_uri` longtext COLLATE utf8mb4_unicode_ci,
   `thumbnail` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL
+  `created_at` datetime DEFAULT NULL,
+  `viewers` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `live`
 --
 
-INSERT INTO `live` (`id`, `vendor_id`, `broadcast_id`, `views`, `status`, `channel`, `event`, `display`, `resource_uri`, `thumbnail`, `created_at`) VALUES
-(32, 1, '3c4f77dc-71ee-4190-b2af-afc6edfb54c6', 0, 2, 'channel32', 'event32', 1, 'https://cdn.bambuser.net/broadcasts/5ba0bee3-94e8-4120-a804-3a1ecbfef417?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328744&da_static=1&da_ttl=0&da_signature=cc1a826dbcb71986ef8c6c613d9b1d2680682514be15a58ffbaba02b6278778e', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg', '2021-10-26 16:31:42'),
-(35, 1, 'fff9859f-5da3-42fc-b941-0bb1484dd88f', 1, 2, 'channel35', 'event35', 1, 'https://cdn.bambuser.net/broadcasts/fff9859f-5da3-42fc-b941-0bb1484dd88f?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328744&da_static=1&da_ttl=0&da_signature=66aa05df995765d594455a05448651979a642ae088b330205eba292a8b002e3a', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg', '2021-10-26 16:31:37'),
-(36, 2, 'c8a24b07-df04-4919-a3a2-542693b55dccv', 4, 2, 'channel36', 'event36', 1, 'https://cdn.bambuser.net/broadcasts/c8a24b07-df04-4919-a3a2-542693b55dcc?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1636630747&da_static=1&da_ttl=0&da_signature=b299b180652570f451efb273ad09fe930ae3e0b365b58d9560ed9c7f408b83d4', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC9jOGEyNGIwNy1kZjA0LTQ5MTktYTNhMi01NDI2OTNiNTVkY2MifQ==/preview.jpg', '2021-11-01 16:31:40'),
-(38, 2, '4653f0ac-5042-4c11-992f-3393f7200c05', 1, 2, 'channel123', 'event123', 1, 'https://cdn.bambuser.net/broadcasts/4653f0ac-5042-4c11-992f-3393f7200c05?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1636713299&da_static=1&da_ttl=0&da_signature=7c81f82a6b73506fa9f4cffa2c0a4173c317f9b21777882c90cc2c0a4de11c6f', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC80NjUzZjBhYy01MDQyLTRjMTEtOTkyZi0zMzkzZjcyMDBjMDUifQ==/preview.jpg', '2021-11-12 11:34:51');
+INSERT INTO `live` (`id`, `vendor_id`, `broadcast_id`, `status`, `channel`, `event`, `display`, `resource_uri`, `thumbnail`, `created_at`, `viewers`) VALUES
+(32, 1, '3c4f77dc-71ee-4190-b2af-afc6edfb54c6', 2, 'channel32', 'event32', 1, 'https://cdn.bambuser.net/broadcasts/5ba0bee3-94e8-4120-a804-3a1ecbfef417?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328744&da_static=1&da_ttl=0&da_signature=cc1a826dbcb71986ef8c6c613d9b1d2680682514be15a58ffbaba02b6278778e', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg', '2021-10-26 16:31:42', NULL),
+(35, 1, 'fff9859f-5da3-42fc-b941-0bb1484dd88f', 2, 'channel35', 'event35', 1, 'https://cdn.bambuser.net/broadcasts/fff9859f-5da3-42fc-b941-0bb1484dd88f?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328744&da_static=1&da_ttl=0&da_signature=66aa05df995765d594455a05448651979a642ae088b330205eba292a8b002e3a', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg', '2021-10-26 16:31:37', NULL),
+(36, 2, 'c8a24b07-df04-4919-a3a2-542693b55dccv', 1, 'channel36', 'event36', 1, 'https://cdn.bambuser.net/broadcasts/c8a24b07-df04-4919-a3a2-542693b55dcc?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1636630747&da_static=1&da_ttl=0&da_signature=b299b180652570f451efb273ad09fe930ae3e0b365b58d9560ed9c7f408b83d4', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC9jOGEyNGIwNy1kZjA0LTQ5MTktYTNhMi01NDI2OTNiNTVkY2MifQ==/preview.jpg', '2021-11-01 16:31:40', -1),
+(38, 2, '4653f0ac-5042-4c11-992f-3393f7200c05', 1, 'channel123', 'event123', 1, 'https://cdn.bambuser.net/broadcasts/4653f0ac-5042-4c11-992f-3393f7200c05?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1636713299&da_static=1&da_ttl=0&da_signature=7c81f82a6b73506fa9f4cffa2c0a4173c317f9b21777882c90cc2c0a4de11c6f', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC80NjUzZjBhYy01MDQyLTRjMTEtOTkyZi0zMzkzZjcyMDBjMDUifQ==/preview.jpg', '2021-11-12 11:34:51', 1);
 
 -- --------------------------------------------------------
 
@@ -157,48 +157,38 @@ CREATE TABLE `message` (
   `vendor_id` int(11) DEFAULT NULL,
   `type` int(11) NOT NULL,
   `created_at` datetime NOT NULL,
-  `content` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+  `content` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `time` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `message`
 --
 
-INSERT INTO `message` (`id`, `live_id`, `user_id`, `vendor_id`, `type`, `created_at`, `content`) VALUES
-(14, 32, NULL, 1, 0, '2021-10-26 11:44:10', 'j\'adore'),
-(15, 32, NULL, 2, 0, '2021-10-26 11:45:07', 'c\'est de la bombe'),
-(16, 35, NULL, 1, 0, '2021-10-26 11:45:27', 'test'),
-(19, 35, NULL, 1, 0, '2021-11-02 15:33:08', 'test 2'),
-(20, 35, NULL, 1, 0, '2021-11-02 16:22:05', 'test 3'),
-(21, 35, NULL, 1, 0, '2021-11-03 17:47:14', 'njhjhjhjhjhjh'),
-(22, 35, NULL, 1, 0, '2021-11-04 14:58:23', 'test'),
-(23, 35, NULL, 1, 0, '2021-11-04 15:00:15', 'au top'),
-(24, 35, NULL, 1, 0, '2021-11-04 15:00:30', 'dffdfd'),
-(25, 35, NULL, 1, 0, '2021-11-04 15:05:00', 'test'),
-(26, 35, NULL, 1, 0, '2021-11-04 15:05:03', 'fgfgfgf'),
-(27, 35, NULL, 1, 0, '2021-11-04 15:06:01', 'dfdfdfdf'),
-(28, 35, NULL, 1, 0, '2021-11-04 15:06:12', 'test'),
-(29, 35, NULL, 1, 0, '2021-11-04 15:06:18', 'au top du top'),
-(30, 32, NULL, 2, 0, '2021-11-12 12:07:11', 'test'),
-(31, 38, NULL, 2, 0, '2021-11-12 12:09:59', 'test'),
-(32, 38, NULL, 2, 0, '2021-11-12 12:10:04', 'hello'),
-(33, 38, NULL, 2, 0, '2021-11-12 12:10:12', 'c\'est de la bombe'),
-(34, 38, NULL, 2, 0, '2021-11-12 12:10:14', 'fdfdfdfdd'),
-(35, 38, NULL, 2, 0, '2021-11-12 12:10:17', 'dfdfdf'),
-(36, 38, NULL, 2, 0, '2021-11-12 12:10:19', 'fdfdf'),
-(37, 32, NULL, 2, 0, '2021-11-12 12:10:48', 'a vie'),
-(38, 32, NULL, 2, 0, '2021-11-12 12:15:49', 'test'),
-(39, 38, NULL, 2, 0, '2021-11-12 12:15:58', 'hello'),
-(40, 38, NULL, 2, 0, '2021-11-12 12:16:05', 'hello'),
-(41, 36, NULL, 2, 0, '2021-11-12 12:20:35', 'reis'),
-(42, 38, NULL, 2, 0, '2021-11-12 12:20:51', 'au top'),
-(43, 36, NULL, 2, 0, '2021-11-12 12:21:53', 'test'),
-(44, 32, NULL, 2, 0, '2021-11-12 12:22:09', 'j\'aime'),
-(45, 32, NULL, 2, 0, '2021-11-12 12:24:07', 'j\'aime apprendre'),
-(46, 38, NULL, 2, 0, '2021-11-12 12:24:38', 'coucou les loulous'),
-(47, 32, NULL, 2, 0, '2021-11-12 13:01:53', 'test'),
-(48, 36, NULL, 2, 0, '2021-11-12 13:01:58', 'au top'),
-(49, 36, NULL, 2, 0, '2021-11-12 13:16:20', 'de la bombe');
+INSERT INTO `message` (`id`, `live_id`, `user_id`, `vendor_id`, `type`, `created_at`, `content`, `time`) VALUES
+(14, 36, NULL, 2, 0, '2021-10-26 11:44:10', 'j\'adore', NULL),
+(23, 36, NULL, 2, 0, '2021-11-04 15:00:15', 'au top', NULL),
+(51, 36, NULL, 2, 0, '2021-11-04 15:00:15', 'ok', NULL),
+(52, 36, NULL, 2, 0, '2021-11-04 15:00:15', 'yes', NULL),
+(53, 36, NULL, 2, 0, '2021-11-16 11:32:27', 'test', NULL),
+(54, 36, NULL, 2, 0, '2021-11-16 11:46:53', 'hello', NULL),
+(56, 36, NULL, 2, 0, '2021-11-16 11:47:14', 'why not', NULL),
+(57, 36, NULL, 2, 0, '2021-11-16 12:11:24', 'hey reis', NULL),
+(58, 38, NULL, 2, 0, '2021-11-16 18:00:07', 'fgfggfgfg', NULL),
+(59, 38, NULL, 2, 0, '2021-11-16 18:02:17', 'hello', NULL),
+(60, 38, NULL, 2, 0, '2021-11-16 18:05:33', 'fdfdfdfdfdfdfdfd', NULL),
+(61, 38, NULL, 2, 0, '2021-11-17 10:12:04', 'dsdsdsds', NULL),
+(62, 38, NULL, 2, 0, '2021-11-17 10:18:39', 'dsdsdsdsds', NULL),
+(63, 38, NULL, 2, 0, '2021-11-17 10:21:41', 'test 2', NULL),
+(64, 38, NULL, 2, 0, '2021-11-17 10:24:31', 'hello test', NULL),
+(65, 38, NULL, 2, 0, '2021-11-17 10:26:40', 'julien test ', NULL),
+(66, 38, NULL, 2, 0, '2021-11-17 10:26:50', 'voila ', NULL),
+(67, 38, NULL, 2, 0, '2021-11-17 10:27:22', 'trop bien j\'adore', NULL),
+(68, 38, NULL, 2, 0, '2021-11-17 11:30:54', 'hello', NULL),
+(69, 38, NULL, 2, 0, '2021-11-17 13:12:55', 'fdfdfd', NULL),
+(70, 38, NULL, 2, 0, '2021-11-17 17:30:56', 'hello', NULL),
+(71, 36, NULL, 1, 0, '2021-11-18 11:27:08', 'heyyy', NULL),
+(72, 36, NULL, 1, 0, '2021-11-18 11:34:45', 'au top', NULL);
 
 -- --------------------------------------------------------
 
@@ -419,7 +409,7 @@ ALTER TABLE `live_products`
 -- AUTO_INCREMENT pour la table `message`
 --
 ALTER TABLE `message`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT pour la table `product`

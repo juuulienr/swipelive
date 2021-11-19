@@ -138,32 +138,35 @@ class LiveAPIController extends Controller {
    * @Route("/vendor/api/live/bambuser/{id}", name="vendor_api_live_bambuser", methods={"PUT"})
    */
   public function updateBambuser(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    $url = "https://api.bambuser.com/broadcasts?limit=1&titleContains=Live" . $live->getId();
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-    curl_setopt($ch, CURLOPT_URL, $url);
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
+      $broadcastId = $param["broadcastId"];
 
-    $result = curl_exec($ch);
-    $result = json_decode($result);
-    curl_close($ch);
+      if ($broadcastId) {
+        $url = "https://api.bambuser.com/broadcasts/" . $broadcastId;
+        $ch = curl_init();
+        
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($ch, CURLOPT_URL, $url);
 
-    if (sizeof($result->results) > 0) {
-      $broadcastId = $result->results[0]->id;
-      $resourceUri = $result->results[0]->resourceUri;
-      $thumbnail = $result->results[0]->preview;
-      $vendor = $this->getUser();
+        $result = curl_exec($ch);
+        $result = json_decode($result);
+        curl_close($ch);
 
-      $live->setBroadcastId($broadcastId);
-      $live->setResourceUri($resourceUri);
-      $live->setThumbnail($thumbnail);
-      $live->setStatus(1);
-      $manager->flush();
+        if (sizeof($result->results) > 0) {
+          $live->setBroadcastId($broadcastId);
+          $live->setResourceUri($result->results[0]->resourceUri);
+          $live->setThumbnail($result->results[0]->preview);
+          $live->setStatus(1);
+          $manager->flush();
 
-      return $this->json(true, 200);
-    } else {
-      return $this->json(false, 404);
+          return $this->json(true, 200);
+        } else {
+          return $this->json(false, 404);
+        }
+      }
     }
   }
 
