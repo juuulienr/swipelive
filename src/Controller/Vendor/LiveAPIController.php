@@ -220,28 +220,28 @@ class LiveAPIController extends Controller {
    * @Route("/vendor/api/live/{id}/update/viewers", name="vendor_api_live_update_viewers", methods={"PUT"})
    */
   public function updateViewers(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    if ($json = $request->getContent()) {
-      $param = json_decode($json, true);
-      $viewers = $param["viewers"];
-      $vendor = $this->getUser();
+    $vendor = $this->getUser();
 
-      $live->setViewers($viewers);
+    $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $info = $pusher->getChannelInfo($live->getChannel(), ['info' => 'subscription_count']);
+    $count = $info->subscription_count;
+
+    if ($count && $count > 0) {
+      $live->setViewers($count);
       $manager->flush();
-
-      $data = [ 
-        "viewers" => $viewers,
-        "entrances" => [
-          "user" => null, 
-          "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), 
-          "picture" => $vendor->getPicture() ? $vendor->getPicture() : null, 
-        ]
-      ];
-
-      $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
-      $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
-
-      return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
     }
-  }
 
+    $data = [ 
+      "viewers" => $count,
+      "entrances" => [
+        "user" => null, 
+        "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), 
+        "picture" => $vendor->getPicture() ? $vendor->getPicture() : null, 
+      ]
+    ];
+
+    $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
+
+    return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+  }
 }
