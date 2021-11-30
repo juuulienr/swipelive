@@ -226,8 +226,8 @@ class LiveAPIController extends Controller {
     $info = $pusher->getChannelInfo($live->getChannel(), ['info' => 'subscription_count']);
     $count = $info->subscription_count;
 
-    if ($count && $count > 0) {
-      $live->setViewers($count);
+    if ($count) {
+      $live->setViewers($count - 1);
       $manager->flush();
     }
 

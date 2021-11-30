@@ -2,6 +2,7 @@
 
 namespace App\Controller\Web;
 
+use Carbon\Carbon;
 use App\Entity\Live;
 use App\Entity\User;
 use App\Entity\Vendor;
@@ -20,6 +21,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
+
 
 class APIController extends Controller {
 
@@ -155,8 +157,8 @@ class APIController extends Controller {
     $info = $pusher->getChannelInfo($live->getChannel(), ['info' => 'subscription_count']);
     $count = $info->subscription_count;
 
-    if ($count && $count > 0) {
-      $live->setViewers($count);
+    if ($count) {
+      $live->setViewers($count -1);
       $manager->flush();
     }
 
@@ -168,7 +170,7 @@ class APIController extends Controller {
         "picture" => null
       ]
     ];
-    
+
     $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
     return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
