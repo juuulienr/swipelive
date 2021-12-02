@@ -1,8 +1,13 @@
 {% extends 'web/base.html.twig' %}
 
-{% block title %} Vendeurs {% endblock %}
+{% block title %} Vendeurs - Présentez vos produits en live{% endblock %}
 
-{% block metadata %}{% endblock %}
+{% block metadata %}
+    <meta name="description" content="Présentez vos produits en live, une boutique intégrée et gratuite, 70% de vente supplémentaire, une expérience unique" />
+    <meta property="og:image" content="{{ app.request.schemeAndHttpHost }}/img/logo.png" />
+    <meta property="og:title" content="Influenceurs - Soyez rémunéré sur chaque vente"/>
+    <meta property="og:description" content="Présentez vos produits en live, une boutique intégrée et gratuite, 70% de vente supplémentaire, une expérience unique"/>
+{% endblock %}
     
 {% block stylesheets %}
     <link rel="stylesheet" href="css/style.css">

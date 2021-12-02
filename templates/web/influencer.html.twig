@@ -1,8 +1,13 @@
 {% extends 'web/base.html.twig' %}
 
-{% block title %} Influenceurs {% endblock %}
+{% block title %} Influenceurs - Soyez rémunéré sur chaque vente{% endblock %}
 
-{% block metadata %}{% endblock %}
+{% block metadata %}
+    <meta name="description" content="Soyez rémunéré sur chaque vente, pas de contrats, des marques à volonté, 100% de la commission" />
+    <meta property="og:image" content="{{ app.request.schemeAndHttpHost }}/img/logo.png" />
+    <meta property="og:title" content="Influenceurs - Soyez rémunéré sur chaque vente"/>
+    <meta property="og:description" content="Soyez rémunéré sur chaque vente, pas de contrats, des marques à volonté, 100% de la commission"/>
+{% endblock %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="css/style.css">

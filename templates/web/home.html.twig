@@ -2,7 +2,12 @@
 
 {% block title %} Le shopping en ligne, (re)inventé {% endblock %}
 
-{% block metadata %}{% endblock %}
+{% block metadata %}
+    <meta name="description" content="Des expériences d'achat interactives et en direct. De vraies personnes, de vrais produits. Des histoires vraies." />
+    <meta property="og:image" content="{{ app.request.schemeAndHttpHost }}/img/logo.png" />
+    <meta property="og:title" content="Le shopping en ligne, (re)inventé"/>
+    <meta property="og:description" content="Des expériences d'achat interactives et en direct. De vraies personnes, de vrais produits. Des histoires vraies."/>
+{% endblock %}
     
 {% block stylesheets %}
     <link rel="stylesheet" href="css/style.css">
