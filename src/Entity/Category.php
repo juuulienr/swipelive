@@ -28,6 +28,8 @@ class Category
      * @Groups("category:read")
      * @Groups("product:read")
      * @Groups("vendor:read")
+     * @Groups("live:read")
+     * @Groups("clip:read")
      */
     private $name;
 

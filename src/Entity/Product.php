@@ -40,6 +40,7 @@ class Product
      * @ORM\JoinColumn(nullable=false)
      * @Groups("product:read")
      * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $category;
 
@@ -52,6 +53,8 @@ class Product
     /**
      * @ORM\Column(type="text")
      * @Groups("product:read")
+     * @Groups("live:read")
+     * @Groups("clip:read")
      */
     private $description;
 
@@ -90,6 +93,7 @@ class Product
      * @Groups("product:read")
      * @Groups("vendor:read")
      * @Groups("live:read")
+     * @Groups("clip:read")
      */
     private $quantity;
 
@@ -97,6 +101,8 @@ class Product
      * @ORM\Column(type="boolean")
      * @Groups("product:read")
      * @Groups("vendor:read")
+     * @Groups("live:read")
+     * @Groups("clip:read")
      */
     private $tracking;
 
