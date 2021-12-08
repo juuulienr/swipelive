@@ -158,7 +158,8 @@ class APIController extends Controller {
     $count = $info->subscription_count;
 
     if ($count) {
-      $live->setViewers($count -1);
+      $count = $count - 1;
+      $live->setViewers($count);
       $manager->flush();
     }
 

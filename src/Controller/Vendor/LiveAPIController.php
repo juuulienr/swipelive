@@ -228,13 +228,13 @@ class LiveAPIController extends Controller {
    */
   public function updateViewers(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     $vendor = $this->getUser();
-
     $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $info = $pusher->getChannelInfo($live->getChannel(), ['info' => 'subscription_count']);
     $count = $info->subscription_count;
 
     if ($count) {
-      $live->setViewers($count - 1);
+      $count = $count - 1;
+      $live->setViewers($count);
       $manager->flush();
     }
 
