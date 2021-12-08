@@ -93,9 +93,8 @@ class LiveAPIController extends Controller {
       $manager->flush();
 
       // enregistrer la durée pour créer et récupérer le clip
-      $data = [ "display" => $display ];
       $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
-      $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
+      $pusher->trigger($live->getChannel(), $live->getEvent(), [ "display" => $display ]);
     
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
     }
@@ -139,10 +138,14 @@ class LiveAPIController extends Controller {
           $data = [
             "message" => [
               "content" => "Début du live", 
-              "user" => "", 
-              "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), 
-              "picture" => $vendor->getPicture()
-            ], 
+              "user" => null, 
+              "vendor" => [
+                "company" => $vendor->getCompany(),
+                "firstname" => $vendor->getFirstname(),
+                "lastname" => $vendor->getLastname(),
+                "picture" => $vendor->getPicture()
+              ]
+            ]
           ];
 
           $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
@@ -200,9 +203,13 @@ class LiveAPIController extends Controller {
       $data = [
         "message" => [
           "content" => $content, 
-          "user" => "", 
-          "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), 
-          "picture" => $vendor->getPicture()
+          "user" => null, 
+          "vendor" => [
+            "company" => $vendor->getCompany(),
+            "firstname" => $vendor->getFirstname(),
+            "lastname" => $vendor->getLastname(),
+            "picture" => $vendor->getPicture()
+          ]
         ]
       ];
       
@@ -235,8 +242,12 @@ class LiveAPIController extends Controller {
       "viewers" => $count,
       "entrances" => [
         "user" => null, 
-        "vendor" => $vendor->getCompany() ? $vendor->getCompany() : $vendor->getFirstname(), 
-        "picture" => $vendor->getPicture() ? $vendor->getPicture() : null, 
+        "vendor" => [
+          "company" => $vendor->getCompany(),
+          "firstname" => $vendor->getFirstname(),
+          "lastname" => $vendor->getLastname(),
+          "picture" => $vendor->getPicture()
+        ]
       ]
     ];
 

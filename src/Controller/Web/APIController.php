@@ -166,8 +166,7 @@ class APIController extends Controller {
       "viewers" => $count,
       "entrances" => [
         "user" => null, 
-        "vendor" => null, 
-        "picture" => null
+        "vendor" => null
       ]
     ];
 
