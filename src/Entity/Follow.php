@@ -25,11 +25,15 @@ class Follow
 
     /**
      * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="following")
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
      */
     private $vendor;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="following")
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
      */
     private $user;
 

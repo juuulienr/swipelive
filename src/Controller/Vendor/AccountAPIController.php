@@ -95,7 +95,10 @@ class AccountAPIController extends Controller {
    * @Route("/vendor/api/profile", name="vendor_api_profile", methods={"GET"})
    */
   public function profile(Request $request, ObjectManager $manager) {
-    return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:edit']);
+    return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:edit', 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+      dd($object);
+        return $object->getId();
+    } ]);
   }
 
 
@@ -135,7 +138,26 @@ class AccountAPIController extends Controller {
       return $this->json(true, 200);
     }
 
-    return $this->json(false, 404);
+    $manager->remove($follow);
+    $manager->flush();
+
+    return $this->json(false, 200);
+  }
+
+
+  /**
+   * Vérifier un follow
+   *
+   * @Route("/vendor/api/follow/check/{id}", name="vendor_api_follow_check", methods={"GET"})
+   */
+  public function checkFollow(Vendor $vendor, Request $request, ObjectManager $manager, FollowRepository $followRepo) {
+    $follow = $followRepo->findOneBy(['following' => $vendor, 'vendor' => $this->getUser() ]);
+
+    if ($follow) {
+      return $this->json(true, 200);
+    }
+
+    return $this->json(false, 200);
   }
 
 }
