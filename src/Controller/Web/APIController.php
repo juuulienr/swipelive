@@ -87,7 +87,9 @@ class APIController extends Controller {
    */
   public function profile(Vendor $vendor, Request $request, ObjectManager $manager)
   {
-    return $this->json($vendor, 200, [], ['groups' => 'vendor:read']);
+    return $this->json($vendor, 200, [], ['groups' => 'vendor:read', 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+        return $object->getId();
+    } ]);
   }
 
 

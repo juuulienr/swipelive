@@ -146,6 +146,7 @@ class Vendor implements UserInterface
     /**
      * @ORM\OneToMany(targetEntity=Product::class, mappedBy="vendor")
      * @Groups("vendor:read")
+     * @Groups("vendor:edit")
      * @Groups("clip:read")
      * @Groups("live:read")
      */

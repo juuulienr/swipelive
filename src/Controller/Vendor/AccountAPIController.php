@@ -96,7 +96,6 @@ class AccountAPIController extends Controller {
    */
   public function profile(Request $request, ObjectManager $manager) {
     return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:edit', 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
-      dd($object);
         return $object->getId();
     } ]);
   }
@@ -112,10 +111,40 @@ class AccountAPIController extends Controller {
       $serializer->deserialize($json, Vendor::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $this->getUser()]);
       $manager->flush();
 
-      return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:edit'], 200);
+      return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:edit', 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } ]);
     }
 
     return $this->json([ "error" => "Une erreur est survenue"], 404);
+  }
+
+
+  /**
+   * Modifier image du profil
+   *
+   * @Route("/vendor/api/profile/picture", name="vendor_api_profile_picture", methods={"POST"})
+   */
+  public function picture(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($request->files->get('picture')) {
+      $file = $request->files->get('picture');
+
+      if (!$file) {
+        return $this->json("L'image est introuvable !", 404);
+      }
+
+      $filename = md5(time().uniqid()). "." . $file->guessExtension(); 
+      $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
+      file_put_contents($filepath, file_get_contents($file));
+
+      $vendor = $this->getUser();
+      $vendor->setPicture($filepath);
+      $manager->flush();
+
+      return $this->json($filepath, 200);
+    }
+
+    return $this->json("L'image est introuvable !", 404);
   }
 
 
@@ -124,40 +153,39 @@ class AccountAPIController extends Controller {
    *
    * @Route("/vendor/api/follow/vendor/{id}", name="vendor_api_follow", methods={"GET"})
    */
-  public function follow(Vendor $vendor, Request $request, ObjectManager $manager, FollowRepository $followRepo) {
-    $follow = $followRepo->findOneBy(['following' => $vendor, 'vendor' => $this->getUser() ]);
+  public function follow(Vendor $id, Request $request, ObjectManager $manager, FollowRepository $followRepo) {
+    $follow = $followRepo->findOneBy(['following' => $id, 'vendor' => $this->getUser() ]);
 
     if (!$follow) {
       $follow = new Follow();
       $follow->setVendor($this->getUser());
-      $follow->setFollowing($vendor);
-
+      $follow->setFollowing($id);
       $manager->persist($follow);
-      $manager->flush();
-
-      return $this->json(true, 200);
+    } else {
+      $manager->remove($follow);
     }
 
-    $manager->remove($follow);
     $manager->flush();
 
-    return $this->json(false, 200);
+    return $this->json($id, 200, [], ['groups' => 'vendor:read', 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+      return $object->getId();
+    } ]);
   }
 
 
-  /**
-   * Vérifier un follow
-   *
-   * @Route("/vendor/api/follow/check/{id}", name="vendor_api_follow_check", methods={"GET"})
-   */
-  public function checkFollow(Vendor $vendor, Request $request, ObjectManager $manager, FollowRepository $followRepo) {
-    $follow = $followRepo->findOneBy(['following' => $vendor, 'vendor' => $this->getUser() ]);
+  // /**
+  //  * Vérifier un follow
+  //  *
+  //  * @Route("/vendor/api/follow/check/{id}", name="vendor_api_follow_check", methods={"GET"})
+  //  */
+  // public function checkFollow(Vendor $vendor, Request $request, ObjectManager $manager, FollowRepository $followRepo) {
+  //   $follow = $followRepo->findOneBy(['following' => $vendor, 'vendor' => $this->getUser() ]);
 
-    if ($follow) {
-      return $this->json(true, 200);
-    }
+  //   if ($follow) {
+  //     return $this->json(true, 200);
+  //   }
 
-    return $this->json(false, 200);
-  }
+  //   return $this->json(false, 200);
+  // }
 
 }

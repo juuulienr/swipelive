@@ -27,6 +27,17 @@ class ClipRepository extends ServiceEntityRepository
                     ->getQuery()
                     ->getResult();
     }
+
+
+    public function findClipByFollowing($vendor){
+        return $this->createQueryBuilder('c')
+                    ->join('c.vendor', 'v')
+                    ->join('v.following', 'f')
+                    ->andWhere('f.vendor = :vendor')
+                    ->setParameter('vendor', $vendor)
+                    ->getQuery()
+                    ->getResult();
+    }
     // /**
     //  * @return Clip[] Returns an array of Clip objects
     //  */
