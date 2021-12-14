@@ -138,10 +138,10 @@ class AccountAPIController extends Controller {
       file_put_contents($filepath, file_get_contents($file));
 
       $vendor = $this->getUser();
-      $vendor->setPicture($filepath);
+      $vendor->setPicture($filename);
       $manager->flush();
 
-      return $this->json($filepath, 200);
+      return $this->json($filename, 200);
     }
 
     return $this->json("L'image est introuvable !", 404);
