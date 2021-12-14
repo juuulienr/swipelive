@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : jeu. 18 nov. 2021 à 11:43
+-- Généré le : mar. 14 déc. 2021 à 11:24
 -- Version du serveur :  5.7.32
 -- Version de PHP : 7.4.12
 
@@ -31,17 +31,17 @@ CREATE TABLE `category` (
 --
 
 INSERT INTO `category` (`id`, `name`, `picture`) VALUES
-(1, 'Soins & Beauté', '5f35c803603d997aed6d06ca_icon-bath-beauty.svg'),
-(2, 'Bijoux', NULL),
-(4, 'Accessoires', NULL),
-(5, 'Mode Homme', NULL),
-(6, 'Mode Femme', NULL),
-(7, 'Enfants & Bébés', NULL),
-(8, 'Sport', '5f35c8029bbed6c643548f70_icon-sports-outdoors.svg'),
-(9, 'Electronique', NULL),
-(10, 'Décoration', NULL),
-(11, 'Autres', NULL),
-(12, 'Alimentation', NULL);
+(1, 'Soins & Beauté', 'soins-beaute.svg'),
+(2, 'Bijoux', 'bijoux.svg'),
+(4, 'Accessoires', 'accessoires.svg'),
+(5, 'Mode Homme', 'mode-homme.svg'),
+(6, 'Mode Femme', 'mode-femme.svg'),
+(7, 'Enfants & Bébés', 'enfants-bebes.svg'),
+(8, 'Sport', 'sports.svg'),
+(9, 'Electronique', 'electroniques.svg'),
+(10, 'Décoration', 'decorations.svg'),
+(11, 'Autres', 'autres.svg'),
+(12, 'Alimentation', 'alimentation.svg');
 
 -- --------------------------------------------------------
 
@@ -66,8 +66,8 @@ CREATE TABLE `clip` (
 --
 
 INSERT INTO `clip` (`id`, `vendor_id`, `live_id`, `start`, `end`, `duration`, `filename`, `product_id`, `thumbnail`) VALUES
-(5, 1, 32, 0, 8, 8, '1c8311f0-13bd-bec5-3073-757cfd-9c0ab3b07e54591904a0ac447321ee79.mp4', 2, 'thumbnail.png'),
-(6, 1, 32, 9, 18, 8, '1c8311f0-13bd-bec5-3073-757cfd-3c115b544603538f2d66f13aa1bf029e.mp4', 1, 'thumbnail2.png'),
+(5, 1, 32, 0, 8, 8, '1c8311f0-13bd-bec5-3073-757cfd-9c0ab3b07e54591904a0ac447321ee79.mp4', 2, 'thumbnail.jpg'),
+(6, 1, 32, 9, 18, 8, '1c8311f0-13bd-bec5-3073-757cfd-3c115b544603538f2d66f13aa1bf029e.mp4', 1, 'thumbnail2.jpg'),
 (7, 2, 36, 0, 34, 34, '1c8311f0-13bd-bec5-3073-757cfd-20d6bc697bd6327518e8ae4ada50d44f.mp4', 10, 'c8a24b07-df04-4919-a3a2-748221b55dcc.jpg'),
 (8, 2, 38, 0, 9, 9, '1c8311f0-13bd-bec5-3073-757cfd-a2369850f1cff9187ead37995bc8668d.mp4', 9, '4653f0ac-5042-4c11-992f-c664dd200c05.jpg');
 
@@ -89,7 +89,10 @@ CREATE TABLE `follow` (
 --
 
 INSERT INTO `follow` (`id`, `following_id`, `vendor_id`, `user_id`) VALUES
-(1, 1, 2, NULL);
+(1, 1, 2, NULL),
+(7, 2, 1, NULL),
+(20, 2, 3, NULL),
+(24, 1, 3, NULL);
 
 -- --------------------------------------------------------
 
@@ -118,8 +121,9 @@ CREATE TABLE `live` (
 INSERT INTO `live` (`id`, `vendor_id`, `broadcast_id`, `status`, `channel`, `event`, `display`, `resource_uri`, `thumbnail`, `created_at`, `viewers`) VALUES
 (32, 1, '3c4f77dc-71ee-4190-b2af-afc6edfb54c6', 2, 'channel32', 'event32', 1, 'https://cdn.bambuser.net/broadcasts/5ba0bee3-94e8-4120-a804-3a1ecbfef417?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328744&da_static=1&da_ttl=0&da_signature=cc1a826dbcb71986ef8c6c613d9b1d2680682514be15a58ffbaba02b6278778e', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg', '2021-10-26 16:31:42', NULL),
 (35, 1, 'fff9859f-5da3-42fc-b941-0bb1484dd88f', 2, 'channel35', 'event35', 1, 'https://cdn.bambuser.net/broadcasts/fff9859f-5da3-42fc-b941-0bb1484dd88f?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1635328744&da_static=1&da_ttl=0&da_signature=66aa05df995765d594455a05448651979a642ae088b330205eba292a8b002e3a', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC8yMmIzODg2ZC01YzYxLTRhNDAtYTc5NS0xZjZlYjhhMWNiNmEifQ==/preview.jpg', '2021-10-26 16:31:37', NULL),
-(36, 2, 'c8a24b07-df04-4919-a3a2-542693b55dccv', 1, 'channel36', 'event36', 1, 'https://cdn.bambuser.net/broadcasts/c8a24b07-df04-4919-a3a2-542693b55dcc?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1636630747&da_static=1&da_ttl=0&da_signature=b299b180652570f451efb273ad09fe930ae3e0b365b58d9560ed9c7f408b83d4', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC9jOGEyNGIwNy1kZjA0LTQ5MTktYTNhMi01NDI2OTNiNTVkY2MifQ==/preview.jpg', '2021-11-01 16:31:40', -1),
-(38, 2, '4653f0ac-5042-4c11-992f-3393f7200c05', 1, 'channel123', 'event123', 1, 'https://cdn.bambuser.net/broadcasts/4653f0ac-5042-4c11-992f-3393f7200c05?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1636713299&da_static=1&da_ttl=0&da_signature=7c81f82a6b73506fa9f4cffa2c0a4173c317f9b21777882c90cc2c0a4de11c6f', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC80NjUzZjBhYy01MDQyLTRjMTEtOTkyZi0zMzkzZjcyMDBjMDUifQ==/preview.jpg', '2021-11-12 11:34:51', 1);
+(36, 2, 'c8a24b07-df04-4919-a3a2-542693b55dccv', 2, 'channel36', 'event36', 1, 'https://cdn.bambuser.net/broadcasts/c8a24b07-df04-4919-a3a2-542693b55dcc?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1636630747&da_static=1&da_ttl=0&da_signature=b299b180652570f451efb273ad09fe930ae3e0b365b58d9560ed9c7f408b83d4', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC9jOGEyNGIwNy1kZjA0LTQ5MTktYTNhMi01NDI2OTNiNTVkY2MifQ==/preview.jpg', '2021-11-01 16:31:40', 1),
+(38, 2, '4653f0ac-5042-4c11-992f-3393f7200c05', 2, 'channel123', 'event123', 1, 'https://cdn.bambuser.net/broadcasts/4653f0ac-5042-4c11-992f-3393f7200c05?da_signature_method=HMAC-SHA256&da_id=9e1b1e83-657d-7c83-b8e7-0b782ac9543a&da_timestamp=1636713299&da_static=1&da_ttl=0&da_signature=7c81f82a6b73506fa9f4cffa2c0a4173c317f9b21777882c90cc2c0a4de11c6f', 'https://preview.bambuser.io/live/eyJyZXNvdXJjZVVyaSI6Imh0dHBzOlwvXC9jZG4uYmFtYnVzZXIubmV0XC9icm9hZGNhc3RzXC80NjUzZjBhYy01MDQyLTRjMTEtOTkyZi0zMzkzZjcyMDBjMDUifQ==/preview.jpg', '2021-11-12 11:34:51', 0),
+(39, 2, NULL, 0, NULL, NULL, 1, NULL, NULL, '2021-12-07 12:26:25', 0);
 
 -- --------------------------------------------------------
 
@@ -142,7 +146,9 @@ INSERT INTO `live_products` (`id`, `product_id`, `live_id`, `priority`) VALUES
 (64, 8, 32, 1),
 (67, 1, 35, 1),
 (68, 2, 36, 1),
-(73, 9, 38, 1);
+(73, 9, 38, 1),
+(74, 9, 39, 1),
+(75, 10, 39, 2);
 
 -- --------------------------------------------------------
 
@@ -188,7 +194,11 @@ INSERT INTO `message` (`id`, `live_id`, `user_id`, `vendor_id`, `type`, `created
 (69, 38, NULL, 2, 0, '2021-11-17 13:12:55', 'fdfdfd', NULL),
 (70, 38, NULL, 2, 0, '2021-11-17 17:30:56', 'hello', NULL),
 (71, 36, NULL, 1, 0, '2021-11-18 11:27:08', 'heyyy', NULL),
-(72, 36, NULL, 1, 0, '2021-11-18 11:34:45', 'au top', NULL);
+(72, 36, NULL, 1, 0, '2021-11-18 11:34:45', 'au top', NULL),
+(73, 32, NULL, 2, 0, '2021-12-07 15:16:06', 'fddfdfdf', NULL),
+(74, 32, NULL, 2, 0, '2021-12-07 15:16:20', 'hello', NULL),
+(75, 36, NULL, 2, 0, '2021-12-07 15:16:25', 'dfdfdfd', NULL),
+(76, 36, NULL, 2, 0, '2021-12-07 15:16:29', 'fdfdfdfdfd', NULL);
 
 -- --------------------------------------------------------
 
@@ -218,7 +228,7 @@ INSERT INTO `product` (`id`, `category_id`, `vendor_id`, `description`, `online`
 (2, 1, 1, 'Laissez-vous envoûter par les pouvoirs revitalisants et protecteurs de l’huile de Figue de Barbarie ! \r\n\r\nLa gamme à l’huile de Figue de Barbarie de Youarda.C est un véritable concentré de bienfaits pour vos cheveux, elle nourrit votre cuir chevelu en profondeur, favorise la micro-circulation et hydrate le cheveu.\r\n\r\n', 1, 39.9, 49.9, 23, 1, 'Gamme Ricin'),
 (8, 6, 1, 'Test', 1, 79.99, 99.99, 10, 1, 'Veste sandro'),
 (9, 9, 2, 'Rehaussez vos séances de jeu avec des chargements à la vitesse de l’éclair grâce au disque SSD ultrarapide, une meilleure immersion grâce au retour haptique, aux gâchettes adaptatives et à la technologie audio 3D, et l’incroyable catalogue de jeux PlayStation® nouvelle génération.\r\n\r\n', 1, 500, 600, 100, 1, 'Playstation 5'),
-(10, 9, 2, 'Les invitations sont lancées ! Réunissez famille et amis pour vous affronter sur le jeu de plateau le plus déjanté avec Mario Party Superstars dès le 29 octobre sur Nintendo Switch.\r\n\r\nMario, Peach et tous leurs amis sont prêts à faire la fête avec vous sur 5 plateaux issus des versions Nintendo 64. Au début de chaque tour, lancez votre dé pour avancer. Votre but : réunir le plus de pièces possible pour acheter des étoiles et gagner la partie ! Comment ? Affrontez-vous autour de mini-jeux à la fin de chaque tour pour tenter de ramasser le plus de pièces possible. Courses, jeux d’agilité ou de réflexe… 100 mini-jeux issus de toute la série vont vous permettre de défier vos proches.\r\n\r\nAttention sur votre chemin… chaque plateau comporte son lot de surprises et les renversements de situation sont de la partie. Gare aux Roi Boo dans le Pays de l’horreur. Il peut vous voler vos étoiles à tout moment et sans prévenir ! Sur l’Île tropicale de Yoshi, Bowser peut remplacer Toadette n’importe quand et l’étoile peut vous passer sous le nez.\r\n\r\n', 1, 49, 59, 1000, 1, 'Mario party superstars');
+(10, 9, 2, 'Les invitations sont lancées ! Réunissez famille et amis pour vous affronter sur le jeu de plateau le plus déjanté avec Mario Party Superstars dès le 29 octobre sur Nintendo Switch.\r\n\r\nMario, Peach et tous leurs amis sont prêts à faire la fête avec vous sur 5 plateaux issus des versions Nintendo 64. Au début de chaque tour, lancez votre dé pour avancer. Votre but : réunir le plus de pièces possible pour acheter des étoiles et gagner la partie ! Comment ? Affrontez-vous autour de mini-jeux à la fin de chaque tour pour tenter de ramasser le plus de pièces possible. Courses, jeux d’agilité ou de réflexe… 100 mini-jeux issus de toute la série vont vous permettre de défier vos proches.\r\n\r\nAttention sur votre chemin… chaque plateau comporte son lot de surprises et les renversements de situation sont de la partie. Gare aux Roi Boo dans le Pays de l’horreur. Il peut vous voler vos étoiles à tout moment et sans prévenir ! Sur l’Île tropicale de Yoshi, Bowser peut remplacer Toadette n’importe quand et l’étoile peut vous passer sous le nez.\r\n\r\n', 1, 49, NULL, 1000, 1, 'Mario party superstars');
 
 -- --------------------------------------------------------
 
@@ -290,7 +300,8 @@ CREATE TABLE `vendor` (
 
 INSERT INTO `vendor` (`id`, `email`, `hash`, `push_token`, `created_at`, `company`, `firstname`, `lastname`, `summary`, `picture`, `facebook`, `instagram`, `snapchat`, `pinterest`) VALUES
 (1, 'julienreignierr@gmail.com', '$2y$13$3kA7Taz29ojRAQ3Fc48w0uGJGi6/r70zH5v1sP4euOsJ6VWNQyQP2', NULL, '2021-10-06 11:11:06', 'Julien SAS', 'Julien', 'REIGNIER', 'Boutique de vêtements et accessoires', '1a058cfb9ea95f0acd4fedd647d5bb40.jpg', 'juuulienr', 'juuulienr', 'juuulienr', 'juuulienr'),
-(2, 'c.cheklat@yahoo.fr', '$2y$13$3kA7Taz29ojRAQ3Fc48w0uGJGi6/r70zH5v1sP4euOsJ6VWNQyQP2', NULL, '2021-10-13 13:53:21', 'CHEMS SAS', 'Chems eddine', 'Cheklat', 'Boutique de jeux vidéos et accessoires', 'ad5c0d1afe40f225779afda26ff9d4a6.jpg', 'kabyleluxe', 'kabyleluxe', 'kabyleluxe', 'kabyleluxe');
+(2, 'c.cheklat@yahoo.fr', '$2y$13$3kA7Taz29ojRAQ3Fc48w0uGJGi6/r70zH5v1sP4euOsJ6VWNQyQP2', NULL, '2021-10-13 13:53:21', 'CHEMS SAS', 'Chems eddine', 'Cheklat', 'Boutique de jeux vidéos et accessoires', 'ad5c0d1afe40f225779afda26ff9d4a6.jpg', 'kabyleluxe', 'kabyleluxe', 'kabyleluxe', 'kabyleluxe'),
+(3, 'test@gmail.com', '$2y$13$xEmLZF.C88YEphFvv6lUJuUT3PU3A4TXRqIp5QRXNGd7ofTy4hTpm', NULL, '2021-12-10 15:15:29', 'TEST SAS', 'test', 'test', 'Je suis un compte test pour voir si ça marche', NULL, '', '', '', '');
 
 --
 -- Index pour les tables déchargées
@@ -391,25 +402,25 @@ ALTER TABLE `clip`
 -- AUTO_INCREMENT pour la table `follow`
 --
 ALTER TABLE `follow`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT pour la table `live`
 --
 ALTER TABLE `live`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT pour la table `live_products`
 --
 ALTER TABLE `live_products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT pour la table `message`
 --
 ALTER TABLE `message`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
 --
 -- AUTO_INCREMENT pour la table `product`
@@ -433,7 +444,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT pour la table `vendor`
 --
 ALTER TABLE `vendor`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Contraintes pour les tables déchargées
