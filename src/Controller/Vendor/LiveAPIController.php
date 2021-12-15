@@ -94,7 +94,7 @@ class LiveAPIController extends Controller {
       $manager->flush();
 
       // créer le clip
-      $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "display" => $display ]);
+      $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $display ]);
 
       if ($liveProduct) {
         $clip = new Clip();
