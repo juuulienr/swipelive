@@ -94,7 +94,7 @@ class LiveAPIController extends Controller {
       $manager->flush();
 
       // créer le clip
-      $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $display ]);
+      $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $display - 1 ]);
 
       if ($liveProduct) {
         $clip = new Clip();
@@ -112,7 +112,7 @@ class LiveAPIController extends Controller {
         $created = $live->getCreatedAt();
         $now = new \DateTime('now', timezone_open('Europe/Paris'));
         $end = $now->diff($created);
-        $end = $end->format('U');
+        $end = (string) $end->format('U');
 
         $clip->setStart($start);
         $clip->setEnd($end);
