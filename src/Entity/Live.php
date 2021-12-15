@@ -44,7 +44,6 @@ class Live
 
     /**
      * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="live", orphanRemoval=true)
-     * @ORM\OrderBy({"priority" = "ASC"})
      * @Groups("live:read")
      */
     private $clips;
