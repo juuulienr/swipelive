@@ -44,6 +44,7 @@ class Live
 
     /**
      * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="live", orphanRemoval=true)
+     * @ORM\OrderBy({"priority" = "ASC"})
      * @Groups("live:read")
      */
     private $clips;
@@ -102,10 +103,14 @@ class Live
      */
     private $viewers;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $duration;
+
     
     public function __construct()
     {
-        $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->messages = new ArrayCollection();
         $this->clips = new ArrayCollection();
         $this->viewers = 0;
@@ -326,6 +331,18 @@ class Live
     public function setViewers(?int $viewers): self
     {
         $this->viewers = $viewers;
+
+        return $this;
+    }
+
+    public function getDuration(): ?int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(?int $duration): self
+    {
+        $this->duration = $duration;
 
         return $this;
     }

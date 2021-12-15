@@ -71,6 +71,16 @@ class Clip
      */
     private $thumbnail;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $broadcastId;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $status;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -168,6 +178,30 @@ class Clip
     public function setThumbnail(?string $thumbnail): self
     {
         $this->thumbnail = $thumbnail;
+
+        return $this;
+    }
+
+    public function getBroadcastId(): ?string
+    {
+        return $this->broadcastId;
+    }
+
+    public function setBroadcastId(?string $broadcastId): self
+    {
+        $this->broadcastId = $broadcastId;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?string $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

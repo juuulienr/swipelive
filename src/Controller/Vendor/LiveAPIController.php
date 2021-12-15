@@ -92,7 +92,60 @@ class LiveAPIController extends Controller {
       $live->setDisplay($display);
       $manager->flush();
 
-      // enregistrer la durée pour créer et récupérer le clip
+      // créer le clip
+      $liveProduct = $repo->findOneBy([ "live" => $live, "display" => $display ]);
+
+      if ($liveProduct) {
+        $clip = new Clip();
+        $clip->setVendor($vendor);
+        $clip->setLive($live);
+        $clip->setThumbnail($live->getThumbnail());
+        $clip->setProduct($liveProduct->getProduct());
+
+        if ($display < 2) {
+          $start = 0;
+        } else {
+          $start = $live->getDuration() + 1;
+        }
+
+        $created = $live->getCreatedAt();
+        $now = Carbon::now();
+        $end = $now->diffInSeconds($created);
+
+        $clip->setStart($start);
+        $clip->setEnd($end);
+        $clip->setDuration($end - $start);
+
+        $data = [
+          "source" => [
+            "broadcastId" => $live->getBroadcastId(), 
+            "start" => $start, 
+            "end" => $end
+          ]
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_URL, "https://api.bambuser.com/broadcasts");
+
+        $result = curl_exec($ch);
+        $result = json_decode($result);
+        curl_close($ch);
+
+        if ($result && $result->newBroadcastId) {
+          $clip->setBroadcastId($result->newBroadcastId);
+          $clip->setStatus($result->status);
+        }
+
+        $live->setDuration($end);
+
+        $manager->persist($clip);
+        $manager->flush();
+      }
+
       $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger($live->getChannel(), $live->getEvent(), [ "display" => $display ]);
     
@@ -125,9 +178,14 @@ class LiveAPIController extends Controller {
         curl_close($ch);
 
         if ($result && $result->id) {
+          $unix = $result->created;
+          $createdAt = new Carbon('@$unix', 'Europe/Paris');
+          $createdAt->add('1', "hour");
+
           $live->setBroadcastId($broadcastId);
           $live->setResourceUri($result->resourceUri);
           $live->setThumbnail($result->preview);
+          $live->setCreatedAt($createdAt);
           $live->setStatus(1);
           $manager->flush();
 
