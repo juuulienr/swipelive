@@ -180,7 +180,7 @@ class LiveAPIController extends Controller {
 
         if ($result && $result->id) {
           $unix = $result->created;
-          $createdAt = new Carbon('@$unix', 'Europe/Paris');
+          $createdAt = new Carbon($unix, 'Europe/Paris');
           $createdAt->add('1', "hour");
 
           $live->setBroadcastId($broadcastId);
