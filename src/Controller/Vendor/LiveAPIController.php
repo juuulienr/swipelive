@@ -103,7 +103,7 @@ class LiveAPIController extends Controller {
         $clip->setThumbnail($live->getThumbnail());
         $clip->setProduct($liveProduct->getProduct());
 
-        if ($display < 2) {
+        if ($display == 1) {
           $start = 0;
         } else {
           $start = $live->getDuration() + 1;
@@ -112,7 +112,7 @@ class LiveAPIController extends Controller {
         $created = $live->getCreatedAt();
         $now = new \DateTime('now', timezone_open('Europe/Paris'));
         $end = $now->diff($created);
-        $end = $end->format('%s');
+        $end = $end->format('U');
 
         $clip->setStart($start);
         $clip->setEnd($end);
@@ -230,10 +230,67 @@ class LiveAPIController extends Controller {
    *
    * @Route("/vendor/api/live/stop/{id}", name="vendor_api_live_stop", methods={"PUT"})
    */
-  public function stopLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function stopLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo) {
     if ($json = $request->getContent()) {
       $live->setStatus(2);
       $manager->flush();
+
+      $vendor = $this->getUser();
+
+      // créer le dernier clip
+      $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
+
+      if ($liveProduct) {
+        $clip = new Clip();
+        $clip->setVendor($vendor);
+        $clip->setLive($live);
+        $clip->setThumbnail($live->getThumbnail());
+        $clip->setProduct($liveProduct->getProduct());
+
+        if ($display == 1) {
+          $start = 0;
+        } else {
+          $start = $live->getDuration() + 1;
+        }
+
+        $created = $live->getCreatedAt();
+        $now = new \DateTime('now', timezone_open('Europe/Paris'));
+        $end = $now->diff($created);
+        $end = $end->format('U');
+
+        $clip->setStart($start);
+        $clip->setEnd($end);
+        $clip->setDuration($end - $start);
+
+        $data = [
+          "source" => [
+            "broadcastId" => $live->getBroadcastId(), 
+            "start" => $start, 
+            "end" => $end
+          ]
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_URL, "https://api.bambuser.com/broadcasts");
+
+        $result = curl_exec($ch);
+        $result = json_decode($result);
+        curl_close($ch);
+
+        if ($result && $result->newBroadcastId) {
+          $clip->setBroadcastId($result->newBroadcastId);
+          $clip->setStatus($result->status);
+        }
+
+        $live->setDuration($end);
+
+        $manager->persist($clip);
+        $manager->flush();
+      }
 
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
     }
