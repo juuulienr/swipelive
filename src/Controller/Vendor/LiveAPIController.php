@@ -11,6 +11,7 @@ use App\Entity\Follow;
 use App\Entity\Product;
 use App\Entity\LiveProducts;
 use App\Entity\Upload;
+use App\Repository\LiveProductRepository;
 use App\Repository\FollowRepository;
 use App\Repository\VendorRepository;
 use App\Repository\ClipRepository;
@@ -83,7 +84,7 @@ class LiveAPIController extends Controller {
    *
    * @Route("/vendor/api/live/{id}/update/display", name="vendor_api_live_update_display", methods={"PUT"})
    */
-  public function updateDisplay(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function updateDisplay(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductRepository $liveProductRepo) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
       $display = $param["display"];
@@ -93,7 +94,7 @@ class LiveAPIController extends Controller {
       $manager->flush();
 
       // créer le clip
-      $liveProduct = $repo->findOneBy([ "live" => $live, "display" => $display ]);
+      $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "display" => $display ]);
 
       if ($liveProduct) {
         $clip = new Clip();
