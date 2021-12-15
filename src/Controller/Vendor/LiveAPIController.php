@@ -27,7 +27,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Carbon\Carbon; 
 
 
 class LiveAPIController extends Controller {
@@ -110,8 +109,9 @@ class LiveAPIController extends Controller {
         }
 
         $created = $live->getCreatedAt();
-        $now = Carbon::now();
-        $end = $now->diffInSeconds($created);
+        $now = new \DateTime('now', timezone_open('Europe/Paris'));
+        $end = $now->diff($created);
+        $end = $end->format('%s');
 
         $clip->setStart($start);
         $clip->setEnd($end);
@@ -180,8 +180,9 @@ class LiveAPIController extends Controller {
 
         if ($result && $result->id) {
           $unix = $result->created;
-          $createdAt = new Carbon($unix, 'Europe/Paris');
-          $createdAt->add('1', "hour");
+          $gmdate = gmdate("d-m-Y H:i:s", $unix);
+          $createdAt = new \DateTime($gmdate);
+          $createdAt->modify('+1 hour');
 
           $live->setBroadcastId($broadcastId);
           $live->setResourceUri($result->resourceUri);
