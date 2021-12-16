@@ -93,6 +93,9 @@ class LiveAPIController extends Controller {
       $live->setDisplay($display);
       $manager->flush();
 
+      $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher->trigger($live->getChannel(), $live->getEvent(), [ "display" => $display ]);
+
       // créer le clip pour le produit précédent
       $display = $display - 1;
       $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $display ]);
@@ -148,9 +151,6 @@ class LiveAPIController extends Controller {
         $manager->persist($clip);
         $manager->flush();
       }
-
-      $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
-      $pusher->trigger($live->getChannel(), $live->getEvent(), [ "display" => $display ]);
     
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
     }
@@ -233,10 +233,10 @@ class LiveAPIController extends Controller {
    */
   public function stopLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo) {
     if ($json = $request->getContent()) {
+      $vendor = $this->getUser();
       $live->setStatus(2);
       $manager->flush();
 
-      $vendor = $this->getUser();
 
       // créer le dernier clip
       $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
