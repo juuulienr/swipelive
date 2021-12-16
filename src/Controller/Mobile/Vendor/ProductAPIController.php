@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Vendor;
+namespace App\Controller\Mobile\Vendor;
 
 use App\Entity\Vendor;
 use App\Entity\Clip;

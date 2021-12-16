@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Vendor;
+namespace App\Controller\Mobile\Vendor;
 
 use App\Entity\Vendor;
 use App\Entity\Clip;
@@ -236,7 +236,6 @@ class LiveAPIController extends Controller {
       $vendor = $this->getUser();
       $live->setStatus(2);
       $manager->flush();
-
 
       // créer le dernier clip
       $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);

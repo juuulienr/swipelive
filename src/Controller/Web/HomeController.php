@@ -13,7 +13,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Cookie;
 
 
-class WebController extends Controller {
+class HomeController extends Controller {
 
     /**
      * @Route("/", name="home")
@@ -55,6 +55,13 @@ class WebController extends Controller {
      */
     public function cookies(){
         return $this->render('web/cookies.html.twig');
+    }
+
+    /**
+     * @Route("/test", name="test")
+     */
+    public function test(){
+        return $this->json(true);
     }
 }
 
