@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Mobile;
+namespace App\Controller\Mobile\Anonyme;
 
 use App\Entity\Live;
 use App\Entity\User;
