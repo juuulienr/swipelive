@@ -93,8 +93,9 @@ class LiveAPIController extends Controller {
       $live->setDisplay($display);
       $manager->flush();
 
-      // créer le clip
-      $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $display - 1 ]);
+      // créer le clip pour le produit précédent
+      $display = $display - 1;
+      $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $display ]);
 
       if ($liveProduct) {
         $clip = new Clip();
@@ -111,8 +112,8 @@ class LiveAPIController extends Controller {
 
         $created = $live->getCreatedAt();
         $now = new \DateTime('now', timezone_open('Europe/Paris'));
-        $end = $now->diff($created);
-        $end = (string) $end->format('U');
+        $diff = $now->diff($created);
+        $end = $this->dateIntervalToSeconds($diff);
 
         $clip->setStart($start);
         $clip->setEnd($end);
@@ -255,8 +256,8 @@ class LiveAPIController extends Controller {
 
         $created = $live->getCreatedAt();
         $now = new \DateTime('now', timezone_open('Europe/Paris'));
-        $end = $now->diff($created);
-        $end = $end->format('U');
+        $diff = $now->diff($created);
+        $end = $this->dateIntervalToSeconds($diff);
 
         $clip->setStart($start);
         $clip->setEnd($end);
@@ -372,5 +373,13 @@ class LiveAPIController extends Controller {
     $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
     return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+  }
+
+
+  function dateIntervalToSeconds($dateInterval)  {
+    $reference = new \DateTimeImmutable;
+    $endTime = $reference->add($dateInterval);
+
+    return $endTime->getTimestamp() - $reference->getTimestamp();
   }
 }

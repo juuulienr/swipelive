@@ -60,10 +60,6 @@ class APIController extends Controller {
    */
   public function lastClips(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
   {
-          $date = gmdate("d-m-Y H:i:s", 1639578020);
-          $currentTime = new \DateTime($date);
-          $currentTime->modify('+1 hour');
-          dd($currentTime);
     $clips = $clipRepo->findByClip(10);
 
     return $this->json($clips, 200, [], ['groups' => 'clip:read']);
