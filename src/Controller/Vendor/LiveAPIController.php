@@ -380,6 +380,6 @@ class LiveAPIController extends Controller {
     $reference = new \DateTimeImmutable;
     $endTime = $reference->add($dateInterval);
 
-    return $endTime->getTimestamp() - $reference->getTimestamp();
+    return $reference->getTimestamp() - $endTime->getTimestamp();
   }
 }
