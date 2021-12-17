@@ -110,12 +110,13 @@ class Live
     
     public function __construct()
     {
+        $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->messages = new ArrayCollection();
         $this->clips = new ArrayCollection();
+        $this->liveProducts = new ArrayCollection();
         $this->viewers = 0;
         $this->status = 0;
         $this->display = 1;
-        $this->liveProducts = new ArrayCollection();
     }
 
 
