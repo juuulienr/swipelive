@@ -176,4 +176,14 @@ class APIController extends Controller {
 
     return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
   }
+
+
+  /**
+   * Webhooks Bambuser
+   *
+   * @Route("/api/bambuser/webhooks", name="api_bambuser_webhooks", methods={"POST"})
+   */
+  public function webhooks(Request $request) {
+    return $this->json(true, 200);
+  }
 }
