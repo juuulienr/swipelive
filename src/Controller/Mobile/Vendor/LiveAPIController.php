@@ -142,6 +142,7 @@ class LiveAPIController extends Controller {
 
         if ($result && $result->newBroadcastId) {
           $clip->setBroadcastId($result->newBroadcastId);
+          $clip->setPreview($result->preview);
           $clip->setStatus($result->status);
         }
 
@@ -281,6 +282,7 @@ class LiveAPIController extends Controller {
 
         if ($result && $result->newBroadcastId) {
           $clip->setBroadcastId($result->newBroadcastId);
+          $clip->setPreview($result->preview);
           $clip->setStatus($result->status);
         }
 
