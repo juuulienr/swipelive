@@ -185,9 +185,6 @@ class APIController extends Controller {
    */
   public function webhooks(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager) {
     $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyException(
-      new Exception($result["payload"]["id"])
-    );
 
     if ($result["collection"] == "broadcast") {
       if ($result["action"] == "add") {
@@ -196,7 +193,7 @@ class APIController extends Controller {
 
         if ($clip) {
           $clip->setPreview($result["payload"]["preview"]);
-          $clip->setRessourceUri($result["payload"]["preview"]);
+          $clip->setResourceUri($result["payload"]["preview"]);
           $clip->setStatus("available");
           $manager->flush();
         }

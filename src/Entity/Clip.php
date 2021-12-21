@@ -51,7 +51,7 @@ class Clip
     private $duration;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      * @Groups("clip:read")
      * @Groups("vendor:read")
      */
