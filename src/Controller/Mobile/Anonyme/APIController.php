@@ -186,9 +186,9 @@ class APIController extends Controller {
   public function webhooks(Request $request) {
     $result = json_decode($request->getContent(), true);
 
-    $this->get('bugsnag')->notifyException(
-        new Exception($result)
-    );
+    // $this->get('bugsnag')->notifyException(
+    //     new Exception($result)
+    // );
     
     $this->get('bugsnag')->notifyException(
         new Exception($result["message"])
