@@ -195,21 +195,28 @@ class APIController extends Controller {
         $clip = $clipRepo->findOneByBroadcastId($broadcastId);
 
         if ($clip) {
-          if ($result["payload"]["preview"]) {
-            $clip->setPreview($result["payload"]["preview"]);
-          }
           $clip->setResourceUri($result["payload"]["resourceUri"]);
           $clip->setStatus("available");
           $manager->flush();
         }
       }
-      
+
       if ($result["action"] == "update") {
         $broadcastId = $result["payload"]["id"];
         $live = $liveRepo->findOneByBroadcastId($broadcastId);
 
         if ($live && $result["payload"]["type"] == "archived") {
           $live->setStatus(2);
+          $manager->flush();
+        }
+
+        $clip = $clipRepo->findOneByBroadcastId($broadcastId);
+
+        if ($clip) {
+          if ($result["payload"]["preview"]) {
+            $clip->setPreview($result["payload"]["preview"]);
+          }
+          
           $manager->flush();
         }
       }
