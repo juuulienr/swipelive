@@ -183,20 +183,34 @@ class APIController extends Controller {
    *
    * @Route("/api/bambuser/webhooks", name="api_bambuser_webhooks", methods={"POST"})
    */
-  public function webhooks(Request $request) {
+  public function webhooks(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager) {
     $result = json_decode($request->getContent(), true);
+    $this->get('bugsnag')->notifyException(
+      new Exception($result["payload"]["id"])
+    );
 
-    $this->get('bugsnag')->notifyException(
-        new Exception($result["action"])
-    );
-    
-    $this->get('bugsnag')->notifyException(
-        new Exception($result["collection"])
-    );
-    
-    // $this->get('bugsnag')->notifyException(
-    //     new Exception($result["action"])
-    // );
+    if ($result["collection"] == "broadcast") {
+      if ($result["action"] == "add") {
+        $broadcastId = $result["payload"]["id"];
+        $clip = $clipRepo->findOneByBroadcastId($broadcastId);
+
+        if ($clip) {
+          $clip->setPreview($result["payload"]["preview"]);
+          $clip->setRessourceUri($result["payload"]["preview"]);
+          $clip->setStatus("available");
+          $manager->flush();
+        }
+      }
+      if ($result["action"] == "update") {
+        $broadcastId = $result["payload"]["id"];
+        $live = $liveRepo->findOneByBroadcastId($broadcastId);
+
+        if ($live && $result["payload"]["type"] == "archived") {
+          $live->setStatus(2);
+          $manager->flush();
+        }
+      }
+    }
 
     return $this->json(true, 200);
   }

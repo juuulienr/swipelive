@@ -104,7 +104,6 @@ class LiveAPIController extends Controller {
         $clip = new Clip();
         $clip->setVendor($vendor);
         $clip->setLive($live);
-        $clip->setThumbnail($live->getThumbnail());
         $clip->setProduct($liveProduct->getProduct());
 
         if ($display == 1) {
@@ -188,7 +187,7 @@ class LiveAPIController extends Controller {
 
           $live->setBroadcastId($broadcastId);
           $live->setResourceUri($result->resourceUri);
-          $live->setThumbnail($result->preview);
+          $live->setPreview($result->preview);
           $live->setCreatedAt($createdAt);
           $live->setStatus(1);
           $manager->flush();
@@ -244,7 +243,6 @@ class LiveAPIController extends Controller {
         $clip = new Clip();
         $clip->setVendor($vendor);
         $clip->setLive($live);
-        $clip->setThumbnail($live->getThumbnail());
         $clip->setProduct($liveProduct->getProduct());
 
         if ($display == 1) {

@@ -89,7 +89,7 @@ class Live
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("live:read")
      */
-    private $thumbnail;
+    private $preview;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -105,6 +105,11 @@ class Live
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
+    private $totalViewers;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
     private $duration;
 
     
@@ -115,6 +120,7 @@ class Live
         $this->clips = new ArrayCollection();
         $this->liveProducts = new ArrayCollection();
         $this->viewers = 0;
+        $this->totalViewers = 0;
         $this->status = 0;
         $this->display = 1;
     }
@@ -299,14 +305,14 @@ class Live
         return $this;
     }
 
-    public function getThumbnail(): ?string
+    public function getPreview(): ?string
     {
-        return $this->thumbnail;
+        return $this->preview;
     }
 
-    public function setThumbnail(?string $thumbnail): self
+    public function setPreview(?string $preview): self
     {
-        $this->thumbnail = $thumbnail;
+        $this->preview = $preview;
 
         return $this;
     }
@@ -331,6 +337,18 @@ class Live
     public function setViewers(?int $viewers): self
     {
         $this->viewers = $viewers;
+
+        return $this;
+    }
+
+    public function getTotalViewers(): ?int
+    {
+        return $this->totalViewers;
+    }
+
+    public function setTotalViewers(?int $totalViewers): self
+    {
+        $this->totalViewers = $totalViewers;
 
         return $this;
     }

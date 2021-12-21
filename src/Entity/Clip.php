@@ -55,7 +55,7 @@ class Clip
      * @Groups("clip:read")
      * @Groups("vendor:read")
      */
-    private $filename;
+    private $resourceUri;
 
     /**
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="clips")
@@ -69,7 +69,7 @@ class Clip
      * @Groups("clip:read")
      * @Groups("vendor:read")
      */
-    private $thumbnail;
+    private $preview;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -146,14 +146,14 @@ class Clip
         return $this;
     }
 
-    public function getFilename(): ?string
+    public function getResourceUri(): ?string
     {
-        return $this->filename;
+        return $this->resourceUri;
     }
 
-    public function setFilename(?string $filename): self
+    public function setResourceUri(?string $resourceUri): self
     {
-        $this->filename = $filename;
+        $this->resourceUri = $resourceUri;
 
         return $this;
     }
@@ -170,14 +170,14 @@ class Clip
         return $this;
     }
 
-    public function getThumbnail(): ?string
+    public function getPreview(): ?string
     {
-        return $this->thumbnail;
+        return $this->preview;
     }
 
-    public function setThumbnail(?string $thumbnail): self
+    public function setPreview(?string $preview): self
     {
-        $this->thumbnail = $thumbnail;
+        $this->preview = $preview;
 
         return $this;
     }
