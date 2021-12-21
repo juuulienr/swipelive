@@ -20,6 +20,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 
 class APIController extends Controller {
@@ -29,8 +30,7 @@ class APIController extends Controller {
    *
    * @Route("/api/feed", name="api_feed", methods={"GET"})
    */
-  public function feed(Request $request, ObjectManager $manager, ClipRepository $clipRepo, LiveRepository $liveRepo, SerializerInterface $serializer)
-  {
+  public function feed(Request $request, ObjectManager $manager, ClipRepository $clipRepo, LiveRepository $liveRepo, SerializerInterface $serializer) {
     $lives = $liveRepo->findByLive();
     $array = [];
 
@@ -60,6 +60,10 @@ class APIController extends Controller {
    */
   public function lastClips(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
   {
+    $this->get('bugsnag')->notifyException(
+        new Exception('Example exception!');
+    );
+
     $clips = $clipRepo->findByClip(10);
 
     return $this->json($clips, 200, [], ['groups' => 'clip:read']);
