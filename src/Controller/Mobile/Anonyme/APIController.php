@@ -61,7 +61,7 @@ class APIController extends Controller {
   public function lastClips(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
   {
     $this->get('bugsnag')->notifyException(
-        new Exception('Example exception!');
+        new Exception('Example exception!')
     );
 
     $clips = $clipRepo->findByClip(10);
