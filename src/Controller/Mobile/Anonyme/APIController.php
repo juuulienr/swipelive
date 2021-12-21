@@ -60,10 +60,6 @@ class APIController extends Controller {
    */
   public function lastClips(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
   {
-    $this->get('bugsnag')->notifyException(
-        new Exception('Example exception!')
-    );
-
     $clips = $clipRepo->findByClip(10);
 
     return $this->json($clips, 200, [], ['groups' => 'clip:read']);
@@ -188,6 +184,10 @@ class APIController extends Controller {
    * @Route("/api/bambuser/webhooks", name="api_bambuser_webhooks", methods={"POST"})
    */
   public function webhooks(Request $request) {
+    $this->get('bugsnag')->notifyException(
+        new Exception('Bambuser exception!')
+    );
+
     return $this->json(true, 200);
   }
 }
