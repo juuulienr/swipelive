@@ -185,7 +185,10 @@ class APIController extends Controller {
    */
   public function webhooks(Request $request) {
     $this->get('bugsnag')->notifyException(
-        new Exception('Bambuser exception!')
+        new Exception($request->query)
+    );
+    $this->get('bugsnag')->notifyException(
+        new Exception($request->request)
     );
 
     return $this->json(true, 200);
