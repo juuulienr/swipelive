@@ -185,10 +185,13 @@ class APIController extends Controller {
    */
   public function webhooks(Request $request) {
     $this->get('bugsnag')->notifyException(
-        new Exception($request->query)
+        new Exception($request->getContent())
     );
     $this->get('bugsnag')->notifyException(
-        new Exception($request->request)
+        new Exception($request->query->get('message'))
+    );
+    $this->get('bugsnag')->notifyException(
+        new Exception($request->request->get('message'))
     );
 
     return $this->json(true, 200);
