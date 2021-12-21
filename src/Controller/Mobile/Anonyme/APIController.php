@@ -184,14 +184,14 @@ class APIController extends Controller {
    * @Route("/api/bambuser/webhooks", name="api_bambuser_webhooks", methods={"POST"})
    */
   public function webhooks(Request $request) {
+    $result = json_decode($request->getContent(), true);
+
     $this->get('bugsnag')->notifyException(
-        new Exception($request->getContent())
+        new Exception($result)
     );
+    
     $this->get('bugsnag')->notifyException(
-        new Exception($request->query->get('message'))
-    );
-    $this->get('bugsnag')->notifyException(
-        new Exception($request->request->get('message'))
+        new Exception($result["message"])
     );
 
     return $this->json(true, 200);
