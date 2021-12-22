@@ -78,6 +78,8 @@ class Clip
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("clip:read")
+     * @Groups("vendor:read")
      */
     private $status;
 
