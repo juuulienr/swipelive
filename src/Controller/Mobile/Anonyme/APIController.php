@@ -186,6 +186,10 @@ class APIController extends Controller {
   public function webhooks(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager) {
     $result = json_decode($request->getContent(), true);
 
+    $this->get('bugsnag')->notifyException(
+      new Exception($result["payload"]["id"]);
+    );
+
     if ($result["collection"] == "broadcast") {
       if ($result["action"] == "add") {
         $broadcastId = $result["payload"]["id"];
