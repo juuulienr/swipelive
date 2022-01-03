@@ -38,7 +38,7 @@ class RemoveWaitingLive extends ContainerAwareCommand
 
         if ($lives) {
             foreach ($lives as $live) {
-                if ($live->getCreatedAt() > $now && $live->getStatus() == 0) {
+                if ($live->getCreatedAt() < $now && $live->getStatus() == 0) {
                     $liveProducts = $live->getLiveProducts();
 
                     if ($liveProducts) {
