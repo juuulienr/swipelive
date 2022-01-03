@@ -2,6 +2,7 @@
 
 namespace App\Controller\Mobile\Anonyme;
 
+use App\Entity\Clip;
 use App\Entity\Live;
 use App\Entity\User;
 use App\Entity\Vendor;
