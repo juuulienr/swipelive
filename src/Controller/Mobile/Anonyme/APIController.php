@@ -183,7 +183,7 @@ class APIController extends Controller {
    *
    * @Route("/api/bambuser/webhooks", name="api_bambuser_webhooks", methods={"POST"})
    */
-  public function webhooks(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager) {
+  public function webhooks(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager, LiveProductsRepository $liveProductRepo) {
     $result = json_decode($request->getContent(), true);
     $this->get('bugsnag')->notifyException(new Exception($result["payload"]["id"]));
 
