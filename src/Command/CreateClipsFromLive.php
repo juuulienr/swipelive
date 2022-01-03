@@ -69,7 +69,7 @@ class CreateClipsFromLive extends ContainerAwareCommand
                 }
 
                 // mise à jour du clip
-                if ($clip->getBroadcastId() && $clip->getRessourceId() && $createdAt->modify('+10 minutes') < $now && $clip->getStatus() == "waiting") {
+                if ($clip->getBroadcastId() && $clip->getResourceUri() && $createdAt->modify('+10 minutes') < $now && $clip->getStatus() == "waiting") {
                     $clip->setStatus("available");
                     $this->manager->flush();
                 }
