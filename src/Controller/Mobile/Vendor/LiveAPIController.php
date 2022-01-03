@@ -236,6 +236,7 @@ class LiveAPIController extends Controller {
           $clip->setVendor($vendor);
           $clip->setLive($live);
           $clip->setProduct($liveProduct->getProduct());
+          $clip->setPreview($live->getPreview());
 
           $clip->setStart($start);
           $clip->setEnd($end);

@@ -199,6 +199,7 @@ class APIController extends Controller {
 
         if ($clip) {
           $clip->setResourceUri($result["payload"]["resourceUri"]);
+          $clip->setEventId($result["eventId"]);
 
           if ($result["payload"]["preview"]) {
             $clip->setPreview($result["payload"]["preview"]);
@@ -213,17 +214,26 @@ class APIController extends Controller {
         $broadcastId = $result["payload"]["id"];
         $live = $liveRepo->findOneByBroadcastId($broadcastId);
 
-        if ($live && $result["payload"]["type"] == "archived") {
-          $live->setStatus(2);
+        if ($live) {
+          $live->setEventId($result["eventId"]);
+
+          if ($result["payload"]["type"] == "archived") {
+            $live->setStatus(2);
+          }
+
+          $manager->flush();
         }
 
         $clip = $clipRepo->findOneByBroadcastId($broadcastId);
 
         if ($clip) {
+          $clip->setEventId($result["eventId"]);
+
           if ($result["payload"]["preview"]) {
             $clip->setPreview($result["payload"]["preview"]);
-            $manager->flush();
           }
+
+          $manager->flush();
         }
       }
 
@@ -233,10 +243,13 @@ class APIController extends Controller {
         $clip = $clipRepo->findOneByBroadcastId($broadcastId);
 
         if ($clip) {
+          $clip->setEventId($result["eventId"]);
+
           if ($result["payload"]["status"]) {
             $clip->setStatus($result["payload"]["status"]);
-            $manager->flush();
           }
+          
+          $manager->flush();
         }
       }
 
@@ -268,13 +281,5 @@ class APIController extends Controller {
     }
 
     return $this->json(true, 200);
-  }
-
-
-  function dateIntervalToSeconds($dateInterval) {
-    $reference = new \DateTimeImmutable;
-    $endTime = $reference->add($dateInterval);
-
-    return $reference->getTimestamp() - $endTime->getTimestamp();
   }
 }
