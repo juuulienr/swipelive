@@ -214,6 +214,7 @@ class LiveAPIController extends Controller {
     if ($json = $request->getContent()) {
       $vendor = $this->getUser();
       $live->setStatus(2);
+      $manager->flush();
 
       // créer le dernier clip
       $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
@@ -225,31 +226,40 @@ class LiveAPIController extends Controller {
           $start = $live->getDuration() + 1;
         }
 
-        $created = $live->getCreatedAt();
-        $now = new \DateTime('now', timezone_open('Europe/Paris'));
-        $diff = $now->diff($created);
-        $end = $this->dateIntervalToSeconds($diff);
-        $duration = $end - $start;
+        $url = "https://api.bambuser.com/broadcasts/" . $live->getBroadcastId();
+        $ch = curl_init();
 
-        if ($duration > 30) {
-          $clip = new Clip();
-          $clip->setVendor($vendor);
-          $clip->setLive($live);
-          $clip->setProduct($liveProduct->getProduct());
-          $clip->setPreview($live->getPreview());
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($ch, CURLOPT_URL, $url);
 
-          $clip->setStart($start);
-          $clip->setEnd($end);
-          $clip->setDuration($duration);
+        $result = curl_exec($ch);
+        $result = json_decode($result);
+        curl_close($ch);
 
-          $live->setDuration($end);
+        if ($result && $result->id) {
+          $end = $result->length;
+          $duration = $end - $start;
 
-          $manager->persist($clip);
-          $manager->flush();
+          if ($duration > 30) {
+            $clip = new Clip();
+            $clip->setVendor($vendor);
+            $clip->setLive($live);
+            $clip->setProduct($liveProduct->getProduct());
+            $clip->setPreview($live->getPreview());
+
+            $clip->setStart($start);
+            $clip->setEnd($end);
+            $clip->setDuration($duration);
+
+            $live->setDuration($end);
+
+            $manager->persist($clip);
+            $manager->flush();
+          }
         }
       }
-
-      $manager->flush();
 
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
     }
