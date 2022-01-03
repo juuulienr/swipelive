@@ -105,6 +105,7 @@ class LiveAPIController extends Controller {
         $clip->setVendor($vendor);
         $clip->setLive($live);
         $clip->setProduct($liveProduct->getProduct());
+        $clip->setPreview($live->getPreview());
 
         if ($display == 1) {
           $start = 0;
@@ -142,7 +143,6 @@ class LiveAPIController extends Controller {
 
         if ($result && $result->newBroadcastId) {
           $clip->setBroadcastId($result->newBroadcastId);
-          $clip->setPreview($result->preview);
           $clip->setStatus($result->status);
         }
 
@@ -245,6 +245,7 @@ class LiveAPIController extends Controller {
         $clip->setVendor($vendor);
         $clip->setLive($live);
         $clip->setProduct($liveProduct->getProduct());
+        $clip->setPreview($live->getPreview());
 
         if ($display == 1) {
           $start = 0;
@@ -282,7 +283,6 @@ class LiveAPIController extends Controller {
 
         if ($result && $result->newBroadcastId) {
           $clip->setBroadcastId($result->newBroadcastId);
-          $clip->setPreview($result->preview);
           $clip->setStatus($result->status);
         }
 
@@ -375,7 +375,7 @@ class LiveAPIController extends Controller {
   }
 
 
-  function dateIntervalToSeconds($dateInterval)  {
+  function dateIntervalToSeconds($dateInterval) {
     $reference = new \DateTimeImmutable;
     $endTime = $reference->add($dateInterval);
 
