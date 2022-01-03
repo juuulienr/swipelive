@@ -40,7 +40,8 @@ class CreateClipsFromLive extends ContainerAwareCommand
             foreach ($clips as $clip) {
                 $createdAt = $clip->getCreatedAt();
 
-                if ($createdAt->modify('+5 minutes') < $now && $clip->getStatus() == "waiting") {
+                // creation du clip sur bambuser
+                if (!$clip->getBroadcastId() && $createdAt->modify('+5 minutes') < $now && $clip->getStatus() == "waiting") {
                     $data = [
                       "source" => [
                         "broadcastId" => $clip->getLive()->getBroadcastId(), 
@@ -61,11 +62,17 @@ class CreateClipsFromLive extends ContainerAwareCommand
                     curl_close($ch);
 
                     if ($result && $result->newBroadcastId) {
-                      $clip->setBroadcastId($result->newBroadcastId);
+                        $clip->setBroadcastId($result->newBroadcastId);
                     }
 
                     $this->manager->flush();
-                }             
+                }
+
+                // mise à jour du clip
+                if ($clip->getBroadcastId() && $clip->getRessourceId() && $createdAt->modify('+10 minutes') < $now && $clip->getStatus() == "waiting") {
+                    $clip->setStatus("available");
+                    $this->manager->flush();
+                }
             }
         }
     }

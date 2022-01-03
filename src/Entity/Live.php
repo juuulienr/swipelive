@@ -43,6 +43,11 @@ class Live
     private $broadcastId;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $eventId;
+
+    /**
      * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="live", orphanRemoval=true)
      * @Groups("live:read")
      */
@@ -361,6 +366,18 @@ class Live
     public function setDuration(?int $duration): self
     {
         $this->duration = $duration;
+
+        return $this;
+    }
+
+    public function getEventId(): ?string
+    {
+        return $this->eventId;
+    }
+
+    public function setEventId(?string $eventId): self
+    {
+        $this->eventId = $eventId;
 
         return $this;
     }

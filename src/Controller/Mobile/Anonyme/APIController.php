@@ -199,7 +199,6 @@ class APIController extends Controller {
 
         if ($clip) {
           $clip->setResourceUri($result["payload"]["resourceUri"]);
-          $clip->setStatus("available");
 
           if ($result["payload"]["preview"]) {
             $clip->setPreview($result["payload"]["preview"]);

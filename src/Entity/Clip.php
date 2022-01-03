@@ -89,6 +89,11 @@ class Clip
      */
     private $createdAt;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $eventId;
+
     
     public function __construct()
     {
@@ -230,6 +235,18 @@ class Clip
     public function setCreatedAt(?\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getEventId(): ?string
+    {
+        return $this->eventId;
+    }
+
+    public function setEventId(?string $eventId): self
+    {
+        $this->eventId = $eventId;
 
         return $this;
     }

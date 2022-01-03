@@ -101,12 +101,6 @@ class LiveAPIController extends Controller {
       $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $display ]);
 
       if ($liveProduct) {
-        $clip = new Clip();
-        $clip->setVendor($vendor);
-        $clip->setLive($live);
-        $clip->setProduct($liveProduct->getProduct());
-        $clip->setPreview($live->getPreview());
-
         if ($display == 1) {
           $start = 0;
         } else {
@@ -117,14 +111,24 @@ class LiveAPIController extends Controller {
         $now = new \DateTime('now', timezone_open('Europe/Paris'));
         $diff = $now->diff($created);
         $end = $this->dateIntervalToSeconds($diff);
+        $duration = $end - $start;
 
-        $clip->setStart($start);
-        $clip->setEnd($end);
-        $clip->setDuration($end - $start);
-        $live->setDuration($end);
+        if ($duration > 30) {
+          $clip = new Clip();
+          $clip->setVendor($vendor);
+          $clip->setLive($live);
+          $clip->setProduct($liveProduct->getProduct());
+          $clip->setPreview($live->getPreview());
 
-        $manager->persist($clip);
-        $manager->flush();
+          $clip->setStart($start);
+          $clip->setEnd($end);
+          $clip->setDuration($duration);
+
+          $live->setDuration($end);
+
+          $manager->persist($clip);
+          $manager->flush();
+        }
       }
     
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
@@ -211,16 +215,10 @@ class LiveAPIController extends Controller {
       $vendor = $this->getUser();
       $live->setStatus(2);
 
-
       // créer le dernier clip
       $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
 
       if ($liveProduct) {
-        $clip = new Clip();
-        $clip->setVendor($vendor);
-        $clip->setLive($live);
-        $clip->setProduct($liveProduct->getProduct());
-
         if ($display == 1) {
           $start = 0;
         } else {
@@ -231,15 +229,23 @@ class LiveAPIController extends Controller {
         $now = new \DateTime('now', timezone_open('Europe/Paris'));
         $diff = $now->diff($created);
         $end = $this->dateIntervalToSeconds($diff);
+        $duration = $end - $start;
 
-        $clip->setStart($start);
-        $clip->setEnd($end);
-        $clip->setDuration($end - $start);
-        
-        $live->setDuration($end);
+        if ($duration > 30) {
+          $clip = new Clip();
+          $clip->setVendor($vendor);
+          $clip->setLive($live);
+          $clip->setProduct($liveProduct->getProduct());
 
-        $manager->persist($clip);
-        $manager->flush();
+          $clip->setStart($start);
+          $clip->setEnd($end);
+          $clip->setDuration($duration);
+
+          $live->setDuration($end);
+
+          $manager->persist($clip);
+          $manager->flush();
+        }
       }
 
       $manager->flush();
