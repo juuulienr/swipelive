@@ -185,10 +185,12 @@ class APIController extends Controller {
    */
   public function webhooks(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager) {
     $result = json_decode($request->getContent(), true);
-
     $this->get('bugsnag')->notifyException(new Exception($result["payload"]["id"]));
 
+    // broadcast
     if ($result["collection"] == "broadcast") {
+
+      // broadcast add
       if ($result["action"] == "add") {
         $broadcastId = $result["payload"]["id"];
         $clip = $clipRepo->findOneByBroadcastId($broadcastId);
@@ -196,22 +198,7 @@ class APIController extends Controller {
         if ($clip) {
           $clip->setResourceUri($result["payload"]["resourceUri"]);
           $clip->setStatus("available");
-          $manager->flush();
-        }
-      }
 
-      if ($result["action"] == "update") {
-        $broadcastId = $result["payload"]["id"];
-        $live = $liveRepo->findOneByBroadcastId($broadcastId);
-
-        if ($live && $result["payload"]["type"] == "archived") {
-          $live->setStatus(2);
-          $manager->flush();
-        }
-
-        $clip = $clipRepo->findOneByBroadcastId($broadcastId);
-
-        if ($clip) {
           if ($result["payload"]["preview"]) {
             $clip->setPreview($result["payload"]["preview"]);
           }
@@ -219,8 +206,126 @@ class APIController extends Controller {
           $manager->flush();
         }
       }
+
+      // broadcast update
+      if ($result["action"] == "update") {
+        $broadcastId = $result["payload"]["id"];
+        $live = $liveRepo->findOneByBroadcastId($broadcastId);
+
+        if ($live && $result["payload"]["type"] == "archived") {
+          $live->setStatus(2);
+
+          // create last clip
+          $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
+
+          if ($liveProduct) {
+            $clip = new Clip();
+            $clip->setVendor($live->getVendor());
+            $clip->setLive($live);
+            $clip->setProduct($liveProduct->getProduct());
+            $clip->setPreview($live->getPreview());
+
+            if ($display == 1) {
+              $start = 0;
+            } else {
+              $start = $live->getDuration() + 1;
+            }
+
+            $end = $result["payload"]["length"];
+
+            $clip->setStart($start);
+            $clip->setEnd($end);
+            $clip->setDuration($end - $start);
+
+            $data = [
+              "source" => [
+                "broadcastId" => $live->getBroadcastId(), 
+                "start" => $start, 
+                "end" => $end
+              ]
+            ];
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($ch, CURLOPT_URL, "https://api.bambuser.com/broadcasts");
+
+            $result = curl_exec($ch);
+            $result = json_decode($result);
+            curl_close($ch);
+
+            if ($result && $result->newBroadcastId) {
+              $clip->setBroadcastId($result->newBroadcastId);
+              $clip->setStatus($result->status);
+            }
+
+            $live->setDuration($end);
+
+            $manager->persist($clip);
+            $manager->flush();
+          }
+        }
+
+        $clip = $clipRepo->findOneByBroadcastId($broadcastId);
+
+        if ($clip) {
+          if ($result["payload"]["preview"]) {
+            $clip->setPreview($result["payload"]["preview"]);
+            $manager->flush();
+          }
+        }
+      }
+
+      // broadcast extract
+      if ($result["action"] == "extract") {
+        $broadcastId = $result["payload"]["id"];
+        $clip = $clipRepo->findOneByBroadcastId($broadcastId);
+
+        if ($clip) {
+          if ($result["payload"]["status"]) {
+            $clip->setStatus($result["payload"]["status"]);
+            $manager->flush();
+          }
+        }
+      }
+
+      // broadcast remove
+      if ($result["action"] == "remove") {
+        $broadcastId = $result["payload"]["id"];
+        $clip = $clipRepo->findOneByBroadcastId($broadcastId);
+
+        if ($clip) {
+          $manager->remove($clip);
+          $manager->flush();
+        }
+
+        $live = $liveRepo->findOneByBroadcastId($broadcastId);
+
+        if ($live) {
+          $liveProducts = $live->getLiveProducts();
+
+          if ($liveProducts) {
+            foreach ($liveProducts as $liveProduct) {
+              $manager->remove($liveProduct);
+            }
+          }
+
+          $manager->remove($live);
+          $manager->flush();
+        }
+      }
     }
 
     return $this->json(true, 200);
+  }
+
+
+  function dateIntervalToSeconds($dateInterval) {
+    $reference = new \DateTimeImmutable;
+    $endTime = $reference->add($dateInterval);
+
+    return $reference->getTimestamp() - $endTime->getTimestamp();
   }
 }
