@@ -83,6 +83,20 @@ class Clip
      */
     private $status;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups("clip:read")
+     */
+    private $createdAt;
+
+    
+    public function __construct()
+    {
+        $this->status = "waiting";
+        $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
+    }
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -204,6 +218,18 @@ class Clip
     public function setStatus(?string $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }

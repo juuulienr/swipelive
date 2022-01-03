@@ -216,58 +216,6 @@ class APIController extends Controller {
 
         if ($live && $result["payload"]["type"] == "archived") {
           $live->setStatus(2);
-
-          // create last clip
-          $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
-
-          if ($liveProduct) {
-            $clip = new Clip();
-            $clip->setVendor($live->getVendor());
-            $clip->setLive($live);
-            $clip->setProduct($liveProduct->getProduct());
-            $clip->setPreview($live->getPreview());
-
-            if ($display == 1) {
-              $start = 0;
-            } else {
-              $start = $live->getDuration() + 1;
-            }
-
-            $end = $result["payload"]["length"];
-
-            $clip->setStart($start);
-            $clip->setEnd($end);
-            $clip->setDuration($end - $start);
-
-            $data = [
-              "source" => [
-                "broadcastId" => $live->getBroadcastId(), 
-                "start" => $start, 
-                "end" => $end
-              ]
-            ];
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-            curl_setopt($ch, CURLOPT_URL, "https://api.bambuser.com/broadcasts");
-
-            $result = curl_exec($ch);
-            $result = json_decode($result);
-            curl_close($ch);
-
-            if ($result && $result->newBroadcastId) {
-              $clip->setBroadcastId($result->newBroadcastId);
-              $clip->setStatus($result->status);
-            }
-
-            $live->setDuration($end);
-
-            $manager->persist($clip);
-            $manager->flush();
-          }
         }
 
         $clip = $clipRepo->findOneByBroadcastId($broadcastId);

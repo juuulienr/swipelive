@@ -56,12 +56,5 @@ class HomeController extends Controller {
     public function cookies(){
         return $this->render('web/cookies.html.twig');
     }
-
-    /**
-     * @Route("/test", name="test")
-     */
-    public function test(){
-        return $this->json(true);
-    }
 }
 

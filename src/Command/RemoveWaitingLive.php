@@ -47,7 +47,6 @@ class RemoveWaitingLive extends ContainerAwareCommand
                         }
                     }
                     $this->manager->flush();
-                    $this->manager->remove($live);
                 }             
             }
         }
