@@ -100,7 +100,7 @@ class APIController extends Controller {
    * @Route("/api/vendor/{id}/products", name="api_vendor_products", methods={"GET"})
    */
   public function products(Vendor $vendor, Request $request, ObjectManager $manager, ProductRepository $productRepo) {
-    $products = $productRepo->findByVendor($vendor);
+    $products = $productRepo->findBy([ "vendor" => $vendor, "archived" => false ]);
 
     return $this->json($products, 200, [], ['groups' => 'product:read']);
   }
@@ -144,7 +144,7 @@ class APIController extends Controller {
    * @Route("/api/categories/{id}/products", name="api_category_products", methods={"GET"})
    */
   public function productsCategory(Category $category, Request $request, ObjectManager $manager, ProductRepository $productRepo) {
-    $products = $productRepo->findByCategory($category);
+    $products = $productRepo->findBy([ "category" => $category, "archived" => false ]);
 
     return $this->json($products, 200, [], ['groups' => 'product:read']);
   }
@@ -177,109 +177,5 @@ class APIController extends Controller {
     $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
     return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
-  }
-
-
-  /**
-   * Webhooks Bambuser
-   *
-   * @Route("/api/bambuser/webhooks", name="api_bambuser_webhooks", methods={"POST"})
-   */
-  public function webhooks(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager, LiveProductsRepository $liveProductRepo) {
-    $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyException(new Exception($result["payload"]["id"]));
-
-    // broadcast
-    if ($result["collection"] == "broadcast") {
-
-      // broadcast add
-      if ($result["action"] == "add") {
-        $broadcastId = $result["payload"]["id"];
-        $clip = $clipRepo->findOneByBroadcastId($broadcastId);
-
-        if ($clip) {
-          $clip->setResourceUri($result["payload"]["resourceUri"]);
-          $clip->setEventId($result["eventId"]);
-
-          if ($result["payload"]["preview"]) {
-            $clip->setPreview($result["payload"]["preview"]);
-          }
-
-          $manager->flush();
-        }
-      }
-
-      // broadcast update
-      if ($result["action"] == "update") {
-        $broadcastId = $result["payload"]["id"];
-        $live = $liveRepo->findOneByBroadcastId($broadcastId);
-
-        if ($live) {
-          $live->setEventId($result["eventId"]);
-
-          if ($result["payload"]["type"] == "archived") {
-            $live->setStatus(2);
-          }
-
-          $manager->flush();
-        }
-
-        $clip = $clipRepo->findOneByBroadcastId($broadcastId);
-
-        if ($clip) {
-          $clip->setEventId($result["eventId"]);
-
-          if ($result["payload"]["preview"]) {
-            $clip->setPreview($result["payload"]["preview"]);
-          }
-
-          $manager->flush();
-        }
-      }
-
-      // broadcast extract
-      if ($result["action"] == "extract") {
-        $broadcastId = $result["payload"]["id"];
-        $clip = $clipRepo->findOneByBroadcastId($broadcastId);
-
-        if ($clip) {
-          $clip->setEventId($result["eventId"]);
-
-          if ($result["payload"]["status"]) {
-            $clip->setStatus($result["payload"]["status"]);
-          }
-          
-          $manager->flush();
-        }
-      }
-
-      // broadcast remove
-      if ($result["action"] == "remove") {
-        $broadcastId = $result["payload"]["id"];
-        $clip = $clipRepo->findOneByBroadcastId($broadcastId);
-
-        if ($clip) {
-          $manager->remove($clip);
-          $manager->flush();
-        }
-
-        $live = $liveRepo->findOneByBroadcastId($broadcastId);
-
-        if ($live) {
-          $liveProducts = $live->getLiveProducts();
-
-          if ($liveProducts) {
-            foreach ($liveProducts as $liveProduct) {
-              $manager->remove($liveProduct);
-            }
-          }
-
-          $manager->remove($live);
-          $manager->flush();
-        }
-      }
-    }
-
-    return $this->json(true, 200);
   }
 }

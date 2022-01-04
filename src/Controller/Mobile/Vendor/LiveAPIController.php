@@ -239,7 +239,7 @@ class LiveAPIController extends Controller {
         curl_close($ch);
 
         if ($result && $result->id) {
-          $end = $result->length;
+          $end = $result->length - 1;
           $duration = $end - $start;
 
           if ($duration > 30) {

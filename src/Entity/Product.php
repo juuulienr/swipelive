@@ -126,6 +126,16 @@ class Product
      */
     private $liveProducts;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups("product:read")
+     * @Groups("vendor:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     */
+    private $archived;
+
     public function __construct()
     {
         $this->uploads = new ArrayCollection();
@@ -332,6 +342,18 @@ class Product
                 $liveProduct->setProduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getArchived(): ?bool
+    {
+        return $this->archived;
+    }
+
+    public function setArchived(?bool $archived): self
+    {
+        $this->archived = $archived;
 
         return $this;
     }

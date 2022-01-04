@@ -97,23 +97,25 @@ class ProductAPIController extends Controller {
    */
   public function deleteProduct(Product $product, Request $request, ObjectManager $manager) {
     if ($product) {
-      if ($product->getUploads()->toArray()) {
-        foreach ($product->getUploads()->toArray() as $upload) {
-          $filePath = $this->getParameter('uploads_directory') . '/' . $upload->getFilename();
+      $product->setArchived(true);
 
-          if (file_exists($filePath)) {
-            $filesystem = new Filesystem();
-            $filesystem->remove($filePath);
+      // if ($product->getUploads()->toArray()) {
+      //   foreach ($product->getUploads()->toArray() as $upload) {
+      //     $filePath = $this->getParameter('uploads_directory') . '/' . $upload->getFilename();
 
-            $manager->remove($upload);
-            $manager->flush();
-          }
-        }
-      }
+      //     if (file_exists($filePath)) {
+      //       $filesystem = new Filesystem();
+      //       $filesystem->remove($filePath);
 
-      $manager->remove($product);
-      $manager->flush();
+      //       $manager->remove($upload);
+      //       $manager->flush();
+      //     }
+      //   }
+      // }
 
+      // $manager->remove($product);
+      // $manager->flush();
+      
       return $this->json(true, 200);
     }
 
