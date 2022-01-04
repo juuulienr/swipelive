@@ -94,11 +94,19 @@ class Clip
      */
     private $eventId;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups("clip:read")
+     * @Groups("vendor:read")
+     */
+    private $archived;
+
     
     public function __construct()
     {
         $this->status = "waiting";
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
+        $this->archived = 0;
     }
 
 
@@ -247,6 +255,18 @@ class Clip
     public function setEventId(?string $eventId): self
     {
         $this->eventId = $eventId;
+
+        return $this;
+    }
+
+    public function getArchived(): ?bool
+    {
+        return $this->archived;
+    }
+
+    public function setArchived(?bool $archived): self
+    {
+        $this->archived = $archived;
 
         return $this;
     }
