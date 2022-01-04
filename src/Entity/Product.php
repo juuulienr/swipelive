@@ -141,6 +141,7 @@ class Product
         $this->uploads = new ArrayCollection();
         $this->clips = new ArrayCollection();
         $this->liveProducts = new ArrayCollection();
+        $this->archived = 0;
     }
 
     public function getId(): ?int
