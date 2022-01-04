@@ -95,6 +95,18 @@ class APIController extends Controller {
 
 
   /**
+   * Récupérer les clips d'un profil
+   *
+   * @Route("/api/profile/{id}/clips", name="api_profile_clips", methods={"GET"})
+   */
+  public function profileClips(Vendor $vendor, Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
+    $clips = $clipRepo->retrieveClips($vendor);
+
+    return $this->json($clips, 200, [], ['groups' => 'clip:read']);
+  }
+
+
+  /**
    * Afficher les produits du vendeur
    *
    * @Route("/api/vendor/{id}/products", name="api_vendor_products", methods={"GET"})
