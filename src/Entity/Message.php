@@ -72,7 +72,6 @@ class Message
 
     /**
      * @ORM\ManyToOne(targetEntity=Clip::class, inversedBy="messages")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $clip;
 
