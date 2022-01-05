@@ -20,7 +20,6 @@ class Message
 
     /**
      * @ORM\ManyToOne(targetEntity=Live::class, inversedBy="messages")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $live;
 
