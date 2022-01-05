@@ -104,7 +104,7 @@ class Clip
     private $archived;
 
     /**
-     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="clip", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="clip")
      * @ORM\OrderBy({"createdAt" = "ASC"})
      * @Groups("clip:read")
      * @Groups("vendor:read")
