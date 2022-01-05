@@ -217,7 +217,7 @@ class LiveAPIController extends Controller {
    *
    * @Route("/vendor/api/live/stop/{id}", name="vendor_api_live_stop", methods={"PUT"})
    */
-  public function stopLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo) {
+  public function stopLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo, MessageRepository $messageRepo) {
     if ($json = $request->getContent()) {
       $vendor = $this->getUser();
       $live->setStatus(2);
@@ -258,7 +258,6 @@ class LiveAPIController extends Controller {
             $clip->setStart($start);
             $clip->setEnd($end);
             $clip->setDuration($duration);
-
 
             $manager->persist($clip);
             $manager->flush();
