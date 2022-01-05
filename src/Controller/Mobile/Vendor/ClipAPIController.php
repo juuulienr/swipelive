@@ -69,7 +69,7 @@ class ClipAPIController extends Controller {
       $message = new Message();
       $message->setContent($content);
       $message->setVendor($vendor);
-      $message->setLive($clip->getLive());
+      $message->setClip($clip);
       $manager->persist($message);
       $manager->flush();
 
