@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ClipRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -101,12 +103,21 @@ class Clip
      */
     private $archived;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="clip", orphanRemoval=true)
+     * @ORM\OrderBy({"createdAt" = "ASC"})
+     * @Groups("clip:read")
+     * @Groups("vendor:read")
+     */
+    private $messages;
+
     
     public function __construct()
     {
         $this->status = "waiting";
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->archived = 0;
+        $this->messages = new ArrayCollection();
     }
 
 
@@ -267,6 +278,36 @@ class Clip
     public function setArchived(?bool $archived): self
     {
         $this->archived = $archived;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Message[]
+     */
+    public function getMessages(): Collection
+    {
+        return $this->messages;
+    }
+
+    public function addMessage(Message $message): self
+    {
+        if (!$this->messages->contains($message)) {
+            $this->messages[] = $message;
+            $message->setClip($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessage(Message $message): self
+    {
+        if ($this->messages->removeElement($message)) {
+            // set the owning side to null (unless already changed)
+            if ($message->getClip() === $this) {
+                $message->setClip(null);
+            }
+        }
 
         return $this;
     }

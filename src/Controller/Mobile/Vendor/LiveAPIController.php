@@ -16,6 +16,7 @@ use App\Repository\FollowRepository;
 use App\Repository\VendorRepository;
 use App\Repository\ClipRepository;
 use App\Repository\ProductRepository;
+use App\Repository\MessageRepository;
 use App\Repository\LiveRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Filesystem\Filesystem;
@@ -84,7 +85,7 @@ class LiveAPIController extends Controller {
    *
    * @Route("/vendor/api/live/{id}/update/display", name="vendor_api_live_update_display", methods={"PUT"})
    */
-  public function updateDisplay(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo) {
+  public function updateDisplay(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo, MessageRepository $messageRepo) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
       $display = $param["display"];
@@ -119,14 +120,20 @@ class LiveAPIController extends Controller {
           $clip->setLive($live);
           $clip->setProduct($liveProduct->getProduct());
           $clip->setPreview($live->getPreview());
-
           $clip->setStart($start);
           $clip->setEnd($end);
           $clip->setDuration($duration);
 
-          $live->setDuration($end);
-
           $manager->persist($clip);
+          $manager->flush();
+
+          $live->setDuration($end);
+          $messages = $messageRepo->findByLiveAndClipNull($live);
+
+          foreach ($messages as $message) {
+            $message->setClip($clip);
+          }
+
           $manager->flush();
         }
       }
@@ -248,14 +255,21 @@ class LiveAPIController extends Controller {
             $clip->setLive($live);
             $clip->setProduct($liveProduct->getProduct());
             $clip->setPreview($live->getPreview());
-
             $clip->setStart($start);
             $clip->setEnd($end);
             $clip->setDuration($duration);
 
-            $live->setDuration($end);
 
             $manager->persist($clip);
+            $manager->flush();
+
+            $live->setDuration($end);
+            $messages = $messageRepo->findByLiveAndClipNull($live);
+
+            foreach ($messages as $message) {
+              $message->setClip($clip);
+            }
+
             $manager->flush();
           }
         }

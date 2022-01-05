@@ -19,6 +19,16 @@ class MessageRepository extends ServiceEntityRepository
         parent::__construct($registry, Message::class);
     }
 
+
+    public function findByLiveAndClipNull($live) {
+        return $this->createQueryBuilder('m')
+                    ->andWhere('m.clip IS NULL')
+                    ->andWhere('m.live = :live')
+                    ->setParameter('live', $live)
+                    ->getQuery()
+                    ->getResult();
+    }
+
     // /**
     //  * @return Message[] Returns an array of Message objects
     //  */

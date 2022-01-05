@@ -70,6 +70,12 @@ class Message
      */
     private $time;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Clip::class, inversedBy="messages")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $clip;
+
     
     public function __construct()
     {
@@ -162,6 +168,18 @@ class Message
     public function setTime(?int $time): self
     {
         $this->time = $time;
+
+        return $this;
+    }
+
+    public function getClip(): ?Clip
+    {
+        return $this->clip;
+    }
+
+    public function setClip(?Clip $clip): self
+    {
+        $this->clip = $clip;
 
         return $this;
     }
