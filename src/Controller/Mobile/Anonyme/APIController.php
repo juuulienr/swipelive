@@ -56,13 +56,13 @@ class APIController extends Controller {
 
 
   /**
-   * Afficher les 10 derniers clips
+   * Afficher 10 clips tendances
    *
-   * @Route("/api/clips/last", name="api_clips_last", methods={"GET"})
+   * @Route("/api/clips/trending", name="api_clips_trending", methods={"GET"})
    */
-  public function lastClips(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
+  public function trending(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
   {
-    $clips = $clipRepo->findByClip(10);
+    $clips = $clipRepo->findBy([ "status" => "available"], [ "createdAt" => "DESC" ]);
 
     return $this->json($clips, 200, [], ['groups' => 'clip:read']);
   }
