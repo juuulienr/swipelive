@@ -153,7 +153,7 @@ class LiveAPIController extends Controller {
       $param = json_decode($json, true);
       $broadcastId = $param["broadcastId"];
 
-      if ($broadcastId) {
+      if ($broadcastId && !$live->getBroadcastId() && $live->getStatus() != 2) {
         $url = "https://api.bambuser.com/broadcasts/" . $broadcastId;
         $ch = curl_init();
 
@@ -218,66 +218,61 @@ class LiveAPIController extends Controller {
    * @Route("/vendor/api/live/stop/{id}", name="vendor_api_live_stop", methods={"PUT"})
    */
   public function stopLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo, MessageRepository $messageRepo) {
-    if ($json = $request->getContent()) {
-      $vendor = $this->getUser();
-      $live->setStatus(2);
-      $manager->flush();
+    $live->setStatus(2);
+    $manager->flush();
 
-      // créer le dernier clip
-      $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
+    // créer le dernier clip
+    $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
 
-      if ($liveProduct) {
-        if ($display == 1) {
-          $start = 0;
-        } else {
-          $start = $live->getDuration() + 1;
-        }
-
-        $url = "https://api.bambuser.com/broadcasts/" . $live->getBroadcastId();
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-        curl_setopt($ch, CURLOPT_URL, $url);
-
-        $result = curl_exec($ch);
-        $result = json_decode($result);
-        curl_close($ch);
-
-        if ($result && $result->id) {
-          $end = $result->length - 1;
-          $duration = $end - $start;
-
-          if ($duration > 30) {
-            $clip = new Clip();
-            $clip->setVendor($vendor);
-            $clip->setLive($live);
-            $clip->setProduct($liveProduct->getProduct());
-            $clip->setPreview($live->getPreview());
-            $clip->setStart($start);
-            $clip->setEnd($end);
-            $clip->setDuration($duration);
-
-            $manager->persist($clip);
-            $manager->flush();
-
-            $live->setDuration($end);
-            $messages = $messageRepo->findByLiveAndClipNull($live);
-
-            foreach ($messages as $message) {
-              $message->setClip($clip);
-            }
-
-            $manager->flush();
-          }
-        }
+    if ($liveProduct) {
+      if ($display == 1) {
+        $start = 0;
+      } else {
+        $start = $live->getDuration() + 1;
       }
 
-      return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+      $url = "https://api.bambuser.com/broadcasts/" . $live->getBroadcastId();
+      $ch = curl_init();
+
+      curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+      curl_setopt($ch, CURLOPT_URL, $url);
+
+      $result = curl_exec($ch);
+      $result = json_decode($result);
+      curl_close($ch);
+
+      if ($result && $result->id) {
+        $end = $result->length - 1;
+        $duration = $end - $start;
+
+        if ($duration > 30) {
+          $clip = new Clip();
+          $clip->setVendor($this->getUser());
+          $clip->setLive($live);
+          $clip->setProduct($liveProduct->getProduct());
+          $clip->setPreview($live->getPreview());
+          $clip->setStart($start);
+          $clip->setEnd($end);
+          $clip->setDuration($duration);
+
+          $manager->persist($clip);
+          $manager->flush();
+
+          $live->setDuration($end);
+          $messages = $messageRepo->findByLiveAndClipNull($live);
+
+          foreach ($messages as $message) {
+            $message->setClip($clip);
+          }
+
+          $manager->flush();
+        }
+      }
     }
 
-    return $this->json(false, 404);
+    return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
   }
 
 
