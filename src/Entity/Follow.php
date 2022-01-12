@@ -30,12 +30,6 @@ class Follow
      */
     private $vendor;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="following")
-     * @Groups("vendor:read")
-     */
-    private $user;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -61,18 +55,6 @@ class Follow
     public function setVendor(?Vendor $vendor): self
     {
         $this->vendor = $vendor;
-
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
 
         return $this;
     }

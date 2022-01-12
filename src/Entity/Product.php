@@ -127,6 +127,12 @@ class Product
     private $liveProducts;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("product:read")
+     */
+    private $weight;
+
+    /**
      * @ORM\Column(type="boolean", nullable=true)
      * @Groups("product:read")
      * @Groups("vendor:read")
@@ -355,6 +361,18 @@ class Product
     public function setArchived(?bool $archived): self
     {
         $this->archived = $archived;
+
+        return $this;
+    }
+
+    public function getWeight(): ?string
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(?string $weight): self
+    {
+        $this->weight = $weight;
 
         return $this;
     }

@@ -32,7 +32,7 @@ class ClipAPIController extends Controller {
 
 
   /**
-   * Récupérer les clips
+   * Récupérer les clips disponibles
    *
    * @Route("/vendor/api/clips", name="vendor_api_clips", methods={"GET"})
    */

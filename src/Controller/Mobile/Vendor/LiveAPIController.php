@@ -103,7 +103,7 @@ class LiveAPIController extends Controller {
 
       if ($liveProduct) {
         if ($display == 1) {
-          $start = 0;
+          $start = 1;
         } else {
           $start = $live->getDuration() + 1;
         }
@@ -226,7 +226,7 @@ class LiveAPIController extends Controller {
 
     if ($liveProduct) {
       if ($display == 1) {
-        $start = 0;
+        $start = 1;
       } else {
         $start = $live->getDuration() + 1;
       }
