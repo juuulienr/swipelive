@@ -142,12 +142,24 @@ class Product
      */
     private $archived;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Option::class, mappedBy="product")
+     */
+    private $options;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Variant::class, mappedBy="product")
+     */
+    private $variants;
+
     public function __construct()
     {
         $this->uploads = new ArrayCollection();
         $this->clips = new ArrayCollection();
         $this->liveProducts = new ArrayCollection();
         $this->archived = 0;
+        $this->options = new ArrayCollection();
+        $this->variants = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -373,6 +385,66 @@ class Product
     public function setWeight(?string $weight): self
     {
         $this->weight = $weight;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Option[]
+     */
+    public function getOptions(): Collection
+    {
+        return $this->options;
+    }
+
+    public function addOption(Option $option): self
+    {
+        if (!$this->options->contains($option)) {
+            $this->options[] = $option;
+            $option->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOption(Option $option): self
+    {
+        if ($this->options->removeElement($option)) {
+            // set the owning side to null (unless already changed)
+            if ($option->getProduct() === $this) {
+                $option->setProduct(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Variant[]
+     */
+    public function getVariants(): Collection
+    {
+        return $this->variants;
+    }
+
+    public function addVariant(Variant $variant): self
+    {
+        if (!$this->variants->contains($variant)) {
+            $this->variants[] = $variant;
+            $variant->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVariant(Variant $variant): self
+    {
+        if ($this->variants->removeElement($variant)) {
+            // set the owning side to null (unless already changed)
+            if ($variant->getProduct() === $this) {
+                $variant->setProduct(null);
+            }
+        }
 
         return $this;
     }
