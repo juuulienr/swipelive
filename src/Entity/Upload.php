@@ -37,12 +37,18 @@ class Upload
     private $filename;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="integer", nullable=true)
      * @Groups("upload:read")
      * @Groups("product:read")
      * @Groups("vendor:read")
      * @Groups("clip:read")
      * @Groups("category:read")
+     * @Groups("live:read")
+     */
+    private $position;
+
+    /**
+     * @ORM\Column(type="datetime")
      */
     private $createdAt;
 
@@ -50,11 +56,6 @@ class Upload
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="uploads")
      */
     private $product;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $position;
 
     /**
      * @ORM\OneToMany(targetEntity=Variant::class, mappedBy="upload")

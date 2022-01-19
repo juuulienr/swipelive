@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\VariantRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=VariantRepository::class)
@@ -14,51 +15,71 @@ class Variant
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("product:read")
+     * @Groups("variant:read")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("product:read")
+     * @Groups("variant:read")
      */
     private $title;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups("product:read")
+     * @Groups("variant:read")
      */
     private $price;
 
     /**
      * @ORM\Column(type="float", nullable=true)
+     * @Groups("product:read")
+     * @Groups("variant:read")
      */
     private $compareAtPrice;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups("product:read")
+     * @Groups("variant:read")
      */
     private $quantity;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups("product:read")
+     * @Groups("variant:read")
      */
     private $tracking;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups("product:read")
+     * @Groups("variant:read")
      */
     private $position;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("product:read")
+     * @Groups("variant:read")
      */
     private $option1;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("product:read")
+     * @Groups("variant:read")
      */
     private $option2;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("product:read")
+     * @Groups("variant:read")
      */
     private $weight;
 

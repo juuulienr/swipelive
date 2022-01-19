@@ -36,7 +36,7 @@ class Product
     private $title;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="products")
+     * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="products", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      * @Groups("product:read")
      * @Groups("clip:read")
@@ -107,7 +107,7 @@ class Product
     private $tracking;
 
     /**
-     * @ORM\OneToMany(targetEntity=Upload::class, mappedBy="product")
+     * @ORM\OneToMany(targetEntity=Upload::class, mappedBy="product", cascade={"persist"})
      * @Groups("product:read")
      * @Groups("vendor:read")
      * @Groups("clip:read")
@@ -143,12 +143,14 @@ class Product
     private $archived;
 
     /**
-     * @ORM\OneToMany(targetEntity=Option::class, mappedBy="product")
+     * @ORM\OneToMany(targetEntity=Option::class, mappedBy="product", cascade={"persist"})
+     * @Groups("product:read")
      */
     private $options;
 
     /**
-     * @ORM\OneToMany(targetEntity=Variant::class, mappedBy="product")
+     * @ORM\OneToMany(targetEntity=Variant::class, mappedBy="product", cascade={"persist"})
+     * @Groups("product:read")
      */
     private $variants;
 
@@ -157,9 +159,9 @@ class Product
         $this->uploads = new ArrayCollection();
         $this->clips = new ArrayCollection();
         $this->liveProducts = new ArrayCollection();
-        $this->archived = 0;
         $this->options = new ArrayCollection();
         $this->variants = new ArrayCollection();
+        $this->archived = 0;
     }
 
     public function getId(): ?int

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\OptionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=OptionRepository::class)
@@ -20,23 +21,26 @@ class Option
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("product:read")
      */
     private $name;
 
     /**
      * @ORM\Column(type="array")
+     * @Groups("product:read")
      */
     private $data = [];
+
+    /**
+     * @ORM\Column(type="integer")
+     * @Groups("product:read")
+     */
+    private $position;
 
     /**
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="options")
      */
     private $product;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $position;
 
     public function getId(): ?int
     {

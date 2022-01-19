@@ -114,7 +114,7 @@ class LiveAPIController extends Controller {
         $end = $this->dateIntervalToSeconds($diff);
         $duration = $end - $start;
 
-        if ($duration > 30) {
+        if ($duration > 15) {
           $clip = new Clip();
           $clip->setVendor($vendor);
           $clip->setLive($live);
@@ -247,7 +247,7 @@ class LiveAPIController extends Controller {
         $end = $result->length - 1;
         $duration = $end - $start;
 
-        if ($duration > 30) {
+        if ($duration > 15) {
           $clip = new Clip();
           $clip->setVendor($this->getUser());
           $clip->setLive($live);

@@ -8,6 +8,7 @@ use App\Entity\Live;
 use App\Entity\Category;
 use App\Entity\Message;
 use App\Entity\Follow;
+use App\Entity\Variant;
 use App\Entity\Product;
 use App\Entity\LiveProducts;
 use App\Entity\Upload;
@@ -104,6 +105,23 @@ class ProductAPIController extends Controller {
     }
 
     return $this->json([ "error" => "Le produit est introuvable"], 404);
+  }
+
+
+  /**
+   * Editer un variant
+   *
+   * @Route("/vendor/api/variant/edit/{id}", name="vendor_api_variant_edit", methods={"POST"})
+   */
+  public function editVariant(Variant $variant, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $serializer->deserialize($json, Variant::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $variant]);
+      $manager->flush();
+
+      return $this->json($variant, 200, [], ['groups' => 'variant:read'], 200);
+    }
+
+    return $this->json([ "error" => "Une erreur est survenue"], 404);
   }
 
 
