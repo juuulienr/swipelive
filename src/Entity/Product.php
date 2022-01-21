@@ -89,22 +89,13 @@ class Product
     private $compareAtPrice;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="integer")
      * @Groups("product:read")
      * @Groups("vendor:read")
      * @Groups("live:read")
      * @Groups("clip:read")
      */
     private $quantity;
-
-    /**
-     * @ORM\Column(type="boolean")
-     * @Groups("product:read")
-     * @Groups("vendor:read")
-     * @Groups("live:read")
-     * @Groups("clip:read")
-     */
-    private $tracking;
 
     /**
      * @ORM\OneToMany(targetEntity=Upload::class, mappedBy="product", cascade={"persist"})
@@ -154,14 +145,14 @@ class Product
      */
     private $variants;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->uploads = new ArrayCollection();
         $this->clips = new ArrayCollection();
         $this->liveProducts = new ArrayCollection();
         $this->options = new ArrayCollection();
         $this->variants = new ArrayCollection();
         $this->archived = 0;
+        $this->quantity = 0;
     }
 
     public function getId(): ?int
@@ -253,26 +244,14 @@ class Product
         return $this;
     }
 
-    public function getQuantity(): ?int
+    public function getQuantity(): int
     {
         return $this->quantity;
     }
 
-    public function setQuantity(?int $quantity): self
+    public function setQuantity(int $quantity): self
     {
         $this->quantity = $quantity;
-
-        return $this;
-    }
-
-    public function getTracking(): ?bool
-    {
-        return $this->tracking;
-    }
-
-    public function setTracking(bool $tracking): self
-    {
-        $this->tracking = $tracking;
 
         return $this;
     }

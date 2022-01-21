@@ -126,6 +126,23 @@ class ProductAPIController extends Controller {
 
 
   /**
+   * Supprimer un variant
+   *
+   * @Route("/vendor/api/variant/delete/{id}", name="vendor_api_variant_delete", methods={"GET"})
+   */
+  public function deleteVariant(Variant $variant, Request $request, ObjectManager $manager) {
+    if ($variant) {
+      $variant->setArchived(true);
+      $manager->flush();
+      
+      return $this->json(true, 200);
+    }
+
+    return $this->json([ "error" => "Le variant est introuvable"], 404);
+  }
+
+
+  /**
    * Ajouter une image
    *
    * @Route("/vendor/api/products/upload/add", name="vendor_api_upload_add", methods={"POST"})

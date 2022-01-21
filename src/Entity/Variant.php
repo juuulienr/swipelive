@@ -42,18 +42,11 @@ class Variant
     private $compareAtPrice;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="integer")
      * @Groups("product:read")
      * @Groups("variant:read")
      */
     private $quantity;
-
-    /**
-     * @ORM\Column(type="boolean")
-     * @Groups("product:read")
-     * @Groups("variant:read")
-     */
-    private $tracking;
 
     /**
      * @ORM\Column(type="integer")
@@ -92,6 +85,19 @@ class Variant
      * @ORM\ManyToOne(targetEntity=Upload::class, inversedBy="variants")
      */
     private $upload;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups("product:read")
+     * @Groups("variant:read")
+     */
+    private $archived;
+
+    public function __construct()
+    {
+        $this->quantity = 0;
+        $this->archived = 0;
+    }
 
     public function getId(): ?int
     {
@@ -134,26 +140,14 @@ class Variant
         return $this;
     }
 
-    public function getQuantity(): ?int
+    public function getQuantity(): int
     {
         return $this->quantity;
     }
 
-    public function setQuantity(?int $quantity): self
+    public function setQuantity(int $quantity): self
     {
         $this->quantity = $quantity;
-
-        return $this;
-    }
-
-    public function getTracking(): ?bool
-    {
-        return $this->tracking;
-    }
-
-    public function setTracking(bool $tracking): self
-    {
-        $this->tracking = $tracking;
 
         return $this;
     }
@@ -226,6 +220,18 @@ class Variant
     public function setUpload(?Upload $upload): self
     {
         $this->upload = $upload;
+
+        return $this;
+    }
+
+    public function getArchived(): ?bool
+    {
+        return $this->archived;
+    }
+
+    public function setArchived(?bool $archived): self
+    {
+        $this->archived = $archived;
 
         return $this;
     }
