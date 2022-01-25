@@ -38,7 +38,7 @@ class ProductAPIController extends Controller {
    * @Route("/vendor/api/products", name="vendor_api_products", methods={"GET"})
    */
   public function products(Request $request, ObjectManager $manager, ProductRepository $productRepo) {
-    $products = $productRepo->findByVendor($this->getUser());
+    $products = $productRepo->findBy([ "vendor" => $this->getUser(), "archived" => false ]);
 
     return $this->json($products, 200, [], ['groups' => 'product:read']);
   }
@@ -132,7 +132,7 @@ class ProductAPIController extends Controller {
    */
   public function deleteVariant(Variant $variant, Request $request, ObjectManager $manager) {
     if ($variant) {
-      $variant->setArchived(true);
+      $variant->setProduct(null);
       $manager->flush();
       
       return $this->json(true, 200);

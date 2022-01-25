@@ -24,6 +24,7 @@ class Variant
      * @ORM\Column(type="string", length=255)
      * @Groups("product:read")
      * @Groups("variant:read")
+     * @Groups("clip:read")
      */
     private $title;
 
@@ -31,6 +32,7 @@ class Variant
      * @ORM\Column(type="float")
      * @Groups("product:read")
      * @Groups("variant:read")
+     * @Groups("clip:read")
      */
     private $price;
 
@@ -38,6 +40,7 @@ class Variant
      * @ORM\Column(type="float", nullable=true)
      * @Groups("product:read")
      * @Groups("variant:read")
+     * @Groups("clip:read")
      */
     private $compareAtPrice;
 
@@ -45,6 +48,7 @@ class Variant
      * @ORM\Column(type="integer")
      * @Groups("product:read")
      * @Groups("variant:read")
+     * @Groups("clip:read")
      */
     private $quantity;
 
@@ -52,6 +56,7 @@ class Variant
      * @ORM\Column(type="integer")
      * @Groups("product:read")
      * @Groups("variant:read")
+     * @Groups("clip:read")
      */
     private $position;
 
@@ -59,6 +64,7 @@ class Variant
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("product:read")
      * @Groups("variant:read")
+     * @Groups("clip:read")
      */
     private $option1;
 
@@ -66,6 +72,7 @@ class Variant
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("product:read")
      * @Groups("variant:read")
+     * @Groups("clip:read")
      */
     private $option2;
 
@@ -73,6 +80,7 @@ class Variant
      * @ORM\Column(type="string", length=255)
      * @Groups("product:read")
      * @Groups("variant:read")
+     * @Groups("clip:read")
      */
     private $weight;
 
@@ -86,17 +94,9 @@ class Variant
      */
     private $upload;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     * @Groups("product:read")
-     * @Groups("variant:read")
-     */
-    private $archived;
-
     public function __construct()
     {
         $this->quantity = 0;
-        $this->archived = 0;
     }
 
     public function getId(): ?int
@@ -220,18 +220,6 @@ class Variant
     public function setUpload(?Upload $upload): self
     {
         $this->upload = $upload;
-
-        return $this;
-    }
-
-    public function getArchived(): ?bool
-    {
-        return $this->archived;
-    }
-
-    public function setArchived(?bool $archived): self
-    {
-        $this->archived = $archived;
 
         return $this;
     }

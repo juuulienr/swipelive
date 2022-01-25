@@ -59,16 +59,6 @@ class Product
     private $description;
 
     /**
-     * @ORM\Column(type="boolean")
-     * @Groups("product:read")
-     * @Groups("vendor:read")
-     * @Groups("clip:read")
-     * @Groups("category:read")
-     * @Groups("live:read")
-     */
-    private $online;
-
-    /**
      * @ORM\Column(type="float")
      * @Groups("product:read")
      * @Groups("vendor:read")
@@ -135,13 +125,16 @@ class Product
 
     /**
      * @ORM\OneToMany(targetEntity=Option::class, mappedBy="product", cascade={"persist"})
+     * @ORM\OrderBy({"position" = "ASC"})
      * @Groups("product:read")
+     * @Groups("clip:read")
      */
     private $options;
 
     /**
      * @ORM\OneToMany(targetEntity=Variant::class, mappedBy="product", cascade={"persist"})
      * @Groups("product:read")
+     * @Groups("clip:read")
      */
     private $variants;
 
@@ -204,18 +197,6 @@ class Product
     public function setDescription(string $description): self
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    public function getOnline(): ?bool
-    {
-        return $this->online;
-    }
-
-    public function setOnline(bool $online): self
-    {
-        $this->online = $online;
 
         return $this;
     }
