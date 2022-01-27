@@ -64,6 +64,10 @@ class ProductAPIController extends Controller {
       $product = $serializer->deserialize($json, Product::class, "json");
       $product->setVendor($this->getUser());
 
+      foreach ($product->getUploads() as $key => $upload) {
+        $upload->setPosition($key + 1);
+      }
+
       $manager->persist($product);
       $manager->flush();
 

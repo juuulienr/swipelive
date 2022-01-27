@@ -171,21 +171,4 @@ class AccountAPIController extends Controller {
       return $object->getId();
     } ]);
   }
-
-
-  // /**
-  //  * Vérifier un follow
-  //  *
-  //  * @Route("/vendor/api/follow/check/{id}", name="vendor_api_follow_check", methods={"GET"})
-  //  */
-  // public function checkFollow(Vendor $vendor, Request $request, ObjectManager $manager, FollowRepository $followRepo) {
-  //   $follow = $followRepo->findOneBy(['following' => $vendor, 'vendor' => $this->getUser() ]);
-
-  //   if ($follow) {
-  //     return $this->json(true, 200);
-  //   }
-
-  //   return $this->json(false, 200);
-  // }
-
 }

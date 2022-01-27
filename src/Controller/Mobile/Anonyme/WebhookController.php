@@ -35,7 +35,7 @@ class WebhookController extends Controller {
    */
   public function webhooks(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager, LiveProductsRepository $liveProductRepo) {
     $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyException(new Exception($result["payload"]["id"]));
+    // $this->get('bugsnag')->notifyException(new Exception($result["payload"]["id"]));
 
     // broadcast
     if ($result["collection"] == "broadcast") {
