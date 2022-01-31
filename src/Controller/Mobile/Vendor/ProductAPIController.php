@@ -38,7 +38,7 @@ class ProductAPIController extends Controller {
    * @Route("/vendor/api/products", name="vendor_api_products", methods={"GET"})
    */
   public function products(Request $request, ObjectManager $manager, ProductRepository $productRepo) {
-    $products = $productRepo->findBy([ "vendor" => $this->getUser(), "archived" => false ]);
+    $products = $productRepo->findBy([ "vendor" => $this->getUser(), "archived" => false ], [ "title" => "ASC" ]);
 
     return $this->json($products, 200, [], ['groups' => 'product:read']);
   }

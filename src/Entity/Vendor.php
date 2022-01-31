@@ -116,35 +116,8 @@ class Vendor implements UserInterface
     private $picture;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("vendor:read")
-     * @Groups("vendor:edit")
-     */
-    private $facebook;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("vendor:read")
-     * @Groups("vendor:edit")
-     */
-    private $instagram;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("vendor:read")
-     * @Groups("vendor:edit")
-     */
-    private $snapchat;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("vendor:read")
-     * @Groups("vendor:edit")
-     */
-    private $pinterest;
-
-    /**
      * @ORM\OneToMany(targetEntity=Product::class, mappedBy="vendor")
+     * @ORM\OrderBy({"title" = "ASC"})
      * @Groups("vendor:read")
      * @Groups("vendor:edit")
      * @Groups("clip:read")
@@ -167,6 +140,48 @@ class Vendor implements UserInterface
      * @Groups("vendor:edit")
      */
     private $following;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     */
+    private $businessType;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     */
+    private $dob;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     */
+    private $siren;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     */
+    private $address;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     */
+    private $city;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     */
+    private $zip;
 
     
     public function __construct()
@@ -405,54 +420,6 @@ class Vendor implements UserInterface
         return $this;
     }
 
-    public function getFacebook(): ?string
-    {
-        return $this->facebook;
-    }
-
-    public function setFacebook(?string $facebook): self
-    {
-        $this->facebook = $facebook;
-
-        return $this;
-    }
-
-    public function getInstagram(): ?string
-    {
-        return $this->instagram;
-    }
-
-    public function setInstagram(?string $instagram): self
-    {
-        $this->instagram = $instagram;
-
-        return $this;
-    }
-
-    public function getSnapchat(): ?string
-    {
-        return $this->snapchat;
-    }
-
-    public function setSnapchat(?string $snapchat): self
-    {
-        $this->snapchat = $snapchat;
-
-        return $this;
-    }
-
-    public function getPinterest(): ?string
-    {
-        return $this->pinterest;
-    }
-
-    public function setPinterest(?string $pinterest): self
-    {
-        $this->pinterest = $pinterest;
-
-        return $this;
-    }
-
     /**
      * @return Collection|Product[]
      */
@@ -539,6 +506,78 @@ class Vendor implements UserInterface
                 $following->setVendor(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getBusinessType(): ?string
+    {
+        return $this->businessType;
+    }
+
+    public function setBusinessType(?string $businessType): self
+    {
+        $this->businessType = $businessType;
+
+        return $this;
+    }
+
+    public function getDob(): ?\DateTimeInterface
+    {
+        return $this->dob;
+    }
+
+    public function setDob(?\DateTimeInterface $dob): self
+    {
+        $this->dob = $dob;
+
+        return $this;
+    }
+
+    public function getSiren(): ?string
+    {
+        return $this->siren;
+    }
+
+    public function setSiren(?string $siren): self
+    {
+        $this->siren = $siren;
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(?string $city): self
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    public function getZip(): ?string
+    {
+        return $this->zip;
+    }
+
+    public function setZip(?string $zip): self
+    {
+        $this->zip = $zip;
 
         return $this;
     }

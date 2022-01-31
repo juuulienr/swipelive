@@ -21,6 +21,7 @@
         "pusher/pusher-php-server": "^7.0",
         "sensio/framework-extra-bundle": "~5.1",
         "sngrl/php-firebase-cloud-messaging": "dev-master",
+        "stripe/stripe-php": "^7.112",
         "symfony/apache-pack": "~1.0",
         "symfony/asset": "4.4.*",
         "symfony/console": "4.4.*",

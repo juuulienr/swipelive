@@ -38,7 +38,6 @@ class AccountAPIController extends Controller {
   * @Route("/api/vendor/register", name="vendor_api_register")
   */
   public function register(Request $request, ObjectManager $manager, VendorRepository $vendorRepo , UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
-
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
@@ -52,6 +51,51 @@ class AccountAPIController extends Controller {
 
           $manager->persist($vendor);
           $manager->flush();
+
+          if ($param['businessType'] == "company") {
+            try {
+              $stripe = new \Stripe\StripeClient('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
+              $response = $stripe->accounts->create([
+                'country' => 'FR',
+                'type' => 'custom',
+                'capabilities' => [
+                  'transfers' => ['requested' => true],
+                ],
+                'business_profile' => [
+                  'product_description' => $param['summary'],
+                ],
+                'account_token' => $param['tokenAccount']
+              ]);
+
+              \Stripe\Stripe::setApiKey('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
+
+              $person = \Stripe\Account::createPerson($response->id, [
+                'person_token' => $param['tokenPerson'],
+              ]);
+            } catch (Exception $e) {
+              dump($e->getMessage());
+              dd($request);
+            }
+
+          } else if ($param['businessType'] == "individual") {
+            try {
+              $stripe = new \Stripe\StripeClient('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
+              $response = $stripe->accounts->create([
+                'country' => 'FR',
+                'type' => 'custom',
+                'capabilities' => [
+                  'transfers' => ['requested' => true],
+                ],
+                'business_profile' => [
+                  'product_description' => $param['summary'],
+                ],
+                'account_token' => $param['tokenAccount']
+              ]);
+            } catch (Exception $e) {
+              dump($e->getMessage());
+              dd($request);
+            }
+          }
 
           return $this->json($vendor, 200);
 
