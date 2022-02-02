@@ -183,6 +183,11 @@ class Vendor implements UserInterface
      */
     private $zip;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $stripeAcc;
+
     
     public function __construct()
     {
@@ -578,6 +583,18 @@ class Vendor implements UserInterface
     public function setZip(?string $zip): self
     {
         $this->zip = $zip;
+
+        return $this;
+    }
+
+    public function getStripeAcc(): ?string
+    {
+        return $this->stripeAcc;
+    }
+
+    public function setStripeAcc(?string $stripeAcc): self
+    {
+        $this->stripeAcc = $stripeAcc;
 
         return $this;
     }

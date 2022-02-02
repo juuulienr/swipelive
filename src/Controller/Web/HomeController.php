@@ -56,46 +56,5 @@ class HomeController extends Controller {
   public function cookies(){
     return $this->render('web/cookies.html.twig');
   }
-
-  /**
-   * @Route("/stripe", name="stripe")
-   */
-  public function stripe(){
-    return $this->render('web/stripe.html.twig');
-  }
-
-  /**
-   * @Route("/test", name="test")
-   */
-  public function test(Request $request){
-
-    $stripe = new \Stripe\StripeClient('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
-
-    $response = $stripe->accounts->create(
-      [
-        'country' => 'FR',
-        'type' => 'custom',
-        'capabilities' => [
-          'transfers' => ['requested' => true],
-        ],
-        'business_profile' => [
-          'product_description' => 'Vente de produits beauté'
-        ],
-        'account_token' => $request->request->get('token-account'),
-      ]
-    );
-
-    $token = $_POST['token-person'];
-    \Stripe\Stripe::setApiKey('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
-
-    $person = \Stripe\Account::createPerson(
-      $response->id, // id of the account created earlier
-      [
-        'person_token' => $request->request->get('token-person'),
-      ]
-    );
-
-    return $this->json(true);
-  }
 }
 

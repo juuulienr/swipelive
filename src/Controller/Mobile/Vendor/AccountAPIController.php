@@ -72,9 +72,12 @@ class AccountAPIController extends Controller {
               $person = \Stripe\Account::createPerson($response->id, [
                 'person_token' => $param['tokenPerson'],
               ]);
+
+              $vendor->setStripeAcc($response->id);
+              $vendor->flush();
+
             } catch (Exception $e) {
-              dump($e->getMessage());
-              dd($request);
+              return $this->json($e->getMessage(), 404);
             }
 
           } else if ($param['businessType'] == "individual") {
@@ -91,9 +94,12 @@ class AccountAPIController extends Controller {
                 ],
                 'account_token' => $param['tokenAccount']
               ]);
+
+              $vendor->setStripeAcc($response->id);
+              $vendor->flush();
+              
             } catch (Exception $e) {
-              dump($e->getMessage());
-              dd($request);
+              return $this->json($e->getMessage(), 404);
             }
           }
 

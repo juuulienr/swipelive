@@ -1,176 +1,67 @@
-{# {% extends 'web/base.html.twig' %} #}
-
-{% block title %} Test Stripe {% endblock %}
-
-{% block metadata %}{% endblock %}
-    
-{% block stylesheets %}
-    <link rel="stylesheet" href="css/style.css">
-{% endblock %}
-
-
-{% block body %}
-  <div id="root-terms">
-    <div id="main-terms">
-
-      <form class="my-form" action="{{ path('test') }}" method="post">
-        <input type="hidden" name="token-account" id="token-account">
-        {# <input type="hidden" name="token-person" id="token-person"> #}
-       {#  <label>
-        <span>Business Name</span>
-        <input class="inp-company-name">
-        </label> #}
-        <fieldset>
-        {# <legend>Business Address</legend> #}
-        <label>
-        <span>Street Address Line 1</span>
-        <input class="inp-company-street-address1">
-        </label>
-        <label>
-        <span>City</span>
-        <input class="inp-company-city">
-        </label>
-        <label>
-        <span>Postal Code</span>
-        <input class="inp-company-zip">
-        </label>
-        </fieldset>
-        <label>
-        <span>Representative First Name</span>
-        <input class="inp-person-first-name">
-        </label>
-        <label>
-        <span>Representative Last Name</span>
-        <input class="inp-person-last-name">
-        </label>
-        <p>By clicking, you agree to <a href="#">our terms</a> and the <a href="/connect-account/legal">Stripe Connected Account Agreement</a>.</p>
-
-        <button>Submit</button>
-      </form>
-
+<html>
+  <head>
+    <title>Checkout</title>
+  </head>
+  <body>
+  <div>{{ intent }}</div>
+  <form id="payment-form">
+    <div id="payment-element">
+    <!-- Elements will create form elements here -->
     </div>
-  </div>
-{% endblock %}
+    <button id="submit">Submit</button>
+    <div id="error-message">
+    <!-- Display error message to your customers here -->
+    </div>
+  </form>
 
-    
-{% block javascripts %}
-  <script src="https://js.stripe.com/v3/"></script>
 
-  <script>
-    const myForm = document.querySelector('.my-form');
-    console.log(myForm);
 
-    // Assumes you've already included Stripe.js!
-    const stripe = Stripe('pk_test_aIJETJxn5e12xD24xXy0ovEg');
-    // const myForm = document.querySelector('.my-form');
-    myForm.addEventListener('submit', handleForm);
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+      const stripe = Stripe('pk_test_aIJETJxn5e12xD24xXy0ovEg');
 
-    // async function handleForm(event) {
-    //   console.log(event);
-    //   event.preventDefault();
+      const options = {
+        clientSecret: '{{intent.client_secret}}',
+        // Fully customizable with appearance API.
+        appearance: {/*...*/},
+      };
 
-    //   const accountResult = await stripe.createToken('account', {
-    //     business_type: 'company',
-    //     company: {
-    //       name: document.querySelector('.inp-company-name').value,
-    //       phone: "+33609953007",
-    //       tax_id: "833627045",
-    //       // vat_id: "FR84833627045",
-    //       address: {
-    //         line1: document.querySelector('.inp-company-street-address1').value,
-    //         city: document.querySelector('.inp-company-city').value,
-    //         postal_code: document.querySelector('.inp-company-zip').value,
-    //       },
-    //       owners_provided: true,
-    //       directors_provided: true,
-    //       executives_provided: true,
-    //     },
-    //     tos_shown_and_accepted: true,
-    //   });
+      // Set up Stripe.js and Elements to use in checkout form, passing the client secret obtained in step 2
+      const elements = stripe.elements(options);
 
-    //   const personResult = await stripe.createToken('person', {
-    //     person: {
-    //       first_name: document.querySelector('.inp-person-first-name').value,
-    //       last_name: document.querySelector('.inp-person-last-name').value,
-    //       email: 'julienreignierr@gmail.com',
-    //       phone: "+33609953007",
-    //       dob: {
-    //         day: 12,
-    //         month: 6,
-    //         year: 1996
-    //       },
-    //       address: {
-    //         line1: document.querySelector('.inp-company-street-address1').value,
-    //         city: document.querySelector('.inp-company-city').value,
-    //         postal_code: document.querySelector('.inp-company-zip').value,
-    //       },
-    //       relationship: {
-    //         representative: true,
-    //         owner: true,
-    //       }
-    //     },
-    //   });
+      // Create and mount the Payment Element
+      const paymentElement = elements.create('payment');
+      paymentElement.mount('#payment-element');
 
-    //   if (accountResult.token && personResult.token) {
-    //     document.querySelector('#token-account').value = accountResult.token.id;
-    //     document.querySelector('#token-person').value = personResult.token.id;
-    //     myForm.submit();
-    //   }
-    // }
 
-    async function handleForm(event) {
-      console.log(event);
-      event.preventDefault();
+      const form = document.getElementById('payment-form');
 
-      const accountResult = await stripe.createToken('account', {
-        business_type: 'individual',
-        individual: {
-          first_name: document.querySelector('.inp-person-first-name').value,
-          last_name: document.querySelector('.inp-person-last-name').value,
-          email: 'julienreignierr@gmail.com',
-          phone: "+33609953007",
-          dob: {
-            day: 12,
-            month: 6,
-            year: 1996
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const {error} = await stripe.confirmPayment({
+          //`Elements` instance that was used to create the Payment Element
+          elements,
+          confirmParams: {
+            return_url: 'http://127.0.0.1:8000/status',
           },
-          address: {
-            line1: document.querySelector('.inp-company-street-address1').value,
-            city: document.querySelector('.inp-company-city').value,
-            postal_code: document.querySelector('.inp-company-zip').value,
-          },
-        },
-        tos_shown_and_accepted: true,
+        });
+
+        if (error) {
+          // This point will only be reached if there is an immediate error when
+          // confirming the payment. Show error to your customer (for example, payment
+          // details incomplete)
+          const messageContainer = document.querySelector('#error-message');
+          messageContainer.textContent = error.message;
+        } else {
+          // Your customer will be redirected to your `return_url`. For some payment
+          // methods like iDEAL, your customer will be redirected to an intermediate
+          // site first to authorize the payment, then redirected to the `return_url`.
+        }
       });
 
-      // const personResult = await stripe.createToken('person', {
-      //   individual: {
-      //     first_name: document.querySelector('.inp-person-first-name').value,
-      //     last_name: document.querySelector('.inp-person-last-name').value,
-      //     email: 'julienreignierr@gmail.com',
-      //     phone: "+33609953007",
-      //     dob: {
-      //       day: 12,
-      //       month: 6,
-      //       year: 1996
-      //     },
-      //     address: {
-      //       line1: document.querySelector('.inp-company-street-address1').value,
-      //       city: document.querySelector('.inp-company-city').value,
-      //       postal_code: document.querySelector('.inp-company-zip').value,
-      //     },
-      //     relationship: {
-      //       representative: true,
-      //       owner: true,
-      //     }
-      //   },
-      // });
 
-      if (accountResult.token) {
-        document.querySelector('#token-account').value = accountResult.token.id;
-        myForm.submit();
-      }
-    }
-  </script>
-{% endblock %}
 
+    </script>
+  </body>
+</html> 
