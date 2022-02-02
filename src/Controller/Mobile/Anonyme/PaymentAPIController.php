@@ -50,11 +50,11 @@ class PaymentAPIController extends Controller {
   		],
   	]);
 
-    return $this->json($intent, 200);
+    return $this->json($intent->client_secret, 200);
   }
 
   /**
-   * @Route("/api/payment/status", name="api_payment_status")
+   * @Route("/payment/status", name="payment_status")
    */
   public function status(){
 
