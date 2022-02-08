@@ -31,7 +31,8 @@ class PaymentAPIController extends Controller {
    * @Route("/api/payment/intent", name="api_payment_intent")
    */
   public function paymentIntent(){
-  	\Stripe\Stripe::setApiKey('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
+  	// \Stripe\Stripe::setApiKey('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
+    \Stripe\Stripe::setApiKey('sk_live_dNOTznFTks1nDNJjfzd5yzYs');
 
   	$intent = \Stripe\PaymentIntent::create([
   		'amount' => 1000,
@@ -49,6 +50,8 @@ class PaymentAPIController extends Controller {
   			'destination' => 'acct_1KMvY32YfkHlUvQi',
   		],
   	]);
+
+    // créer et enregistrer une commande
 
     return $this->json($intent->client_secret, 200);
   }
