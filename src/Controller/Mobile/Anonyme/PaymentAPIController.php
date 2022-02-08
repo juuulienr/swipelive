@@ -40,11 +40,11 @@ class PaymentAPIController extends Controller {
   		'automatic_payment_methods' => [
   			'enabled' => 'true',
   		],
-  		'payment_method_options' => [
-  			'card' => [
-  				'setup_future_usage' => 'off_session',
-  			],
-  		],
+  		// 'payment_method_options' => [
+  		// 	'card' => [
+  		// 		'setup_future_usage' => 'off_session',
+  		// 	],
+  		// ],
   		// 'application_fee_amount' => 1000 * 0.1,
   		// 'transfer_data' => [
   			// 'destination' => 'acct_1KMvY32YfkHlUvQi',
