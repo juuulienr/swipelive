@@ -46,9 +46,9 @@ class PaymentAPIController extends Controller {
   			],
   		],
   		'application_fee_amount' => 1000 * 0.1,
-  		'transfer_data' => [
-  			'destination' => 'acct_1KMvY32YfkHlUvQi',
-  		],
+  		// 'transfer_data' => [
+  			// 'destination' => 'acct_1KMvY32YfkHlUvQi',
+  		// ],
   	]);
 
     // créer et enregistrer une commande
