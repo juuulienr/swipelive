@@ -45,7 +45,7 @@ class PaymentAPIController extends Controller {
   				'setup_future_usage' => 'off_session',
   			],
   		],
-  		'application_fee_amount' => 1000 * 0.1,
+  		// 'application_fee_amount' => 1000 * 0.1,
   		// 'transfer_data' => [
   			// 'destination' => 'acct_1KMvY32YfkHlUvQi',
   		// ],
