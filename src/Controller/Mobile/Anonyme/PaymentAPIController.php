@@ -45,15 +45,12 @@ class PaymentAPIController extends Controller {
           'name' => $param['name'],
         ]);
 
-        // $ephemeralKey = \Stripe\EphemeralKey::create([
-        //   'customer' => $customer->id, [ 
-        //   'stripe_version' => '2020-08-27' ]
-        // ]);
-
-
-  	// \Stripe\Stripe::setApiKey('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
+     // \Stripe\Stripe::setApiKey('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
         \Stripe\Stripe::setApiKey('sk_live_dNOTznFTks1nDNJjfzd5yzYs');
 
+        $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer->id ], [ 'stripe_version' => '2020-08-27' ]);
+
+          
         $intent = \Stripe\PaymentIntent::create([
           // 'amount' => $param['variant']['price'],
           'amount' => 500,
@@ -77,7 +74,7 @@ class PaymentAPIController extends Controller {
           "publishableKey"=> "pk_live_KGjyLVjmMB3WnzLBitoNtsKC",
           "companyName"=> "Swipe Live",
           "paymentIntent"=> $intent->client_secret,
-          // "ephemeralKey" => $ephemeralKey->secret,
+          "ephemeralKey" => $ephemeralKey->secret,
           "customerId"=> $customer->id,
           "appleMerchantId"=> "merchant.com.swipelive.app",
           "appleMerchantCountryCode"=> "FR",
