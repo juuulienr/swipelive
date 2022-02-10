@@ -30,30 +30,64 @@ class PaymentAPIController extends Controller {
   /**
    * @Route("/api/payment/intent", name="api_payment_intent")
    */
-  public function paymentIntent(){
+  public function paymentIntent(Request $request){
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
+
+      if ($param) {
+
+        $stripe = new \Stripe\StripeClient(
+          'sk_live_dNOTznFTks1nDNJjfzd5yzYs'
+        );
+
+        $customer = $stripe->customers->create([
+          'email' => $param['email'],
+          'name' => $param['name'],
+        ]);
+
+        // $ephemeralKey = \Stripe\EphemeralKey::create([
+        //   'customer' => $customer->id, [ 
+        //   'stripe_version' => '2020-08-27' ]
+        // ]);
+
+
   	// \Stripe\Stripe::setApiKey('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
-    \Stripe\Stripe::setApiKey('sk_live_dNOTznFTks1nDNJjfzd5yzYs');
+        \Stripe\Stripe::setApiKey('sk_live_dNOTznFTks1nDNJjfzd5yzYs');
 
-  	$intent = \Stripe\PaymentIntent::create([
-  		'amount' => 1000,
-  		'currency' => 'eur',
-  		'automatic_payment_methods' => [
-  			'enabled' => 'true',
-  		],
-  		// 'payment_method_options' => [
-  		// 	'card' => [
-  		// 		'setup_future_usage' => 'off_session',
-  		// 	],
-  		// ],
-  		// 'application_fee_amount' => 1000 * 0.1,
-  		// 'transfer_data' => [
-  			// 'destination' => 'acct_1KMvY32YfkHlUvQi',
-  		// ],
-  	]);
+        $intent = \Stripe\PaymentIntent::create([
+          // 'amount' => $param['variant']['price'],
+          'amount' => 500,
+          'customer' => $customer->id,
+          'currency' => 'eur',
+          'automatic_payment_methods' => [
+           'enabled' => 'true',
+         ],
+         'payment_method_options' => [
+           'card' => [
+              'setup_future_usage' => 'off_session',
+            ],
+          ],
+          // 'application_fee_amount' => 500 * 0.1,
+          // 'transfer_data' => [
+          //  'destination' => 'acct_1KMvY32YfkHlUvQi',
+          // ],
+        ]);
 
-    // créer et enregistrer une commande
+      $array = [
+          "publishableKey"=> "pk_live_KGjyLVjmMB3WnzLBitoNtsKC",
+          "companyName"=> "Swipe Live",
+          "paymentIntent"=> $intent->client_secret,
+          // "ephemeralKey" => $ephemeralKey->secret,
+          "customerId"=> $customer->id,
+          "appleMerchantId"=> "merchant.com.swipelive.app",
+          "appleMerchantCountryCode"=> "FR",
+          "mobilePayEnabled"=> true
+        ];
 
-    return $this->json($intent->client_secret, 200);
+        return $this->json($array, 200);
+      }
+    }
+    return $this->json(false, 404);
   }
 
   /**
