@@ -35,22 +35,18 @@ class PaymentAPIController extends Controller {
       $param = json_decode($json, true);
 
       if ($param) {
-
-        $stripe = new \Stripe\StripeClient(
-          'sk_live_dNOTznFTks1nDNJjfzd5yzYs'
-        );
+        // $stripe = new \Stripe\StripeClient('sk_live_dNOTznFTks1nDNJjfzd5yzYs');
+        $stripe = new \Stripe\StripeClient('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
 
         $customer = $stripe->customers->create([
           'email' => $param['email'],
-          'name' => $param['name'],
+          'name' => "Julien REIGNIER",
         ]);
 
-     // \Stripe\Stripe::setApiKey('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
-        \Stripe\Stripe::setApiKey('sk_live_dNOTznFTks1nDNJjfzd5yzYs');
-
+        // \Stripe\Stripe::setApiKey('sk_live_dNOTznFTks1nDNJjfzd5yzYs');
+        \Stripe\Stripe::setApiKey('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
         $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer->id ], [ 'stripe_version' => '2020-08-27' ]);
 
-          
         $intent = \Stripe\PaymentIntent::create([
           // 'amount' => $param['variant']['price'],
           'amount' => 500,
@@ -58,20 +54,21 @@ class PaymentAPIController extends Controller {
           'currency' => 'eur',
           'automatic_payment_methods' => [
            'enabled' => 'true',
-         ],
-         'payment_method_options' => [
+          ],
+          'payment_method_options' => [
            'card' => [
               'setup_future_usage' => 'off_session',
             ],
           ],
-          // 'application_fee_amount' => 500 * 0.1,
-          // 'transfer_data' => [
-          //  'destination' => 'acct_1KMvY32YfkHlUvQi',
-          // ],
+          'application_fee_amount' => 500 * 0.1,
+          'transfer_data' => [
+           'destination' => 'acct_1KMvY32YfkHlUvQi',
+          ],
         ]);
 
-      $array = [
-          "publishableKey"=> "pk_live_KGjyLVjmMB3WnzLBitoNtsKC",
+        $array = [
+          // "publishableKey"=> "pk_live_KGjyLVjmMB3WnzLBitoNtsKC",
+          "publishableKey"=> "pk_test_aIJETJxn5e12xD24xXy0ovEg",
           "companyName"=> "Swipe Live",
           "paymentIntent"=> $intent->client_secret,
           "ephemeralKey" => $ephemeralKey->secret,
