@@ -136,61 +136,40 @@ class WebhookController extends Controller {
    *
    * @Route("/api/stripe/webhooks", name="api_stripe_webhooks", methods={"POST"})
    */
-  public function stripe(Request $request) {
+  public function stripe(Request $request, ObjectManager $manager) {
     $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyException(new Exception($result));
 
-    // This is your Stripe CLI webhook secret for testing your endpoint locally.
-    $endpoint_secret = 'whsec_143bc4785520f2730325d443bc883c3fb44fbeb568626c0216cd7a0adab70b5a';
+    if (($result["type"]) {
+      $order = $orderRepo->findOneByPaymentId($result["data"]->object->id);
 
-    $payload = @file_get_contents('php://input');
-    $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
-    $event = null;
+      switch (($result["type"]) {
+        case 'account.updated':
+          // $result["data"]->object;
+        case 'account.external_account.created':
+          // $result["data"]->object;
+        case 'account.external_account.deleted':
+          // $result["data"]->object;
+        case 'account.external_account.updated':
+          // $result["data"]->object;
+        case 'payment_intent.canceled':
+          $order->setStatus($result["data"]->object->status);
+        case 'payment_intent.created':
+          $order->setStatus($result["data"]->object->status);
+        case 'payment_intent.payment_failed':
+          $order->setStatus($result["data"]->object->status);
+        case 'payment_intent.processing':
+          $order->setStatus($result["data"]->object->status);
+        case 'payment_intent.requires_action':
+          $order->setStatus($result["data"]->object->status);
+        case 'payment_intent.succeeded':
+          $order->setStatus($result["data"]->object->status);
+        default:
+        // 
+      }
 
-    try {
-      $event = \Stripe\Webhook::constructEvent(
-        $payload, $sig_header, $endpoint_secret
-      );
-    } catch(\UnexpectedValueException $e) {
-  // Invalid payload
-      http_response_code(400);
-      exit();
-    } catch(\Stripe\Exception\SignatureVerificationException $e) {
-  // Invalid signature
-      http_response_code(400);
-      exit();
+      $manager->flush();
+
+      return $this->json(true, 200);
     }
-
-  // Handle the event
-    switch ($event->type) {
-      case 'account.updated':
-      $account = $event->data->object;
-      case 'account.external_account.created':
-      $externalAccount = $event->data->object;
-      case 'account.external_account.deleted':
-      $externalAccount = $event->data->object;
-      case 'account.external_account.updated':
-      $externalAccount = $event->data->object;
-      case 'payment_intent.amount_capturable_updated':
-      $paymentIntent = $event->data->object;
-      case 'payment_intent.canceled':
-      $paymentIntent = $event->data->object;
-      case 'payment_intent.created':
-      $paymentIntent = $event->data->object;
-      case 'payment_intent.payment_failed':
-      $paymentIntent = $event->data->object;
-      case 'payment_intent.processing':
-      $paymentIntent = $event->data->object;
-      case 'payment_intent.requires_action':
-      $paymentIntent = $event->data->object;
-      case 'payment_intent.succeeded':
-      $paymentIntent = $event->data->object;
-  // ... handle other event types
-      default:
-      echo 'Received unknown event type ' . $event->type;
-    }
-
-    return $this->json(true, 200);
   }
-  
 }
