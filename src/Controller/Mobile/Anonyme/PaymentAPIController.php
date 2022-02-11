@@ -35,6 +35,8 @@ class PaymentAPIController extends Controller {
       $param = json_decode($json, true);
 
       if ($param) {
+
+        // if customer
         // $stripe = new \Stripe\StripeClient('sk_live_dNOTznFTks1nDNJjfzd5yzYs');
         $stripe = new \Stripe\StripeClient('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
 

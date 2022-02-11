@@ -188,6 +188,11 @@ class Vendor implements UserInterface
      */
     private $stripeAcc;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $stripeCus;
+
     
     public function __construct()
     {
@@ -202,6 +207,10 @@ class Vendor implements UserInterface
 
     public function getClassName() {
         return (new \ReflectionClass($this))->getShortName();
+    }
+
+    public function getFullname() {
+        return "{$this->firstname} {$this->lastname}";
     }
 
     public function getId()
@@ -595,6 +604,18 @@ class Vendor implements UserInterface
     public function setStripeAcc(?string $stripeAcc): self
     {
         $this->stripeAcc = $stripeAcc;
+
+        return $this;
+    }
+
+    public function getStripeCus(): ?string
+    {
+        return $this->stripeCus;
+    }
+
+    public function setStripeCus(?string $stripeCus): self
+    {
+        $this->stripeCus = $stripeCus;
 
         return $this;
     }

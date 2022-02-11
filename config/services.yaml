@@ -6,7 +6,10 @@
 parameters:
     locale: 'fr'
     uploads_directory: '%kernel.project_dir%/public/uploads'
-    root_directory: '%kernel.project_dir%/public'
+    stripe_pk_test: '%env(STRIPE_PK_TEST)%'
+    stripe_sk_test: '%env(STRIPE_SK_TEST)%'
+    stripe_pk_live: '%env(STRIPE_PK_LIVE)%'
+    stripe_sk_live: '%env(STRIPE_SK_LIVE)%'
 
 
 services:
