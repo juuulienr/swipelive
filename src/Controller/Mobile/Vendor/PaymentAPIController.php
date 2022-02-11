@@ -30,7 +30,7 @@ class PaymentAPIController extends Controller {
   /**
    * @Route("/vendor/api/payment", name="vendor_api_payment")
    */
-  public function payment(Request $request){
+  public function payment(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo){
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
