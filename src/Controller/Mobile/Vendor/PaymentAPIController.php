@@ -83,7 +83,7 @@ class PaymentAPIController extends Controller {
     \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk_test'));
     $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
     $intent = \Stripe\PaymentIntent::create([
-      'amount' => $price,
+      'amount' => $price * 100,
       'customer' => $customer,
       'currency' => 'eur',
       'automatic_payment_methods' => [
@@ -94,7 +94,7 @@ class PaymentAPIController extends Controller {
           'setup_future_usage' => 'off_session',
         ],
       ],
-      'application_fee_amount' => $price * 0.1,
+      'application_fee_amount' => $price * 10,
       'transfer_data' => [
        'destination' => $stripeAcc,
       ],
