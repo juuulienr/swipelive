@@ -32,7 +32,7 @@ class WebhookController extends Controller {
    *
    * @Route("/api/bambuser/webhooks", name="api_bambuser_webhooks", methods={"POST"})
    */
-  public function webhooks(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager, LiveProductsRepository $liveProductRepo) {
+  public function bambuser(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager, LiveProductsRepository $liveProductRepo) {
     $result = json_decode($request->getContent(), true);
     // $this->get('bugsnag')->notifyException(new Exception($result["payload"]["id"]));
 
@@ -136,7 +136,7 @@ class WebhookController extends Controller {
    *
    * @Route("/api/stripe/webhooks", name="api_stripe_webhooks", methods={"POST"})
    */
-  public function webhooks(Request $request) {
+  public function stripe(Request $request) {
     $result = json_decode($request->getContent(), true);
     $this->get('bugsnag')->notifyException(new Exception($result));
 
