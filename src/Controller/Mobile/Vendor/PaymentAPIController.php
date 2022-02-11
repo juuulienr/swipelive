@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Mobile\Anonyme;
+namespace App\Controller\Mobile\Vendor;
 
 use App\Entity\Clip;
 use App\Entity\Live;
