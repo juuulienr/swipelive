@@ -139,18 +139,18 @@ class WebhookController extends Controller {
   public function stripe(Request $request, ObjectManager $manager) {
     $result = json_decode($request->getContent(), true);
 
-    if (($result["type"]) {
+    if ($result["type"]) {
       $order = $orderRepo->findOneByPaymentId($result["data"]->object->id);
 
-      switch (($result["type"]) {
-        case 'account.updated':
-          // $result["data"]->object;
-        case 'account.external_account.created':
-          // $result["data"]->object;
-        case 'account.external_account.deleted':
-          // $result["data"]->object;
-        case 'account.external_account.updated':
-          // $result["data"]->object;
+      switch ($result["type"]) {
+        // case 'account.updated':
+        //   $result["data"]->object;
+        // case 'account.external_account.created':
+        //   // $result["data"]->object;
+        // case 'account.external_account.deleted':
+        //   // $result["data"]->object;
+        // case 'account.external_account.updated':
+        //   // $result["data"]->object;
         case 'payment_intent.canceled':
           $order->setStatus($result["data"]->object->status);
         case 'payment_intent.created':

@@ -56,6 +56,7 @@ class PaymentAPIController extends Controller {
           $variant = $variantRepo->findOneById($param["variant"]);
 
           if ($variant) {
+            $description = $variant->getTitle();
             $price = $variant->getPrice();
             $stripeAcc = $variant->getVendor()->getStripeAcc();
           }
@@ -63,6 +64,7 @@ class PaymentAPIController extends Controller {
           $product = $productRepo->findOneById($param["product"]);
 
           if ($product) {
+            $description = $product->getTitle();
             $price = $product->getPrice();
             $stripeAcc = $product->getVendor()->getStripeAcc();
           }
@@ -70,7 +72,7 @@ class PaymentAPIController extends Controller {
           return $this->json("Le produit est introuvable", 404); 
         }
 
-        $array = $this->generatePaymentIntent($customer, $price, $stripeAcc);
+        $array = $this->generatePaymentIntent($customer, $price, $stripeAcc, $description);
 
         return $this->json($array, 200);
       }
@@ -85,6 +87,7 @@ class PaymentAPIController extends Controller {
     $intent = \Stripe\PaymentIntent::create([
       'amount' => $price * 100,
       'customer' => $customer,
+      'description' => $description,
       'currency' => 'eur',
       'automatic_payment_methods' => [
        'enabled' => 'true',

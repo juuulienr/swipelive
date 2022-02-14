@@ -29,7 +29,7 @@ class Variant
     private $title;
 
     /**
-     * @ORM\Column(type="float")
+     * @ORM\Column(type="decimal", precision=8, scale=2)
      * @Groups("product:read")
      * @Groups("variant:read")
      * @Groups("clip:read")
@@ -37,7 +37,7 @@ class Variant
     private $price;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
      * @Groups("product:read")
      * @Groups("variant:read")
      * @Groups("clip:read")
@@ -116,24 +116,24 @@ class Variant
         return $this;
     }
 
-    public function getPrice(): ?float
+    public function getPrice(): string
     {
         return $this->price;
     }
 
-    public function setPrice(float $price): self
+    public function setPrice(string $price): self
     {
         $this->price = $price;
 
         return $this;
     }
 
-    public function getCompareAtPrice(): ?float
+    public function getCompareAtPrice(): ?string
     {
         return $this->compareAtPrice;
     }
 
-    public function setCompareAtPrice(?float $compareAtPrice): self
+    public function setCompareAtPrice(?string $compareAtPrice): self
     {
         $this->compareAtPrice = $compareAtPrice;
 

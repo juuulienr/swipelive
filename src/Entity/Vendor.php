@@ -193,6 +193,16 @@ class Vendor implements UserInterface
      */
     private $stripeCus;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Order::class, mappedBy="vendor")
+     */
+    private $sales;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Order::class, mappedBy="buyer")
+     */
+    private $purchases;
+
     
     public function __construct()
     {
@@ -203,6 +213,8 @@ class Vendor implements UserInterface
         $this->products = new ArrayCollection();
         $this->followers = new ArrayCollection();
         $this->following = new ArrayCollection();
+        $this->sales = new ArrayCollection();
+        $this->purchases = new ArrayCollection();
     }
 
     public function getClassName() {
@@ -616,6 +628,66 @@ class Vendor implements UserInterface
     public function setStripeCus(?string $stripeCus): self
     {
         $this->stripeCus = $stripeCus;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Order[]
+     */
+    public function getSales(): Collection
+    {
+        return $this->sales;
+    }
+
+    public function addSale(Order $sale): self
+    {
+        if (!$this->sales->contains($sale)) {
+            $this->sales[] = $sale;
+            $sale->setVendor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSale(Order $sale): self
+    {
+        if ($this->sales->removeElement($sale)) {
+            // set the owning side to null (unless already changed)
+            if ($sale->getVendor() === $this) {
+                $sale->setVendor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Order[]
+     */
+    public function getPurchases(): Collection
+    {
+        return $this->purchases;
+    }
+
+    public function addPurchase(Order $purchase): self
+    {
+        if (!$this->purchases->contains($purchase)) {
+            $this->purchases[] = $purchase;
+            $purchase->setBuyer($this);
+        }
+
+        return $this;
+    }
+
+    public function removePurchase(Order $purchase): self
+    {
+        if ($this->purchases->removeElement($purchase)) {
+            // set the owning side to null (unless already changed)
+            if ($purchase->getBuyer() === $this) {
+                $purchase->setBuyer(null);
+            }
+        }
 
         return $this;
     }
