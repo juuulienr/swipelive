@@ -129,7 +129,6 @@ class PaymentAPIController extends Controller {
         ]);
 
         $order->setPaymentId($intent->id);
-        $order->setStatus($intent->status);
         $order->setSubTotal($price);
         $order->setTotal($price);
         $order->setFees($price / 10);

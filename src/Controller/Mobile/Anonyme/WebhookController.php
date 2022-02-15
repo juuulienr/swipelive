@@ -140,11 +140,8 @@ class WebhookController extends Controller {
   public function stripe(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
 
-    if ($result["type"]) {
-      // $this->get('bugsnag')->notifyException(new Exception($result["data"]));
-      // $this->get('bugsnag')->notifyException(new Exception($result["data"]["object"]));
-      $this->get('bugsnag')->notifyException(new Exception($result["data"]["object"]["status"]));
-      $order = $orderRepo->findOneByPaymentId($result["data"]->object->id);
+    if ($result["type"] && $result["data"]["object"]["id"]) {
+      $order = $orderRepo->findOneByPaymentId($result["data"]["object"]["id"]);
 
       if ($order) {
         switch ($result["type"]) {
@@ -157,17 +154,17 @@ class WebhookController extends Controller {
           // case 'account.external_account.updated':
           //   // $result["data"]->object;
           case 'payment_intent.canceled':
-            $order->setStatus($result["data"]->object->status);
+            $order->setStatus("canceled");
           case 'payment_intent.created':
-            $order->setStatus($result["data"]->object->status);
+            $order->setStatus("created");
           case 'payment_intent.payment_failed':
-            $order->setStatus($result["data"]->object->status);
+            $order->setStatus("payment_failed");
           case 'payment_intent.processing':
-            $order->setStatus($result["data"]->object->status);
+            $order->setStatus("processing");
           case 'payment_intent.requires_action':
-            $order->setStatus($result["data"]->object->status);
+            $order->setStatus("requires_action");
           case 'payment_intent.succeeded':
-            $order->setStatus($result["data"]->object->status);
+            $order->setStatus("succeeded");
           default:
           // 
         }
