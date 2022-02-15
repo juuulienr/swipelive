@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\VariantRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -94,9 +96,15 @@ class Variant
      */
     private $upload;
 
+    /**
+     * @ORM\OneToMany(targetEntity=LineItem::class, mappedBy="variant")
+     */
+    private $lineItems;
+
     public function __construct()
     {
         $this->quantity = 0;
+        $this->lineItems = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -220,6 +228,36 @@ class Variant
     public function setUpload(?Upload $upload): self
     {
         $this->upload = $upload;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LineItem[]
+     */
+    public function getLineItems(): Collection
+    {
+        return $this->lineItems;
+    }
+
+    public function addLineItem(LineItem $lineItem): self
+    {
+        if (!$this->lineItems->contains($lineItem)) {
+            $this->lineItems[] = $lineItem;
+            $lineItem->setVariant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLineItem(LineItem $lineItem): self
+    {
+        if ($this->lineItems->removeElement($lineItem)) {
+            // set the owning side to null (unless already changed)
+            if ($lineItem->getVariant() === $this) {
+                $lineItem->setVariant(null);
+            }
+        }
 
         return $this;
     }

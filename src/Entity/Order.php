@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\OrderRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -54,6 +56,21 @@ class Order
      * @ORM\Column(type="decimal", precision=8, scale=2)
      */
     private $total;
+
+    /**
+     * @ORM\OneToMany(targetEntity=LineItem::class, mappedBy="orderId")
+     */
+    private $lineItems;
+
+    /**
+     * @ORM\Column(type="decimal", precision=8, scale=2)
+     */
+    private $fees;
+
+    public function __construct()
+    {
+        $this->lineItems = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -140,6 +157,48 @@ class Order
     public function setTotal(string $total): self
     {
         $this->total = $total;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LineItem[]
+     */
+    public function getLineItems(): Collection
+    {
+        return $this->lineItems;
+    }
+
+    public function addLineItem(LineItem $lineItem): self
+    {
+        if (!$this->lineItems->contains($lineItem)) {
+            $this->lineItems[] = $lineItem;
+            $lineItem->setOrderId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLineItem(LineItem $lineItem): self
+    {
+        if ($this->lineItems->removeElement($lineItem)) {
+            // set the owning side to null (unless already changed)
+            if ($lineItem->getOrderId() === $this) {
+                $lineItem->setOrderId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getFees(): ?string
+    {
+        return $this->fees;
+    }
+
+    public function setFees(string $fees): self
+    {
+        $this->fees = $fees;
 
         return $this;
     }

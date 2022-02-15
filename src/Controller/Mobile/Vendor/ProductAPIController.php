@@ -177,6 +177,37 @@ class ProductAPIController extends Controller {
 
 
   /**
+   * Ajouter une image sur un produit
+   *
+   * @Route("/vendor/api/products/edit/upload/add/{id}", name="vendor_api_edit_upload_add", methods={"POST"})
+   */
+  public function addUploadProduct(Product $product, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($request->files->get('picture')) {
+      $file = $request->files->get('picture');
+
+      if (!$file) {
+        return $this->json("L'image est introuvable !", 404);
+      }
+
+      $filename = md5(time().uniqid()). "." . $file->guessExtension(); 
+      $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
+      file_put_contents($filepath, file_get_contents($file));
+
+      $upload = new Upload();
+      $upload->setFilename($filename);
+      $product->setUpload($upload);
+
+      $manager->persist($upload);
+      $manager->flush();
+
+      return $this->json($upload, 200);
+    }
+
+    return $this->json("L'image est introuvable !", 404);
+  }
+
+
+  /**
    * Supprimer une image
    *
    * @Route("/vendor/api/products/upload/delete/{id}", name="vendor_api_upload_delete", methods={"GET"})

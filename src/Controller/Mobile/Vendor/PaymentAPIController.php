@@ -9,6 +9,8 @@ use App\Entity\Vendor;
 use App\Entity\Message;
 use App\Entity\Product;
 use App\Entity\Category;
+use App\Entity\Order;
+use App\Entity\LineItem;
 use App\Repository\ClipRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
@@ -36,43 +38,73 @@ class PaymentAPIController extends Controller {
       $param = json_decode($json, true);
 
       if ($param) {
-        $vendor = $this->getUser();
-        $customer = $vendor->getStripeCus();
+        $buyer = $this->getUser();
+        $customer = $buyer->getStripeCus();
+        $param["quantity"] ? $quantity = $param["quantity"] : $quantity = 1;
 
+        // buyer/customer
         if (!$customer) {
           $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk_test'));
 
           $customer = $stripe->customers->create([
-            'email' => $vendor->getEmail(),
-            'name' => ucwords($vendor->getFullname()),
+            'email' => $buyer->getEmail(),
+            'name' => ucwords($buyer->getFullname()),
           ]);
 
           $customer = $customer->id;
-          $vendor->setStripeCus($customer);
+          $buyer->setStripeCus($customer);
           $manager->flush();
         }
+
+        $order = new Order();
+        $order->setBuyer($buyer);
+        $manager->persist($order);
 
         if ($param["variant"]) {
           $variant = $variantRepo->findOneById($param["variant"]);
 
           if ($variant) {
-            $description = $variant->getTitle();
-            $price = $variant->getPrice();
+            $title = $variant->getTitle();
+            $price = $variant->getPrice() * $quantity;
             $stripeAcc = $variant->getVendor()->getStripeAcc();
+
+            $lineItem = new LineItem();
+            $lineItem->setQuantity($quantity);
+            $lineItem->setPrice($price);
+            $lineItem->setVariant($variant);
+            $lineItem->setTitle($title);
+            $lineItem->setOrderId($order);
+            $manager->persist($lineItem);
+
+            $order->setVendor($variant->getVendor());
+          } else {
+            return $this->json("Le variant est introuvable", 404); 
           }
         } elseif ($param["product"]) {
           $product = $productRepo->findOneById($param["product"]);
 
           if ($product) {
-            $description = $product->getTitle();
-            $price = $product->getPrice();
+            $title = $product->getTitle();
+            $price = $product->getPrice() * $quantity;
             $stripeAcc = $product->getVendor()->getStripeAcc();
+
+            $lineItem = new LineItem();
+            $lineItem->setQuantity($quantity);
+            $lineItem->setPrice($price);
+            $lineItem->setProduct($product);
+            $lineItem->setTitle($title);
+            $lineItem->setOrderId($order);
+            $manager->persist($lineItem);
+
+            $order->setVendor($product->getVendor());
+          } else {
+            return $this->json("Le produit est introuvable", 404); 
           }
         } else {
-          return $this->json("Le produit est introuvable", 404); 
+          return $this->json("Un produit ou un variant est obligatoire", 404); 
         }
 
-        $array = $this->generatePaymentIntent($customer, $price, $stripeAcc, $description);
+        $array = $this->generatePaymentIntent($customer, $price, $stripeAcc, $title, $order, $manager);
 
         return $this->json($array, 200);
       }
@@ -81,13 +113,14 @@ class PaymentAPIController extends Controller {
   }
 
 
-  function generatePaymentIntent($customer, $price, $stripeAcc){
+  function generatePaymentIntent($customer, $price, $stripeAcc, $order, $manager){
     \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk_test'));
     $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
+
     $intent = \Stripe\PaymentIntent::create([
       'amount' => $price * 100,
       'customer' => $customer,
-      'description' => $description,
+      'description' => $title,
       'currency' => 'eur',
       'automatic_payment_methods' => [
        'enabled' => 'true',
@@ -102,6 +135,13 @@ class PaymentAPIController extends Controller {
        'destination' => $stripeAcc,
       ],
     ]);
+
+    $order->setPaymentId($intent->id);
+    $order->setStatus($intent->status);
+    $order->setSubTotal($price * 100);
+    $order->setTotal($price * 100);
+    $order->setFees($price * 10);
+    $manager->flush();
 
     $array = [
       "publishableKey"=> $this->getParameter('stripe_pk_test'),
