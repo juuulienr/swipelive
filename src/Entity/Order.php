@@ -67,9 +67,20 @@ class Order
      */
     private $fees;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $eventId;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $updatedAt;
+
     public function __construct()
     {
         $this->lineItems = new ArrayCollection();
+        $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
     }
 
     public function getId(): ?int
@@ -199,6 +210,30 @@ class Order
     public function setFees(string $fees): self
     {
         $this->fees = $fees;
+
+        return $this;
+    }
+
+    public function getEventId(): ?string
+    {
+        return $this->eventId;
+    }
+
+    public function setEventId(?string $eventId): self
+    {
+        $this->eventId = $eventId;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

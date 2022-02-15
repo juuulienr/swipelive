@@ -10,6 +10,7 @@ use App\Entity\Message;
 use App\Entity\Product;
 use App\Entity\Category;
 use App\Repository\ClipRepository;
+use App\Repository\OrderRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use App\Repository\LiveRepository;
@@ -136,38 +137,42 @@ class WebhookController extends Controller {
    *
    * @Route("/api/stripe/webhooks", name="api_stripe_webhooks", methods={"POST"})
    */
-  public function stripe(Request $request, ObjectManager $manager) {
+  public function stripe(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
 
     if ($result["type"]) {
       $order = $orderRepo->findOneByPaymentId($result["data"]->object->id);
 
-      switch ($result["type"]) {
-        // case 'account.updated':
-        //   $result["data"]->object;
-        // case 'account.external_account.created':
-        //   // $result["data"]->object;
-        // case 'account.external_account.deleted':
-        //   // $result["data"]->object;
-        // case 'account.external_account.updated':
-        //   // $result["data"]->object;
-        case 'payment_intent.canceled':
-          $order->setStatus($result["data"]->object->status);
-        case 'payment_intent.created':
-          $order->setStatus($result["data"]->object->status);
-        case 'payment_intent.payment_failed':
-          $order->setStatus($result["data"]->object->status);
-        case 'payment_intent.processing':
-          $order->setStatus($result["data"]->object->status);
-        case 'payment_intent.requires_action':
-          $order->setStatus($result["data"]->object->status);
-        case 'payment_intent.succeeded':
-          $order->setStatus($result["data"]->object->status);
-        default:
-        // 
-      }
+      if ($order) {
+        switch ($result["type"]) {
+          // case 'account.updated':
+          //   $result["data"]->object;
+          // case 'account.external_account.created':
+          //   // $result["data"]->object;
+          // case 'account.external_account.deleted':
+          //   // $result["data"]->object;
+          // case 'account.external_account.updated':
+          //   // $result["data"]->object;
+          case 'payment_intent.canceled':
+            $order->setStatus($result["data"]->object->status);
+          case 'payment_intent.created':
+            $order->setStatus($result["data"]->object->status);
+          case 'payment_intent.payment_failed':
+            $order->setStatus($result["data"]->object->status);
+          case 'payment_intent.processing':
+            $order->setStatus($result["data"]->object->status);
+          case 'payment_intent.requires_action':
+            $order->setStatus($result["data"]->object->status);
+          case 'payment_intent.succeeded':
+            $order->setStatus($result["data"]->object->status);
+          default:
+          // 
+        }
 
-      $manager->flush();
+        $order->setEventId($result["id"]);
+        $order->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
+        $manager->flush();
+      }
 
       return $this->json(true, 200);
     }
