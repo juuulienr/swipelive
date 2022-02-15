@@ -141,8 +141,8 @@ class WebhookController extends Controller {
     $result = json_decode($request->getContent(), true);
 
     if ($result["type"]) {
-      $this->get('bugsnag')->notifyException(new Exception($result["data"]->object);
-      $this->get('bugsnag')->notifyException(new Exception($result["id"]);
+      $this->get('bugsnag')->notifyException(new Exception($result["data"]->object));
+      $this->get('bugsnag')->notifyException(new Exception($result["id"]));
       $order = $orderRepo->findOneByPaymentId($result["data"]->object->id);
 
       if ($order) {
