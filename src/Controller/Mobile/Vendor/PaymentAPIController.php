@@ -64,19 +64,20 @@ class PaymentAPIController extends Controller {
           $variant = $variantRepo->findOneById($param["variant"]);
 
           if ($variant) {
-            $title = $variant->getTitle();
+            $title = $product->getTitle() . " " . $variant->getTitle();
             $price = $variant->getPrice() * $quantity;
-            $stripeAcc = $variant->getVendor()->getStripeAcc();
+            $stripeAcc = $variant->getProduct()->getVendor()->getStripeAcc();
 
             $lineItem = new LineItem();
             $lineItem->setQuantity($quantity);
             $lineItem->setPrice($price);
+            $lineItem->setProduct($variant->getProduct());
             $lineItem->setVariant($variant);
             $lineItem->setTitle($title);
             $lineItem->setOrderId($order);
             $manager->persist($lineItem);
 
-            $order->setVendor($variant->getVendor());
+            $order->setVendor($variant->getProduct()->getVendor());
           } else {
             return $this->json("Le variant est introuvable", 404); 
           }
@@ -104,56 +105,50 @@ class PaymentAPIController extends Controller {
           return $this->json("Un produit ou un variant est obligatoire", 404); 
         }
 
-        $array = $this->generatePaymentIntent($customer, $price, $stripeAcc, $title, $order, $manager);
+
+        \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk_test'));
+        $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
+
+        $intent = \Stripe\PaymentIntent::create([
+          'amount' => str_replace(',', '', $price) * 100,
+          'customer' => $customer,
+          'description' => $title,
+          'currency' => 'eur',
+          'automatic_payment_methods' => [
+           'enabled' => 'true',
+          ],
+          'payment_method_options' => [
+           'card' => [
+              'setup_future_usage' => 'off_session',
+            ],
+          ],
+          'application_fee_amount' => str_replace(',', '', $price) * 10,
+          'transfer_data' => [
+           'destination' => $stripeAcc,
+          ],
+        ]);
+
+        $order->setPaymentId($intent->id);
+        $order->setStatus($intent->status);
+        $order->setSubTotal($price);
+        $order->setTotal($price);
+        $order->setFees($price / 10);
+        $manager->flush();
+
+        $array = [
+          "publishableKey"=> $this->getParameter('stripe_pk_test'),
+          "companyName"=> "Swipe Live",
+          "paymentIntent"=> $intent->client_secret,
+          "ephemeralKey" => $ephemeralKey->secret,
+          "customerId"=> $customer,
+          "appleMerchantId"=> "merchant.com.swipelive.app",
+          "appleMerchantCountryCode"=> "FR",
+          "mobilePayEnabled"=> true
+        ];
 
         return $this->json($array, 200);
       }
     }
     return $this->json(false, 404);
-  }
-
-
-  function generatePaymentIntent($customer, $price, $stripeAcc, $order, $manager){
-    \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk_test'));
-    $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
-
-    $intent = \Stripe\PaymentIntent::create([
-      'amount' => $price * 100,
-      'customer' => $customer,
-      'description' => $title,
-      'currency' => 'eur',
-      'automatic_payment_methods' => [
-       'enabled' => 'true',
-      ],
-      'payment_method_options' => [
-       'card' => [
-          'setup_future_usage' => 'off_session',
-        ],
-      ],
-      'application_fee_amount' => $price * 10,
-      'transfer_data' => [
-       'destination' => $stripeAcc,
-      ],
-    ]);
-
-    $order->setPaymentId($intent->id);
-    $order->setStatus($intent->status);
-    $order->setSubTotal($price * 100);
-    $order->setTotal($price * 100);
-    $order->setFees($price * 10);
-    $manager->flush();
-
-    $array = [
-      "publishableKey"=> $this->getParameter('stripe_pk_test'),
-      "companyName"=> "Swipe Live",
-      "paymentIntent"=> $intent->client_secret,
-      "ephemeralKey" => $ephemeralKey->secret,
-      "customerId"=> $customer,
-      "appleMerchantId"=> "merchant.com.swipelive.app",
-      "appleMerchantCountryCode"=> "FR",
-      "mobilePayEnabled"=> true
-    ];
-
-    return $array;
   }
 }

@@ -19,6 +19,7 @@ class Variant
      * @ORM\Column(type="integer")
      * @Groups("product:read")
      * @Groups("variant:read")
+     * @Groups("clip:read")
      */
     private $id;
 
