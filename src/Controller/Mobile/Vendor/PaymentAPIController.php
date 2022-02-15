@@ -64,7 +64,7 @@ class PaymentAPIController extends Controller {
           $variant = $variantRepo->findOneById($param["variant"]);
 
           if ($variant) {
-            $title = $product->getTitle() . " " . $variant->getTitle();
+            $title = $variant->getProduct()->getTitle() . " - " . $variant->getTitle();
             $price = $variant->getPrice() * $quantity;
             $stripeAcc = $variant->getProduct()->getVendor()->getStripeAcc();
 
