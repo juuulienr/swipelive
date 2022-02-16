@@ -136,7 +136,7 @@ class PaymentAPIController extends Controller {
         $manager->flush();
 
         $array = [
-          "publishableKey"=> $this->getParameter('stripe_pk_test'),
+          "publishableKey"=> $this->getParameter('stripe_pk'),
           "companyName"=> "Swipe Live",
           "paymentIntent"=> $intent->client_secret,
           "ephemeralKey" => $ephemeralKey->secret,
