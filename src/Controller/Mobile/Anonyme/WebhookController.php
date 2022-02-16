@@ -142,17 +142,10 @@ class WebhookController extends Controller {
 
     if ($result["type"] && $result["data"]["object"]["id"]) {
       $order = $orderRepo->findOneByPaymentId($result["data"]["object"]["id"]);
+// balance.available
 
       if ($order) {
         switch ($result["type"]) {
-          // case 'account.updated':
-          //   $result["data"]->object;
-          // case 'account.external_account.created':
-          //   // $result["data"]->object;
-          // case 'account.external_account.deleted':
-          //   // $result["data"]->object;
-          // case 'account.external_account.updated':
-          //   // $result["data"]->object;
           case 'payment_intent.canceled':
             $order->setStatus("canceled");
           case 'payment_intent.created':
@@ -166,7 +159,44 @@ class WebhookController extends Controller {
           case 'payment_intent.succeeded':
             $order->setStatus("succeeded");
           default:
-          // 
+        }
+
+        $order->setEventId($result["id"]);
+        $order->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
+        $manager->flush();
+      }
+
+      return $this->json(true, 200);
+    }
+  }
+
+
+  /**
+   * Webhooks Stripe Connect
+   *
+   * @Route("/api/stripe/webhooks/connect", name="api_stripe_webhooks_connect", methods={"POST"})
+   */
+  public function stripeConnect(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+    $result = json_decode($request->getContent(), true);
+
+    if ($result["type"] && $result["data"]["object"]["id"]) {
+      $order = $orderRepo->findOneByPaymentId($result["data"]["object"]["id"]);
+
+      if ($order) {
+        switch ($event->type) {
+          case 'account.updated':
+            $account = $event->data->object;
+          case 'account.external_account.updated':
+            $externalAccount = $event->data->object;
+          case 'balance.available':
+            $balance = $event->data->object;
+          case 'payout.failed':
+            $payout = $event->data->object;
+          case 'person.updated':
+            $person = $event->data->object;
+          // ... handle other event types
+          default:
+            echo 'Received unknown event type ' . $event->type;
         }
 
         $order->setEventId($result["id"]);

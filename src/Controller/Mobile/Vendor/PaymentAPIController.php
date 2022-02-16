@@ -132,6 +132,7 @@ class PaymentAPIController extends Controller {
         $order->setSubTotal($price);
         $order->setTotal($price);
         $order->setFees($price / 10);
+        $order->setStatus("created");
         $manager->flush();
 
         $array = [
