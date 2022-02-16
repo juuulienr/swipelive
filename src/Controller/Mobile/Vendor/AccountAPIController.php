@@ -54,7 +54,7 @@ class AccountAPIController extends Controller {
 
           if ($param['businessType'] == "company") {
             try {
-              $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk_test'));
+              $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
               $response = $stripe->accounts->create([
                 'country' => 'FR',
                 'type' => 'custom',
@@ -67,7 +67,7 @@ class AccountAPIController extends Controller {
                 'account_token' => $param['tokenAccount']
               ]);
 
-              \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk_test'));
+              \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
 
               $person = \Stripe\Account::createPerson($response->id, [
                 'person_token' => $param['tokenPerson'],
@@ -82,7 +82,7 @@ class AccountAPIController extends Controller {
 
           } else if ($param['businessType'] == "individual") {
             try {
-              $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk_test'));
+              $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
               $response = $stripe->accounts->create([
                 'country' => 'FR',
                 'type' => 'custom',

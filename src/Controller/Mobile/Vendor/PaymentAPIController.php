@@ -44,7 +44,7 @@ class PaymentAPIController extends Controller {
 
         // buyer/customer
         if (!$customer) {
-          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk_test'));
+          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
 
           $customer = $stripe->customers->create([
             'email' => $buyer->getEmail(),
@@ -106,7 +106,7 @@ class PaymentAPIController extends Controller {
         }
 
 
-        \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk_test'));
+        \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
         $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
 
         $intent = \Stripe\PaymentIntent::create([

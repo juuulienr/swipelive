@@ -140,9 +140,8 @@ class WebhookController extends Controller {
   public function stripe(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
 
-    if ($result["type"] && $result["data"]["object"]["id"]) {
+    if ($result["object"] == "event" && $result["data"]["object"]["object"] == "payment_intent") {
       $order = $orderRepo->findOneByPaymentId($result["data"]["object"]["id"]);
-// balance.available
 
       if ($order) {
         switch ($result["type"]) {
@@ -165,9 +164,9 @@ class WebhookController extends Controller {
         $order->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
         $manager->flush();
       }
-
-      return $this->json(true, 200);
     }
+
+    return $this->json(true, 200);
   }
 
 
@@ -179,32 +178,25 @@ class WebhookController extends Controller {
   public function stripeConnect(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
 
-    if ($result["type"] && $result["data"]["object"]["id"]) {
-      $order = $orderRepo->findOneByPaymentId($result["data"]["object"]["id"]);
+    $this->get('bugsnag')->notifyException(new Exception("Stripe Webhooks Connect"));
 
-      if ($order) {
-        switch ($event->type) {
-          case 'account.updated':
-            $account = $event->data->object;
-          case 'account.external_account.updated':
-            $externalAccount = $event->data->object;
-          case 'balance.available':
-            $balance = $event->data->object;
-          case 'payout.failed':
-            $payout = $event->data->object;
-          case 'person.updated':
-            $person = $event->data->object;
-          // ... handle other event types
-          default:
-            echo 'Received unknown event type ' . $event->type;
-        }
+    // if ($result["type"] && $result["data"]["object"]["id"]) {
+    //   switch ($result["type"]) {
+    //     case 'account.updated':
+    //       $account = $result["data"]["object"];
+    //     case 'account.external_account.updated':
+    //       $externalAccount = $result["data"]["object"];
+    //     case 'balance.available':
+    //       $balance = $result["data"]["object"];
+    //     case 'payout.failed':
+    //       $payout = $result["data"]["object"];
+    //     case 'person.updated':
+    //       $person = $result["data"]["object"];
+    //     // ... handle other event types
+    //     default:
+    //   }
+    // }
 
-        $order->setEventId($result["id"]);
-        $order->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
-        $manager->flush();
-      }
-
-      return $this->json(true, 200);
-    }
+    return $this->json(true, 200);
   }
 }

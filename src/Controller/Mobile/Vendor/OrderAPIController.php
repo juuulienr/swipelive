@@ -40,7 +40,7 @@ class OrderAPIController extends Controller {
         $customer = $vendor->getStripeCus();
 
         if (!$customer) {
-          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk_test'));
+          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
 
           $customer = $stripe->customers->create([
             'email' => $vendor->getEmail(),
@@ -80,7 +80,7 @@ class OrderAPIController extends Controller {
 
 
   function generatePaymentIntent($customer, $price, $stripeAcc){
-    \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk_test'));
+    \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
     $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
     $intent = \Stripe\PaymentIntent::create([
       'amount' => $price * 100,
@@ -101,7 +101,7 @@ class OrderAPIController extends Controller {
     ]);
 
     $array = [
-      "publishableKey"=> $this->getParameter('stripe_pk_test'),
+      "publishableKey"=> $this->getParameter('stripe_pk'),
       "companyName"=> "Swipe Live",
       "paymentIntent"=> $intent->client_secret,
       "ephemeralKey" => $ephemeralKey->secret,
