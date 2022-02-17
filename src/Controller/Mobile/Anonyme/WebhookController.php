@@ -140,6 +140,7 @@ class WebhookController extends Controller {
   public function stripe(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
 
+    // payment_intent
     if ($result["object"] == "event" && $result["data"]["object"]["object"] == "payment_intent") {
       $order = $orderRepo->findOneByPaymentId($result["data"]["object"]["id"]);
 
@@ -157,6 +158,22 @@ class WebhookController extends Controller {
             $order->setStatus("requires_action");
           case 'payment_intent.succeeded':
             $order->setStatus("succeeded");
+
+            foreach ($order->getLineItems() as $lineItem) {
+              $variant = $lineItem->getVariant();
+              $quantity = $lineItem->getQuantity();
+
+              if ($variant) {
+                $variant->setQuantity($variant->getQuantity() - $quantity);
+              } else {
+                $product->setQuantity($product->getQuantity() - $quantity);
+              }
+            }
+
+            $manager->flush();
+
+            // envoyer notif au vendeur
+
           default:
         }
 
@@ -165,6 +182,8 @@ class WebhookController extends Controller {
         $manager->flush();
       }
     }
+
+    // balance etc.
 
     return $this->json(true, 200);
   }

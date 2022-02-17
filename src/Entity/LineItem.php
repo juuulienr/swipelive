@@ -44,6 +44,11 @@ class LineItem
     private $price;
 
     /**
+     * @ORM\Column(type="decimal", precision=8, scale=2)
+     */
+    private $total;
+
+    /**
      * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="lineItems")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -110,6 +115,18 @@ class LineItem
     public function setPrice(string $price): self
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    public function getTotal(): ?string
+    {
+        return $this->total;
+    }
+
+    public function setTotal(string $total): self
+    {
+        $this->total = $total;
 
         return $this;
     }

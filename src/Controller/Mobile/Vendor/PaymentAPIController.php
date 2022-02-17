@@ -70,9 +70,10 @@ class PaymentAPIController extends Controller {
 
             $lineItem = new LineItem();
             $lineItem->setQuantity($quantity);
-            $lineItem->setPrice($price);
             $lineItem->setProduct($variant->getProduct());
             $lineItem->setVariant($variant);
+            $lineItem->setPrice($variant->getPrice());
+            $lineItem->setTotal($price);
             $lineItem->setTitle($title);
             $lineItem->setOrderId($order);
             $manager->persist($lineItem);
@@ -91,9 +92,10 @@ class PaymentAPIController extends Controller {
 
             $lineItem = new LineItem();
             $lineItem->setQuantity($quantity);
-            $lineItem->setPrice($price);
             $lineItem->setProduct($product);
             $lineItem->setTitle($title);
+            $lineItem->setPrice($product->getPrice());
+            $lineItem->setTotal($price);
             $lineItem->setOrderId($order);
             $manager->persist($lineItem);
 
@@ -108,6 +110,7 @@ class PaymentAPIController extends Controller {
 
         \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
         $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
+        $fees = 70 + str_replace(',', '', $price) * 8;
 
         $intent = \Stripe\PaymentIntent::create([
           'amount' => str_replace(',', '', $price) * 100,
@@ -122,7 +125,7 @@ class PaymentAPIController extends Controller {
               'setup_future_usage' => 'off_session',
             ],
           ],
-          'application_fee_amount' => str_replace(',', '', $price) * 10,
+          'application_fee_amount' => $fees,
           'transfer_data' => [
            'destination' => $stripeAcc,
           ],
@@ -131,7 +134,7 @@ class PaymentAPIController extends Controller {
         $order->setPaymentId($intent->id);
         $order->setSubTotal($price);
         $order->setTotal($price);
-        $order->setFees($price / 10);
+        $order->setFees($fees);
         $order->setStatus("created");
         $manager->flush();
 
