@@ -65,7 +65,7 @@ class PaymentAPIController extends Controller {
 
           if ($variant) {
             $title = $variant->getProduct()->getTitle() . " - " . $variant->getTitle();
-            $price = $variant->getPrice() * $quantity;
+            $totla = $variant->getPrice() * $quantity;
             $stripeAcc = $variant->getProduct()->getVendor()->getStripeAcc();
 
             $lineItem = new LineItem();
@@ -73,7 +73,7 @@ class PaymentAPIController extends Controller {
             $lineItem->setProduct($variant->getProduct());
             $lineItem->setVariant($variant);
             $lineItem->setPrice($variant->getPrice());
-            $lineItem->setTotal($price);
+            $lineItem->setTotal($totla);
             $lineItem->setTitle($title);
             $lineItem->setOrderId($order);
             $manager->persist($lineItem);
@@ -87,7 +87,7 @@ class PaymentAPIController extends Controller {
 
           if ($product) {
             $title = $product->getTitle();
-            $price = $product->getPrice() * $quantity;
+            $totla = $product->getPrice() * $quantity;
             $stripeAcc = $product->getVendor()->getStripeAcc();
 
             $lineItem = new LineItem();
@@ -95,7 +95,7 @@ class PaymentAPIController extends Controller {
             $lineItem->setProduct($product);
             $lineItem->setTitle($title);
             $lineItem->setPrice($product->getPrice());
-            $lineItem->setTotal($price);
+            $lineItem->setTotal($totla);
             $lineItem->setOrderId($order);
             $manager->persist($lineItem);
 
@@ -110,10 +110,10 @@ class PaymentAPIController extends Controller {
 
         \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
         $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
-        $fees = 70 + str_replace(',', '', $price) * 8;
+        $fees = 70 + str_replace(',', '', $totla) * 8;
 
         $intent = \Stripe\PaymentIntent::create([
-          'amount' => str_replace(',', '', $price) * 100,
+          'amount' => str_replace(',', '', $totla) * 100,
           'customer' => $customer,
           'description' => $title,
           'currency' => 'eur',
@@ -131,10 +131,13 @@ class PaymentAPIController extends Controller {
           ],
         ]);
 
+        $profit = $fees - (25 + str_replace(',', '', $totla) * 1.4);
+
         $order->setPaymentId($intent->id);
-        $order->setSubTotal($price);
-        $order->setTotal($price);
+        $order->setSubTotal($totla);
+        $order->setTotal($totla);
         $order->setFees($fees);
+        $order->setProfit($profit);
         $order->setStatus("created");
         $manager->flush();
 
