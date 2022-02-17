@@ -136,8 +136,8 @@ class PaymentAPIController extends Controller {
         $order->setPaymentId($intent->id);
         $order->setSubTotal($totla);
         $order->setTotal($totla);
-        $order->setFees($fees);
-        $order->setProfit($profit);
+        $order->setFees($fees / 100);
+        $order->setProfit($profit / 100);
         $order->setStatus("created");
         $manager->flush();
 
