@@ -20,12 +20,11 @@ class ClipRepository extends ServiceEntityRepository
     }
 
 
-    public function findByClip($limit){
+    public function findByClip(){
         return $this->createQueryBuilder('c')
                     ->andWhere('c.status = :status')
                     ->setParameter('status', "available")
                     ->orderBy('RAND()')
-                    ->setMaxResults($limit)
                     ->getQuery()
                     ->getResult();
     }

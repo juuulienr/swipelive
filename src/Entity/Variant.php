@@ -93,11 +93,6 @@ class Variant
     private $product;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Upload::class, inversedBy="variants")
-     */
-    private $upload;
-
-    /**
      * @ORM\OneToMany(targetEntity=LineItem::class, mappedBy="variant")
      */
     private $lineItems;
@@ -217,18 +212,6 @@ class Variant
     public function setProduct(?Product $product): self
     {
         $this->product = $product;
-
-        return $this;
-    }
-
-    public function getUpload(): ?Upload
-    {
-        return $this->upload;
-    }
-
-    public function setUpload(?Upload $upload): self
-    {
-        $this->upload = $upload;
 
         return $this;
     }

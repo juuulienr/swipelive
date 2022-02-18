@@ -35,7 +35,6 @@ class WebhookController extends Controller {
    */
   public function bambuser(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager, LiveProductsRepository $liveProductRepo) {
     $result = json_decode($request->getContent(), true);
-    // $this->get('bugsnag')->notifyException(new Exception($result["payload"]["id"]));
 
     // broadcast
     if ($result["collection"] == "broadcast") {
@@ -140,6 +139,8 @@ class WebhookController extends Controller {
   public function stripe(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
 
+    $this->get('bugsnag')->notifyException(new Exception("Stripe Webhooks"));
+
     // payment_intent
     if ($result["object"] == "event" && $result["data"]["object"]["object"] == "payment_intent") {
       $order = $orderRepo->findOneByPaymentId($result["data"]["object"]["id"]);
@@ -157,16 +158,13 @@ class WebhookController extends Controller {
           case 'payment_intent.requires_action':
             $order->setStatus("requires_action");
           case 'payment_intent.succeeded':
-            $order->setStatus("succeeded");
+            // $order->setStatus("succeeded");
 
             foreach ($order->getLineItems() as $lineItem) {
-              $variant = $lineItem->getVariant();
-              $quantity = $lineItem->getQuantity();
-
-              if ($variant) {
-                $variant->setQuantity($variant->getQuantity() - $quantity);
+              if ($lineItem->getVariant()) {
+                $variant->setQuantity($variant->getQuantity() - $lineItem->getQuantity());
               } else {
-                $product->setQuantity($product->getQuantity() - $quantity);
+                $product->setQuantity($product->getQuantity() - $lineItem->getQuantity());
               }
             }
 

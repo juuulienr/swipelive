@@ -34,6 +34,7 @@ class APIController extends Controller {
    */
   public function feed(Request $request, ObjectManager $manager, ClipRepository $clipRepo, LiveRepository $liveRepo, SerializerInterface $serializer) {
     $lives = $liveRepo->findByLive();
+    $clips = $clipRepo->findByClip();
     $array = [];
 
     if ($lives) {
@@ -42,12 +43,9 @@ class APIController extends Controller {
       }
     }
 
-    if (sizeof($lives) != 10) {
-      $clips = $clipRepo->findByClip(10 - sizeof($lives));
-      if ($clips) {
-        foreach ($clips as $clip) {
-          $array[] = [ "type" => "clip", "value" => $serializer->serialize($clip, "json", ['groups' => 'clip:read']) ];
-        }
+    if ($clips) {
+      foreach ($clips as $clip) {
+        $array[] = [ "type" => "clip", "value" => $serializer->serialize($clip, "json", ['groups' => 'clip:read']) ];
       }
     }
 

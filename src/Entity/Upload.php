@@ -57,16 +57,10 @@ class Upload
      */
     private $product;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Variant::class, mappedBy="upload")
-     */
-    private $variants;
-
     
     public function __construct()
     {
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
-        $this->variants = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -118,36 +112,6 @@ class Upload
     public function setPosition(?int $position): self
     {
         $this->position = $position;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Variant[]
-     */
-    public function getVariants(): Collection
-    {
-        return $this->variants;
-    }
-
-    public function addVariant(Variant $variant): self
-    {
-        if (!$this->variants->contains($variant)) {
-            $this->variants[] = $variant;
-            $variant->setUpload($this);
-        }
-
-        return $this;
-    }
-
-    public function removeVariant(Variant $variant): self
-    {
-        if ($this->variants->removeElement($variant)) {
-            // set the owning side to null (unless already changed)
-            if ($variant->getUpload() === $this) {
-                $variant->setUpload(null);
-            }
-        }
 
         return $this;
     }
