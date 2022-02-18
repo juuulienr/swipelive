@@ -139,7 +139,7 @@ class WebhookController extends Controller {
   public function stripe(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
 
-    $this->get('bugsnag')->notifyException(new Exception("Stripe Webhooks"));
+    $this->get('bugsnag')->notifyException(new Exception($result["type"]));
 
     // payment_intent
     if ($result["object"] == "event" && $result["data"]["object"]["object"] == "payment_intent") {
@@ -149,14 +149,24 @@ class WebhookController extends Controller {
         switch ($result["type"]) {
           case 'payment_intent.canceled':
             $order->setStatus("canceled");
+            break;
+
           case 'payment_intent.created':
             $order->setStatus("created");
+            break;
+
           case 'payment_intent.payment_failed':
             $order->setStatus("payment_failed");
+            break;
+
           case 'payment_intent.processing':
             $order->setStatus("processing");
+            break;
+
           case 'payment_intent.requires_action':
             $order->setStatus("requires_action");
+            break;
+
           case 'payment_intent.succeeded':
             $order->setStatus("succeeded");
 
@@ -169,10 +179,11 @@ class WebhookController extends Controller {
                 $product->setQuantity($product->getQuantity() - $lineItem->getQuantity());
               }
             }
-
-            // envoyer notif au vendeur
+            break;
 
           default:
+            $this->get('bugsnag')->notifyException(new Exception($result["type"]));
+            break;
         }
 
         $order->setEventId($result["id"]);
