@@ -158,17 +158,17 @@ class WebhookController extends Controller {
           case 'payment_intent.requires_action':
             $order->setStatus("requires_action");
           case 'payment_intent.succeeded':
-            // $order->setStatus("succeeded");
+            $order->setStatus("succeeded");
 
             foreach ($order->getLineItems() as $lineItem) {
               if ($lineItem->getVariant()) {
+                $variant = $lineItem->getVariant();
                 $variant->setQuantity($variant->getQuantity() - $lineItem->getQuantity());
               } else {
+                $product = $lineItem->getProduct();
                 $product->setQuantity($product->getQuantity() - $lineItem->getQuantity());
               }
             }
-
-            $manager->flush();
 
             // envoyer notif au vendeur
 
