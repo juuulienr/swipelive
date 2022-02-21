@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\LineItemRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -14,37 +15,44 @@ class LineItem
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("order:read")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("order:read")
      */
     private $title;
 
     /**
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="lineItems")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("order:read")
      */
     private $product;
 
     /**
      * @ORM\ManyToOne(targetEntity=Variant::class, inversedBy="lineItems")
+     * @Groups("order:read")
      */
     private $variant;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups("order:read")
      */
     private $quantity;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
+     * @Groups("order:read")
      */
     private $price;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
+     * @Groups("order:read")
      */
     private $total;
 

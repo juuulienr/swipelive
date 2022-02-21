@@ -22,6 +22,7 @@ class Product
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $id;
 
@@ -32,6 +33,7 @@ class Product
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $title;
 
@@ -94,6 +96,7 @@ class Product
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $uploads;
 

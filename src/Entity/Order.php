@@ -6,6 +6,7 @@ use App\Repository\OrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=OrderRepository::class)
@@ -17,6 +18,7 @@ class Order
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("order:read")
      */
     private $id;
 
@@ -28,47 +30,56 @@ class Order
     /**
      * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="sales")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("order:read")
      */
     private $vendor;
 
     /**
      * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="purchases")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("order:read")
      */
     private $buyer;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("order:read")
      */
     private $status;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups("order:read")
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
+     * @Groups("order:read")
      */
     private $subTotal;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
+     * @Groups("order:read")
      */
     private $total;
 
     /**
      * @ORM\OneToMany(targetEntity=LineItem::class, mappedBy="orderId")
+     * @Groups("order:read")
      */
     private $lineItems;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
+     * @Groups("order:read")
      */
     private $fees;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
+     * @Groups("order:read")
      */
     private $profit;
 
@@ -79,6 +90,7 @@ class Order
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups("order:read")
      */
     private $updatedAt;
 

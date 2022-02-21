@@ -20,6 +20,7 @@ class Variant
      * @Groups("product:read")
      * @Groups("variant:read")
      * @Groups("clip:read")
+     * @Groups("order:read")
      */
     private $id;
 
@@ -28,6 +29,7 @@ class Variant
      * @Groups("product:read")
      * @Groups("variant:read")
      * @Groups("clip:read")
+     * @Groups("order:read")
      */
     private $title;
 
