@@ -27,12 +27,6 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
-        resolve_target_entities:
-            Mgilet\NotificationBundle\Entity\Notification: App\Entity\Notification
         dql:
             numeric_functions:
-                cos: App\DQL\Cos
-                acos: App\DQL\Acos
-                sin: App\DQL\Sin
-                radians: App\DQL\Radians
                 rand: App\DQL\Rand

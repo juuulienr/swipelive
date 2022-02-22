@@ -75,7 +75,7 @@ class APIController extends Controller {
   {
     $messages = $live->getMessages();
 
-    return $this->json($messages, 200, [], ['groups' => 'message:read']);
+    return $this->json($messages, 200, [], ['groups' => 'message:read' ]);
   }
 
 

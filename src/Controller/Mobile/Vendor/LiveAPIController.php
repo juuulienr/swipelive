@@ -188,7 +188,7 @@ class LiveAPIController extends Controller {
               "content" => "Début du live", 
               "user" => null, 
               "vendor" => [
-                "company" => $vendor->getCompany(),
+                "businessName" => $vendor->getBusinessName(),
                 "firstname" => $vendor->getFirstname(),
                 "lastname" => $vendor->getLastname(),
                 "picture" => $vendor->getPicture()
@@ -300,7 +300,7 @@ class LiveAPIController extends Controller {
           "content" => $content, 
           "user" => null, 
           "vendor" => [
-            "company" => $vendor->getCompany(),
+            "businessName" => $vendor->getBusinessName(),
             "firstname" => $vendor->getFirstname(),
             "lastname" => $vendor->getLastname(),
             "picture" => $vendor->getPicture()
@@ -338,7 +338,7 @@ class LiveAPIController extends Controller {
       "entrances" => [
         "user" => null, 
         "vendor" => [
-          "company" => $vendor->getCompany(),
+          "businessName" => $vendor->getBusinessName(),
           "firstname" => $vendor->getFirstname(),
           "lastname" => $vendor->getLastname(),
           "picture" => $vendor->getPicture()

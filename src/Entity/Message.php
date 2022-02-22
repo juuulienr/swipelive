@@ -32,14 +32,6 @@ class Message
     private $type;
 
     /**
-     * @ORM\Column(type="datetime")
-     * @Groups("clip:read")
-     * @Groups("message:read")
-     * @Groups("live:read")
-     */
-    private $createdAt;
-
-    /**
      * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="messages")
      * @Groups("clip:read")
      * @Groups("live:read")
@@ -67,10 +59,16 @@ class Message
      */
     private $clip;
 
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @Groups("message:read")
+     *     
+     */
+    private $createdAt;
+
     
     public function __construct()
     {
-        $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->type = 0;
     }
 
@@ -99,18 +97,6 @@ class Message
     public function setType(int $type): self
     {
         $this->type = $type;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTime
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTime $createdAt): self
-    {
-        $this->createdAt = $createdAt;
 
         return $this;
     }
@@ -159,6 +145,18 @@ class Message
     public function setClip(?Clip $clip): self
     {
         $this->clip = $clip;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }

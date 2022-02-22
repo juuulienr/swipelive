@@ -145,7 +145,7 @@ class AccountAPIController extends Controller {
    * @Route("/vendor/api/profile", name="vendor_api_profile", methods={"GET"})
    */
   public function profile(Request $request, ObjectManager $manager) {
-    return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:edit', 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+    return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:edit', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
         return $object->getId();
     } ]);
   }
@@ -161,7 +161,7 @@ class AccountAPIController extends Controller {
       $serializer->deserialize($json, Vendor::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $this->getUser()]);
       $manager->flush();
 
-      return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:edit', 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+      return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:edit', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
         return $object->getId();
       } ]);
     }

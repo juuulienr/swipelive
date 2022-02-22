@@ -45,6 +45,13 @@ class EntityNormalizer extends ObjectNormalizer
     /**
      * @inheritDoc
      */
+    public function supportsNormalization($data, $format = null) {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function supportsDenormalization($data, $type, $format = null)
     {
         return strpos($type, 'App\\Entity\\') === 0 && (is_numeric($data) || is_string($data));

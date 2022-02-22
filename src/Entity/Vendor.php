@@ -75,8 +75,6 @@ class Vendor implements UserInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("vendor:read")
      * @Groups("vendor:edit")
-     * @Groups("clip:read")
-     * @Groups("live:read")
      */
     private $company;
 
@@ -149,6 +147,15 @@ class Vendor implements UserInterface
     private $businessType;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("vendor:read")
+     * @Groups("vendor:edit")
+     * @Groups("clip:read")
+     * @Groups("live:read")
+     */
+    private $businessName;
+
+    /**
      * @ORM\Column(type="datetime", nullable=true)
      * @Groups("vendor:read")
      * @Groups("vendor:edit")
@@ -213,8 +220,8 @@ class Vendor implements UserInterface
         $this->products = new ArrayCollection();
         $this->followers = new ArrayCollection();
         $this->following = new ArrayCollection();
-        $this->sales = new ArrayCollection();
         $this->purchases = new ArrayCollection();
+        $this->sales = new ArrayCollection();
     }
 
     public function getClassName() {
@@ -688,6 +695,18 @@ class Vendor implements UserInterface
                 $purchase->setBuyer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getBusinessName(): ?string
+    {
+        return $this->businessName;
+    }
+
+    public function setBusinessName(?string $businessName): self
+    {
+        $this->businessName = $businessName;
 
         return $this;
     }
