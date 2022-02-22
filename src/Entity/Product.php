@@ -49,6 +49,7 @@ class Product
     /**
      * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="products")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("product:read")
      */
     private $vendor;
 

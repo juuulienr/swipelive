@@ -19,6 +19,7 @@ class Order
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups("order:read")
+     * @Groups("vendor:read")
      */
     private $id;
 

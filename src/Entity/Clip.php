@@ -18,6 +18,7 @@ class Clip
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups("clip:read")
+     * @Groups("vendor:read")
      */
     private $id;
 
@@ -107,7 +108,6 @@ class Clip
      * @ORM\OneToMany(targetEntity=Message::class, mappedBy="clip")
      * @ORM\OrderBy({"createdAt" = "ASC"})
      * @Groups("clip:read")
-     * @Groups("vendor:read")
      */
     private $messages;
 

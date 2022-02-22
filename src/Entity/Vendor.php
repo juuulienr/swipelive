@@ -26,7 +26,6 @@ class Vendor implements UserInterface
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      * @Groups("clip:read")
      * @Groups("live:read")
      */
@@ -35,7 +34,7 @@ class Vendor implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Email(message="L'adresse mail est invalide !")
-     * @Groups("vendor:edit")
+     * @Groups("vendor:read")
      */
     private $email;
 
@@ -51,11 +50,13 @@ class Vendor implements UserInterface
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups("vendor:read")
      */
     private $createdAt;
 
     /**
      * @ORM\OneToMany(targetEntity=Live::class, mappedBy="vendor")
+     * @Groups("vendor:read")
      */
     private $lives;
 
@@ -67,39 +68,36 @@ class Vendor implements UserInterface
     /**
      * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="vendor")
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      */
     private $clips;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      */
     private $company;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("product:read")
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("product:read")
      */
     private $lastname;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      * @Groups("clip:edit")
      */
     private $summary;
@@ -107,7 +105,6 @@ class Vendor implements UserInterface
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      * @Groups("clip:read")
      * @Groups("live:read")
      */
@@ -117,7 +114,6 @@ class Vendor implements UserInterface
      * @ORM\OneToMany(targetEntity=Product::class, mappedBy="vendor")
      * @ORM\OrderBy({"title" = "ASC"})
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      * @Groups("clip:read")
      * @Groups("live:read")
      */
@@ -126,7 +122,6 @@ class Vendor implements UserInterface
     /**
      * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="following")
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      * @Groups("clip:read")
      * @Groups("live:read")
      */
@@ -135,58 +130,52 @@ class Vendor implements UserInterface
     /**
      * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="vendor")
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      */
     private $following;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
+     * @Groups("product:read")
      */
     private $businessType;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("product:read")
      */
     private $businessName;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      */
     private $dob;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      */
     private $siren;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      */
     private $address;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      */
     private $city;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("vendor:read")
-     * @Groups("vendor:edit")
      */
     private $zip;
 
@@ -202,11 +191,13 @@ class Vendor implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Order::class, mappedBy="vendor")
+     * @Groups("vendor:read")
      */
     private $sales;
 
     /**
      * @ORM\OneToMany(targetEntity=Order::class, mappedBy="buyer")
+     * @Groups("vendor:read")
      */
     private $purchases;
 

@@ -18,6 +18,7 @@ class Live
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups("live:read")
+     * @Groups("vendor:read")
      */
     private $id;
 
