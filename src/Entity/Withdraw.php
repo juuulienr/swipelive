@@ -52,6 +52,12 @@ class Withdraw
      */
     private $last4;
 
+    
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
+    }
+
     public function getId(): ?int
     {
         return $this->id;

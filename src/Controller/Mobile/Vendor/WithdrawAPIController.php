@@ -10,6 +10,7 @@ use App\Entity\Message;
 use App\Entity\Product;
 use App\Entity\Category;
 use App\Entity\Order;
+use App\Entity\Withdraw;
 use App\Entity\LineItem;
 use App\Entity\BankAccount;
 use App\Repository\ClipRepository;
@@ -62,6 +63,48 @@ class WithdrawAPIController extends Controller {
           $bank->setVendor($vendor);
           
           $manager->persist($bank);
+          $manager->flush();
+
+          return $this->json(true, 200);
+        }
+      }
+    }
+
+    return $this->json(false, 404);
+  }
+
+  /**
+   * @Route("/vendor/api/withdraw", name="vendor_api_withdraw")
+   */
+  public function withdraw(Request $request, ObjectManager $manager){
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
+
+      if ($param) {
+        $vendor = $this->getUser();
+        dump($vendor->getBankAccounts());
+
+        if ($vendor->getStripeAcc() && $vendor->getBankAccounts()) {
+          \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
+
+          $payout = \Stripe\Payout::create([
+            'amount' => $vendor->getAvailable() * 100,
+            'currency' => 'eur',
+          ], [
+            'stripe_account' => $vendor->getStripeAcc(),
+          ]);
+
+          dd($payout);
+
+          $vendor->setAvailable("0.00");
+
+          $withdraw = new Withdraw();
+          $withdraw->setPayoutId($payout->id);
+          $withdraw->setAmount($vendor->getAvailable());
+          $withdraw->setStatus("completed");
+          $withdraw->setLast4($vendor->getBankAccounts()[0]->getLast4());
+          
+          $manager->persist($withdraw);
           $manager->flush();
 
           return $this->json(true, 200);
