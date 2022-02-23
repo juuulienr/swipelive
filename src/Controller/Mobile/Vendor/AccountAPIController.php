@@ -64,7 +64,14 @@ class AccountAPIController extends Controller {
                 'business_profile' => [
                   'product_description' => $param['summary'],
                 ],
-                'account_token' => $param['tokenAccount']
+                'account_token' => $param['tokenAccount'],
+                'settings' => [
+                  'payouts' => [
+                    'schedule' => [
+                      'interval' => 'manual'
+                    ]
+                  ]
+                ]
               ]);
 
               \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
