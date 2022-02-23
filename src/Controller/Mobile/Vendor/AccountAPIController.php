@@ -152,7 +152,7 @@ class AccountAPIController extends Controller {
    * @Route("/vendor/api/profile", name="vendor_api_profile", methods={"GET"})
    */
   public function profile(Request $request, ObjectManager $manager) {
-    return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:read', "datetime_format" => "Y-m-d H:i:s", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+    return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
         return $object->getId();
     } ]);
   }

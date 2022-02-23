@@ -180,7 +180,7 @@ class WebhookController extends Controller {
             break;
 
           default:
-            $this->get('bugsnag')->notifyException(new Exception($result["type"]));
+            // $this->get('bugsnag')->notifyException(new Exception($result["type"]));
             break;
         }
 
@@ -190,7 +190,16 @@ class WebhookController extends Controller {
       }
     }
 
-    // balance etc.
+    // balance available
+    if ($result["object"] == "event" && $result["data"]["object"]["object"] == "balance") {
+      if ($result["type"] == "balance.available") {
+        $pending = $result["data"]["object"]["pending"]["amount"];
+        $available = $result["data"]["object"]["available"]["amount"];
+        $connect_reserved = $result["data"]["object"]["connect_reserved"]["amount"];
+        $livemode = $result["data"]["object"]["livemode"];
+      }
+    }
+
     return $this->json(true, 200);
   }
 
@@ -227,7 +236,7 @@ class WebhookController extends Controller {
           break;
           
         default:
-          $this->get('bugsnag')->notifyException(new Exception($result["type"]));
+          // $this->get('bugsnag')->notifyException(new Exception($result["type"]));
           break;
       }
     }

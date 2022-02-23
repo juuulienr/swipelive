@@ -201,6 +201,36 @@ class Vendor implements UserInterface
      */
     private $purchases;
 
+    /**
+     * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+     * @Groups("vendor:read")
+     */
+    private $total;
+
+    /**
+     * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+     * @Groups("vendor:read")
+     */
+    private $pending;
+
+    /**
+     * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+     * @Groups("vendor:read")
+     */
+    private $available;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Withdraw::class, mappedBy="vendor")
+     * @Groups("vendor:read")
+     */
+    private $withdraws;
+
+    /**
+     * @ORM\OneToMany(targetEntity=BankAccount::class, mappedBy="vendor")
+     * @Groups("vendor:read")
+     */
+    private $bankAccounts;
+
     
     public function __construct()
     {
@@ -213,6 +243,11 @@ class Vendor implements UserInterface
         $this->following = new ArrayCollection();
         $this->purchases = new ArrayCollection();
         $this->sales = new ArrayCollection();
+        $this->withdraws = new ArrayCollection();
+        $this->total = "0.00";
+        $this->pending = "0.00";
+        $this->available = "0.00";
+        $this->bankAccounts = new ArrayCollection();
     }
 
     public function getClassName() {
@@ -698,6 +733,102 @@ class Vendor implements UserInterface
     public function setBusinessName(?string $businessName): self
     {
         $this->businessName = $businessName;
+
+        return $this;
+    }
+
+    public function getTotal(): ?string
+    {
+        return $this->total;
+    }
+
+    public function setTotal(?string $total): self
+    {
+        $this->total = $total;
+
+        return $this;
+    }
+
+    public function getPending(): ?string
+    {
+        return $this->pending;
+    }
+
+    public function setPending(?string $pending): self
+    {
+        $this->pending = $pending;
+
+        return $this;
+    }
+
+    public function getAvailable(): ?string
+    {
+        return $this->available;
+    }
+
+    public function setAvailable(?string $available): self
+    {
+        $this->available = $available;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Withdraw[]
+     */
+    public function getWithdraws(): Collection
+    {
+        return $this->withdraws;
+    }
+
+    public function addWithdraw(Withdraw $withdraw): self
+    {
+        if (!$this->withdraws->contains($withdraw)) {
+            $this->withdraws[] = $withdraw;
+            $withdraw->setVendor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWithdraw(Withdraw $withdraw): self
+    {
+        if ($this->withdraws->removeElement($withdraw)) {
+            // set the owning side to null (unless already changed)
+            if ($withdraw->getVendor() === $this) {
+                $withdraw->setVendor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|BankAccount[]
+     */
+    public function getBankAccounts(): Collection
+    {
+        return $this->bankAccounts;
+    }
+
+    public function addBankAccount(BankAccount $bankAccount): self
+    {
+        if (!$this->bankAccounts->contains($bankAccount)) {
+            $this->bankAccounts[] = $bankAccount;
+            $bankAccount->setVendor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBankAccount(BankAccount $bankAccount): self
+    {
+        if ($this->bankAccounts->removeElement($bankAccount)) {
+            // set the owning side to null (unless already changed)
+            if ($bankAccount->getVendor() === $this) {
+                $bankAccount->setVendor(null);
+            }
+        }
 
         return $this;
     }
