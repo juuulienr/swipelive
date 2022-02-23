@@ -32,7 +32,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 class WithdrawAPIController extends Controller {
 
   /**
-   * @Route("/api/bank/add", name="vendor_api_bank_add")
+   * @Route("/vendor/api/bank/add", name="vendor_api_bank_add")
    */
   public function addBank(Request $request, ObjectManager $manager){
     if ($json = $request->getContent()) {
@@ -43,7 +43,7 @@ class WithdrawAPIController extends Controller {
 
         if ($vendor->getStripeAcc() && $param["number"]) {
           $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
-          $bank = $stripe->accounts->createExternalAccount($vendor->getStripeAcc(), [
+          $result = $stripe->accounts->createExternalAccount($vendor->getStripeAcc(), [
             'external_account' => [
               "object" => "bank_account",
               "country" => "FR",
@@ -54,8 +54,8 @@ class WithdrawAPIController extends Controller {
           ]);
 
           $bank = new BankAccount();
-          $bank->setBankId($bank->id);
-          $bank->setLast4($bank->last4);
+          $bank->setBankId($result->id);
+          $bank->setLast4($result->last4);
           $bank->setCountry("FR");
           $bank->setCurrency("eur");
           $bank->setNumber($param["number"]);

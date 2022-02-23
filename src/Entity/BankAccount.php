@@ -47,6 +47,12 @@ class BankAccount
      */
     private $vendor;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("vendor:read")
+     */
+    private $last4;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -108,6 +114,18 @@ class BankAccount
     public function setVendor(?Vendor $vendor): self
     {
         $this->vendor = $vendor;
+
+        return $this;
+    }
+
+    public function getLast4(): ?string
+    {
+        return $this->last4;
+    }
+
+    public function setLast4(string $last4): self
+    {
+        $this->last4 = $last4;
 
         return $this;
     }
