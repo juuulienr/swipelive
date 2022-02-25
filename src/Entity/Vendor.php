@@ -238,6 +238,11 @@ class Vendor implements UserInterface
      */
     private $personId;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $verified;
+
     
     public function __construct()
     {
@@ -848,6 +853,18 @@ class Vendor implements UserInterface
     public function setPersonId(?string $personId): self
     {
         $this->personId = $personId;
+
+        return $this;
+    }
+
+    public function getVerified(): ?bool
+    {
+        return $this->verified;
+    }
+
+    public function setVerified(?bool $verified): self
+    {
+        $this->verified = $verified;
 
         return $this;
     }

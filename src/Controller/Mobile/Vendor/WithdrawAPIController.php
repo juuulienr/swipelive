@@ -182,35 +182,21 @@ class WithdrawAPIController extends Controller {
   /**
    * @Route("/vendor/api/verification/document/front", name="vendor_api_verification_document_front")
    */
-  public function verifFront(Request $request, ObjectManager $manager){
-    if ($request->files->get('document')) {
-      $file = $request->files->get('document');
+  public function verifFront(Request $request, ObjectManager $manager) {
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
 
-      if (!$file) {
-        return $this->json("Le document est introuvable !", 404);
+      if ($param) {
+        $personToken = $param['person_token'];
+        $vendor = $this->getUser();
+
+        if ($personToken && $vendor->getStripeAcc()) {
+          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+          $update = $stripe->accounts->updatePerson($vendor->getStripeAcc(), $vendor->getPersonId(), [ 'person_token' => $personToken ]);
+        }
+
+        return $this->json(true, 200);
       }
-
-      $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
-      // $result = \Stripe\File::create([
-      //   'purpose' => 'identity_document',
-      //   'file' => fopen($file, 'r'),
-      //   // 'file' => fopen('/path/to/a/file.jpg', 'r'),
-      // ], [
-      //   'stripe_account' => $this->getUser()->getStripeAcc(),
-      // ]);
-
-
-      $update = $stripe->accounts->updatePerson(
-        'acct_1KVuhr2UN7FvnBJC',
-        'person_4KVuht00shEzVFe9',
-        ['verification' => ['document' => ['front' => "file_1KWk6U2VEI63cHkrwJw0Ebu5" ]]]
-        // ['verification' => ['document' => ['front' => $result->id ]]]
-      );
-
-      // dd($update);
-      // dd($result->id);
-
-      return $this->json(true, 200);
     }
 
     return $this->json("Le document est introuvable !", 404);
@@ -220,26 +206,21 @@ class WithdrawAPIController extends Controller {
   /**
    * @Route("/vendor/api/verification/document/back", name="vendor_api_verification_document_back")
    */
-  public function verifBack(Request $request, ObjectManager $manager){
-    if ($request->files->get('document')) {
-      $file = $request->files->get('document');
+  public function verifBack(Request $request, ObjectManager $manager) {
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
 
-      if (!$file) {
-        return $this->json("Le document est introuvable !", 404);
+      if ($param) {
+        $personToken = $param['person_token'];
+        $vendor = $this->getUser();
+
+        if ($personToken && $vendor->getStripeAcc()) {
+          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+          $update = $stripe->accounts->updatePerson($vendor->getStripeAcc(), $vendor->getPersonId(), [ 'person_token' => $personToken ]);
+        }
+
+        return $this->json(true, 200);
       }
-
-      \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
-      $file = \Stripe\File::create([
-        'purpose' => 'identity_document',
-        'file' => fopen(file_get_contents($file), 'r'),
-        // 'file' => fopen('/path/to/a/file.jpg', 'r'),
-      ], [
-        'stripe_account' => $this->getUser()->getStripeAcc(),
-      ]);
-
-      // dd($file->id);
-
-      return $this->json(true, 200);
     }
 
     return $this->json("Le document est introuvable !", 404);
