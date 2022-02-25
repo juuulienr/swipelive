@@ -167,6 +167,7 @@ class WebhookController extends Controller {
 
           case 'payment_intent.succeeded':
             $order->setStatus("succeeded");
+            $vendor->setPending($order->getTotal() - $order->getFees());
 
             foreach ($order->getLineItems() as $lineItem) {
               if ($lineItem->getVariant()) {

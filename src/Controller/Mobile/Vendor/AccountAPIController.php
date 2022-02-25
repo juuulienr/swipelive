@@ -81,6 +81,7 @@ class AccountAPIController extends Controller {
               ]);
 
               $vendor->setStripeAcc($response->id);
+              $vendor->setPersonId($person->id);
               $manager->flush();
 
             } catch (Exception $e) {

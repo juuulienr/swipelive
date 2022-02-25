@@ -191,12 +191,14 @@ class Vendor implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Order::class, mappedBy="vendor")
+     * @ORM\OrderBy({"createdAt" = "DESC"})
      * @Groups("vendor:read")
      */
     private $sales;
 
     /**
      * @ORM\OneToMany(targetEntity=Order::class, mappedBy="buyer")
+     * @ORM\OrderBy({"createdAt" = "DESC"})
      * @Groups("vendor:read")
      */
     private $purchases;
@@ -230,6 +232,11 @@ class Vendor implements UserInterface
      * @Groups("vendor:read")
      */
     private $bankAccounts;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $personId;
 
     
     public function __construct()
@@ -829,6 +836,18 @@ class Vendor implements UserInterface
                 $bankAccount->setVendor(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPersonId(): ?string
+    {
+        return $this->personId;
+    }
+
+    public function setPersonId(?string $personId): self
+    {
+        $this->personId = $personId;
 
         return $this;
     }
