@@ -128,6 +128,9 @@
     "ilovepdf/iloveimg-php": {
         "version": "v1.1.15"
     },
+    "imbue/sendcloud-api-php": {
+        "version": "0.2.2"
+    },
     "intervention/image": {
         "version": "2.5.1"
     },

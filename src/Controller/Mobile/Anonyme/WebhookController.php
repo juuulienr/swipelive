@@ -244,4 +244,16 @@ class WebhookController extends Controller {
 
     return $this->json(true, 200);
   }
+
+
+  /**
+   * Sendcloud Weebhook
+   *
+   * @Route("/api/sendcloud/webhooks", name="api_sendcloud_webhooks")", methods={"POST"})
+   */
+  public function sendcloud(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+    $this->get('bugsnag')->notifyException(new Exception("Sendcloud"));
+
+    return $this->json(true, 200);
+  }
 }

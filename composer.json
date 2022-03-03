@@ -14,6 +14,7 @@
         "doctrine/orm": "~2.7",
         "facebook/graph-sdk": "~5.7",
         "guzzlehttp/guzzle": "^7.2",
+        "imbue/sendcloud-api-php": "^0.2.2",
         "intervention/image": "^2.5",
         "lexik/jwt-authentication-bundle": "~2.9",
         "nelmio/cors-bundle": "^2.1",
