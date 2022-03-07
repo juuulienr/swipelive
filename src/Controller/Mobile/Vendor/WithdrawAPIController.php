@@ -88,89 +88,89 @@ class WithdrawAPIController extends Controller {
     $vendor = $this->getUser();
 
     if ($vendor->getStripeAcc() && sizeof($vendor->getBankAccounts()->toArray()) > 0) {
-      // \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
+      \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
 
-      // $balance = \Stripe\Balance::retrieve(
-      //   ['stripe_account' => $vendor->getStripeAcc()]
-      // );
+      $balance = \Stripe\Balance::retrieve(
+        ['stripe_account' => $vendor->getStripeAcc()]
+      );
 
-      // $available = $balance->available[0]->amount;
-      // $pending = $balance->pending[0]->amount;
+      $available = $balance->available[0]->amount;
+      $pending = $balance->pending[0]->amount;
 
-      // if ($available == ($vendor->getAvailable() * 100)) {
-      //   dump("identique");
-      // } else {
-      //   dump($available);
-      //   dump($vendor->getAvailable() * 100);
-      // }
+      if ($available == ($vendor->getAvailable() * 100)) {
+        dump("identique");
+      } else {
+        dump($available);
+        dump($vendor->getAvailable() * 100);
+      }
 
-      // try {
-      //   $payout = \Stripe\Payout::create([
-      //     // 'amount' => $vendor->getAvailable() * 100,
-      //     'amount' => 1000,
-      //     'currency' => 'eur',
-      //   ], [
-      //     'stripe_account' => $vendor->getStripeAcc(),
-      //   ]);
+      try {
+        $payout = \Stripe\Payout::create([
+          // 'amount' => $vendor->getAvailable() * 100,
+          'amount' => 1000,
+          'currency' => 'eur',
+        ], [
+          'stripe_account' => $vendor->getStripeAcc(),
+        ]);
 
-      //   dump($payout);
+        dump($payout);
 
-      //   $vendor->setAvailable("0.00");
+        $vendor->setAvailable("0.00");
 
-      //   $withdraw = new Withdraw();
-      //   $withdraw->setPayoutId($payout->id);
-      //   $withdraw->setAmount($vendor->getAvailable());
-      //   $withdraw->setStatus("completed");
-      //   $withdraw->setLast4($vendor->getBankAccounts()[0]->getLast4());
+        // check amount payout
+        $withdraw = new Withdraw();
+        $withdraw->setPayoutId($payout->id);
+        $withdraw->setAmount($vendor->getAvailable());
+        $withdraw->setStatus("completed");
+        $withdraw->setLast4($vendor->getBankAccounts()[0]->getLast4());
+        $withdraw->setVendor($vendor);
 
-      //   $manager->persist($withdraw);
-      //   $manager->flush();
+        $manager->persist($withdraw);
+        $manager->flush();
 
-      // } catch(\Stripe\Exception\CardException $e) {
-      //   // Since it's a decline, \Stripe\Exception\CardException will be caught
-      //   dump($e->getHttpStatus());
-      //   dump($e->getError()->type);
-      //   dump($e->getError()->code);
-      //   dump($e->getError()->message);
-      // } catch (\Stripe\Exception\RateLimitException $e) {
-      //   // Too many requests made to the API too quickly
-      //   dump($e->getHttpStatus());
-      //   dump($e->getError()->type);
-      //   dump($e->getError()->code);
-      //   dump($e->getError()->message);
-      // } catch (\Stripe\Exception\InvalidRequestException $e) {
-      //   dump($e->getHttpStatus());
-      //   dump($e->getError()->type);
-      //   dump($e->getError()->code);
-      //   dump($e->getError()->message);
-      //   // Invalid parameters were supplied to Stripe's API
-      // } catch (\Stripe\Exception\AuthenticationException $e) {
-      //   dump($e->getHttpStatus());
-      //   dump($e->getError()->type);
-      //   dump($e->getError()->code);
-      //   dump($e->getError()->message);
-      //   // Authentication with Stripe's API failed
-      //   // (maybe you changed API keys recently)
-      // } catch (\Stripe\Exception\ApiConnectionException $e) {
-      //   // Network communication with Stripe failed
-      //   dump($e->getHttpStatus());
-      //   dump($e->getError()->type);
-      //   dump($e->getError()->code);
-      //   dump($e->getError()->message);
-      // } catch (\Stripe\Exception\ApiErrorException $e) {
-      //   dump($e->getHttpStatus());
-      //   dump($e->getError()->type);
-      //   dump($e->getError()->code);
-      //   dump($e->getError()->message);
+      } catch(\Stripe\Exception\CardException $e) {
+        // Since it's a decline, \Stripe\Exception\CardException will be caught
+        dump($e->getHttpStatus());
+        dump($e->getError()->type);
+        dump($e->getError()->code);
+        dump($e->getError()->message);
+      } catch (\Stripe\Exception\RateLimitException $e) {
+        // Too many requests made to the API too quickly
+        dump($e->getHttpStatus());
+        dump($e->getError()->type);
+        dump($e->getError()->code);
+        dump($e->getError()->message);
+      } catch (\Stripe\Exception\InvalidRequestException $e) {
+        dump($e->getHttpStatus());
+        dump($e->getError()->type);
+        dump($e->getError()->code);
+        dump($e->getError()->message);
+        // Invalid parameters were supplied to Stripe's API
+      } catch (\Stripe\Exception\AuthenticationException $e) {
+        dump($e->getHttpStatus());
+        dump($e->getError()->type);
+        dump($e->getError()->code);
+        dump($e->getError()->message);
+        // Authentication with Stripe's API failed
+        // (maybe you changed API keys recently)
+      } catch (\Stripe\Exception\ApiConnectionException $e) {
+        // Network communication with Stripe failed
+        dump($e->getHttpStatus());
+        dump($e->getError()->type);
+        dump($e->getError()->code);
+        dump($e->getError()->message);
+      } catch (\Stripe\Exception\ApiErrorException $e) {
+        dump($e->getHttpStatus());
+        dump($e->getError()->type);
+        dump($e->getError()->code);
+        dump($e->getError()->message);
 
-      //   // Display a very generic error to the user, and maybe send
-      //   // yourself an email
-      // } catch (Exception $e) {
-      //   dump($e);
-      //   // Something else happened, completely unrelated to Stripe
-      // }
-
-      // dd("test");
+        // Display a very generic error to the user, and maybe send
+        // yourself an email
+      } catch (Exception $e) {
+        dump($e);
+        // Something else happened, completely unrelated to Stripe
+      }
 
       return $this->json(true, 200);
     }
