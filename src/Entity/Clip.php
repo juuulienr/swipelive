@@ -64,6 +64,7 @@ class Clip
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="clips")
      * @ORM\JoinColumn(nullable=false)
      * @Groups("clip:read")
+     * @Groups("vendor:read")
      */
     private $product;
 
