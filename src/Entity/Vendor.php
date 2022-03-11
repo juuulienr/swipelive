@@ -74,6 +74,7 @@ class Vendor implements UserInterface
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("vendor:read")
+     * @Groups("clip:read")
      */
     private $company;
 
