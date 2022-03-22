@@ -153,6 +153,8 @@ class LiveAPIController extends Controller {
       $param = json_decode($json, true);
       $broadcastId = $param["broadcastId"];
 
+      return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+
       if ($broadcastId && !$live->getBroadcastId() && $live->getStatus() != 2) {
         $url = "https://api.bambuser.com/broadcasts/" . $broadcastId;
         $ch = curl_init();
