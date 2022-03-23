@@ -45,8 +45,9 @@ class RemoveWaitingLive extends ContainerAwareCommand
                         foreach ($liveProducts as $liveProduct) {
                             $this->manager->remove($liveProduct);
                         }
+                        $this->manager->flush();
                     }
-                    $this->manager->flush();
+                    $this->manager->remove($live);
                 }             
             }
         }
