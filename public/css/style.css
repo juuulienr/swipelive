@@ -210,20 +210,25 @@ ul li {
 
 
 @media screen and (max-width: 767px) {
+  #header {
+    padding-top: 60px;
+  }
+
   #root {
-    font-size: 13pt;
+    font-size: 12pt;
     margin-top: 9vh;
   }
+
   .nav div {
     margin: 10px;
   }
 
   .app-ios {
-    height: 48px;
+    height: 55px;
   }
 
   .app-android {
-    height: 48px;
+    height: 55px;
   }
 
   #logo {
@@ -239,5 +244,22 @@ ul li {
     height: 5px;
     width: 60px;
     margin: 20px 25px 5px;
+  }
+
+  .headline h1 {
+    min-height: 130px;
+  }
+
+  .legals {
+    font-size: 14px;
+  }
+
+  #header-terms {
+    padding-top: 30px;
+  }
+
+  #root-terms {
+    margin: 15px;
+    max-width: none;
   }
 }
