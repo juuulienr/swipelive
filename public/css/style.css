@@ -84,7 +84,6 @@ body {
   justify-items: center;
 }
 #download {
-  margin-top: 20px;
   justify-content: center;
 }
 .flex {
@@ -212,7 +211,7 @@ ul li {
 
 @media screen and (max-width: 767px) {
   #root {
-    font-size: 14pt;
+    font-size: 13pt;
     margin-top: 9vh;
   }
   .nav div {
@@ -230,5 +229,15 @@ ul li {
   #logo {
     height: 72px;
     width: 72px;
+  }
+
+  .nav div a {
+    font-size: 14px;
+  }
+
+  #scroll-indicator {
+    height: 5px;
+    width: 60px;
+    margin: 20px 25px 5px;
   }
 }
