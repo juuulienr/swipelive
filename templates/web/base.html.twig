@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr-FR">
-
-<head>
+  <head>
     <title>{% block title %}{% endblock %}| Swipe Live</title>
     
     <meta charset="UTF-8">
@@ -9,10 +8,10 @@
 
     {% block metadata %}{% endblock %}
 
-    <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
-    <link rel="shortcut icon" href="img/favicon.ico">
+    {# <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png"> #}
+    {# <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png"> #}
+    {# <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png"> #}
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.png">
 
     {% block stylesheets %}
     {% endblock %}
@@ -26,7 +25,5 @@
   <body>
 
     {% block body %}{% endblock %}
-      
-    {% include 'web/footer.html.twig' %}
   </body>
 </html>

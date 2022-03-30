@@ -23,21 +23,7 @@ class HomeController extends Controller {
   }
 
   /**
-   * @Route("/vendeur", name="vendor")
-   */
-  public function vendor(){
-    return $this->render('web/vendor.html.twig');
-  }
-
-  /**
-   * @Route("/influenceur", name="influencer")
-   */
-  public function influencer(){
-    return $this->render('web/influencer.html.twig');
-  }
-
-  /**
-   * @Route("/termes-et-conditions", name="terms")
+   * @Route("/mentions-legales", name="terms")
    */
   public function terms(){
     return $this->render('web/terms.html.twig');
@@ -50,25 +36,18 @@ class HomeController extends Controller {
     return $this->render('web/privacy.html.twig');
   }
 
-  /**
-   * @Route("/politique-de-cookies", name="cookies")
-   */
-  public function cookies(){
-    return $this->render('web/cookies.html.twig');
-  }
+  // /**
+  //  * @Route("/test", name="test")
+  //  */
+  // public function test(){
+  //   $stripe = new \Stripe\StripeClient('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
 
-  /**
-   * @Route("/test", name="test")
-   */
-  public function test(){
-    $stripe = new \Stripe\StripeClient('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
+  //   $stripe->accounts->update(
+  //     'acct_1KUTeq2VEI63cHkr',
+  //     ['settings' => ['payouts' => ['schedule' => ['interval' => 'manual']]]]
+  //   );
 
-    $stripe->accounts->update(
-      'acct_1KUTeq2VEI63cHkr',
-      ['settings' => ['payouts' => ['schedule' => ['interval' => 'manual']]]]
-    );
-
-    return $this->json(true);
-  }
+  //   return $this->json(true);
+  // }
 }
 

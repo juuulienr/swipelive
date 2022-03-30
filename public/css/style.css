@@ -1,7 +1,30 @@
+/*  ----------- 01- Start Base CSS  ----------- */
 @font-face {
-    font-family: "SwipeLiveLanding";
-    font-weight: 600;
-    src: url("../webfonts/SwipeLiveLandingSemibold.otf");
+  font-family: 'SwipeLive';
+  font-style: normal;
+  font-weight: 400;
+  src: local('SwipeLive Extra Light'), url('../webfonts/SwipeLiveExtraLight.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'SwipeLive';
+  font-style: normal;
+  font-weight: 500;
+  src: local('SwipeLive Light'), url('../webfonts/SwipeLiveLight.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'SwipeLive';
+  font-style: normal;
+  font-weight: 600;
+  src: local('SwipeLive Medium'), url('../webfonts/SwipeLiveMedium.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'SwipeLive';
+  font-style: normal;
+  font-weight: bold;
+  src: local('SwipeLive Bold'), url('../webfonts/SwipeLiveBold.woff') format('woff');
 }
 html {
     overflow-x: hidden;
@@ -12,22 +35,21 @@ body {
     padding: 0;
 }
 #root {
-    max-width: 600px;
+    max-width: 750px;
     margin: auto;
-    font-family: "SwipeLiveLanding";
-    font-size: 25pt;
+    font-family: "SwipeLive";
+    font-size: 20pt;
+    margin-top: 22vh;
 }
 #root-terms {
     margin: auto;
-    font-family: "SwipeLiveLanding";
+    font-family: "SwipeLive";
     font-size: 17px;
     max-width: 80vw;
 }
 #header {
     padding-top: 70px;
-    position: absolute;
     text-align: center;
-    min-width: 100vw;
 }
 #header-terms {
     padding-top: 70px;
@@ -56,15 +78,13 @@ body {
 }
 #main {
     display: flex;
-    height: 110vh;
     align-content: center;
     align-items: center;
     justify-content: center;
     justify-items: center;
-    margin-bottom: -19vh;
 }
 #download {
-    margin-top: 50px;
+    margin-top: 20px;
     justify-content: center;
 }
 .flex {
@@ -75,52 +95,45 @@ body {
 }
 .headline h1 {
     text-align: center;
-    min-height: 180px;
+    min-height: 150px;
+    color: white;
+    margin: 0px;
 }
 #footer {
-    background:linear-gradient(179.137663921407deg, rgba(255, 55, 176,1) 7.6709905660377355%,rgba(254, 55, 176,1) 7.6709905660377355%,rgba(128, 55, 180,1) 91.24017295597483%);
+    background: white;
     width: 100vw;
     justify-items: center;
     flex-direction: column;
     justify-content: center;
     text-align: center;
     align-items: center;
-    -webkit-border-top-left-radius: 30px;
-    -webkit-border-top-right-radius: 30px;
-    -moz-border-radius-topleft: 30px;
-    -moz-border-radius-topright: 30px;
     border-top-left-radius: 30px;
     border-top-right-radius: 30px;
-    font-family: "SwipeLiveLanding";
-    padding-bottom: 50px;
-    -webkit-box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.05);
-    -moz-box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.05);
+    font-family: "SwipeLive";
+    padding-bottom: 30px;
     box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.05);
+    position: absolute;
+    bottom: 0px;
 }
 #scroll-indicator {
     height: 9px;
     width: 90px;
-    background: black;
+    background: rgba(0,0,0,0.2);
     border-radius: 4.5px;
     margin: 25px;
-    opacity: 0.2;
 }
 .nav {
     display: flex;
-    padding-top: 30px;
-    padding-bottom: 30px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 .nav div {
     margin: 20px;
 }
 .nav div a {
-    color: #fff;
+    color: rgba(0,0,0,0.5);
     text-decoration: none;
-}
-.nav div a:hover {
-    color: #fff;
-    text-decoration: none;
-    border-bottom: #fff 1px solid;
+    font-weight: 600;
 }
 .legals {
     padding: 10px 20px 10px 20px;
@@ -128,66 +141,16 @@ body {
     background: #fff;
     border-radius: 100px;
     color: black;
+    border: 1px solid black;
+    font-weight: 600;
 }
-#team {
-    margin-bottom: 40px;
-}
-[data-tooltip] {
-    position: relative;
-    z-index: 2;
-    cursor: pointer;
-}
-[data-tooltip]:before,
-[data-tooltip]:after {
-    visibility: hidden;
-    -ms-filter: "alpha(opacity=0)";
-    filter: alpha(opacity=0);
-    opacity: 0;
-    pointer-events: none;
-}
-[data-tooltip]:before {
-    position: absolute;
-    bottom: 290%;
-    left: 50%;
-    margin-bottom: 5px;
-    margin-left: -50px;
-    padding: 7px;
-    width: 100px;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 100px;
-    background-color: #fff;
-    color: #000;
-    content: attr(data-tooltip);
-    text-align: center;
-    font-size: 14px;
-    line-height: 1.2;
-}
-[data-tooltip]:after {
-    position: absolute;
-    bottom: 290%;
-    left: 50%;
-    margin-left: -5px;
-    width: 0;
-    border-top: 5px solid #fff;
-    border-right: 5px solid transparent;
-    border-left: 5px solid transparent;
-    content: " ";
-    font-size: 0;
-    line-height: 0;
-}
-[data-tooltip]:hover:before,
-[data-tooltip]:hover:after {
-    visibility: visible;
-    -ms-filter: "alpha(opacity=100)";
-    filter: alpha(opacity=100);
-    opacity: 1;
-}
-
 #logo {
+    width: 90px;
+    height: 90px;
 	padding:8px;
 	border-radius: 20px;
 	box-shadow: rgb(0 0 0 / 16%) 0px 1px 4px;
+    background: white;
 }
 
 ul li {
