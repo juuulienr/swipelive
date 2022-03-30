@@ -248,6 +248,7 @@ ul li {
 
   .headline h1 {
     min-height: 130px;
+    margin: 0px 10px;
   }
 
   .legals {
