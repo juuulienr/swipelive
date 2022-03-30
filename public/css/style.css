@@ -157,6 +157,37 @@ ul li {
     padding: 5px 0px;
 }
 
+.privacy p {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: 500;
+}
+.privacy ul {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: 500;
+}
+.privacy li {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: 500;
+}
+
+.mention p {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: 500;
+}
+.mention ul {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: 500;
+}
+.mention li {
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: 500;
+}
 
 @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
     #download {
