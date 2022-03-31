@@ -2,31 +2,31 @@
 
 namespace App\Controller\Web;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\HttpFoundation\Cookie;
 
 
 class HomeController extends Controller {
 
   /**
-   * @Route("/", name="home")
+   * @Route("/", name="landing")
    */
-  public function home(){
-    return $this->render('web/home.html.twig');
+  public function landing(){
+    return $this->render('web/landing.html.twig');
   }
 
   /**
-   * @Route("/mentions-legales", name="terms")
+   * @Route("/mentions-legales", name="legal")
    */
-  public function terms(){
-    return $this->render('web/terms.html.twig');
+  public function legal(){
+    return $this->render('web/legal.html.twig');
   }
 
   /**
