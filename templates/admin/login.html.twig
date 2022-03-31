@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+  <head>
+    <title>Connexion Admin | Swipe Live</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&display=swap">
+  </head>
+  <body>
+    <div class="css-v82cpl">
+        <div class="MuiContainer-root MuiContainer-maxWidthSm css-1m6pqln">
+            <div class="css-26q4qm">
+                <div class="css-14pz86n">
+                    <div class="MuiBox-root css-i9gxme">
+                        <h4 class="MuiTypography-root MuiTypography-h4 MuiTypography-gutterBottom css-1bhrkuh">Se connecter à Swipe Live</h4>
+                        <p class="MuiTypography-root MuiTypography-body1 css-1s3hfzc">Enter your details below.</p>
+                    </div>
+                    <span class="MuiBox-root css-mit0e3">
+                        <span class="wrapper lazy-load-image-background lazy-load-image-loaded" style="display: inline-block;">
+                            <img class="MuiBox-root css-6jrdpz" alt="firebase" src="{{ app.request.baseUrl }}/img/logo.png" sx="[object Object]" />
+                        </span>
+                    </span>
+                </div>
+                {# <form data-dashlane-rid="fd182f03c66146af" data-form-type="login"> #}
+                    <div class="css-ovnx7g">
+                        <div class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-feqhe6">
+                            <label class="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary MuiFormLabel-filled css-10vgr5e" data-shrink="true" for="mui-171" id="mui-171-label">
+                                Adresse mail
+                            </label>
+                            <div class="MuiOutlinedInput-root MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl css-1l1mlix">
+                                <input aria-invalid="false" name="email" type="text" class="MuiOutlinedInput-input MuiInputBase-input css-yzm7vx" value="demo@minimals.cc" id="mui-171"/>
+                                <fieldset aria-hidden="true" class="MuiOutlinedInput-notchedOutline css-igs3ac">
+                                    <legend class="css-7nxzgd"><span>Adresse mail</span></legend>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="MuiFormControl-root MuiFormControl-fullWidth MuiTextField-root css-feqhe6">
+                            <label class="MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-root MuiFormLabel-colorPrimary MuiFormLabel-filled css-10vgr5e" data-shrink="true" for="mui-172" id="mui-172-label">
+                                Mot de passe
+                            </label>
+                            <div class="MuiOutlinedInput-root MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-adornedEnd css-1t2syce css-1l1mlix">
+                                <input aria-invalid="false" name="password" type="password" class="MuiOutlinedInput-input MuiInputBase-input MuiInputBase-inputAdornedEnd css-1nuss9t css-yzm7vx" value="demo1234" id="mui-172"/>
+                                <fieldset aria-hidden="true" class="MuiOutlinedInput-notchedOutline css-igs3ac">
+                                    <legend class="css-7nxzgd"><span>Mot de passe</span></legend>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div><br><br>
+                    <a href="{{ path('dashboard') }}" style="text-decoration: none;">
+                        <button  class="MuiLoadingButton-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeLarge MuiButton-containedSizeLarge MuiButton-fullWidth MuiButtonBase-root css-wmpqfy" tabindex="0" type="submit" id="mui-173">
+                            Connexion
+                            <span class="MuiTouchRipple-root css-w0pj6f"></span>
+                        </button>
+                    </a>
+                {# </form> #}
+            </div>
+        </div>
+    </div>
+
+    <style>
+
+    @media (min-width: 900px) {
+        .css-v82cpl {
+            display: flex;
+        }
+    }
+
+    @media (min-width: 600px) {
+        .css-1m6pqln {
+            max-width: 600px;
+        }
+    }
+    @media (min-width: 600px) {
+        .css-1m6pqln {
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+        .css-1m6pqln {
+            width: 100%;
+            margin-left: auto;
+            box-sizing: border-box;
+            margin-right: auto;
+            display: block;
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+    }
+
+    .css-26q4qm {
+        max-width: 480px;
+        margin: auto;
+        display: flex;
+        min-height: 100vh;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .css-14pz86n {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-bottom: 40px;
+    }
+
+    .css-i9gxme {
+        flex-grow: 1;
+    }
+
+    .css-1bhrkuh {
+        margin: 0px 0px 8px;
+        font-weight: 700;
+        line-height: 1.5;
+        font-size: 1.25rem;
+        font-family: "Public Sans", sans-serif;
+    }
+
+
+    @media (min-width: 1200px) {
+        .css-1bhrkuh {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (min-width: 900px) {
+        .css-1bhrkuh {
+            font-size: 1.5rem;
+        }
+    }
+
+
+    .css-1s3hfzc {
+        margin: 0px;
+        line-height: 1.5;
+        font-size: 1rem;
+        font-family: "Public Sans", sans-serif;
+        font-weight: 400;
+        color: rgb(99, 115, 129);
+    }
+
+    .css-mit0e3 {
+        line-height: 0;
+        display: block;
+        overflow: hidden;
+        width: 32px;
+        height: 32px;
+    }
+
+
+    .css-mit0e3 .wrapper {
+        width: 100%;
+        height: 100%;
+        background-size: cover !important;
+    }
+
+    .css-6jrdpz {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .css-ovnx7g {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .css-feqhe6 {
+        display: inline-flex;
+        flex-direction: column;
+        position: relative;
+        min-width: 0px;
+        padding: 0px;
+        margin: 0px;
+        border: 0px;
+        vertical-align: top;
+        width: 100%;
+    }
+
+
+    .css-1l1mlix {
+        line-height: 1.4375em;
+        font-size: 1rem;
+        font-family: "Public Sans", sans-serif;
+        font-weight: 400;
+        color: rgb(33, 43, 54);
+        box-sizing: border-box;
+        cursor: text;
+        display: inline-flex;
+        align-items: center;
+        width: 100%;
+        position: relative;
+        border-radius: 8px;
+    }
+    .css-1l1mlix .MuiOutlinedInput-notchedOutline {
+        border-color: rgba(145, 158, 171, 0.32);
+    }
+    .css-igs3ac {
+        text-align: left;
+        position: absolute;
+        inset: -5px 0px 0px;
+        margin: 0px;
+        padding: 0px 8px;
+        pointer-events: none;
+        border-radius: inherit;
+        border-style: solid;
+        border-width: 1px;
+        overflow: hidden;
+        min-width: 0%;
+        border-color: rgba(0, 0, 0, 0.23);
+    }
+
+    .css-yzm7vx {
+        font: inherit;
+        letter-spacing: inherit;
+        color: currentcolor;
+        border: 0px;
+        box-sizing: content-box;
+        background: none;
+        height: 1.4375em;
+        margin: 0px;
+        -webkit-tap-highlight-color: transparent;
+        display: block;
+        min-width: 0px;
+        width: 100%;
+        animation-name: mui-auto-fill-cancel;
+        animation-duration: 10ms;
+        padding: 16.5px 14px;
+    }
+
+
+    .css-1l1mlix .MuiOutlinedInput-notchedOutline {
+        border-color: rgba(145, 158, 171, 0.32);
+    }
+
+    .css-ovnx7g > :not(style) + :not(style) {
+        margin: 24px 0px 0px;
+    }
+
+    .css-10vgr5e {
+        line-height: 1.4375em;
+        font-size: 1rem;
+        font-family: "Public Sans", sans-serif;
+        font-weight: 400;
+        padding: 0px;
+        color: rgb(145, 158, 171);
+        display: block;
+        transform-origin: left top;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: calc(133% - 24px);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        transform: translate(14px, -9px) scale(0.75);
+        transition: color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms, transform 200ms cubic-bezier(0, 0, 0.2, 1) 0ms, max-width 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+        z-index: 1;
+        pointer-events: auto;
+        user-select: none;
+    }
+
+    .css-1t2syce {
+        line-height: 1.4375em;
+        font-size: 1rem;
+        font-family: "Public Sans", sans-serif;
+        font-weight: 400;
+        color: rgb(33, 43, 54);
+        box-sizing: border-box;
+        cursor: text;
+        display: inline-flex;
+        align-items: center;
+        width: 100%;
+        position: relative;
+        border-radius: 8px;
+    }
+
+    .css-7nxzgd {
+        float: unset;
+        overflow: hidden;
+        display: block;
+        width: auto;
+        padding: 0px;
+        height: 11px;
+        font-size: 0.75em;
+        visibility: hidden;
+        max-width: 100%;
+        transition: max-width 100ms cubic-bezier(0, 0, 0.2, 1) 50ms;
+        white-space: nowrap;
+    }
+
+    .css-7nxzgd > span {
+        padding-left: 5px;
+        padding-right: 5px;
+        display: inline-block;
+    }
+
+    .css-1nuss9t {
+        font: inherit;
+        letter-spacing: inherit;
+        color: currentcolor;
+        border: 0px;
+        box-sizing: content-box;
+        background: none;
+        height: 1.4375em;
+        margin: 0px;
+        -webkit-tap-highlight-color: transparent;
+        display: block;
+        min-width: 0px;
+        width: 100%;
+        animation-name: mui-auto-fill-cancel;
+        animation-duration: 10ms;
+        padding: 16.5px 0px 16.5px 14px;
+    }
+
+
+    .css-wmpqfy {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        outline: 0px;
+        border: 0px;
+        margin: 0px;
+        cursor: pointer;
+        user-select: none;
+        vertical-align: middle;
+        appearance: none;
+        text-decoration: none;
+        font-weight: 700;
+        line-height: 1.71429;
+        font-size: 0.9375rem;
+        text-transform: capitalize;
+        font-family: "Public Sans", sans-serif;
+        min-width: 64px;
+        padding: 8px 22px;
+        border-radius: 8px;
+        color: rgb(255, 255, 255);
+        background-color: #fe2c55;
+        width: 100%;
+        height: 48px;
+        transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    }
+
+    .css-w0pj6f {
+        overflow: hidden;
+        pointer-events: none;
+        position: absolute;
+        z-index: 0;
+        inset: 0px;
+        border-radius: inherit;
+    }
+
+    .css-yzm7vx:focus {
+        outline: 0px;
+    }
+
+    .css-1l1mlix:hover .MuiOutlinedInput-notchedOutline {
+        border-color: rgb(33, 43, 54);
+    }
+
+    body {
+        margin: 0px;
+    }
+
+    </style>
+
+  </body>
+</html>

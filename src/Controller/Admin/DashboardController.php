@@ -22,6 +22,15 @@ class DashboardController extends Controller {
     return $this->render('admin/dashboard.html.twig');
   }
 
+
+  /**
+   * @Route("/login", name="login")
+   */
+  public function login(){
+    return $this->render('admin/login.html.twig');
+  }
+
+
   // /**
   //  * @Route("/test", name="test")
   //  */
