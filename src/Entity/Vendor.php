@@ -13,137 +13,64 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\VendorRepository")
- * @ORM\HasLifecycleCallbacks()
- * @UniqueEntity(
- *  fields={"email"},
- *  message="Un compte est associé à cette adresse mail"
- * )
  */
-class Vendor implements UserInterface
+class Vendor
 {
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("live:read")
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\Email(message="L'adresse mail est invalide !")
-     * @Groups("vendor:read")
-     */
-    private $email;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $hash;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $pushToken;
-
-    /**
-     * @ORM\Column(type="datetime")
-     * @Groups("vendor:read")
-     */
-    private $createdAt;
-
-    /**
      * @ORM\OneToMany(targetEntity=Live::class, mappedBy="vendor")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $lives;
 
     /**
-     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="vendor")
-     */
-    private $messages;
-
-    /**
      * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="vendor")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $clips;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
      */
     private $company;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups("vendor:read")
-     * @Groups("clip:read")
-     * @Groups("live:read")
-     * @Groups("product:read")
-     */
-    private $firstname;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups("vendor:read")
-     * @Groups("clip:read")
-     * @Groups("live:read")
-     * @Groups("product:read")
-     */
-    private $lastname;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      * @Groups("clip:edit")
      */
     private $summary;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("vendor:read")
-     * @Groups("clip:read")
-     * @Groups("live:read")
-     */
-    private $picture;
-
-    /**
      * @ORM\OneToMany(targetEntity=Product::class, mappedBy="vendor")
      * @ORM\OrderBy({"title" = "ASC"})
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("live:read")
      */
     private $products;
 
     /**
-     * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="following")
-     * @Groups("vendor:read")
-     * @Groups("clip:read")
-     * @Groups("live:read")
-     */
-    private $followers;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="vendor")
-     * @Groups("vendor:read")
-     */
-    private $following;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      * @Groups("product:read")
      */
     private $businessType;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("live:read")
      * @Groups("product:read")
@@ -152,31 +79,31 @@ class Vendor implements UserInterface
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $dob;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $siren;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $address;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $city;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $zip;
 
@@ -186,51 +113,39 @@ class Vendor implements UserInterface
     private $stripeAcc;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $stripeCus;
-
-    /**
      * @ORM\OneToMany(targetEntity=Order::class, mappedBy="vendor")
      * @ORM\OrderBy({"createdAt" = "DESC"})
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $sales;
 
     /**
-     * @ORM\OneToMany(targetEntity=Order::class, mappedBy="buyer")
-     * @ORM\OrderBy({"createdAt" = "DESC"})
-     * @Groups("vendor:read")
-     */
-    private $purchases;
-
-    /**
      * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $total;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $pending;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $available;
 
     /**
      * @ORM\OneToMany(targetEntity=Withdraw::class, mappedBy="vendor")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $withdraws;
 
     /**
      * @ORM\OneToMany(targetEntity=BankAccount::class, mappedBy="vendor")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $bankAccounts;
 
@@ -247,14 +162,9 @@ class Vendor implements UserInterface
     
     public function __construct()
     {
-        $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->lives = new ArrayCollection();
-        $this->messages = new ArrayCollection();
         $this->clips = new ArrayCollection();
         $this->products = new ArrayCollection();
-        $this->followers = new ArrayCollection();
-        $this->following = new ArrayCollection();
-        $this->purchases = new ArrayCollection();
         $this->sales = new ArrayCollection();
         $this->withdraws = new ArrayCollection();
         $this->total = "0.00";
@@ -263,85 +173,12 @@ class Vendor implements UserInterface
         $this->bankAccounts = new ArrayCollection();
     }
 
-    public function getClassName() {
-        return (new \ReflectionClass($this))->getShortName();
-    }
-
-    public function getFullname() {
-        return "{$this->firstname} {$this->lastname}";
-    }
-
     public function getId()
     {
         return $this->id;
     }
 
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
-    public function getHash(): ?string
-    {
-        return $this->hash;
-    }
-
-    public function setHash(string $hash): self
-    {
-        $this->hash = $hash;
-
-        return $this;
-    }
-
-    public function getRoles() {
-
-        return ['ROLE_VENDOR'];
-    }
-
-    public function getPassword() {
-        return $this->hash;
-    }
-
-    public function getSalt() {}
-    
-    public function getUsername() {
-        return $this->email;
-    }
-
-    public function eraseCredentials() {}
-
-
-    public function getPushToken(): ?string
-    {
-        return $this->pushToken;
-    }
-
-    public function setPushToken(?string $pushToken): self
-    {
-        $this->pushToken = $pushToken;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
+  
     /**
      * @return Collection|Live[]
      */
@@ -350,57 +187,28 @@ class Vendor implements UserInterface
         return $this->lives;
     }
 
-    public function addLife(Live $life): self
+    public function addLive(Live $live): self
     {
-        if (!$this->lives->contains($life)) {
-            $this->lives[] = $life;
-            $life->setVendor($this);
+        if (!$this->lives->contains($live)) {
+            $this->lives[] = $live;
+            $live->setVendor($this);
         }
 
         return $this;
     }
 
-    public function removeLife(Live $life): self
+    public function removeLive(Live $live): self
     {
-        if ($this->lives->removeElement($life)) {
+        if ($this->lives->removeElement($live)) {
             // set the owning side to null (unless already changed)
-            if ($life->getVendor() === $this) {
-                $life->setVendor(null);
+            if ($live->getVendor() === $this) {
+                $live->setVendor(null);
             }
         }
 
         return $this;
     }
 
-    /**
-     * @return Collection|Message[]
-     */
-    public function getMessages(): Collection
-    {
-        return $this->messages;
-    }
-
-    public function addMessage(Message $message): self
-    {
-        if (!$this->messages->contains($message)) {
-            $this->messages[] = $message;
-            $message->setVendor($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMessage(Message $message): self
-    {
-        if ($this->messages->removeElement($message)) {
-            // set the owning side to null (unless already changed)
-            if ($message->getVendor() === $this) {
-                $message->setVendor(null);
-            }
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection|Clip[]
@@ -444,30 +252,7 @@ class Vendor implements UserInterface
         return $this;
     }
 
-    public function getFirstname(): ?string
-    {
-        return $this->firstname;
-    }
-
-    public function setFirstname(string $firstname): self
-    {
-        $this->firstname = $firstname;
-
-        return $this;
-    }
-
-    public function getLastname(): ?string
-    {
-        return $this->lastname;
-    }
-
-    public function setLastname(string $lastname): self
-    {
-        $this->lastname = $lastname;
-
-        return $this;
-    }
-
+  
     public function getSummary(): ?string
     {
         return $this->summary;
@@ -476,18 +261,6 @@ class Vendor implements UserInterface
     public function setSummary(?string $summary): self
     {
         $this->summary = $summary;
-
-        return $this;
-    }
-
-    public function getPicture(): ?string
-    {
-        return $this->picture;
-    }
-
-    public function setPicture(?string $picture): self
-    {
-        $this->picture = $picture;
 
         return $this;
     }
@@ -522,65 +295,6 @@ class Vendor implements UserInterface
         return $this;
     }
 
-    /**
-     * @return Collection|Follow[]
-     */
-    public function getFollowers(): Collection
-    {
-        return $this->followers;
-    }
-
-    public function addFollower(Follow $follower): self
-    {
-        if (!$this->followers->contains($follower)) {
-            $this->followers[] = $follower;
-            $follower->setFollowing($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFollower(Follow $follower): self
-    {
-        if ($this->followers->removeElement($follower)) {
-            // set the owning side to null (unless already changed)
-            if ($follower->getFollowing() === $this) {
-                $follower->setFollowing(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Follow[]
-     */
-    public function getFollowing(): Collection
-    {
-        return $this->following;
-    }
-
-    public function addFollowing(Follow $following): self
-    {
-        if (!$this->following->contains($following)) {
-            $this->following[] = $following;
-            $following->setVendor($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFollowing(Follow $following): self
-    {
-        if ($this->following->removeElement($following)) {
-            // set the owning side to null (unless already changed)
-            if ($following->getVendor() === $this) {
-                $following->setVendor(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getBusinessType(): ?string
     {
@@ -666,18 +380,7 @@ class Vendor implements UserInterface
         return $this;
     }
 
-    public function getStripeCus(): ?string
-    {
-        return $this->stripeCus;
-    }
-
-    public function setStripeCus(?string $stripeCus): self
-    {
-        $this->stripeCus = $stripeCus;
-
-        return $this;
-    }
-
+  
     /**
      * @return Collection|Order[]
      */
@@ -702,36 +405,6 @@ class Vendor implements UserInterface
             // set the owning side to null (unless already changed)
             if ($sale->getVendor() === $this) {
                 $sale->setVendor(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Order[]
-     */
-    public function getPurchases(): Collection
-    {
-        return $this->purchases;
-    }
-
-    public function addPurchase(Order $purchase): self
-    {
-        if (!$this->purchases->contains($purchase)) {
-            $this->purchases[] = $purchase;
-            $purchase->setBuyer($this);
-        }
-
-        return $this;
-    }
-
-    public function removePurchase(Order $purchase): self
-    {
-        if ($this->purchases->removeElement($purchase)) {
-            // set the owning side to null (unless already changed)
-            if ($purchase->getBuyer() === $this) {
-                $purchase->setBuyer(null);
             }
         }
 

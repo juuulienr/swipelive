@@ -30,25 +30,25 @@ class Withdraw
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $amount;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $status;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $last4;
 

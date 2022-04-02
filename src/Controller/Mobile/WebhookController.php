@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Mobile\Anonyme;
+namespace App\Controller\Mobile;
 
 use App\Entity\Clip;
 use App\Entity\Live;
@@ -167,7 +167,7 @@ class WebhookController extends Controller {
 
           case 'payment_intent.succeeded':
             $order->setStatus("succeeded");
-            $vendor->setPending($order->getTotal() - $order->getFees());
+            $user->setPending($order->getTotal() - $order->getFees());
 
             foreach ($order->getLineItems() as $lineItem) {
               if ($lineItem->getVariant()) {

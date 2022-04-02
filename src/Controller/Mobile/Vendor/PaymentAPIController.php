@@ -31,7 +31,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 class PaymentAPIController extends Controller {
 
   /**
-   * @Route("/vendor/api/payment", name="vendor_api_payment")
+   * @Route("/user/api/payment", name="user_api_payment")
    */
   public function payment(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo){
     if ($json = $request->getContent()) {

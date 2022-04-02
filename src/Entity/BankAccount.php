@@ -25,19 +25,19 @@ class BankAccount
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $currency;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $country;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $number;
 
@@ -49,7 +49,7 @@ class BankAccount
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $last4;
 

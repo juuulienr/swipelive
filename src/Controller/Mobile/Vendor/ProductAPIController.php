@@ -35,10 +35,10 @@ class ProductAPIController extends Controller {
   /**
    * Récupérer les produits
    *
-   * @Route("/vendor/api/products", name="vendor_api_products", methods={"GET"})
+   * @Route("/user/api/products", name="user_api_products", methods={"GET"})
    */
   public function products(Request $request, ObjectManager $manager, ProductRepository $productRepo) {
-    $products = $productRepo->findBy([ "vendor" => $this->getUser(), "archived" => false ], [ "title" => "ASC" ]);
+    $products = $productRepo->findBy([ "user" => $this->getUser(), "archived" => false ], [ "title" => "ASC" ]);
 
     return $this->json($products, 200, [], ['groups' => 'product:read']);
   }
@@ -47,7 +47,7 @@ class ProductAPIController extends Controller {
   /**
    * Récupérer un produit
    *
-   * @Route("/vendor/api/products/{id}", name="vendor_api_product", methods={"GET"})
+   * @Route("/user/api/products/{id}", name="user_api_product", methods={"GET"})
    */
   public function product(Product $product) {
     return $this->json($product, 200, [], ['groups' => 'product:read']);
@@ -57,7 +57,7 @@ class ProductAPIController extends Controller {
   /**
    * Ajouter un produit
    *
-   * @Route("/vendor/api/products/add", name="vendor_api_product_add", methods={"POST"})
+   * @Route("/user/api/products/add", name="user_api_product_add", methods={"POST"})
    */
   public function addProduct(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
@@ -81,7 +81,7 @@ class ProductAPIController extends Controller {
   /**
    * Editer un produit
    *
-   * @Route("/vendor/api/products/edit/{id}", name="vendor_api_product_edit", methods={"POST"})
+   * @Route("/user/api/products/edit/{id}", name="user_api_product_edit", methods={"POST"})
    */
   public function editProduct(Product $product, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
@@ -98,7 +98,7 @@ class ProductAPIController extends Controller {
   /**
    * Supprimer un produit
    *
-   * @Route("/vendor/api/products/delete/{id}", name="vendor_api_product_delete", methods={"GET"})
+   * @Route("/user/api/products/delete/{id}", name="user_api_product_delete", methods={"GET"})
    */
   public function deleteProduct(Product $product, Request $request, ObjectManager $manager) {
     if ($product) {
@@ -115,7 +115,7 @@ class ProductAPIController extends Controller {
   /**
    * Editer un variant
    *
-   * @Route("/vendor/api/variant/edit/{id}", name="vendor_api_variant_edit", methods={"POST"})
+   * @Route("/user/api/variant/edit/{id}", name="user_api_variant_edit", methods={"POST"})
    */
   public function editVariant(Variant $variant, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
@@ -132,7 +132,7 @@ class ProductAPIController extends Controller {
   /**
    * Supprimer un variant
    *
-   * @Route("/vendor/api/variant/delete/{id}", name="vendor_api_variant_delete", methods={"GET"})
+   * @Route("/user/api/variant/delete/{id}", name="user_api_variant_delete", methods={"GET"})
    */
   public function deleteVariant(Variant $variant, Request $request, ObjectManager $manager) {
     if ($variant) {
@@ -149,7 +149,7 @@ class ProductAPIController extends Controller {
   /**
    * Ajouter une image
    *
-   * @Route("/vendor/api/products/upload/add", name="vendor_api_upload_add", methods={"POST"})
+   * @Route("/user/api/products/upload/add", name="user_api_upload_add", methods={"POST"})
    */
   public function addUpload(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($request->files->get('picture')) {
@@ -179,7 +179,7 @@ class ProductAPIController extends Controller {
   /**
    * Ajouter une image sur un produit
    *
-   * @Route("/vendor/api/products/edit/upload/add/{id}", name="vendor_api_edit_upload_add", methods={"POST"})
+   * @Route("/user/api/products/edit/upload/add/{id}", name="user_api_edit_upload_add", methods={"POST"})
    */
   public function addUploadProduct(Product $product, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($request->files->get('picture')) {
@@ -210,7 +210,7 @@ class ProductAPIController extends Controller {
   /**
    * Supprimer une image
    *
-   * @Route("/vendor/api/products/upload/delete/{id}", name="vendor_api_upload_delete", methods={"GET"})
+   * @Route("/user/api/products/upload/delete/{id}", name="user_api_upload_delete", methods={"GET"})
    */
   public function deleteUpload(Upload $upload, Request $request, ObjectManager $manager) {
     $filePath = $this->getParameter('uploads_directory') . '/' . $upload->getFilename();

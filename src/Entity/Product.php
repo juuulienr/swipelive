@@ -18,7 +18,7 @@ class Product
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups("product:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
@@ -29,7 +29,7 @@ class Product
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("product:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
@@ -64,7 +64,7 @@ class Product
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
      * @Groups("product:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
@@ -74,7 +74,7 @@ class Product
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
      * @Groups("product:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
@@ -84,7 +84,7 @@ class Product
     /**
      * @ORM\Column(type="integer")
      * @Groups("product:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      * @Groups("live:read")
      * @Groups("clip:read")
      */
@@ -93,7 +93,7 @@ class Product
     /**
      * @ORM\OneToMany(targetEntity=Upload::class, mappedBy="product", cascade={"persist"})
      * @Groups("product:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
@@ -120,7 +120,7 @@ class Product
     /**
      * @ORM\Column(type="boolean", nullable=true)
      * @Groups("product:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")

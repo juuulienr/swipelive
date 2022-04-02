@@ -15,47 +15,47 @@ class Follow
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="followers")
-     * @Groups("vendor:read")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="followers")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $following;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="following")
-     * @Groups("vendor:read")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="following")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $vendor;
+    private $follower;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getFollowing(): ?Vendor
+    public function getFollowing(): ?User
     {
         return $this->following;
     }
 
-    public function setFollowing(?Vendor $following): self
+    public function setFollowing(?User $following): self
     {
         $this->following = $following;
 
         return $this;
     }
 
-    public function getVendor(): ?Vendor
+    public function getFollower(): ?User
     {
-        return $this->vendor;
+        return $this->follower;
     }
 
-    public function setVendor(?Vendor $vendor): self
+    public function setFollower(?User $follower): self
     {
-        $this->vendor = $vendor;
+        $this->follower = $follower;
 
         return $this;
     }

@@ -36,7 +36,7 @@ class LiveAPIController extends Controller {
   /**
    * Préparer un live
    *
-   * @Route("/vendor/api/prelive", name="vendor_api_prelive_step1", methods={"POST"})
+   * @Route("/user/api/prelive", name="user_api_prelive_step1", methods={"POST"})
    */
   public function prelive(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
@@ -56,7 +56,7 @@ class LiveAPIController extends Controller {
   /**
    * Editer un liveproduct   
    * 
-   * @Route("/vendor/api/liveproducts/edit/{id}", name="vendor_api_liveproducts_edit", methods={"PUT"})
+   * @Route("/user/api/liveproducts/edit/{id}", name="user_api_liveproducts_edit", methods={"PUT"})
    */
   public function prelive2(LiveProducts $liveProduct, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
@@ -73,7 +73,7 @@ class LiveAPIController extends Controller {
   /**
    * Récupérer un live
    *
-   * @Route("/vendor/api/live/{id}", name="vendor_api_live", methods={"GET"})
+   * @Route("/user/api/live/{id}", name="user_api_live", methods={"GET"})
    */
   public function live(Live $live, Request $request, ObjectManager $manager) {
     return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
@@ -83,13 +83,13 @@ class LiveAPIController extends Controller {
   /**
    * Mettre à jour le produit pendant le live
    *
-   * @Route("/vendor/api/live/{id}/update/display", name="vendor_api_live_update_display", methods={"PUT"})
+   * @Route("/user/api/live/{id}/update/display", name="user_api_live_update_display", methods={"PUT"})
    */
   public function updateDisplay(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo, MessageRepository $messageRepo) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
       $display = $param["display"];
-      $vendor = $this->getUser();
+      $user = $this->getUser();
 
       $live->setDisplay($display);
       $manager->flush();
@@ -116,7 +116,7 @@ class LiveAPIController extends Controller {
 
         if ($duration > 15) {
           $clip = new Clip();
-          $clip->setVendor($vendor);
+          $clip->setVendor($user);
           $clip->setLive($live);
           $clip->setProduct($liveProduct->getProduct());
           $clip->setPreview($live->getPreview());
@@ -146,7 +146,7 @@ class LiveAPIController extends Controller {
   /**
    * Mettre à jour un live
    *
-   * @Route("/vendor/api/live/update/{id}", name="vendor_api_live_update", methods={"PUT"})
+   * @Route("/user/api/live/update/{id}", name="user_api_live_update", methods={"PUT"})
    */
   public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
@@ -183,17 +183,17 @@ class LiveAPIController extends Controller {
 
           $channel = "channel" . $live->getId();
           $event = "event" . $live->getId();
-          $vendor = $this->getUser();
+          $user = $this->getUser();
 
           $data = [
             "message" => [
               "content" => "Début du live", 
               "user" => null, 
-              "vendor" => [
-                "businessName" => $vendor->getBusinessName(),
-                "firstname" => $vendor->getFirstname(),
-                "lastname" => $vendor->getLastname(),
-                "picture" => $vendor->getPicture()
+              "user" => [
+                "businessName" => $user->getBusinessName(),
+                "firstname" => $user->getFirstname(),
+                "lastname" => $user->getLastname(),
+                "picture" => $user->getPicture()
               ]
             ]
           ];
@@ -217,7 +217,7 @@ class LiveAPIController extends Controller {
   /**
    * Arreter un live
    *
-   * @Route("/vendor/api/live/stop/{id}", name="vendor_api_live_stop", methods={"PUT"})
+   * @Route("/user/api/live/stop/{id}", name="user_api_live_stop", methods={"PUT"})
    */
   public function stopLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo, MessageRepository $messageRepo) {
     $live->setStatus(2);
@@ -282,17 +282,17 @@ class LiveAPIController extends Controller {
   /**
    * Ajouter un message pendant le live
    *
-   * @Route("/vendor/api/live/{id}/message/add", name="vendor_api_live_message_add", methods={"POST"})
+   * @Route("/user/api/live/{id}/message/add", name="user_api_live_message_add", methods={"POST"})
    */
   public function addMessageLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
       $content = $param["content"];
-      $vendor = $this->getUser();
+      $user = $this->getUser();
 
       $message = new Message();
       $message->setContent($content);
-      $message->setVendor($vendor);
+      $message->setVendor($user);
       $message->setLive($live);
       $manager->persist($message);
       $manager->flush();
@@ -301,11 +301,11 @@ class LiveAPIController extends Controller {
         "message" => [
           "content" => $content, 
           "user" => null, 
-          "vendor" => [
-            "businessName" => $vendor->getBusinessName(),
-            "firstname" => $vendor->getFirstname(),
-            "lastname" => $vendor->getLastname(),
-            "picture" => $vendor->getPicture()
+          "user" => [
+            "businessName" => $user->getBusinessName(),
+            "firstname" => $user->getFirstname(),
+            "lastname" => $user->getLastname(),
+            "picture" => $user->getPicture()
           ]
         ]
       ];
@@ -321,10 +321,10 @@ class LiveAPIController extends Controller {
   /**
    * Mettre à jour les vues sur un live
    *
-   * @Route("/vendor/api/live/{id}/update/viewers", name="vendor_api_live_update_viewers", methods={"PUT"})
+   * @Route("/user/api/live/{id}/update/viewers", name="user_api_live_update_viewers", methods={"PUT"})
    */
   public function updateViewers(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    $vendor = $this->getUser();
+    $user = $this->getUser();
     $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $info = $pusher->getChannelInfo($live->getChannel(), ['info' => 'subscription_count']);
     $count = $info->subscription_count;
@@ -339,11 +339,11 @@ class LiveAPIController extends Controller {
       "viewers" => $count,
       "entrances" => [
         "user" => null, 
-        "vendor" => [
-          "businessName" => $vendor->getBusinessName(),
-          "firstname" => $vendor->getFirstname(),
-          "lastname" => $vendor->getLastname(),
-          "picture" => $vendor->getPicture()
+        "user" => [
+          "businessName" => $user->getBusinessName(),
+          "firstname" => $user->getFirstname(),
+          "lastname" => $user->getLastname(),
+          "picture" => $user->getPicture()
         ]
       ]
     ];

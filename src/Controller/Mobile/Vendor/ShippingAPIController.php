@@ -31,7 +31,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 class ShippingAPIController extends Controller {
 
   /**
-   * @Route("/api/shipping", name="vendor_api_shipping")
+   * @Route("/api/shipping", name="user_api_shipping")
    */
   public function shipping(Request $request, ObjectManager $manager){
 

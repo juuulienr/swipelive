@@ -18,7 +18,7 @@ class Clip
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups("clip:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $id;
 
@@ -56,7 +56,7 @@ class Clip
     /**
      * @ORM\Column(type="text", nullable=true)
      * @Groups("clip:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $resourceUri;
 
@@ -64,14 +64,14 @@ class Clip
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="clips")
      * @ORM\JoinColumn(nullable=false)
      * @Groups("clip:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $product;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("clip:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $preview;
 
@@ -83,7 +83,7 @@ class Clip
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("clip:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $status;
 
@@ -101,7 +101,7 @@ class Clip
     /**
      * @ORM\Column(type="boolean", nullable=true)
      * @Groups("clip:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $archived;
 

@@ -35,21 +35,21 @@ class AccountAPIController extends Controller {
   /**
    * Inscription vendeur
    *
-  * @Route("/api/vendor/register", name="vendor_api_register")
+  * @Route("/api/user/register", name="user_api_register")
   */
-  public function register(Request $request, ObjectManager $manager, VendorRepository $vendorRepo , UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
+  public function register(Request $request, ObjectManager $manager, VendorRepository $userRepo , UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
       if ($param) {
-        $vendor = $vendorRepo->findOneByEmail($param['email']);
+        $user = $userRepo->findOneByEmail($param['email']);
 
-        if (!$vendor) {
-          $vendor = $serializer->deserialize($json, Vendor::class, "json");
-          $hash = $encoder->encodePassword($vendor, $param['password']);
-          $vendor->setHash($hash);
+        if (!$user) {
+          $user = $serializer->deserialize($json, Vendor::class, "json");
+          $hash = $encoder->encodePassword($user, $param['password']);
+          $user->setHash($hash);
 
-          $manager->persist($vendor);
+          $manager->persist($user);
           $manager->flush();
 
           if ($param['businessType'] == "company") {
@@ -80,8 +80,8 @@ class AccountAPIController extends Controller {
                 'person_token' => $param['tokenPerson'],
               ]);
 
-              $vendor->setStripeAcc($response->id);
-              $vendor->setPersonId($person->id);
+              $user->setStripeAcc($response->id);
+              $user->setPersonId($person->id);
               $manager->flush();
 
             } catch (Exception $e) {
@@ -103,7 +103,7 @@ class AccountAPIController extends Controller {
                 'account_token' => $param['tokenAccount']
               ]);
 
-              $vendor->setStripeAcc($response->id);
+              $user->setStripeAcc($response->id);
               $manager->flush();
               
             } catch (Exception $e) {
@@ -111,7 +111,7 @@ class AccountAPIController extends Controller {
             }
           }
 
-          return $this->json($vendor, 200);
+          return $this->json($user, 200);
 
         } else {
           return $this->json("Un compte est associé à cette adresse mail", 404);
@@ -126,17 +126,17 @@ class AccountAPIController extends Controller {
   /**
    * Ajouter le push token
    *
-   * @Route("/vendor/api/push/add", name="vendor_push_add")
+   * @Route("/user/api/push/add", name="user_push_add")
    */
   public function addPush(Request $request, ObjectManager $manager)
   {
-    $vendor = $this->getUser(); $token = [];
+    $user = $this->getUser(); $token = [];
 
     // récupérer le push token
     if ($content = $request->getContent()) {
       $result = json_decode($content, true);
       if ($result) {
-        $vendor->setPushToken($result['pushToken']);
+        $user->setPushToken($result['pushToken']);
         $manager->flush();
 
         return $this->json(true, 200);
@@ -150,10 +150,10 @@ class AccountAPIController extends Controller {
   /**
    * Récupérer le profil
    *
-   * @Route("/vendor/api/profile", name="vendor_api_profile", methods={"GET"})
+   * @Route("/user/api/profile", name="user_api_profile", methods={"GET"})
    */
   public function profile(Request $request, ObjectManager $manager) {
-    return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+    return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
         return $object->getId();
     } ]);
   }
@@ -162,14 +162,14 @@ class AccountAPIController extends Controller {
   /**
    * Edition du profil
    *
-  * @Route("/vendor/api/profile/edit", name="vendor_api_profile_edit", methods={"POST"})
+  * @Route("/user/api/profile/edit", name="user_api_profile_edit", methods={"POST"})
   */
-  public function editProfile(Request $request, ObjectManager $manager, VendorRepository $vendorRepo, SerializerInterface $serializer) {
+  public function editProfile(Request $request, ObjectManager $manager, VendorRepository $userRepo, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $serializer->deserialize($json, Vendor::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $this->getUser()]);
       $manager->flush();
 
-      return $this->json($this->getUser(), 200, [], ['groups' => 'vendor:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+      return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
         return $object->getId();
       } ]);
     }
@@ -181,7 +181,7 @@ class AccountAPIController extends Controller {
   /**
    * Modifier image du profil
    *
-   * @Route("/vendor/api/profile/picture", name="vendor_api_profile_picture", methods={"POST"})
+   * @Route("/user/api/profile/picture", name="user_api_profile_picture", methods={"POST"})
    */
   public function picture(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($request->files->get('picture')) {
@@ -195,8 +195,8 @@ class AccountAPIController extends Controller {
       $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
       file_put_contents($filepath, file_get_contents($file));
 
-      $vendor = $this->getUser();
-      $vendor->setPicture($filename);
+      $user = $this->getUser();
+      $user->setPicture($filename);
       $manager->flush();
 
       return $this->json($filename, 200);
@@ -209,10 +209,10 @@ class AccountAPIController extends Controller {
   /**
    * Follow/Unfollow un vendeur
    *
-   * @Route("/vendor/api/follow/vendor/{id}", name="vendor_api_follow", methods={"GET"})
+   * @Route("/user/api/follow/user/{id}", name="user_api_follow", methods={"GET"})
    */
   public function follow(Vendor $id, Request $request, ObjectManager $manager, FollowRepository $followRepo) {
-    $follow = $followRepo->findOneBy(['following' => $id, 'vendor' => $this->getUser() ]);
+    $follow = $followRepo->findOneBy(['following' => $id, 'user' => $this->getUser() ]);
 
     if (!$follow) {
       $follow = new Follow();
@@ -225,7 +225,7 @@ class AccountAPIController extends Controller {
 
     $manager->flush();
 
-    return $this->json($id, 200, [], ['groups' => 'vendor:read', 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+    return $this->json($id, 200, [], ['groups' => 'user:read', 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
       return $object->getId();
     } ]);
   }

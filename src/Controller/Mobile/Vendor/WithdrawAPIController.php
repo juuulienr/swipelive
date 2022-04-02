@@ -33,19 +33,19 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 class WithdrawAPIController extends Controller {
 
   /**
-   * @Route("/vendor/api/bank/add", name="vendor_api_bank_add")
+   * @Route("/user/api/bank/add", name="user_api_bank_add")
    */
   public function addBank(Request $request, ObjectManager $manager){
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
       if ($param) {
-        $vendor = $this->getUser();
-        $oldBank = $bankRepo->findOneByVendor($vendor);
+        $user = $this->getUser();
+        $oldBank = $bankRepo->findOneByVendor($user);
 
-        if ($vendor->getStripeAcc() && $param["number"]) {
+        if ($user->getStripeAcc() && $param["number"]) {
           $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
-          $result = $stripe->accounts->createExternalAccount($vendor->getStripeAcc(), [
+          $result = $stripe->accounts->createExternalAccount($user->getStripeAcc(), [
             'external_account' => [
               "object" => "bank_account",
               "country" => "FR",
@@ -61,13 +61,13 @@ class WithdrawAPIController extends Controller {
           $bank->setCountry("FR");
           $bank->setCurrency("eur");
           $bank->setNumber($param["number"]);
-          $bank->setVendor($vendor);
+          $bank->setVendor($user);
           
           $manager->persist($bank);
           $manager->flush();
 
           if ($oldBank) {
-            $result = $stripe->accounts->deleteExternalAccount($vendor->getStripeAcc(), $oldBank->getBankId(), []);
+            $result = $stripe->accounts->deleteExternalAccount($user->getStripeAcc(), $oldBank->getBankId(), []);
             $manager->remove($oldBank);
             $manager->flush();
           }
@@ -82,48 +82,48 @@ class WithdrawAPIController extends Controller {
 
 
   /**
-   * @Route("/vendor/api/withdraw", name="vendor_api_withdraw")
+   * @Route("/user/api/withdraw", name="user_api_withdraw")
    */
   public function withdraw(Request $request, ObjectManager $manager){
-    $vendor = $this->getUser();
+    $user = $this->getUser();
 
-    if ($vendor->getStripeAcc() && sizeof($vendor->getBankAccounts()->toArray()) > 0) {
+    if ($user->getStripeAcc() && sizeof($user->getBankAccounts()->toArray()) > 0) {
       \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
 
       $balance = \Stripe\Balance::retrieve(
-        ['stripe_account' => $vendor->getStripeAcc()]
+        ['stripe_account' => $user->getStripeAcc()]
       );
 
       $available = $balance->available[0]->amount;
       $pending = $balance->pending[0]->amount;
 
-      if ($available == ($vendor->getAvailable() * 100)) {
+      if ($available == ($user->getAvailable() * 100)) {
         dump("identique");
       } else {
         dump($available);
-        dump($vendor->getAvailable() * 100);
+        dump($user->getAvailable() * 100);
       }
 
       try {
         $payout = \Stripe\Payout::create([
-          // 'amount' => $vendor->getAvailable() * 100,
+          // 'amount' => $user->getAvailable() * 100,
           'amount' => 1000,
           'currency' => 'eur',
         ], [
-          'stripe_account' => $vendor->getStripeAcc(),
+          'stripe_account' => $user->getStripeAcc(),
         ]);
 
         dump($payout);
 
-        $vendor->setAvailable("0.00");
+        $user->setAvailable("0.00");
 
         // check amount payout
         $withdraw = new Withdraw();
         $withdraw->setPayoutId($payout->id);
-        $withdraw->setAmount($vendor->getAvailable());
+        $withdraw->setAmount($user->getAvailable());
         $withdraw->setStatus("completed");
-        $withdraw->setLast4($vendor->getBankAccounts()[0]->getLast4());
-        $withdraw->setVendor($vendor);
+        $withdraw->setLast4($user->getBankAccounts()[0]->getLast4());
+        $withdraw->setVendor($user);
 
         $manager->persist($withdraw);
         $manager->flush();
@@ -180,7 +180,7 @@ class WithdrawAPIController extends Controller {
 
 
   /**
-   * @Route("/vendor/api/verification/document/front", name="vendor_api_verification_document_front")
+   * @Route("/user/api/verification/document/front", name="user_api_verification_document_front")
    */
   public function verifFront(Request $request, ObjectManager $manager) {
     if ($json = $request->getContent()) {
@@ -188,11 +188,11 @@ class WithdrawAPIController extends Controller {
 
       if ($param) {
         $personToken = $param['person_token'];
-        $vendor = $this->getUser();
+        $user = $this->getUser();
 
-        if ($personToken && $vendor->getStripeAcc()) {
+        if ($personToken && $user->getStripeAcc()) {
           $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
-          $update = $stripe->accounts->updatePerson($vendor->getStripeAcc(), $vendor->getPersonId(), [ 'person_token' => $personToken ]);
+          $update = $stripe->accounts->updatePerson($user->getStripeAcc(), $user->getPersonId(), [ 'person_token' => $personToken ]);
         }
 
         return $this->json(true, 200);
@@ -204,7 +204,7 @@ class WithdrawAPIController extends Controller {
 
 
   /**
-   * @Route("/vendor/api/verification/document/back", name="vendor_api_verification_document_back")
+   * @Route("/user/api/verification/document/back", name="user_api_verification_document_back")
    */
   public function verifBack(Request $request, ObjectManager $manager) {
     if ($json = $request->getContent()) {
@@ -212,11 +212,11 @@ class WithdrawAPIController extends Controller {
 
       if ($param) {
         $personToken = $param['person_token'];
-        $vendor = $this->getUser();
+        $user = $this->getUser();
 
-        if ($personToken && $vendor->getStripeAcc()) {
+        if ($personToken && $user->getStripeAcc()) {
           $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
-          $update = $stripe->accounts->updatePerson($vendor->getStripeAcc(), $vendor->getPersonId(), [ 'person_token' => $personToken ]);
+          $update = $stripe->accounts->updatePerson($user->getStripeAcc(), $user->getPersonId(), [ 'person_token' => $personToken ]);
         }
 
         return $this->json(true, 200);
@@ -228,7 +228,7 @@ class WithdrawAPIController extends Controller {
 
 
   // /**
-  //  * @Route("/vendor/api/verification/company/document", name="vendor_api_verification_company_document")
+  //  * @Route("/user/api/verification/company/document", name="user_api_verification_company_document")
   //  */
   // public function verifCompany(Request $request, ObjectManager $manager){
   //   if ($request->files->get('document')) {

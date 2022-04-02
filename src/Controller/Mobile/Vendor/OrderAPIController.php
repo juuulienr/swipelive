@@ -33,10 +33,10 @@ class OrderAPIController extends Controller {
   /**
    * Récupérer les ventes/achats
    *
-   * @Route("/vendor/api/orders", name="vendor_api_orders", methods={"GET"})
+   * @Route("/user/api/orders", name="user_api_orders", methods={"GET"})
    */
   public function orders(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
-    $sales = $orderRepo->findBy([ "vendor" => $this->getUser(), "status" => "succeeded" ]);
+    $sales = $orderRepo->findBy([ "user" => $this->getUser(), "status" => "succeeded" ]);
     $purchases = $orderRepo->findByBuyer([ "buyer" => $this->getUser(), "status" => "succeeded" ]);
 
     $array = [
@@ -50,7 +50,7 @@ class OrderAPIController extends Controller {
   /**
    * Récupérer une commande
    *
-   * @Route("/vendor/api/orders/{id}", name="vendor_api_order", methods={"GET"})
+   * @Route("/user/api/orders/{id}", name="user_api_order", methods={"GET"})
    */
   public function order(Order $order, Request $request, ObjectManager $manager) {
     return $this->json($order, 200, [], ['groups' => 'order:read']);

@@ -19,7 +19,7 @@ class Category
      * @ORM\Column(type="integer")
      * @Groups("product:read")
      * @Groups("category:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $id;
 
@@ -27,7 +27,7 @@ class Category
      * @ORM\Column(type="string", length=255)
      * @Groups("category:read")
      * @Groups("product:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      * @Groups("live:read")
      * @Groups("clip:read")
      */

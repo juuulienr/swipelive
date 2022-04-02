@@ -19,7 +19,7 @@ class Order
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups("order:read")
-     * @Groups("vendor:read")
+     * @Groups("user:read")
      */
     private $id;
 
@@ -34,13 +34,6 @@ class Order
      * @Groups("order:read")
      */
     private $vendor;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="purchases")
-     * @ORM\JoinColumn(nullable=false)
-     * @Groups("order:read")
-     */
-    private $buyer;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -95,6 +88,13 @@ class Order
      */
     private $updatedAt;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="purchases")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $buyer;
+
+
     public function __construct()
     {
         $this->lineItems = new ArrayCollection();
@@ -130,12 +130,12 @@ class Order
         return $this;
     }
 
-    public function getBuyer(): ?Vendor
+    public function getBuyer(): ?User
     {
         return $this->buyer;
     }
 
-    public function setBuyer(?Vendor $buyer): self
+    public function setBuyer(?User $buyer): self
     {
         $this->buyer = $buyer;
 
