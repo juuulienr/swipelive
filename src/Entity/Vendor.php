@@ -159,6 +159,13 @@ class Vendor
      */
     private $verified;
 
+    /**
+     * @ORM\OneToOne(targetEntity=User::class, mappedBy="vendor", cascade={"persist", "remove"})
+     * @Groups("clip:read")
+     * @Groups("live:read")
+     */
+    private $user;
+
     
     public function __construct()
     {
@@ -167,10 +174,10 @@ class Vendor
         $this->products = new ArrayCollection();
         $this->sales = new ArrayCollection();
         $this->withdraws = new ArrayCollection();
+        $this->bankAccounts = new ArrayCollection();
         $this->total = "0.00";
         $this->pending = "0.00";
         $this->available = "0.00";
-        $this->bankAccounts = new ArrayCollection();
     }
 
     public function getId()
@@ -539,6 +546,28 @@ class Vendor
     public function setVerified(?bool $verified): self
     {
         $this->verified = $verified;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        // unset the owning side of the relation if necessary
+        if ($user === null && $this->user !== null) {
+            $this->user->setVendor(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($user !== null && $user->getVendor() !== $this) {
+            $user->setVendor($this);
+        }
+
+        $this->user = $user;
 
         return $this;
     }

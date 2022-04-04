@@ -66,6 +66,8 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $picture;
 
@@ -82,6 +84,9 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="following", orphanRemoval=true)
+     * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $followers;
 
