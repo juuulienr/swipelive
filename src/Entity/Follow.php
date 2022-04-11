@@ -31,6 +31,7 @@ class Follow
      */
     private $follower;
 
+
     public function getId(): ?int
     {
         return $this->id;

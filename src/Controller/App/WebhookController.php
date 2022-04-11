@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Mobile;
+namespace App\Controller\App;
 
 use App\Entity\Clip;
 use App\Entity\Live;

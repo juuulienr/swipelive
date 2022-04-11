@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Controller\Mobile\Vendor;
+namespace App\Controller\App\User;
 
+use App\Entity\User;
 use App\Entity\Vendor;
 use App\Entity\Clip;
 use App\Entity\Live;
@@ -13,6 +14,7 @@ use App\Entity\LiveProducts;
 use App\Entity\Upload;
 use App\Repository\FollowRepository;
 use App\Repository\VendorRepository;
+use App\Repository\UserRepository;
 use App\Repository\ClipRepository;
 use App\Repository\ProductRepository;
 use App\Repository\LiveRepository;
@@ -37,7 +39,7 @@ class AccountAPIController extends Controller {
    *
   * @Route("/api/user/register", name="user_api_register")
   */
-  public function register(Request $request, ObjectManager $manager, VendorRepository $userRepo , UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
+  public function register(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
@@ -45,7 +47,7 @@ class AccountAPIController extends Controller {
         $user = $userRepo->findOneByEmail($param['email']);
 
         if (!$user) {
-          $user = $serializer->deserialize($json, Vendor::class, "json");
+          $user = $serializer->deserialize($json, User::class, "json");
           $hash = $encoder->encodePassword($user, $param['password']);
           $user->setHash($hash);
 
@@ -130,9 +132,8 @@ class AccountAPIController extends Controller {
    */
   public function addPush(Request $request, ObjectManager $manager)
   {
-    $user = $this->getUser(); $token = [];
+    $user = $this->getUser();
 
-    // récupérer le push token
     if ($content = $request->getContent()) {
       $result = json_decode($content, true);
       if ($result) {
@@ -154,7 +155,7 @@ class AccountAPIController extends Controller {
    */
   public function profile(Request $request, ObjectManager $manager) {
     return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
-        return $object->getId();
+      return $object->getId();
     } ]);
   }
 
@@ -164,9 +165,9 @@ class AccountAPIController extends Controller {
    *
   * @Route("/user/api/profile/edit", name="user_api_profile_edit", methods={"POST"})
   */
-  public function editProfile(Request $request, ObjectManager $manager, VendorRepository $userRepo, SerializerInterface $serializer) {
+  public function editProfile(Request $request, ObjectManager $manager, UserRepository $userRepo, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
-      $serializer->deserialize($json, Vendor::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $this->getUser()]);
+      $serializer->deserialize($json, User::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $this->getUser()]);
       $manager->flush();
 
       return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
@@ -199,7 +200,9 @@ class AccountAPIController extends Controller {
       $user->setPicture($filename);
       $manager->flush();
 
-      return $this->json($filename, 200);
+      return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } ]);
     }
 
     return $this->json("L'image est introuvable !", 404);

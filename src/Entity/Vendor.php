@@ -27,6 +27,16 @@ class Vendor
     private $id;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $stripeAcc;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $personId;
+
+    /**
      * @ORM\OneToMany(targetEntity=Live::class, mappedBy="vendor")
      * @Groups("user:read")
      */
@@ -108,11 +118,6 @@ class Vendor
     private $zip;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $stripeAcc;
-
-    /**
      * @ORM\OneToMany(targetEntity=Order::class, mappedBy="vendor")
      * @ORM\OrderBy({"createdAt" = "DESC"})
      * @Groups("user:read")
@@ -150,12 +155,8 @@ class Vendor
     private $bankAccounts;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $personId;
-
-    /**
      * @ORM\Column(type="boolean", nullable=true)
+     * @Groups("user:read")
      */
     private $verified;
 

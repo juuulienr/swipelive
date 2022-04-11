@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Mobile;
+namespace App\Controller\App;
 
 use App\Entity\Clip;
 use App\Entity\Live;
@@ -84,7 +84,7 @@ class APIController extends Controller {
    *
    * @Route("/api/profile/{id}", name="api_profile", methods={"GET"})
    */
-  public function profile(Vendor $user, Request $request, ObjectManager $manager)
+  public function profile(User $user, Request $request, ObjectManager $manager)
   {
     return $this->json($user, 200, [], ['groups' => 'user:read', 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
         return $object->getId();
@@ -97,7 +97,7 @@ class APIController extends Controller {
    *
    * @Route("/api/profile/{id}/clips", name="api_profile_clips", methods={"GET"})
    */
-  public function profileClips(Vendor $user, Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
+  public function profileClips(User $user, Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
     $clips = $clipRepo->retrieveClips($user);
 
     return $this->json($clips, 200, [], ['groups' => 'clip:read']);
@@ -109,7 +109,7 @@ class APIController extends Controller {
    *
    * @Route("/api/user/{id}/products", name="api_user_products", methods={"GET"})
    */
-  public function products(Vendor $user, Request $request, ObjectManager $manager, ProductRepository $productRepo) {
+  public function products(User $user, Request $request, ObjectManager $manager, ProductRepository $productRepo) {
     $products = $productRepo->findBy([ "user" => $user, "archived" => false ]);
 
     return $this->json($products, 200, [], ['groups' => 'product:read']);

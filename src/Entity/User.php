@@ -26,15 +26,10 @@ class User implements UserInterface
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $id;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Assert\Email(message="L'adresse mail est invalide !")
-     * @Groups("user:read")
-     */
-    private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -50,6 +45,18 @@ class User implements UserInterface
      * @ORM\Column(type="datetime")
      */
     private $createdAt;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $stripeCustomer;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Assert\Email(message="L'adresse mail est invalide !")
+     * @Groups("user:read")
+     */
+    private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -70,11 +77,6 @@ class User implements UserInterface
      * @Groups("live:read")
      */
     private $picture;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $stripeCustomer;
 
     /**
      * @ORM\OneToMany(targetEntity=Message::class, mappedBy="user")
@@ -110,6 +112,7 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToOne(targetEntity=Vendor::class, cascade={"persist", "remove"})
+     * @Groups("user:read")
      */
     private $vendor;
     
