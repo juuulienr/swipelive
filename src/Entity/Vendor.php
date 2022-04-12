@@ -179,13 +179,14 @@ class Vendor
         $this->total = "0.00";
         $this->pending = "0.00";
         $this->available = "0.00";
+        $this->verified = false;
     }
+
 
     public function getId()
     {
         return $this->id;
     }
-
   
     /**
      * @return Collection|Live[]

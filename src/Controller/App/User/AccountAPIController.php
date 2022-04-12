@@ -54,7 +54,7 @@ class AccountAPIController extends Controller {
           $manager->persist($user);
           $manager->flush();
 
-          if ($param['businessType'] == "company") {
+          if ($param['businessType'] == "company" | $param['businessType'] == "individual") {
             try {
               $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
               $response = $stripe->accounts->create([
@@ -76,47 +76,48 @@ class AccountAPIController extends Controller {
                 ]
               ]);
 
-              \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
+              $vendor = new Vendor();
+              $vendor->setStripeAcc($response->id);
+              $vendor->setBusinessName($param['businessName']);
+              $vendor->setBusinessType($param['businessType']);
+              $vendor->setSummary($param['summary']);
+              $vendor->setDob(new \DateTime($param['dob']));
+              $vendor->setAddress($param['address']);
+              $vendor->setCity($param['city']);
+              $vendor->setZip($param['zip']);
 
-              $person = \Stripe\Account::createPerson($response->id, [
-                'person_token' => $param['tokenPerson'],
-              ]);
-
-              $user->setStripeAcc($response->id);
-              $user->setPersonId($person->id);
-              $manager->flush();
-
-            } catch (Exception $e) {
-              return $this->json($e->getMessage(), 404);
-            }
-
-          } else if ($param['businessType'] == "individual") {
-            try {
-              $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
-              $response = $stripe->accounts->create([
-                'country' => 'FR',
-                'type' => 'custom',
-                'capabilities' => [
-                  'transfers' => ['requested' => true],
-                ],
-                'business_profile' => [
-                  'product_description' => $param['summary'],
-                ],
-                'account_token' => $param['tokenAccount']
-              ]);
-
-              $user->setStripeAcc($response->id);
-              $manager->flush();
+              $user->setType("vendor");
+              $user->setVendor($vendor);
               
+              $manager->persist($vendor);
+              $manager->flush();
+
+              if ($param['businessType'] == "company") {
+                try {
+                  \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
+
+                  $person = \Stripe\Account::createPerson($response->id, [
+                    'person_token' => $param['tokenPerson'],
+                  ]);
+
+                  $vendor->setCompany($param['company']);
+                  $vendor->setSiren($param['siren']);
+                  $vendor->setPersonId($person->id);
+                  $manager->flush();
+
+                } catch (Exception $e) {
+                  return $this->json($e->getMessage(), 404);
+                }
+              }
+
+              return $this->json($user, 200, [], ['groups' => 'user:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+                return $object->getId();
+              } ]);
+
             } catch (Exception $e) {
               return $this->json($e->getMessage(), 404);
             }
           }
-
-          return $this->json($user, 200, [], ['groups' => 'user:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
-            return $object->getId();
-          } ]);
-
         } else {
           return $this->json("Un compte est associé à cette adresse mail", 404);
         }
