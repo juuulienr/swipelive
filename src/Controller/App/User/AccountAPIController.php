@@ -113,7 +113,9 @@ class AccountAPIController extends Controller {
             }
           }
 
-          return $this->json($user, 200);
+          return $this->json($user, 200, [], ['groups' => 'user:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+            return $object->getId();
+          } ]);
 
         } else {
           return $this->json("Un compte est associé à cette adresse mail", 404);
