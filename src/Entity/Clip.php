@@ -106,11 +106,11 @@ class Clip
     private $archived;
 
     /**
-     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="clip")
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="clip")
      * @ORM\OrderBy({"createdAt" = "ASC"})
      * @Groups("clip:read")
      */
-    private $messages;
+    private $comments;
 
     
     public function __construct()
@@ -118,7 +118,7 @@ class Clip
         $this->status = "waiting";
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->archived = 0;
-        $this->messages = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
 
@@ -284,29 +284,29 @@ class Clip
     }
 
     /**
-     * @return Collection|Message[]
+     * @return Collection|Comment[]
      */
-    public function getMessages(): Collection
+    public function getComments(): Collection
     {
-        return $this->messages;
+        return $this->comments;
     }
 
-    public function addMessage(Message $message): self
+    public function addComment(Comment $comment): self
     {
-        if (!$this->messages->contains($message)) {
-            $this->messages[] = $message;
-            $message->setClip($this);
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setClip($this);
         }
 
         return $this;
     }
 
-    public function removeMessage(Message $message): self
+    public function removeComment(Comment $comment): self
     {
-        if ($this->messages->removeElement($message)) {
+        if ($this->comments->removeElement($comment)) {
             // set the owning side to null (unless already changed)
-            if ($message->getClip() === $this) {
-                $message->setClip(null);
+            if ($comment->getClip() === $this) {
+                $comment->setClip(null);
             }
         }
 

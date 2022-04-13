@@ -27,15 +27,7 @@ class Live
      * @Groups("live:read")
      */
     private $vendor;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="live", orphanRemoval=true)
-     * @ORM\OrderBy({"createdAt" = "ASC"})
-     * @Groups("live:read")
-     * @Groups("clip:read")
-     */
-    private $messages;
-
+    
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("live:read")
@@ -118,17 +110,25 @@ class Live
      */
     private $duration;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="live")
+     * @ORM\OrderBy({"createdAt" = "ASC"})
+     * @Groups("live:read")
+     * @Groups("clip:read")
+     */
+    private $comments;
+
     
     public function __construct()
     {
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
-        $this->messages = new ArrayCollection();
         $this->clips = new ArrayCollection();
         $this->liveProducts = new ArrayCollection();
         $this->viewers = 0;
         $this->totalViewers = 0;
         $this->status = 0;
         $this->display = 1;
+        $this->comments = new ArrayCollection();
     }
 
 
@@ -145,36 +145,6 @@ class Live
     public function setVendor(?Vendor $vendor): self
     {
         $this->vendor = $vendor;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Message[]
-     */
-    public function getMessages(): Collection
-    {
-        return $this->messages;
-    }
-
-    public function addMessage(Message $message): self
-    {
-        if (!$this->messages->contains($message)) {
-            $this->messages[] = $message;
-            $message->setLive($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMessage(Message $message): self
-    {
-        if ($this->messages->removeElement($message)) {
-            // set the owning side to null (unless already changed)
-            if ($message->getLive() === $this) {
-                $message->setLive(null);
-            }
-        }
 
         return $this;
     }
@@ -379,6 +349,36 @@ class Live
     public function setEventId(?string $eventId): self
     {
         $this->eventId = $eventId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Comment[]
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setLive($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getLive() === $this) {
+                $comment->setLive(null);
+            }
+        }
 
         return $this;
     }

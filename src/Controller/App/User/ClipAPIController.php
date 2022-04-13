@@ -6,7 +6,7 @@ use App\Entity\Vendor;
 use App\Entity\Clip;
 use App\Entity\Live;
 use App\Entity\Category;
-use App\Entity\Message;
+use App\Entity\Comment;
 use App\Entity\Follow;
 use App\Entity\Product;
 use App\Entity\LiveProducts;
@@ -69,22 +69,22 @@ class ClipAPIController extends Controller {
 
 
   /**
-   * Ajouter un message sur un clip
+   * Ajouter un comment sur un clip
    *
-   * @Route("/user/api/clip/{id}/message/add", name="user_api_clip_message_add", methods={"POST"})
+   * @Route("/user/api/clip/{id}/comment/add", name="user_api_clip_comment_add", methods={"POST"})
    */
-  public function addMessage(Clip $clip, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function addComment(Clip $clip, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
       $content = $param["content"];
       $user = $this->getUser();
 
-      $message = new Message();
-      $message->setContent($content);
-      $message->setVendor($user);
-      $message->setClip($clip);
+      $comment = new Comment();
+      $comment->setContent($content);
+      $comment->setUser($user);
+      $comment->setClip($clip);
       
-      $manager->persist($message);
+      $manager->persist($comment);
       $manager->flush();
 
       return $this->json($clip, 200, [], ['groups' => 'clip:read'], 200);

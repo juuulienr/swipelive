@@ -79,12 +79,6 @@ class User implements UserInterface
     private $picture;
 
     /**
-     * @ORM\OneToMany(targetEntity=Message::class, mappedBy="user")
-     * @Groups("user:read")
-     */
-    private $messages;
-
-    /**
      * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="following", orphanRemoval=true)
      * @Groups("user:read")
      * @Groups("clip:read")
@@ -115,16 +109,21 @@ class User implements UserInterface
      * @Groups("user:read")
      */
     private $vendor;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="user", orphanRemoval=true)
+     */
+    private $comments;
     
 
     public function __construct()
     {
-        $this->messages = new ArrayCollection();
         $this->followers = new ArrayCollection();
         $this->following = new ArrayCollection();
         $this->purchases = new ArrayCollection();
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->type = "user";
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -194,36 +193,6 @@ class User implements UserInterface
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Message[]
-     */
-    public function getMessages(): Collection
-    {
-        return $this->messages;
-    }
-
-    public function addMessage(Message $message): self
-    {
-        if (!$this->messages->contains($message)) {
-            $this->messages[] = $message;
-            $message->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMessage(Message $message): self
-    {
-        if ($this->messages->removeElement($message)) {
-            // set the owning side to null (unless already changed)
-            if ($message->getUser() === $this) {
-                $message->setUser(null);
-            }
-        }
 
         return $this;
     }
@@ -387,6 +356,36 @@ class User implements UserInterface
     public function setVendor(?Vendor $vendor): self
     {
         $this->vendor = $vendor;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Comment[]
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getUser() === $this) {
+                $comment->setUser(null);
+            }
+        }
 
         return $this;
     }

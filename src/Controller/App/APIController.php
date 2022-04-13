@@ -67,19 +67,6 @@ class APIController extends Controller {
 
 
   /**
-   * Afficher les messages
-   *
-   * @Route("/api/live/{id}/messages", name="api_live_messages", methods={"GET"})
-   */
-  public function messages(Live $live, Request $request, ObjectManager $manager)
-  {
-    $messages = $live->getMessages();
-
-    return $this->json($messages, 200, [], ['groups' => 'message:read' ]);
-  }
-
-
-  /**
    * Afficher le profil
    *
    * @Route("/api/profile/{id}", name="api_profile", methods={"GET"})
@@ -178,10 +165,6 @@ class APIController extends Controller {
 
     $data = [ 
       "viewers" => $count,
-      "entrances" => [
-        "user" => null, 
-        "user" => null
-      ]
     ];
 
     $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
