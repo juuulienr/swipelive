@@ -41,7 +41,7 @@ class LiveAPIController extends Controller {
   public function prelive(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $live = $serializer->deserialize($json, Live::class, "json");
-      $live->setVendor($this->getUser());
+      $live->setVendor($this->getUser()->getVendor());
 
       $manager->persist($live);
       $manager->flush();
@@ -116,7 +116,7 @@ class LiveAPIController extends Controller {
 
         if ($duration > 15) {
           $clip = new Clip();
-          $clip->setVendor($user);
+          $clip->setVendor($user->getVendor());
           $clip->setLive($live);
           $clip->setProduct($liveProduct->getProduct());
           $clip->setPreview($live->getPreview());
@@ -190,7 +190,7 @@ class LiveAPIController extends Controller {
               "content" => "Début du live", 
               "user" => null, 
               "user" => [
-                "businessName" => $user->getBusinessName(),
+                "businessName" => $user->getVendor()->getBusinessName(),
                 "firstname" => $user->getFirstname(),
                 "lastname" => $user->getLastname(),
                 "picture" => $user->getPicture()
@@ -251,7 +251,7 @@ class LiveAPIController extends Controller {
 
         if ($duration > 15) {
           $clip = new Clip();
-          $clip->setVendor($this->getUser());
+          $clip->setVendor($this->getUser()->getVendor());
           $clip->setLive($live);
           $clip->setProduct($liveProduct->getProduct());
           $clip->setPreview($live->getPreview());
@@ -302,7 +302,7 @@ class LiveAPIController extends Controller {
           "content" => $content, 
           "user" => null, 
           "user" => [
-            "businessName" => $user->getBusinessName(),
+            "businessName" => $user->getVendor()->getBusinessName(),
             "firstname" => $user->getFirstname(),
             "lastname" => $user->getLastname(),
             "picture" => $user->getPicture()
@@ -340,7 +340,7 @@ class LiveAPIController extends Controller {
       "entrances" => [
         "user" => null, 
         "user" => [
-          "businessName" => $user->getBusinessName(),
+          "businessName" => $user->getVendor()->getBusinessName(),
           "firstname" => $user->getFirstname(),
           "lastname" => $user->getLastname(),
           "picture" => $user->getPicture()

@@ -88,7 +88,7 @@ class AccountAPIController extends Controller {
 
               $user->setType("vendor");
               $user->setVendor($vendor);
-              
+
               $manager->persist($vendor);
               $manager->flush();
 
@@ -110,7 +110,7 @@ class AccountAPIController extends Controller {
                 }
               }
 
-              return $this->json($user, 200, [], ['groups' => 'user:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+              return $this->json($user, 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
                 return $object->getId();
               } ]);
 
@@ -157,7 +157,7 @@ class AccountAPIController extends Controller {
    * @Route("/user/api/profile", name="user_api_profile", methods={"GET"})
    */
   public function profile(Request $request, ObjectManager $manager) {
-    return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+    return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
       return $object->getId();
     } ]);
   }
@@ -173,7 +173,22 @@ class AccountAPIController extends Controller {
       $serializer->deserialize($json, User::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $this->getUser()]);
       $manager->flush();
 
-      return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+      $param = json_decode($json, true);
+
+      if ($param['businessType']) {
+        $vendor = $this->getUser()->getVendor();
+        $vendor->setBusinessName($param['businessName']);
+        $vendor->setSummary($param['summary']);
+        $vendor->setDob(new \DateTime($param['dob']));
+        $vendor->setAddress($param['address']);
+        $vendor->setCity($param['city']);
+        $vendor->setZip($param['zip']);
+        $vendor->setCompany($param['company']);
+        $vendor->setSiren($param['siren']);
+        $manager->flush();
+      }
+
+      return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
         return $object->getId();
       } ]);
     }
@@ -203,7 +218,7 @@ class AccountAPIController extends Controller {
       $user->setPicture($filename);
       $manager->flush();
 
-      return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "Y-m-d", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+      return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
         return $object->getId();
       } ]);
     }
@@ -231,7 +246,7 @@ class AccountAPIController extends Controller {
 
     $manager->flush();
 
-    return $this->json($id, 200, [], ['groups' => 'user:read', 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+    return $this->json($id, 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
       return $object->getId();
     } ]);
   }
