@@ -228,17 +228,17 @@ class AccountAPIController extends Controller {
 
 
   /**
-   * Follow/Unfollow un vendeur
+   * Follow/Unfollow un utilisateur
    *
-   * @Route("/user/api/follow/user/{id}", name="user_api_follow", methods={"GET"})
+   * @Route("/user/api/follow/{id}", name="user_api_follow", methods={"GET"})
    */
-  public function follow(Vendor $id, Request $request, ObjectManager $manager, FollowRepository $followRepo) {
-    $follow = $followRepo->findOneBy(['following' => $id, 'user' => $this->getUser() ]);
+  public function follow(User $user, Request $request, ObjectManager $manager, FollowRepository $followRepo) {
+    $follow = $followRepo->findOneBy(['following' => $user, 'follower' => $this->getUser() ]);
 
     if (!$follow) {
       $follow = new Follow();
-      $follow->setVendor($this->getUser());
-      $follow->setFollowing($id);
+      $follow->setFollower($this->getUser());
+      $follow->setFollowing($user);
       $manager->persist($follow);
     } else {
       $manager->remove($follow);
@@ -246,7 +246,7 @@ class AccountAPIController extends Controller {
 
     $manager->flush();
 
-    return $this->json($id, 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+    return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
       return $object->getId();
     } ]);
   }

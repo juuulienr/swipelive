@@ -126,7 +126,6 @@ class LiveAPIController extends Controller {
             "comment" => [
               "content" => "Début du live", 
               "user" => [
-                "businessName" => $user->getVendor() ? $user->getVendor()->getBusinessName() : null,
                 "firstname" => $user->getFirstname(),
                 "lastname" => $user->getLastname(),
                 "picture" => $user->getPicture()
@@ -300,7 +299,6 @@ class LiveAPIController extends Controller {
         "comment" => [
           "content" => $content, 
           "user" => [
-            "businessName" => $user->getVendor() ? $user->getVendor()->getBusinessName() : null,
             "firstname" => $user->getFirstname(),
             "lastname" => $user->getLastname(),
             "picture" => $user->getPicture() 

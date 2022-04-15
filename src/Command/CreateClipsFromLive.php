@@ -41,7 +41,7 @@ class CreateClipsFromLive extends ContainerAwareCommand
                 $createdAt = $clip->getCreatedAt();
 
                 // creation du clip sur bambuser
-                if (!$clip->getBroadcastId() && $createdAt->modify('+5 minutes') < $now && $clip->getStatus() == "waiting") {
+                if (!$clip->getBroadcastId() && $createdAt->modify('+5 minutes') < $now) {
                     $data = [
                       "source" => [
                         "broadcastId" => $clip->getLive()->getBroadcastId(), 
