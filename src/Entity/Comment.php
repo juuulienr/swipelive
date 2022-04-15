@@ -2,7 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\CommentRepository;
+use App\Repository\LiveRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -25,6 +28,8 @@ class Comment
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="comments")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("live:read")
+     * @Groups("clip:read")
      */
     private $user;
 
@@ -42,8 +47,6 @@ class Comment
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups("live:read")
-     * @Groups("clip:read")
      */
     private $createdAt;
 

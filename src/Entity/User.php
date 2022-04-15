@@ -61,12 +61,16 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $lastname;
 
