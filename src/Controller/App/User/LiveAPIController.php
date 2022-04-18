@@ -109,7 +109,7 @@ class LiveAPIController extends Controller {
           $unix = $result->created;
           $gmdate = gmdate("d-m-Y H:i:s", $unix);
           $createdAt = new \DateTime($gmdate);
-          $createdAt->modify('+1 hour');
+          $createdAt->modify('+2 hours');
 
           $live->setBroadcastId($broadcastId);
           $live->setResourceUri($result->resourceUri);
