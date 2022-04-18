@@ -63,9 +63,20 @@ class CreateClipsFromLive extends ContainerAwareCommand
 
                     if ($result && $result->newBroadcastId) {
                         $clip->setBroadcastId($result->newBroadcastId);
-                    }
+                        $this->manager->flush();
 
-                    $this->manager->flush();
+                        $data = [ "title" => "Clip" . $clip->getId(), "author" => $clip->getVendor()->getBusinessName() ];
+                        $ch = curl_init();
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
+                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+                        curl_setopt($ch, CURLOPT_URL, "https://api.bambuser.com/broadcasts/" + $clip->getBroadcastId());
+
+                        $result = curl_exec($ch);
+                        $result = json_decode($result);
+                        curl_close($ch);
+                    }
                 }
 
                 // mise à jour du clip
