@@ -65,7 +65,8 @@ class CreateClipsFromLive extends ContainerAwareCommand
                         $clip->setBroadcastId($result->newBroadcastId);
                         $this->manager->flush();
 
-                        $data = [ "title" => "Clip" . $clip->getId(), "author" => $clip->getVendor()->getBusinessName() ];
+                        $title = "Clip" . $clip->getId();
+                        $data = [ "title" => $title, "author" => $clip->getVendor()->getBusinessName() ];
                         $ch = curl_init();
                         curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
                         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
