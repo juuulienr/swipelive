@@ -114,6 +114,9 @@ class Product
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("product:read")
+     * @Groups("user:read")
+     * @Groups("live:read")
+     * @Groups("clip:read")
      */
     private $weight;
 
@@ -132,6 +135,8 @@ class Product
      * @ORM\OrderBy({"position" = "ASC"})
      * @Groups("product:read")
      * @Groups("clip:read")
+     * @Groups("user:read")
+     * @Groups("live:read")
      */
     private $options;
 
@@ -139,6 +144,8 @@ class Product
      * @ORM\OneToMany(targetEntity=Variant::class, mappedBy="product", cascade={"persist"})
      * @Groups("product:read")
      * @Groups("clip:read")
+     * @Groups("user:read")
+     * @Groups("live:read")
      */
     private $variants;
 
