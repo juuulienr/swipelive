@@ -69,9 +69,23 @@ class CreateClipsFromLive extends ContainerAwareCommand
 
                 // mise à jour du clip
                 if ($clip->getBroadcastId() && $clip->getResourceUri() && $createdAt->modify('+15 minutes') < $now && $clip->getStatus() == "waiting") {
-                    $data = [ "author" => $clip->getVendor()->getBusinessName(), "title" => $clip->getId() ];
+                    $data = [ "author" => $clip->getVendor()->getBusinessName()];
                     $url = "https://api.bambuser.com/broadcasts/" . $clip->getBroadcastId();
+                    $title = "Clip" . $clip->getId();
 
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+                    curl_setopt($ch, CURLOPT_URL, $url);
+
+                    $result = curl_exec($ch);
+                    $result = json_decode($result);
+                    curl_close($ch);
+
+
+                    $data = [ "title" => $title ];
                     $ch = curl_init();
                     curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
