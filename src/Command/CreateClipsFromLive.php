@@ -69,8 +69,7 @@ class CreateClipsFromLive extends ContainerAwareCommand
 
                 // mise à jour du clip
                 if ($clip->getBroadcastId() && $clip->getResourceUri() && $createdAt->modify('+15 minutes') < $now && $clip->getStatus() == "waiting") {
-                    $title = "Clip" . $clip->getId();
-                    $data = [ "author" => $clip->getVendor()->getBusinessName(), "title" => $title ];
+                    $data = [ "author" => $clip->getVendor()->getBusinessName(), "title" => $clip->getId() ];
                     $url = "https://api.bambuser.com/broadcasts/" . $clip->getBroadcastId();
 
                     $ch = curl_init();
