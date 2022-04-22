@@ -40,12 +40,12 @@ class WithdrawAPIController extends Controller {
       $param = json_decode($json, true);
 
       if ($param) {
-        $user = $this->getUser();
-        $oldBank = $bankRepo->findOneByVendor($user);
+        $vendor = $this->getUser()->getVendor();
+        $oldBank = $bankRepo->findOneByVendor($vendor);
 
-        if ($user->getStripeAcc() && $param["number"]) {
+        if ($vendor->getStripeAcc() && $param["number"]) {
           $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
-          $result = $stripe->accounts->createExternalAccount($user->getStripeAcc(), [
+          $result = $stripe->accounts->createExternalAccount($vendor->getStripeAcc(), [
             'external_account' => [
               "object" => "bank_account",
               "country" => "FR",
@@ -61,7 +61,7 @@ class WithdrawAPIController extends Controller {
           $bank->setCountry("FR");
           $bank->setCurrency("eur");
           $bank->setNumber($param["number"]);
-          $bank->setVendor($user);
+          $bank->setVendor($vendor);
           
           $manager->persist($bank);
           $manager->flush();
