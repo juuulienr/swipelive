@@ -83,6 +83,10 @@ class ClipAPIController extends Controller {
       $comment->setContent($content);
       $comment->setUser($user);
       $comment->setClip($clip);
+
+      if ($user->getVendor() && $user->getVendor()->getBusinessName() == $clip->getVendor()->getBusinessName()) {
+        $comment->setIsVendor(true);
+      }
       
       $manager->persist($comment);
       $manager->flush();

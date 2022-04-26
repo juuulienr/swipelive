@@ -292,6 +292,11 @@ class LiveAPIController extends Controller {
       $comment->setContent($content);
       $comment->setUser($user);
       $comment->setLive($live);
+
+      if ($user->getVendor() && $user->getVendor()->getBusinessName() == $live->getVendor()->getBusinessName()) {
+        $comment->setIsVendor(true);
+      }
+
       $manager->persist($comment);
       $manager->flush();
 
@@ -301,7 +306,8 @@ class LiveAPIController extends Controller {
           "user" => [
             "firstname" => $user->getFirstname(),
             "lastname" => $user->getLastname(),
-            "picture" => $user->getPicture() 
+            "picture" => $user->getPicture(),
+            "vendor" => $comment->getIsVendor()
           ]
         ]
       ];
@@ -331,7 +337,7 @@ class LiveAPIController extends Controller {
       $manager->flush();
     }
 
-    $data = [ 
+    $data = [
       "viewers" => $count
     ];
 
