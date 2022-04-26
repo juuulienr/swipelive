@@ -225,7 +225,7 @@ class LiveAPIController extends Controller {
     $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
 
     if ($liveProduct) {
-      if ($display == 1) {
+      if ($live->getDisplay() == 1) {
         $start = 1;
       } else {
         $start = $live->getDuration() + 1;
