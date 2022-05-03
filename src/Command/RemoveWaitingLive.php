@@ -12,46 +12,45 @@ use App\Repository\LiveRepository;
 
 class RemoveWaitingLive extends ContainerAwareCommand
 {
-    private $repo;
+  private $repo;
 
-    public function __construct(LiveRepository $repo, ObjectManager $manager)
-    {
-        $this->manager = $manager;
-        $this->repo = $repo;
+  public function __construct(LiveRepository $repo, ObjectManager $manager)
+  {
+    $this->manager = $manager;
+    $this->repo = $repo;
 
-        parent::__construct();
-    }
+    parent::__construct();
+  }
 
-    protected function configure()
-    {
-        $this
-            ->setName('remove:waiting:live')
-            ->setDescription('Supprimer les lives en attente depuis 1 jour')
-        ;
-    }
+  protected function configure()
+  {
+    $this
+    ->setName('remove:waiting:live')
+    ->setDescription('Supprimer les lives en attente depuis 1 jour')
+    ;
+  }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $lives = $this->repo->findAll();
-        $now = new \DateTime('now', timezone_open('Europe/Paris'));
-        $now->modify('-1 day');
+  protected function execute(InputInterface $input, OutputInterface $output)
+  {
+    $lives = $this->repo->findAll();
+    $now = new \DateTime('now', timezone_open('Europe/Paris'));
+    $now->modify('-1 day');
 
-        if ($lives) {
-            foreach ($lives as $live) {
-                if ($live->getCreatedAt() < $now && $live->getStatus() == 0) {
-                    $liveProducts = $live->getLiveProducts();
+    if ($lives) {
+      foreach ($lives as $live) {
+        if ($live->getCreatedAt() < $now && $live->getStatus() == 0) {
+          $liveProducts = $live->getLiveProducts();
 
-                    if ($liveProducts) {
-                        foreach ($liveProducts as $liveProduct) {
-                            $this->manager->remove($liveProduct);
-                        }
-                        $this->manager->flush();
-                    }
-                    $this->manager->remove($live);
-                }             
+          if ($liveProducts) {
+            foreach ($liveProducts as $liveProduct) {
+              $this->manager->remove($liveProduct);
             }
-        }
-        
-        $this->manager->flush();
+          }
+          $this->manager->remove($live);
+        }             
+      }
     }
+    
+    $this->manager->flush();
+  }
 }

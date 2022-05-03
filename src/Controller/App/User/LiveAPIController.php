@@ -46,6 +46,13 @@ class LiveAPIController extends Controller {
       $manager->persist($live);
       $manager->flush();
 
+      $liveProducts = $live->getLiveProducts()->toArray();
+
+      if (sizeof($liveProducts) == 1) {
+        $liveProducts[0]->setPriority(1);
+        $manager->flush();
+      }
+
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
     }
 
@@ -54,7 +61,7 @@ class LiveAPIController extends Controller {
 
 
   /**
-   * Editer un liveproduct   
+   * Modifier l'ordre des produits   
    * 
    * @Route("/user/api/liveproducts/edit/{id}", name="user_api_liveproducts_edit", methods={"PUT"})
    */
@@ -344,6 +351,38 @@ class LiveAPIController extends Controller {
     $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
     return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+  }
+
+
+  /**
+   * Supprimer les lives en attente
+   *
+   * @Route("/user/api/live/remove/waiting", name="user_api_live_waiting", methods={"GET"})
+   */
+  public function removeWaitingLive(Request $request, ObjectManager $manager, LiveRepository $liveRepo) {
+    $user = $this->getUser();
+    $lives = $liveRepo->findByVendor($user->getVendor());
+
+    if ($lives) {
+      foreach ($lives as $live) {
+        if ($live->getStatus() == 0) {
+          $liveProducts = $live->getLiveProducts();
+
+          if ($liveProducts) {
+            foreach ($liveProducts as $liveProduct) {
+              $manager->remove($liveProduct);
+            }
+          }
+          $manager->remove($live);         
+        }
+      }
+      $manager->flush();
+    }
+    
+    return $this->json($user, 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      }
+    ]);
   }
 
 

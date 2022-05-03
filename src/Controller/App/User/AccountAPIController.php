@@ -187,6 +187,20 @@ class AccountAPIController extends Controller {
         $vendor->setCompany($param['company']);
         $vendor->setSiren($param['siren']);
         $manager->flush();
+
+        // modifier les informations sur stripe avec account token
+        // $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+        // $stripe->accounts->update(
+        //   $vendor->getStripeAcc(), [
+        //     'company' => [ 
+        //       'address' => [
+        //         'line1' => $param['address'],
+        //         'city' => $param['city'],
+        //         'postal_code' => $param['zip'],
+        //       ]
+        //     ]
+        //   ]
+        // );
       }
 
       return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
