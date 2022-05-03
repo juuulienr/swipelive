@@ -109,15 +109,15 @@ class AccountAPIController extends Controller {
                   return $this->json($e->getMessage(), 404);
                 }
               }
-
-              return $this->json($user, 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
-                return $object->getId();
-              } ]);
-
             } catch (Exception $e) {
               return $this->json($e->getMessage(), 404);
             }
           }
+
+          return $this->json($user, 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+              return $object->getId();
+            }
+          ]);
         } else {
           return $this->json("Un compte est associé à cette adresse mail", 404);
         }
@@ -158,8 +158,9 @@ class AccountAPIController extends Controller {
    */
   public function profile(Request $request, ObjectManager $manager) {
     return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
-      return $object->getId();
-    } ]);
+        return $object->getId();
+      }
+    ]);
   }
 
 
