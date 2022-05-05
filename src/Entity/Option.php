@@ -22,21 +22,33 @@ class Option
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("product:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $name;
 
     /**
      * @ORM\Column(type="array")
      * @Groups("product:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $data = [];
 
     /**
      * @ORM\Column(type="integer")
      * @Groups("product:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $position;
 

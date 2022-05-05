@@ -134,18 +134,22 @@ class Product
      * @ORM\OneToMany(targetEntity=Option::class, mappedBy="product", cascade={"persist"})
      * @ORM\OrderBy({"position" = "ASC"})
      * @Groups("product:read")
-     * @Groups("clip:read")
      * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
      * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $options;
 
     /**
      * @ORM\OneToMany(targetEntity=Variant::class, mappedBy="product", cascade={"persist"})
      * @Groups("product:read")
-     * @Groups("clip:read")
      * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
      * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $variants;
 

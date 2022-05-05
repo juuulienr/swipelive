@@ -38,24 +38,28 @@ class Order
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $status;
 
     /**
      * @ORM\Column(type="datetime")
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $subTotal;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $total;
 
@@ -68,12 +72,14 @@ class Order
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $fees;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $profit;
 
@@ -85,6 +91,7 @@ class Order
     /**
      * @ORM\Column(type="datetime", nullable=true)
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $updatedAt;
 

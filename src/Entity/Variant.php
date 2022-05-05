@@ -18,8 +18,10 @@ class Variant
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups("product:read")
-     * @Groups("variant:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
      * @Groups("order:read")
      */
     private $id;
@@ -27,8 +29,10 @@ class Variant
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("product:read")
-     * @Groups("variant:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
      * @Groups("order:read")
      */
     private $title;
@@ -36,56 +40,77 @@ class Variant
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
      * @Groups("product:read")
-     * @Groups("variant:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $price;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
      * @Groups("product:read")
-     * @Groups("variant:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $compareAtPrice;
 
     /**
      * @ORM\Column(type="integer")
      * @Groups("product:read")
-     * @Groups("variant:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $quantity;
 
     /**
      * @ORM\Column(type="integer")
      * @Groups("product:read")
-     * @Groups("variant:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $position;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("product:read")
-     * @Groups("variant:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $option1;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("product:read")
-     * @Groups("variant:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $option2;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("product:read")
-     * @Groups("variant:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $weight;
 
