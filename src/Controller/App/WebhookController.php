@@ -106,6 +106,14 @@ class WebhookController extends Controller {
         $clip = $clipRepo->findOneByBroadcastId($broadcastId);
 
         if ($clip) {
+          $comments = $clip->getComments();
+
+          if ($comments) {
+            foreach ($comments as $comment) {
+              $manager->remove($comment);
+            }
+          }
+
           $manager->remove($clip);
           $manager->flush();
         }
@@ -114,10 +122,17 @@ class WebhookController extends Controller {
 
         if ($live) {
           $liveProducts = $live->getLiveProducts();
+          $comments = $live->getComments();
 
           if ($liveProducts) {
             foreach ($liveProducts as $liveProduct) {
               $manager->remove($liveProduct);
+            }
+          }
+
+          if ($comments) {
+            foreach ($comments as $comment) {
+              $manager->remove($comment);
             }
           }
 
