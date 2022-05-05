@@ -125,9 +125,13 @@ class User implements UserInterface
         $this->followers = new ArrayCollection();
         $this->following = new ArrayCollection();
         $this->purchases = new ArrayCollection();
+        $this->comments = new ArrayCollection();
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->type = "user";
-        $this->comments = new ArrayCollection();
+    }
+
+    public function getFullName() {
+        return "{$this->firstName} {$this->lastName}";
     }
 
     public function getId(): ?int

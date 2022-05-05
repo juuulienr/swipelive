@@ -48,7 +48,7 @@ class PaymentAPIController extends Controller {
 
           $customer = $stripe->customers->create([
             'email' => $buyer->getEmail(),
-            'name' => ucwords($buyer->getFullname()),
+            'name' => ucwords($buyer->getFullName()),
           ]);
 
           $customer = $customer->id;
