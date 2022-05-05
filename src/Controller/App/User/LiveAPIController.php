@@ -179,7 +179,7 @@ class LiveAPIController extends Controller {
 
       if ($liveProduct) {
         if ($display == 1) {
-          $start = 1;
+          $start = 5;
         } else {
           $start = $live->getDuration() + 1;
         }
@@ -233,7 +233,7 @@ class LiveAPIController extends Controller {
 
     if ($liveProduct) {
       if ($live->getDisplay() == 1) {
-        $start = 1;
+        $start = 5;
       } else {
         $start = $live->getDuration() + 1;
       }
@@ -251,7 +251,7 @@ class LiveAPIController extends Controller {
       curl_close($ch);
 
       if ($result && $result->id) {
-        $end = $result->length - 1;
+        $end = $result->length - 5;
         $duration = $end - $start;
 
         if ($duration > 15) {
