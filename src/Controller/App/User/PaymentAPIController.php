@@ -39,7 +39,7 @@ class PaymentAPIController extends Controller {
 
       if ($param) {
         $buyer = $this->getUser();
-        $customer = $buyer->getStripeCus();
+        $customer = $buyer->getStripeCustomer();
         $param["quantity"] ? $quantity = $param["quantity"] : $quantity = 1;
 
         // buyer/customer
@@ -52,7 +52,7 @@ class PaymentAPIController extends Controller {
           ]);
 
           $customer = $customer->id;
-          $buyer->setStripeCus($customer);
+          $buyer->setStripeCustomer($customer);
           $manager->flush();
         }
 
