@@ -38,24 +38,28 @@ class ShippingAPIController extends Controller {
     $sendCloud = new \Imbue\SendCloud\SendCloudApiClient();
     $sendCloud->setApiAuth('3826686f2dbc418380898cc254fc0d28', '096e44cb9b26431b90cc5b5defc9e915');
 
+    // intégrations sendcloud
     $integrations = $sendCloud->integrations->list();
+
+    // méthodes de livraison
     $shippingMethods = $sendCloud->shippingMethods->list();
-    $parcels = $sendCloud->parcels->list();
+
+    // status de livraison
     $parcelStatuses = $sendCloud->parcelStatuses->list();
-    dump($integrations);
-    dump($shippingMethods);
-    dump($parcels);
-    dump($parcelStatuses);
+
+    // Colis
+    $parcels = $sendCloud->parcels->list();
+    // $parcel = $sendCloud->parcels->get($id);
 
     // $parcel = $sendCloud->parcels->create([
     //   'parcel' => [
     //     'name' => 'Julie Appleseed',
     //     'company_name' => 'SendCloud',
-    //     'address' => '54 rue du coteau',
-    //     'house_number' => 115,
+    //     'address' => 'rue du coteau',
+    //     'house_number' => 54,
     //     'city' => 'Miribel',
     //     'postal_code' => '01700',
-    //     'telephone' => '+31612345678',
+    //     'telephone' => '+33666666666',
     //     'request_label' => true,
     //     'email' => 'julie@appleseed.com',
     //     'country' => 'FR',
@@ -67,18 +71,37 @@ class ShippingAPIController extends Controller {
     //     'insured_value' => 2000,
     //   ]
     // ]);
-
     // dump($parcel);
 
-    // $this->parcels
-    // $this->parcelStatuses 
-    // $this->shippingMethods
-    // $this->senderAddresses
-    // $this->labels 
-    // $this->invoices
-    // $this->user
-    // $this->integrations
-    // $this->integrationShipments
+    // $parcelId = $parcel->id();
+    $parcelId = 180248575;
+    // dump($parcelId);
+
+
+
+    // $label = $sendCloud->labels->get($parcelId);
+    // // dump($label);
+    // $pdf = $sendCloud->labels->getLabelAsPdf($parcelId, 'normal_printer');
+    // $pdf = $sendCloud->labels->getLabelAsPdf($parcelId, 'label_printer');
+    // // dump($pdf);
+
+    // $filename = md5(time().uniqid()). ".pdf"; 
+    // $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
+    // file_put_contents($filepath, $pdf);
+
+
+
+    // $senderAddresses = $sendCloud->senderAddresses->list();
+    // $user = $sendCloud->user->get();
+
+    // dump($integrations);
+    // dump($shippingMethods);
+    // dump($parcels);
+    // dump($parcelStatuses);
+    // // dump($labels);
+    // // dump($senderAddresses);
+    // // dump($user);
+
 
     die();
   }
