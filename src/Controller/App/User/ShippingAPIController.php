@@ -38,18 +38,15 @@ class ShippingAPIController extends Controller {
     $sendCloud = new \Imbue\SendCloud\SendCloudApiClient();
     $sendCloud->setApiAuth('3826686f2dbc418380898cc254fc0d28', '096e44cb9b26431b90cc5b5defc9e915');
 
-    // intégrations sendcloud
-    $integrations = $sendCloud->integrations->list();
+    // // type of shipping method
+    // $shippingMethods = $sendCloud->shippingMethods->list();
 
-    // méthodes de livraison
-    $shippingMethods = $sendCloud->shippingMethods->list();
+    // // type of status
+    // $parcelStatuses = $sendCloud->parcelStatuses->list();
 
-    // status de livraison
-    $parcelStatuses = $sendCloud->parcelStatuses->list();
-
-    // Colis
-    $parcels = $sendCloud->parcels->list();
-    // $parcel = $sendCloud->parcels->get($id);
+    // // parcel
+    // $parcels = $sendCloud->parcels->list();
+    // $parcel = $sendCloud->parcels->get(180248575);
 
     // $parcel = $sendCloud->parcels->create([
     //   'parcel' => [
@@ -74,33 +71,28 @@ class ShippingAPIController extends Controller {
     // dump($parcel);
 
     // $parcelId = $parcel->id();
-    $parcelId = 180248575;
     // dump($parcelId);
 
 
-
+    // create and print label
+    // $parcelId = 180248575;
     // $label = $sendCloud->labels->get($parcelId);
-    // // dump($label);
-    // $pdf = $sendCloud->labels->getLabelAsPdf($parcelId, 'normal_printer');
     // $pdf = $sendCloud->labels->getLabelAsPdf($parcelId, 'label_printer');
-    // // dump($pdf);
-
     // $filename = md5(time().uniqid()). ".pdf"; 
     // $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
     // file_put_contents($filepath, $pdf);
 
+    
+    // tracking parcel
+    // $tracking_number = $parcel->tracking_number();
+    // $tracking = $sendCloud->tracking->get('SCCWF3BVDTKV');
+    // dump($tracking);
 
 
-    // $senderAddresses = $sendCloud->senderAddresses->list();
-    // $user = $sendCloud->user->get();
-
-    // dump($integrations);
     // dump($shippingMethods);
     // dump($parcels);
     // dump($parcelStatuses);
-    // // dump($labels);
-    // // dump($senderAddresses);
-    // // dump($user);
+    // dump($labels);
 
 
     die();
