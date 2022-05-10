@@ -267,7 +267,17 @@ class WebhookController extends Controller {
    * @Route("/api/sendcloud/webhooks", name="api_sendcloud_webhooks")", methods={"POST"})
    */
   public function sendcloud(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+    $result = json_decode($request->getContent(), true);
     $this->get('bugsnag')->notifyException(new Exception("Sendcloud"));
+
+    // update parcel status
+    if ($result["action"] == "parcel_status_changed") {
+      $this->get('bugsnag')->notifyException(new Exception($result["parcel"]["id"]));
+      $parcelId = $result["parcel"]["id"];
+      $tracking_number = $result["parcel"]["tracking_number"];
+      $statusId = $result["parcel"]["status"]["id"];
+      $statusMessage = $result["parcel"]["status"]["message"];
+    }
 
     return $this->json(true, 200);
   }
