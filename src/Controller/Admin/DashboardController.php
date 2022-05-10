@@ -29,20 +29,5 @@ class DashboardController extends Controller {
   public function login(){
     return $this->render('admin/login.html.twig');
   }
-
-
-  // /**
-  //  * @Route("/test", name="test")
-  //  */
-  // public function test(){
-  //   $stripe = new \Stripe\StripeClient('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
-
-  //   $stripe->accounts->update(
-  //     'acct_1KUTeq2VEI63cHkr',
-  //     ['settings' => ['payouts' => ['schedule' => ['interval' => 'manual']]]]
-  //   );
-
-  //   return $this->json(true);
-  // }
 }
 
