@@ -72,6 +72,7 @@ class ShippingAPIController extends Controller {
 
     // $parcelId = $parcel->id();
     // dump($parcelId);
+    // $parcels = $sendCloud->parcels->cancel();
 
 
     // create and print label
@@ -82,7 +83,7 @@ class ShippingAPIController extends Controller {
     // $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
     // file_put_contents($filepath, $pdf);
 
-    
+
     // tracking parcel
     // $tracking_number = $parcel->tracking_number();
     // $tracking = $sendCloud->tracking->get('SCCWF3BVDTKV');
