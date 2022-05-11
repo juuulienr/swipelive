@@ -40,35 +40,42 @@ class ShippingAPIController extends Controller {
 
     // // type of shipping method
     // $shippingMethods = $sendCloud->shippingMethods->list();
+    // dump($shippingMethods);
 
+    // foreach ($shippingMethods as $method) {
+    //  dump($method);
+    // }
+    
     // // type of status
     // $parcelStatuses = $sendCloud->parcelStatuses->list();
+    // dump($parcelStatuses);
 
     // // parcel
     // $parcels = $sendCloud->parcels->list();
+    // dump($parcels);
     // $parcel = $sendCloud->parcels->get(180248575);
 
     // $parcel = $sendCloud->parcels->create([
     //   'parcel' => [
-    //     'name' => 'Julie Appleseed',
-    //     'company_name' => 'SendCloud',
+    //     'name' => 'Loic Rombai',
+    //     'company_name' => 'Loic SAS',
     //     'address' => 'rue du coteau',
     //     'house_number' => 54,
     //     'city' => 'Miribel',
     //     'postal_code' => '01700',
     //     'telephone' => '+33666666666',
     //     'request_label' => true,
-    //     'email' => 'julie@appleseed.com',
+    //     'email' => 'neoglucogenese@gmail.com',
     //     'country' => 'FR',
     //     'shipment' => [
     //       'id' => 8,
     //     ],
-    //     'weight' => '10.000',
+    //     'weight' => '1.000',
     //     'order_number' => '1234567890',
-    //     'insured_value' => 2000,
+    //     // 'insured_value' => 2000,
     //   ]
     // ]);
-    // dump($parcel);
+    // dd($parcel);
 
     // $parcelId = $parcel->id();
     // dump($parcelId);
@@ -78,6 +85,7 @@ class ShippingAPIController extends Controller {
     // create and print label
     // $parcelId = 180248575;
     // $label = $sendCloud->labels->get($parcelId);
+    // dump($labels);
     // $pdf = $sendCloud->labels->getLabelAsPdf($parcelId, 'label_printer');
     // $filename = md5(time().uniqid()). ".pdf"; 
     // $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
@@ -86,15 +94,8 @@ class ShippingAPIController extends Controller {
 
     // tracking parcel
     // $tracking_number = $parcel->tracking_number();
-    // $tracking = $sendCloud->tracking->get('SCCWF3BVDTKV');
+    // $tracking = $sendCloud->tracking->get('SCCWF3BVYJ7W');
     // dump($tracking);
-
-
-    // dump($shippingMethods);
-    // dump($parcels);
-    // dump($parcelStatuses);
-    // dump($labels);
-
 
     die();
   }

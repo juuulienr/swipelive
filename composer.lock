@@ -2565,12 +2565,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/juuulienr/sendcloud-api-php.git",
-                "reference": "c5aad8d19fcf7a70650c9e04b4a7d893c4bb0c0d"
+                "reference": "d0c36b6bcd0fb68e14cd031a815b5a60af3e9d7c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/juuulienr/sendcloud-api-php/zipball/c5aad8d19fcf7a70650c9e04b4a7d893c4bb0c0d",
-                "reference": "c5aad8d19fcf7a70650c9e04b4a7d893c4bb0c0d",
+                "url": "https://api.github.com/repos/juuulienr/sendcloud-api-php/zipball/d0c36b6bcd0fb68e14cd031a815b5a60af3e9d7c",
+                "reference": "d0c36b6bcd0fb68e14cd031a815b5a60af3e9d7c",
                 "shasum": ""
             },
             "require": {
@@ -2615,9 +2615,9 @@
                 "shipping software"
             ],
             "support": {
-                "source": "https://github.com/juuulienr/sendcloud-api-php/tree/0.3.0"
+                "source": "https://github.com/juuulienr/sendcloud-api-php/tree/master"
             },
-            "time": "2022-05-10T12:03:25+00:00"
+            "time": "2022-05-11T09:43:53+00:00"
         },
         {
             "name": "intervention/image",
