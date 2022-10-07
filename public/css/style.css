@@ -1,271 +1,315 @@
 /*  ----------- 01- Start Base CSS  ----------- */
 @font-face {
-  font-family: 'SwipeLive';
-  font-style: normal;
-  font-weight: 400;
-  src: local('SwipeLive Extra Light'), url('../webfonts/SwipeLiveExtraLight.woff') format('woff');
+	font-family: 'SwipeLive';
+	font-style: normal;
+	font-weight: 400;
+	src: local('SwipeLive Extra Light'), url('../webfonts/SwipeLiveExtraLight.woff') format('woff');
 }
 
 @font-face {
-  font-family: 'SwipeLive';
-  font-style: normal;
-  font-weight: 500;
-  src: local('SwipeLive Light'), url('../webfonts/SwipeLiveLight.woff') format('woff');
+	font-family: 'SwipeLive';
+	font-style: normal;
+	font-weight: 500;
+	src: local('SwipeLive Light'), url('../webfonts/SwipeLiveLight.woff') format('woff');
 }
 
 @font-face {
-  font-family: 'SwipeLive';
-  font-style: normal;
-  font-weight: 600;
-  src: local('SwipeLive Medium'), url('../webfonts/SwipeLiveMedium.woff') format('woff');
+	font-family: 'SwipeLive';
+	font-style: normal;
+	font-weight: 600;
+	src: local('SwipeLive Medium'), url('../webfonts/SwipeLiveMedium.woff') format('woff');
 }
 
 @font-face {
-  font-family: 'SwipeLive';
-  font-style: normal;
-  font-weight: bold;
-  src: local('SwipeLive Bold'), url('../webfonts/SwipeLiveBold.woff') format('woff');
+	font-family: 'SwipeLive';
+	font-style: normal;
+	font-weight: bold;
+	src: local('SwipeLive Bold'), url('../webfonts/SwipeLiveBold.woff') format('woff');
 }
+
 html {
-  overflow-x: hidden;
+	overflow-x: hidden;
 }
+
 body {
-  margin: 0;
-  overflow-x: hidden;
-  padding: 0;
+	margin: 0;
+	overflow-x: hidden;
+	padding: 0;
 }
+
 #root {
-  max-width: 750px;
-  margin: auto;
-  font-family: "SwipeLive";
-  font-size: 20pt;
-  margin-top: 22vh;
+	max-width: 750px;
+	margin: auto;
+	font-family: "SwipeLive";
+	font-size: 20pt;
+	margin-top: 22vh;
 }
+
 #root-terms {
-  margin: auto;
-  font-family: "SwipeLive";
-  font-size: 17px;
-  max-width: 80vw;
+	margin: auto;
+	font-family: "SwipeLive";
+	font-size: 17px;
+	max-width: 80vw;
 }
+
 #header {
-  padding-top: 70px;
-  text-align: center;
+	padding-top: 70px;
+	text-align: center;
 }
+
 #header-terms {
-  padding-top: 70px;
-  text-align: left;
+	padding-top: 70px;
+	text-align: left;
 }
+
 #main-terms {
-  padding-top: 30px;
-  line-height: 1.6em;
-  margin: auto;
-  max-width: 100%;
+	padding-top: 30px;
+	line-height: 1.6em;
+	margin: auto;
+	max-width: 100%;
 }
 #main-terms h2 {
-  opacity: 0.2;
-  font-size: 2em;
-  padding-top: 30px;
-  padding-bottom: 30px;
+	opacity: 0.2;
+	font-size: 2em;
+	padding-top: 30px;
+	padding-bottom: 30px;
 }
+
 #main-terms a {
-  text-decoration: none;
-  color: black;
+	text-decoration: none;
+	color: black;
 }
+
 #main-terms a:hover {
-  text-decoration: none;
-  color: black;
-  border-bottom: 1px solid #000;
+	text-decoration: none;
+	color: black;
+	border-bottom: 1px solid #000;
 }
+
 #main {
-  display: flex;
-  align-content: center;
-  align-items: center;
-  justify-content: center;
-  justify-items: center;
+	display: flex;
+	align-content: center;
+	align-items: center;
+	justify-content: center;
+	justify-items: center;
 }
+
 #download {
-  justify-content: center;
-  margin-top: 30px;
+	justify-content: center;
+	margin-top: 30px;
 }
+
 .flex {
-  display: flex;
+	display: flex;
 }
+
 .dl-btn {
-  margin: 0.5rem;
+	margin: 0.5rem;
 }
+
 .headline h1 {
-  text-align: center;
-  min-height: 150px;
-  color: white;
-  margin: 0px;
+	text-align: center;
+	min-height: 150px;
+	color: white;
+	margin: 0px;
 }
+
 #footer {
-  background: white;
-  width: 100vw;
-  justify-items: center;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-  align-items: center;
-  border-top-left-radius: 30px;
-  border-top-right-radius: 30px;
-  font-family: "SwipeLive";
-  padding-bottom: 30px;
-  box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.05);
-  position: absolute;
-  bottom: 0px;
+	background: white;
+	width: 100vw;
+	justify-items: center;
+	flex-direction: column;
+	justify-content: center;
+	text-align: center;
+	align-items: center;
+	border-top-left-radius: 30px;
+	border-top-right-radius: 30px;
+	font-family: "SwipeLive";
+	padding-bottom: 30px;
+	box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.05);
+	position: absolute;
+	bottom: 0px;
 }
+
 #scroll-indicator {
-  height: 9px;
-  width: 90px;
-  background: rgba(0,0,0,0.2);
-  border-radius: 4.5px;
-  margin: 25px;
+	height: 9px;
+	width: 90px;
+	background: rgba(0,0,0,0.2);
+	border-radius: 4.5px;
+	margin: 25px;
 }
+
 .nav {
-  display: flex;
-  padding-top: 20px;
-  padding-bottom: 20px;
+	display: flex;
+	padding-top: 20px;
+	padding-bottom: 20px;
 }
+
 .nav div {
-  margin: 20px;
+	margin: 20px;
 }
+
 .nav div a {
-  color: rgba(0,0,0,0.5);
-  text-decoration: none;
-  font-weight: 600;
+	color: rgba(0,0,0,0.5);
+	text-decoration: none;
+	font-weight: 600;
 }
+
 .legals {
-  padding: 10px 20px 10px 20px;
-  font-size: 0.85em;
-  background: #fff;
-  border-radius: 100px;
-  color: black;
-  border: 1px solid black;
-  font-weight: 600;
+	padding: 10px 20px 10px 20px;
+	font-size: 0.85em;
+	background: #fff;
+	border-radius: 100px;
+	color: black;
+	border: 1px solid black;
+	font-weight: 600;
 }
+
 #logo {
-  width: 90px;
-  height: 90px;
-  padding:8px;
-  border-radius: 20px;
-  box-shadow: rgb(0 0 0 / 16%) 0px 1px 4px;
-  background: white;
+	width: 90px;
+	height: 90px;
+	padding:8px;
+	border-radius: 20px;
+	box-shadow: rgb(0 0 0 / 16%) 0px 1px 4px;
+	background: white;
 }
 
 ul li {
-  padding: 5px 0px;
+	padding: 5px 0px;
 }
 
 .privacy p {
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: 500;
+	font-size: 16px;
+	line-height: 20px;
+	font-weight: 500;
 }
 
 .privacy ul {
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: 500;
+	font-size: 16px;
+	line-height: 20px;
+	font-weight: 500;
 }
 
 .privacy li {
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: 500;
+	font-size: 16px;
+	line-height: 20px;
+	font-weight: 500;
 }
 
 .mention p {
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: 500;
+	font-size: 16px;
+	line-height: 20px;
+	font-weight: 500;
 }
 
 .mention ul {
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: 500;
+	font-size: 16px;
+	line-height: 20px;
+	font-weight: 500;
 }
 
 .mention li {
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: 500;
+	font-size: 16px;
+	line-height: 20px;
+	font-weight: 500;
 }
 
 .app-ios {
-  height: 64px;
+	height: 64px;
 }
 
 .app-android {
-  height: 64px;
+	height: 64px;
 }
 
 
 @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
-  #download {
-    flex-direction: column;
-    align-items: center;
-  }
+	#download {
+		flex-direction: column;
+		align-items: center;
+	}
 }
 
 
+@media screen and (max-width: 1450px) {
+	.nav div {
+		margin: 10px;
+	}
+	#scroll-indicator {
+		height: 7px;
+		width: 90px;
+		background: rgba(0,0,0,0.2);
+		border-radius: 4.5px;
+		margin: 25px 25px 15px;
+	}
+	#root {
+		font-size: 15pt;
+		margin-top: 8vh;
+	}
+	#download {
+		justify-content: center;
+		margin-top: 10px;
+	}
+}
+
+
+
 @media screen and (max-width: 767px) {
-  #header {
-    padding-top: 60px;
-  }
+	#header {
+		padding-top: 60px;
+	}
 
-  #root {
-    font-size: 12pt;
-    margin-top: 9vh;
-  }
+	#root {
+		font-size: 12pt;
+		margin-top: 9vh;
+	}
 
-  .nav div {
-    margin: 10px;
-  }
+	.nav div {
+		margin: 10px;
+	}
 
-  .app-ios {
-    height: 55px;
-  }
+	.app-ios {
+		height: 55px;
+	}
 
-  .app-android {
-    height: 55px;
-  }
+	.app-android {
+		height: 55px;
+	}
 
-  #logo {
-    height: 72px;
-    width: 72px;
-  }
+	#logo {
+		height: 72px;
+		width: 72px;
+	}
 
-  .nav div a {
-    font-size: 14px;
-  }
+	.nav div a {
+		font-size: 14px;
+	}
 
-  #scroll-indicator {
-    height: 5px;
-    width: 60px;
-    margin: 20px 25px 5px;
-  }
+	#scroll-indicator {
+		height: 5px;
+		width: 60px;
+		margin: 20px 25px 5px;
+	}
 
-  .headline h1 {
-    min-height: 130px;
-    margin: 0px 5px;
-  }
+	.headline h1 {
+		min-height: 130px;
+		margin: 0px 5px;
+	}
 
-  .legals {
-    font-size: 14px;
-  }
+	.legals {
+		font-size: 14px;
+	}
 
-  #header-terms {
-    padding-top: 30px;
-  }
+	#header-terms {
+		padding-top: 30px;
+	}
 
-  #root-terms {
-    margin: 15px;
-    max-width: none;
-  }
+	#root-terms {
+		margin: 15px;
+		max-width: none;
+	}
 
-  #download {
-    margin-top: 0px;
-  }
+	#download {
+		margin-top: 0px;
+	}
 }
