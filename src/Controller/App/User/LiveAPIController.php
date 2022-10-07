@@ -97,13 +97,11 @@ class LiveAPIController extends Controller {
       $param = json_decode($json, true);
       $broadcastId = $param["broadcastId"];
 
-      // return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
-
       if ($broadcastId && !$live->getBroadcastId() && $live->getStatus() != 2) {
         $url = "https://api.bambuser.com/broadcasts/" . $broadcastId;
         $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -241,7 +239,7 @@ class LiveAPIController extends Controller {
       $url = "https://api.bambuser.com/broadcasts/" . $live->getBroadcastId();
       $ch = curl_init();
 
-      curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer 2NJko17PqQdCDQ1DRkyMYr"]);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
       curl_setopt($ch, CURLOPT_URL, $url);
