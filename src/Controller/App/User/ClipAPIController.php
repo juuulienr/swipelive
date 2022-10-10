@@ -50,7 +50,7 @@ class ClipAPIController extends Controller {
    * @Route("/user/api/clips/all", name="user_api_clips_all", methods={"GET"})
    */
   public function allClips(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
-    $clips = $clipRepo->findByVendor($this->getUser());
+    $clips = $clipRepo->findByVendor($this->getUser()->getVendor());
 
     return $this->json($clips, 200, [], ['groups' => 'clip:read']);
   }
