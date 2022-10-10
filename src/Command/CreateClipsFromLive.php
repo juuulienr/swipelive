@@ -69,37 +69,33 @@ class CreateClipsFromLive extends ContainerAwareCommand
 
                 // mise à jour du clip
                 if ($clip->getBroadcastId() && $clip->getResourceUri() && $createdAt->modify('+15 minutes') < $now && $clip->getStatus() == "waiting") {
-                    $data = [ "author" => $clip->getVendor()->getBusinessName()];
-                    $url = "https://api.bambuser.com/broadcasts/" . $clip->getBroadcastId();
-                    $title = "Clip" . $clip->getId();
-
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-                    curl_setopt($ch, CURLOPT_URL, $url);
-
-                    $result = curl_exec($ch);
-                    $result = json_decode($result);
-                    curl_close($ch);
+                  $url = "https://api.bambuser.com/broadcasts/" . $clip->getBroadcastId();
+                  $title = "Clip" . $clip->getId();
+                  $data = [ 
+                  	"author" => $clip->getVendor()->getBusinessName(), 
+                  	"title" => $title 
+                  ];
 
 
-                    $data = [ "title" => $title ];
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-                    curl_setopt($ch, CURLOPT_URL, $url);
+    							$this->get('bugsnag')->notifyException(new Exception($data));
+    							$this->get('bugsnag')->notifyException(new Exception($url));
 
-                    $result = curl_exec($ch);
-                    $result = json_decode($result);
-                    curl_close($ch);
+                  $ch = curl_init();
+                  curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
+                  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                  curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
+                  curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+                  curl_setopt($ch, CURLOPT_URL, $url);
+
+                  $result = curl_exec($ch);
+                  $result = json_decode($result);
+                  curl_close($ch);
 
 
-                    $clip->setStatus("available");
-                    $this->manager->flush();
+                  $clip->setStatus("available");
+                  $this->manager->flush();
+                  
+    							$this->get('bugsnag')->notifyException(new Exception($result));
                 }
             }
         }

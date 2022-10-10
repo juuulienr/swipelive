@@ -252,7 +252,7 @@ class WebhookController extends Controller {
           break;
           
         default:
-          // $this->get('bugsnag')->notifyException(new Exception($result["type"]));
+          $this->get('bugsnag')->notifyException(new Exception($result["type"]));
           break;
       }
     }
