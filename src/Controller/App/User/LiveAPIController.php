@@ -138,7 +138,7 @@ class LiveAPIController extends Controller {
             ]
           ];
 
-          $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
+          $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
           $pusher->trigger($channel, $event, $data);
 
           $live->setChannel($channel);
@@ -168,7 +168,7 @@ class LiveAPIController extends Controller {
       $live->setDisplay($display);
       $manager->flush();
 
-      $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger($live->getChannel(), $live->getEvent(), [ "display" => $display ]);
 
       // créer le clip pour le produit précédent
@@ -317,7 +317,7 @@ class LiveAPIController extends Controller {
         ]
       ];
       
-      $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
       return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
@@ -332,7 +332,7 @@ class LiveAPIController extends Controller {
    */
   public function updateViewers(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     $user = $this->getUser();
-    $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $info = $pusher->getChannelInfo($live->getChannel(), ['info' => 'subscription_count']);
     $count = $info->subscription_count;
 

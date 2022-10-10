@@ -153,7 +153,7 @@ class APIController extends Controller {
    * @Route("/api/live/{id}/update/viewers", name="api_live_update_viewers", methods={"PUT"})
    */
   public function updateViewers(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    $pusher = new \Pusher\Pusher('7fb21964a6ad128ed1ae', 'edede4d885179511adc3', '1299503', [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $info = $pusher->getChannelInfo($live->getChannel(), ['info' => 'subscription_count']);
     $count = $info->subscription_count;
 
@@ -170,5 +170,31 @@ class APIController extends Controller {
     $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
     return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+  }
+
+
+
+
+  /**
+   * Modifier image du profil
+   *
+   * @Route("/api/profile/picture", name="api_profile_picture", methods={"POST"})
+   */
+  public function picture(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($request->files->get('picture')) {
+      $file = $request->files->get('picture');
+
+      if (!$file) {
+        return $this->json("L'image est introuvable !", 404);
+      }
+
+      $filename = md5(time().uniqid()). "." . $file->guessExtension(); 
+      $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
+      file_put_contents($filepath, file_get_contents($file));
+
+      return $this->json($filename, 200);
+    }
+
+    return $this->json("L'image est introuvable !", 404);
   }
 }
