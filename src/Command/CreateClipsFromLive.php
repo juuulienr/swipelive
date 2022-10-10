@@ -77,8 +77,8 @@ class CreateClipsFromLive extends ContainerAwareCommand
                   ];
 
 
-    							$this->get('bugsnag')->notifyException(new Exception($data));
-    							$this->get('bugsnag')->notifyException(new Exception($url));
+    							// $this->get('bugsnag')->notifyException(new Exception($data));
+    							// $this->get('bugsnag')->notifyException(new Exception($url));
 
                   $ch = curl_init();
                   curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
@@ -95,7 +95,7 @@ class CreateClipsFromLive extends ContainerAwareCommand
                   $clip->setStatus("available");
                   $this->manager->flush();
                   
-    							$this->get('bugsnag')->notifyException(new Exception($result));
+    							// $this->get('bugsnag')->notifyException(new Exception($result));
                 }
             }
         }
