@@ -99,13 +99,6 @@ class Clip
     private $eventId;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
-     * @Groups("clip:read")
-     * @Groups("user:read")
-     */
-    private $archived;
-
-    /**
      * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="clip")
      * @ORM\OrderBy({"createdAt" = "ASC"})
      * @Groups("clip:read")
@@ -117,7 +110,6 @@ class Clip
     {
         $this->status = "waiting";
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
-        $this->archived = 0;
         $this->comments = new ArrayCollection();
     }
 
@@ -267,18 +259,6 @@ class Clip
     public function setEventId(?string $eventId): self
     {
         $this->eventId = $eventId;
-
-        return $this;
-    }
-
-    public function getArchived(): ?bool
-    {
-        return $this->archived;
-    }
-
-    public function setArchived(?bool $archived): self
-    {
-        $this->archived = $archived;
 
         return $this;
     }

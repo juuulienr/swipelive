@@ -94,4 +94,81 @@ class ClipAPIController extends Controller {
       return $this->json($clip, 200, [], ['groups' => 'clip:read'], 200);
     }
   }
+
+
+  /**
+   * Supprimer un clip
+   *
+   * @Route("/user/api/clips/{id}/delete", name="user_api_clips_delete", methods={"GET"})
+   */
+  public function delete(Clip $clip, Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
+  	$live = $clip->getLive();
+  	$comments = $clip->getComments();
+
+  	if ($comments) {
+  		foreach ($comments as $comment) {
+  			$manager->remove($comment);
+  		}
+  		$manager->flush();
+  	}
+
+    $url = "https://api.bambuser.com/broadcasts/" . $clip->getBroadcastId();
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+    curl_setopt($ch, CURLOPT_URL, $url);
+
+    $result = curl_exec($ch);
+    $result = json_decode($result);
+    curl_close($ch);
+
+    $manager->remove($clip);
+    $manager->flush();
+
+
+  	if (!sizeof($live->getClips())) {
+      $liveProducts = $live->getLiveProducts();
+  		$comments = $live->getComments();
+
+	  	if ($liveProducts) {
+	  		foreach ($liveProducts as $liveProduct) {
+	  			$manager->remove($liveProduct);
+	  		}
+	  		$manager->flush();
+	  	}
+
+	  	if ($comments) {
+	  		foreach ($comments as $comment) {
+	  			$manager->remove($comment);
+	  		}
+	  		$manager->flush();
+	  	}
+
+      $url = "https://api.bambuser.com/broadcasts/" . $live->getBroadcastId();
+      $ch = curl_init();
+
+      curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+      curl_setopt($ch, CURLOPT_URL, $url);
+
+      $result = curl_exec($ch);
+      $result = json_decode($result);
+      curl_close($ch);
+
+      $manager->remove($live);
+      $manager->flush();
+  	}
+
+    $clips = $clipRepo->findClipByFollowing($this->getUser());
+
+    return $this->json($clips, 200, [], ['groups' => 'clip:read']);
+  }
+
+
+
+
+
 }

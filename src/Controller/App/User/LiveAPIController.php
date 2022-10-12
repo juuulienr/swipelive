@@ -339,6 +339,7 @@ class LiveAPIController extends Controller {
     if ($count) {
       $count = $count - 1;
       $live->setViewers($count);
+	    $live->setTotalViewers($live->getTotalViewers() + 1);
       $manager->flush();
     }
 

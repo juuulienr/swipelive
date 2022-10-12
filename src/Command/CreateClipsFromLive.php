@@ -62,8 +62,8 @@ class CreateClipsFromLive extends ContainerAwareCommand
                     curl_close($ch);
 
                     if ($result && $result->newBroadcastId) {
-                        $clip->setBroadcastId($result->newBroadcastId);
-                        $this->manager->flush();
+                    	$clip->setBroadcastId($result->newBroadcastId);
+                    	$this->manager->flush();
                     }
                 }
 
@@ -75,10 +75,6 @@ class CreateClipsFromLive extends ContainerAwareCommand
                   	"author" => $clip->getVendor()->getBusinessName(), 
                   	"title" => $title 
                   ];
-
-
-    							// $this->get('bugsnag')->notifyException(new Exception($data));
-    							// $this->get('bugsnag')->notifyException(new Exception($url));
 
                   $ch = curl_init();
                   curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
@@ -94,8 +90,6 @@ class CreateClipsFromLive extends ContainerAwareCommand
 
                   $clip->setStatus("available");
                   $this->manager->flush();
-                  
-    							// $this->get('bugsnag')->notifyException(new Exception($result));
                 }
             }
         }

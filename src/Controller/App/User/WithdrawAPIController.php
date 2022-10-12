@@ -51,7 +51,6 @@ class WithdrawAPIController extends Controller {
               "country" => "FR",
               "currency" => "eur",
               "account_number" => $param["number"]
-              // "account_number" => "FR1420041010050500013M02606"
             ],
           ]);
 

@@ -94,7 +94,7 @@ class APIController extends Controller {
   /**
    * Afficher les produits du vendeur
    *
-   * @Route("/api/user/{id}/products", name="api_user_products", methods={"GET"})
+   * @Route("/api/profile/{id}/products", name="api_profile_products", methods={"GET"})
    */
   public function products(User $user, Request $request, ObjectManager $manager, ProductRepository $productRepo) {
     $products = $productRepo->findBy([ "user" => $user, "archived" => false ]);
