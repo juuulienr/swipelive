@@ -157,19 +157,4 @@ class PaymentAPIController extends Controller {
     }
     return $this->json(false, 404);
   }
-
-
-  // /**
-  //  * @Route("/payout", name="payout")
-  //  */
-  // public function payout(){
-  //   $stripe = new \Stripe\StripeClient('sk_test_oS3SEk3VCEWusPy8btUhcCR3');
-
-  //   $stripe->accounts->update(
-  //     'acct_1KUTeq2VEI63cHkr',
-  //     ['settings' => ['payouts' => ['schedule' => ['interval' => 'manual']]]]
-  //   );
-
-  //   return $this->json(true);
-  // }
 }

@@ -26,7 +26,7 @@ class RemoveWaitingLive extends ContainerAwareCommand
   {
     $this
     ->setName('remove:waiting:live')
-    ->setDescription('Supprimer les lives en attente depuis 1 jour')
+    ->setDescription('Supprimer les lives en attente')
     ;
   }
 

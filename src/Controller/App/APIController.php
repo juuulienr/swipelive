@@ -173,14 +173,12 @@ class APIController extends Controller {
   }
 
 
-
-
   /**
    * Modifier image du profil
    *
-   * @Route("/api/profile/picture", name="api_profile_picture", methods={"POST"})
+   * @Route("/api/registration/picture", name="api_registration_picture", methods={"POST"})
    */
-  public function picture(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function registrationPicture(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($request->files->get('picture')) {
       $file = $request->files->get('picture');
 

@@ -166,9 +166,4 @@ class ClipAPIController extends Controller {
 
     return $this->json($clips, 200, [], ['groups' => 'clip:read']);
   }
-
-
-
-
-
 }
