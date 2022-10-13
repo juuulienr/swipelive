@@ -42,19 +42,6 @@ class ClipAPIController extends Controller {
     return $this->json($clips, 200, [], ['groups' => 'clip:read']);
   }
 
-
-  /**
-   * Récupérer les clips des abonnés
-   *
-   * @Route("/user/api/clips/following", name="user_api_clips_following", methods={"GET"})
-   */
-  public function clipsFollowing(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
-    $clips = $clipRepo->findClipByFollowing($this->getUser());
-
-    return $this->json($clips, 200, [], ['groups' => 'clip:read']);
-  }
-
-
   /**
    * Ajouter un comment sur un clip
    *

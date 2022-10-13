@@ -251,4 +251,19 @@ class AccountAPIController extends Controller {
       return $object->getId();
     } ]);
   }
+
+
+
+  /**
+   * Récupérer les abonnés
+   *
+   * @Route("/user/api/following", name="user_api_following", methods={"GET"})
+   */
+  public function following(Request $request, ObjectManager $manager, UserRepository $userRepo) {
+    $following = $userRepo->findUserFollowing($this->getUser());
+
+    return $this->json($following, 200, [], ['groups' => 'user:read']);
+  }
+
+
 }

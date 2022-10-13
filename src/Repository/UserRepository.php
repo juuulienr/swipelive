@@ -19,6 +19,16 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
+
+    public function findUserFollowing($user){
+        return $this->createQueryBuilder('u')
+                    ->join('u.followers', 'f')
+                    ->andWhere('f.follower = :user')
+                    ->setParameter('user', $user)
+                    ->getQuery()
+                    ->getResult();
+    }
+
     // /**
     //  * @return User[] Returns an array of User objects
     //  */
