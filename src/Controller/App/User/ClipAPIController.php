@@ -32,19 +32,6 @@ class ClipAPIController extends Controller {
 
 
   /**
-   * Récupérer les clips disponibles
-   *
-   * @Route("/user/api/clips", name="user_api_clips", methods={"GET"})
-   */
-  public function clips(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
-    $clips = $clipRepo->retrieveClips($this->getUser());
-
-    return $this->json($clips, 200, [], ['groups' => 'clip:read']);
-  }
-
-
-
-  /**
    * Récupérer tous les clips
    *
    * @Route("/user/api/clips/all", name="user_api_clips_all", methods={"GET"})

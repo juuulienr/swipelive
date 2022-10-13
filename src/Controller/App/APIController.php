@@ -85,7 +85,7 @@ class APIController extends Controller {
    * @Route("/api/profile/{id}/clips", name="api_profile_clips", methods={"GET"})
    */
   public function profileClips(User $user, Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
-    $clips = $clipRepo->retrieveClips($user);
+    $clips = $clipRepo->retrieveClips($user->getVendor());
 
     return $this->json($clips, 200, [], ['groups' => 'clip:read']);
   }
@@ -179,7 +179,7 @@ class APIController extends Controller {
    * @Route("/api/registration/picture", name="api_registration_picture")
    */
   public function registrationPicture(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-  	$this->get('bugsnag')->notifyException(new Exception($request));
+  	$this->get('bugsnag')->notifyException(new Exception($request->files));
     if ($request->files->get('picture')) {
       $file = $request->files->get('picture');
 

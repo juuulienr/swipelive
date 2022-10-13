@@ -178,52 +178,52 @@ class WithdrawAPIController extends Controller {
   }
 
 
-  /**
-   * @Route("/user/api/verification/document/front", name="user_api_verification_document_front")
-   */
-  public function verifFront(Request $request, ObjectManager $manager) {
-    if ($json = $request->getContent()) {
-      $param = json_decode($json, true);
+  // /**
+  //  * @Route("/user/api/verification/document/front", name="user_api_verification_document_front")
+  //  */
+  // public function verifFront(Request $request, ObjectManager $manager) {
+  //   if ($json = $request->getContent()) {
+  //     $param = json_decode($json, true);
 
-      if ($param) {
-        $personToken = $param['person_token'];
-        $user = $this->getUser();
+  //     if ($param) {
+  //       $personToken = $param['person_token'];
+  //       $user = $this->getUser();
 
-        if ($personToken && $user->getStripeAcc()) {
-          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
-          $update = $stripe->accounts->updatePerson($user->getStripeAcc(), $user->getPersonId(), [ 'person_token' => $personToken ]);
-        }
+  //       if ($personToken && $user->getStripeAcc()) {
+  //         $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+  //         $update = $stripe->accounts->updatePerson($user->getStripeAcc(), $user->getPersonId(), [ 'person_token' => $personToken ]);
+  //       }
 
-        return $this->json(true, 200);
-      }
-    }
+  //       return $this->json(true, 200);
+  //     }
+  //   }
 
-    return $this->json("Le document est introuvable !", 404);
-  }
+  //   return $this->json("Le document est introuvable !", 404);
+  // }
 
 
-  /**
-   * @Route("/user/api/verification/document/back", name="user_api_verification_document_back")
-   */
-  public function verifBack(Request $request, ObjectManager $manager) {
-    if ($json = $request->getContent()) {
-      $param = json_decode($json, true);
+  // /**
+  //  * @Route("/user/api/verification/document/back", name="user_api_verification_document_back")
+  //  */
+  // public function verifBack(Request $request, ObjectManager $manager) {
+  //   if ($json = $request->getContent()) {
+  //     $param = json_decode($json, true);
 
-      if ($param) {
-        $personToken = $param['person_token'];
-        $user = $this->getUser();
+  //     if ($param) {
+  //       $personToken = $param['person_token'];
+  //       $user = $this->getUser();
 
-        if ($personToken && $user->getStripeAcc()) {
-          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
-          $update = $stripe->accounts->updatePerson($user->getStripeAcc(), $user->getPersonId(), [ 'person_token' => $personToken ]);
-        }
+  //       if ($personToken && $user->getStripeAcc()) {
+  //         $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+  //         $update = $stripe->accounts->updatePerson($user->getStripeAcc(), $user->getPersonId(), [ 'person_token' => $personToken ]);
+  //       }
 
-        return $this->json(true, 200);
-      }
-    }
+  //       return $this->json(true, 200);
+  //     }
+  //   }
 
-    return $this->json("Le document est introuvable !", 404);
-  }
+  //   return $this->json("Le document est introuvable !", 404);
+  // }
 
 
   // /**

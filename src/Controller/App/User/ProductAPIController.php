@@ -169,6 +169,12 @@ class ProductAPIController extends Controller {
       $manager->persist($upload);
       $manager->flush();
 
+      // \Cloudinary::config([ 
+      // 	"cloud_name" => "dxlsenc2r", 
+      // 	"api_key" => "461186889242285", 
+      // 	"api_secret" => "ZUiL6ovY92-do6u1Rr0-pcQqCMg", 
+      // 	"secure" => true]);
+
       return $this->json($upload, 200);
     }
 
