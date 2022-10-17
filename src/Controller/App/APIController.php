@@ -214,7 +214,7 @@ class APIController extends Controller {
    * @Route("/api/registration/picture", name="api_registration_picture")
    */
   public function registrationPicture(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-  	$this->get('bugsnag')->notifyException(new Exception($request->files));
+  	// $this->get('bugsnag')->notifyException(new Exception($request->files));
     if ($request->files->get('picture')) {
       $file = $request->files->get('picture');
 
