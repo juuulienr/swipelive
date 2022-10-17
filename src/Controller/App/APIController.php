@@ -13,6 +13,7 @@ use App\Repository\ClipRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use App\Repository\LiveRepository;
+use App\Repository\UserRepository;
 use App\Repository\LiveProductsRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,15 +39,27 @@ class APIController extends Controller {
     $array = [];
 
     if ($lives) {
-      foreach ($lives as $live) {
-        $array[] = [ "type" => "live", "value" => $serializer->serialize($live, "json", ['groups' => 'live:read']) ];
-      }
+    	foreach ($lives as $live) {
+    		$array[] = [ "type" => "live", "value" => $serializer->serialize($live, "json", [
+    			'groups' => 'live:read', 
+    			'circular_reference_limit' => 1, 
+    			'circular_reference_handler' => function ($object) {
+    				return $object->getId();
+    			} 
+    		])];
+    	}
     }
 
     if ($clips) {
-      foreach ($clips as $clip) {
-        $array[] = [ "type" => "clip", "value" => $serializer->serialize($clip, "json", ['groups' => 'clip:read']) ];
-      }
+    	foreach ($clips as $clip) {
+    		$array[] = [ "type" => "clip", "value" => $serializer->serialize($clip, "json", [
+    			'groups' => 'clip:read', 
+    			'circular_reference_limit' => 1, 
+    			'circular_reference_handler' => function ($object) {
+    				return $object->getId();
+    			} 
+    		])];
+    	} 
     }
 
     return $this->json($array);
@@ -62,7 +75,13 @@ class APIController extends Controller {
   {
     $clips = $clipRepo->findBy([ "status" => "available"], [ "createdAt" => "DESC" ]);
 
-    return $this->json($clips, 200, [], ['groups' => 'clip:read']);
+    return $this->json($clips, 200, [], [
+    	'groups' => 'clip:read', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
   }
 
 
@@ -73,9 +92,13 @@ class APIController extends Controller {
    */
   public function profile(User $user, Request $request, ObjectManager $manager)
   {
-    return $this->json($user, 200, [], ['groups' => 'user:read', 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
-        return $object->getId();
-    } ]);
+    return $this->json($user, 200, [], [
+    	'groups' => 'user:read', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
   }
 
 
@@ -87,7 +110,13 @@ class APIController extends Controller {
   public function profileClips(User $user, Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
     $clips = $clipRepo->retrieveClips($user->getVendor());
 
-    return $this->json($clips, 200, [], ['groups' => 'clip:read']);
+    return $this->json($clips, 200, [], [
+    	'groups' => 'clip:read', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
   }
 
 
@@ -169,7 +198,13 @@ class APIController extends Controller {
 
     $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
-    return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+    return $this->json($live, 200, [], [
+    	'groups' => 'live:read', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
   }
 
 
@@ -195,5 +230,30 @@ class APIController extends Controller {
     }
 
     return $this->json("L'image est introuvable !", 404);
+  }
+
+
+  /**
+   * Rechercher un vendeur
+   *
+   * @Route("/api/user/search", name="api_user_search")
+   */
+  public function userSearch(Request $request, UserRepository $repo, ObjectManager $manager)
+  {
+    $search = $request->query->get('search');
+
+    if ($search || $search == "") {
+      $users = $repo->findUserBySearch($search);
+
+	    return $this->json($users, 200, [], [
+	    	'groups' => 'user:read', 
+	    	'circular_reference_limit' => 1, 
+	    	'circular_reference_handler' => function ($object) {
+	    		return $object->getId();
+	    	} 
+	    ]);
+    }
+
+    return $this->json("Une erreur est survenue", 404);
   }
 }

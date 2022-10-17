@@ -93,6 +93,8 @@ class User implements UserInterface
     /**
      * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="follower", orphanRemoval=true)
      * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $following;
 

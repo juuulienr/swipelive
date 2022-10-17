@@ -39,7 +39,13 @@ class ClipAPIController extends Controller {
   public function allClips(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
     $clips = $clipRepo->findByVendor($this->getUser()->getVendor());
 
-    return $this->json($clips, 200, [], ['groups' => 'clip:read']);
+    return $this->json($clips, 200, [], [
+    	'groups' => 'clip:read', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
   }
 
   /**
@@ -65,7 +71,13 @@ class ClipAPIController extends Controller {
       $manager->persist($comment);
       $manager->flush();
 
-      return $this->json($clip, 200, [], ['groups' => 'clip:read'], 200);
+	    return $this->json($clip, 200, [], [
+	    	'groups' => 'clip:read', 
+	    	'circular_reference_limit' => 1, 
+	    	'circular_reference_handler' => function ($object) {
+	    		return $object->getId();
+	    	} 
+	    ]);
     }
   }
 
@@ -138,6 +150,12 @@ class ClipAPIController extends Controller {
 
     $clips = $clipRepo->findClipByFollowing($this->getUser());
 
-    return $this->json($clips, 200, [], ['groups' => 'clip:read']);
+    return $this->json($clips, 200, [], [
+    	'groups' => 'clip:read', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
   }
 }

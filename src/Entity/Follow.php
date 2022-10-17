@@ -22,12 +22,16 @@ class Follow
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="followers")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $following;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="following")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $follower;
 

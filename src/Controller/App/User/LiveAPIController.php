@@ -53,7 +53,13 @@ class LiveAPIController extends Controller {
         $manager->flush();
       }
 
-      return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+	    return $this->json($live, 200, [], [
+	    	'groups' => 'live:read', 
+	    	'circular_reference_limit' => 1, 
+	    	'circular_reference_handler' => function ($object) {
+	    		return $object->getId();
+	    	} 
+	    ]);
     }
 
     return $this->json([ "error" => "Une erreur est survenue"], 404);
@@ -83,7 +89,13 @@ class LiveAPIController extends Controller {
    * @Route("/user/api/live/{id}", name="user_api_live", methods={"GET"})
    */
   public function live(Live $live, Request $request, ObjectManager $manager) {
-    return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+    return $this->json($live, 200, [], [
+    	'groups' => 'live:read', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
   }
 
 
@@ -145,7 +157,13 @@ class LiveAPIController extends Controller {
           $live->setEvent($event);
           $manager->flush();
 
-          return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+	    		return $this->json($live, 200, [], [
+			    	'groups' => 'live:read', 
+			    	'circular_reference_limit' => 1, 
+			    	'circular_reference_handler' => function ($object) {
+			    		return $object->getId();
+			    	} 
+			    ]);
         } else {
           return $this->json(false, 404);
         }
@@ -212,7 +230,13 @@ class LiveAPIController extends Controller {
         }
       }
     
-      return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+  		return $this->json($live, 200, [], [
+	    	'groups' => 'live:read', 
+	    	'circular_reference_limit' => 1, 
+	    	'circular_reference_handler' => function ($object) {
+	    		return $object->getId();
+	    	} 
+	    ]);
     }
   }
 
@@ -277,7 +301,13 @@ class LiveAPIController extends Controller {
       }
     }
 
-    return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+		return $this->json($live, 200, [], [
+    	'groups' => 'live:read', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
   }
 
 
@@ -320,7 +350,13 @@ class LiveAPIController extends Controller {
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
-      return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+			return $this->json($live, 200, [], [
+	    	'groups' => 'live:read', 
+	    	'circular_reference_limit' => 1, 
+	    	'circular_reference_handler' => function ($object) {
+	    		return $object->getId();
+	    	} 
+	    ]);
     }
   }
 
@@ -349,7 +385,13 @@ class LiveAPIController extends Controller {
 
     $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
-    return $this->json($live, 200, [], ['groups' => 'live:read'], 200);
+		return $this->json($live, 200, [], [
+    	'groups' => 'live:read', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
   }
 
 
@@ -378,9 +420,12 @@ class LiveAPIController extends Controller {
       $manager->flush();
     }
     
-    return $this->json($user, 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      }
+		return $this->json($user, 200, [], [
+    	'groups' => 'user:read', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
     ]);
   }
 

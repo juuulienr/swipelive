@@ -114,10 +114,13 @@ class AccountAPIController extends Controller {
             }
           }
 
-          return $this->json($user, 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
-              return $object->getId();
-            }
-          ]);
+			    return $this->json($user, 200, [], [
+			    	'groups' => 'user:read', 
+			    	'circular_reference_limit' => 1, 
+			    	'circular_reference_handler' => function ($object) {
+			    		return $object->getId();
+			    	} 
+			    ]);
         } else {
           return $this->json("Un compte est associé à cette adresse mail", 404);
         }
@@ -157,9 +160,13 @@ class AccountAPIController extends Controller {
    * @Route("/user/api/profile", name="user_api_profile", methods={"GET"})
    */
   public function profile(Request $request, ObjectManager $manager) {
-    return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      }
+    return $this->json($this->getUser(), 200, [], [
+    	'groups' => 'user:read', 
+    	'datetime_format' => 'd/m/Y', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
     ]);
   }
 
@@ -189,9 +196,14 @@ class AccountAPIController extends Controller {
         $manager->flush();
       }
 
-      return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } ]);
+	    return $this->json($this->getUser(), 200, [], [
+	    	'groups' => 'user:read', 
+	    	'datetime_format' => 'd/m/Y', 
+	    	'circular_reference_limit' => 1, 
+	    	'circular_reference_handler' => function ($object) {
+	    		return $object->getId();
+	    	} 
+	    ]);
     }
 
     return $this->json([ "error" => "Une erreur est survenue"], 404);
@@ -218,10 +230,15 @@ class AccountAPIController extends Controller {
       $user = $this->getUser();
       $user->setPicture($filename);
       $manager->flush();
-
-      return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } ]);
+      
+	    return $this->json($this->getUser(), 200, [], [
+	    	'groups' => 'user:read', 
+	    	'datetime_format' => 'd/m/Y', 
+	    	'circular_reference_limit' => 1, 
+	    	'circular_reference_handler' => function ($object) {
+	    		return $object->getId();
+	    	} 
+	    ]);
     }
 
     return $this->json("L'image est introuvable !", 404);
@@ -246,12 +263,16 @@ class AccountAPIController extends Controller {
     }
 
     $manager->flush();
-
-    return $this->json($this->getUser(), 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
-      return $object->getId();
-    } ]);
+      
+    return $this->json($this->getUser(), 200, [], [
+    	'groups' => 'user:read', 
+    	'datetime_format' => 'd/m/Y', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
   }
-
 
 
   /**
@@ -262,7 +283,14 @@ class AccountAPIController extends Controller {
   public function following(Request $request, ObjectManager $manager, UserRepository $userRepo) {
     $following = $userRepo->findUserFollowing($this->getUser());
 
-    return $this->json($following, 200, [], ['groups' => 'user:read']);
+    return $this->json($following, 200, [], [
+    	'groups' => 'user:read', 
+    	'datetime_format' => 'd/m/Y', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
   }
 
 
@@ -275,28 +303,13 @@ class AccountAPIController extends Controller {
   public function followers(Request $request, ObjectManager $manager, UserRepository $userRepo) {
     $followers = $userRepo->findUserFollowers($this->getUser());
 
-    return $this->json($followers, 200, [], ['groups' => 'user:read']);
+    return $this->json($followers, 200, [], [
+    	'groups' => 'user:read', 
+    	'datetime_format' => 'd/m/Y', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
   }
-
-
-  /**
-   * Rechercher un vendeur
-   *
-   * @Route("/api/user/search", name="api_user_search")
-   */
-  public function userSearch(Request $request, UserRepository $repo, ObjectManager $manager)
-  {
-    $search = $request->query->get('search');
-
-    if ($search || $search == "") {
-      $users = $repo->findUserBySearch($search);
-      return $this->json($users, 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
-	      return $object->getId();
-	    } ]);
-    }
-
-    return $this->json("Une erreur est survenue", 404);
-  }
-
-
 }
