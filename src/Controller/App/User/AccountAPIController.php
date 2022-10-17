@@ -255,7 +255,7 @@ class AccountAPIController extends Controller {
 
 
   /**
-   * Récupérer les abonnés
+   * Récupérer les abonnement
    *
    * @Route("/user/api/following", name="user_api_following", methods={"GET"})
    */
@@ -263,6 +263,39 @@ class AccountAPIController extends Controller {
     $following = $userRepo->findUserFollowing($this->getUser());
 
     return $this->json($following, 200, [], ['groups' => 'user:read']);
+  }
+
+
+
+  /**
+   * Récupérer les abonnés
+   *
+   * @Route("/user/api/followers", name="user_api_followers", methods={"GET"})
+   */
+  public function followers(Request $request, ObjectManager $manager, UserRepository $userRepo) {
+    $followers = $userRepo->findUserFollowers($this->getUser());
+
+    return $this->json($followers, 200, [], ['groups' => 'user:read']);
+  }
+
+
+  /**
+   * Rechercher un vendeur
+   *
+   * @Route("/api/user/search", name="api_user_search")
+   */
+  public function userSearch(Request $request, UserRepository $repo, ObjectManager $manager)
+  {
+    $search = $request->query->get('search');
+
+    if ($search || $search == "") {
+      $users = $repo->findUserBySearch($search);
+      return $this->json($users, 200, [], ['groups' => 'user:read', "datetime_format" => "d/m/Y", 'circular_reference_limit' => 1, 'circular_reference_handler' => function ($object) {
+	      return $object->getId();
+	    } ]);
+    }
+
+    return $this->json("Une erreur est survenue", 404);
   }
 
 

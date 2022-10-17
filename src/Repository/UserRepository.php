@@ -21,12 +21,31 @@ class UserRepository extends ServiceEntityRepository
 
 
     public function findUserFollowing($user){
-        return $this->createQueryBuilder('u')
-                    ->join('u.followers', 'f')
-                    ->andWhere('f.follower = :user')
-                    ->setParameter('user', $user)
-                    ->getQuery()
-                    ->getResult();
+    	return $this->createQueryBuilder('u')
+    	->join('u.followers', 'f')
+    	->andWhere('f.follower = :user')
+    	->setParameter('user', $user)
+    	->getQuery()
+    	->getResult();
+    }
+
+
+    public function findUserFollowers($user){
+    	return $this->createQueryBuilder('u')
+    	->join('u.following', 'f')
+    	->andWhere('f.following = :user')
+    	->setParameter('user', $user)
+    	->getQuery()
+    	->getResult();
+    }
+
+    public function findUserBySearch($search){
+    	return $this->createQueryBuilder('u')
+    	->join('u.vendor', 'v')
+    	->andWhere('u.firstname LIKE :search OR u.lastname LIKE :search OR v.businessName LIKE :search')
+    	->setParameter('search', '%'.$search.'%')
+    	->getQuery()
+    	->getResult();
     }
 
     // /**
