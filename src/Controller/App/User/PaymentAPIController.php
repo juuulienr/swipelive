@@ -38,121 +38,154 @@ class PaymentAPIController extends Controller {
       $param = json_decode($json, true);
 
       if ($param) {
-        $buyer = $this->getUser();
-        $customer = $buyer->getStripeCustomer();
-        $param["quantity"] ? $quantity = $param["quantity"] : $quantity = 1;
+        // $buyer = $this->getUser();
+        // $customer = $buyer->getStripeCustomer();
+        // $param["quantity"] ? $quantity = $param["quantity"] : $quantity = 1;
 
-        // buyer/customer
-        if (!$customer) {
-          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+        // // buyer/customer
+        // if (!$customer) {
+        //   // $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
 
-          $customer = $stripe->customers->create([
-            'email' => $buyer->getEmail(),
-            'name' => ucwords($buyer->getFullName()),
-          ]);
+        //   // $customer = $stripe->customers->create([
+        //   //   'email' => $buyer->getEmail(),
+        //   //   'name' => ucwords($buyer->getFullName()),
+        //   // ]);
 
-          $customer = $customer->id;
-          $buyer->setStripeCustomer($customer);
-          $manager->flush();
-        }
+        //   // $customer = $customer->id;
+        //   // $buyer->setStripeCustomer($customer);
+        //   // $manager->flush();
+        // }
 
-        $order = new Order();
-        $order->setBuyer($buyer);
-        $manager->persist($order);
+        // $order = new Order();
+        // $order->setBuyer($buyer);
+        // $manager->persist($order);
 
-        if ($param["variant"]) {
-          $variant = $variantRepo->findOneById($param["variant"]);
+        // if ($param["variant"]) {
+        //   $variant = $variantRepo->findOneById($param["variant"]);
 
-          if ($variant) {
-            $title = $variant->getProduct()->getTitle() . " - " . $variant->getTitle();
-            $total = $variant->getPrice() * $quantity;
-            $stripeAcc = $variant->getProduct()->getVendor()->getStripeAcc();
+        //   if ($variant) {
+        //     $title = $variant->getProduct()->getTitle() . " - " . $variant->getTitle();
+        //     $total = $variant->getPrice() * $quantity;
+        //     // $stripeAcc = $variant->getProduct()->getVendor()->getStripeAcc();
 
-            $lineItem = new LineItem();
-            $lineItem->setQuantity($quantity);
-            $lineItem->setProduct($variant->getProduct());
-            $lineItem->setVariant($variant);
-            $lineItem->setPrice($variant->getPrice());
-            $lineItem->setTotal($total);
-            $lineItem->setTitle($title);
-            $lineItem->setOrderId($order);
-            $manager->persist($lineItem);
+        //     $lineItem = new LineItem();
+        //     $lineItem->setQuantity($quantity);
+        //     $lineItem->setProduct($variant->getProduct());
+        //     $lineItem->setVariant($variant);
+        //     $lineItem->setPrice($variant->getPrice());
+        //     $lineItem->setTotal($total);
+        //     $lineItem->setTitle($title);
+        //     $lineItem->setOrderId($order);
+        //     $manager->persist($lineItem);
 
-            $order->setVendor($variant->getProduct()->getVendor());
-          } else {
-            return $this->json("Le variant est introuvable", 404); 
-          }
-        } elseif ($param["product"]) {
-          $product = $productRepo->findOneById($param["product"]);
+        //     $order->setVendor($variant->getProduct()->getVendor());
+        //   } else {
+        //     return $this->json("Le variant est introuvable", 404); 
+        //   }
+        // } elseif ($param["product"]) {
+        //   $product = $productRepo->findOneById($param["product"]);
 
-          if ($product) {
-            $title = $product->getTitle();
-            $total = $product->getPrice() * $quantity;
-            $stripeAcc = $product->getVendor()->getStripeAcc();
+        //   if ($product) {
+        //     $title = $product->getTitle();
+        //     $total = $product->getPrice() * $quantity;
+        //     // $stripeAcc = $product->getVendor()->getStripeAcc();
 
-            $lineItem = new LineItem();
-            $lineItem->setQuantity($quantity);
-            $lineItem->setProduct($product);
-            $lineItem->setTitle($title);
-            $lineItem->setPrice($product->getPrice());
-            $lineItem->setTotal($total);
-            $lineItem->setOrderId($order);
-            $manager->persist($lineItem);
+        //     $lineItem = new LineItem();
+        //     $lineItem->setQuantity($quantity);
+        //     $lineItem->setProduct($product);
+        //     $lineItem->setTitle($title);
+        //     $lineItem->setPrice($product->getPrice());
+        //     $lineItem->setTotal($total);
+        //     $lineItem->setOrderId($order);
+        //     $manager->persist($lineItem);
 
-            $order->setVendor($product->getVendor());
-          } else {
-            return $this->json("Le produit est introuvable", 404); 
-          }
-        } else {
-          return $this->json("Un produit ou un variant est obligatoire", 404); 
-        }
+        //     $order->setVendor($product->getVendor());
+        //   } else {
+        //     return $this->json("Le produit est introuvable", 404); 
+        //   }
+        // } else {
+        //   return $this->json("Un produit ou un variant est obligatoire", 404); 
+        // }
 
 
-        \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
-        $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
-        $fees = 70 + str_replace(',', '', $total) * 8;
+        // // \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
+        // // $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
+        // $fees = 70 + str_replace(',', '', $total) * 8;
 
-        $intent = \Stripe\PaymentIntent::create([
-          'amount' => str_replace(',', '', $total) * 100,
-          'customer' => $customer,
-          'description' => $title,
-          'currency' => 'eur',
-          'automatic_payment_methods' => [
-           'enabled' => 'true',
-          ],
-          'payment_method_options' => [
-           'card' => [
-              'setup_future_usage' => 'off_session',
-            ],
-          ],
-          'application_fee_amount' => $fees,
-          'transfer_data' => [
-           'destination' => $stripeAcc,
-          ],
-        ]);
+        // $intent = \Stripe\PaymentIntent::create([
+        //   'amount' => str_replace(',', '', $total) * 100,
+        //   'customer' => $customer,
+        //   'description' => $title,
+        //   'currency' => 'eur',
+        //   'automatic_payment_methods' => [
+        //    'enabled' => 'true',
+        //   ],
+        //   'payment_method_options' => [
+        //    'card' => [
+        //       'setup_future_usage' => 'off_session',
+        //     ],
+        //   ],
+        //   'application_fee_amount' => $fees,
+        //   'transfer_data' => [
+        //    'destination' => $stripeAcc,
+        //   ],
+        // ]);
 
-        $profit = $fees - (25 + str_replace(',', '', $total) * 1.4);
+        // $profit = $fees - (25 + str_replace(',', '', $total) * 1.4);
 
-        $order->setPaymentId($intent->id);
-        $order->setSubTotal($total);
-        $order->setTotal($total);
-        $order->setFees($fees / 100);
-        $order->setProfit($profit / 100);
-        $order->setStatus("created");
-        $manager->flush();
+        // $order->setPaymentId($intent->id);
+        // $order->setSubTotal($total);
+        // $order->setTotal($total);
+        // $order->setFees($fees / 100);
+        // $order->setProfit($profit / 100);
+        // $order->setStatus("created");
+        // $manager->flush();
 
-        $array = [
-          "publishableKey"=> $this->getParameter('stripe_pk'),
-          "companyName"=> "Swipe Live",
-          "paymentIntent"=> $intent->client_secret,
-          "ephemeralKey" => $ephemeralKey->secret,
-          "customerId"=> $customer,
-          "appleMerchantId"=> "merchant.com.swipelive.app",
-          "appleMerchantCountryCode"=> "FR",
-          "mobilePayEnabled"=> true
-        ];
+        // $array = [
+        //   "publishableKey"=> $this->getParameter('stripe_pk'),
+        //   "companyName"=> "Swipe Live",
+        //   "paymentIntent"=> $intent->client_secret,
+        //   "ephemeralKey" => $ephemeralKey->secret,
+        //   "customerId"=> $customer,
+        //   "appleMerchantId"=> "merchant.com.swipelive.app",
+        //   "appleMerchantCountryCode"=> "FR",
+        //   "mobilePayEnabled"=> true
+        // ];
 
-        return $this->json($array, 200);
+		        
+				$apiInstance = new \Swagger\Client\Api\PaymentsApi(new \GuzzleHttp\Client());
+				$authorization = "sandbox_api_m5dZIkcoIqZ960aek04bWNJNGSpVAZmQMkLZbnbFC44BWP5ixYq6LKeSCHFCqPO0";
+
+				$body = new \Swagger\Client\Model\IntentsPaymentBody([
+					  'type' => 'checkout',
+					  'currency' => 'gbp',
+					  'from' => [ 'email'=> 'buyer@trustshare.co' ],
+					  'fee_flat' => 7500,
+					  'settlements' => [
+					    [
+					      'type' => 'escrow',
+					      'to' => [ 'email'=> 'seller@lumber.com' ],
+					      'description' => 'Lumber - Pine Planks',
+					      'amount' => 750000,
+					    ],
+					    [
+					      'type' => 'escrow',
+					      'to' => [ 'email'=> 'seller@bricks.com' ],
+					      'description' => 'Welsh Stone Bricks',
+					      'summary' => 'Quantity: 1400 - Weight: 1.2t',
+					      'amount' => 250000,
+					      'fee_flat' => 5000,
+					    ]
+					  ]
+					]
+				); 
+
+				try {
+					$result = $apiInstance->createPaymentIntent($body, $authorization);
+	        return $this->json($result->client_secret, 200);
+				} catch (Exception $e) {
+	        return $this->json($e->getMessage(), 200);
+				}
       }
     }
     return $this->json(false, 404);

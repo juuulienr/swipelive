@@ -17,6 +17,7 @@ use App\Repository\ProductRepository;
 use App\Repository\LiveRepository;
 use App\Repository\VariantRepository;
 use App\Repository\LiveProductsRepository;
+use \Swagger\Client\Model\AllOfKnownParticipantStatus;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -26,6 +27,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use GuzzleHttp\Client;
 
 
 class ShippingAPIController extends Controller {
@@ -98,5 +100,75 @@ class ShippingAPIController extends Controller {
     // dump($tracking);
 
     die();
+  }
+
+  /**
+   * @Route("/api/test", name="test")
+   */
+  public function test(Request $request, ObjectManager $manager){
+		// $apiInstance = new \Swagger\Client\Api\ParticipantsApi(new \GuzzleHttp\Client());
+
+		// $body = new \Swagger\Client\Model\V1ParticipantsBody([
+		// 	'email' => 'dfdfdfdfdf@gmail.com',
+		// 	'name' => 'Marie Joseph'
+		// ]); 
+
+		// $authorization = "sandbox_api_m5dZIkcoIqZ960aek04bWNJNGSpVAZmQMkLZbnbFC44BWP5ixYq6LKeSCHFCqPO0";
+
+		// try {
+		//     $result = $apiInstance->createParticipant($body, $authorization);
+		//     dump($result);
+		// } catch (Exception $e) {
+		//     dump('Exception when calling ParticipantsApi->createParticipant: ', $e->getMessage());
+		// }
+
+
+		// $apiInstance = new \Swagger\Client\Api\ParticipantsApi(new \GuzzleHttp\Client());
+		// $authorization = "sandbox_api_m5dZIkcoIqZ960aek04bWNJNGSpVAZmQMkLZbnbFC44BWP5ixYq6LKeSCHFCqPO0"; 
+
+		// $id = "participant_yLmWk8TLBO"; // string | A unique ID of an existing participant.  A string in the format: `participant_[0-9a-z]`
+
+		// try {
+		//     $result = $apiInstance->getParticipant($authorization, $id);
+		//     dump($result);
+		// } catch (Exception $e) {
+		//     dump('Exception when calling ParticipantsApi->getParticipant: ', $e->getMessage());
+		// }
+
+		$apiInstance = new \Swagger\Client\Api\PaymentsApi(new \GuzzleHttp\Client());
+		$authorization = "sandbox_api_m5dZIkcoIqZ960aek04bWNJNGSpVAZmQMkLZbnbFC44BWP5ixYq6LKeSCHFCqPO0";
+
+		$body = new \Swagger\Client\Model\IntentsPaymentBody([
+			  'type' => 'checkout',
+			  'currency' => 'gbp',
+			  'from' => [ 'email'=> 'buyer@trustshare.co' ],
+			  'fee_flat' => 7500,
+			  'settlements' => [
+			    [
+			      'type' => 'escrow',
+			      'to' => [ 'email'=> 'seller@lumber.com' ],
+			      'description' => 'Lumber - Pine Planks',
+			      'amount' => 750000,
+			    ],
+			    [
+			      'type' => 'escrow',
+			      'to' => [ 'email'=> 'seller@bricks.com' ],
+			      'description' => 'Welsh Stone Bricks',
+			      'summary' => 'Quantity: 1400 - Weight: 1.2t',
+			      'amount' => 250000,
+			      'fee_flat' => 5000,
+			    ]
+			  ]
+			]
+		); 
+
+		try {
+			$result = $apiInstance->createPaymentIntent($body, $authorization);
+		  dump($result);
+		  dump($result->client_secret);
+		} catch (Exception $e) {
+		  dump('Exception when calling PaymentsApi->createPaymentIntent: ', $e->getMessage());
+		}
+
   }
 }
