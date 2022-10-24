@@ -158,23 +158,27 @@ class PaymentAPIController extends Controller {
 
 				$body = new \Swagger\Client\Model\IntentsPaymentBody([
 					  'type' => 'checkout',
-					  'currency' => 'gbp',
-					  'from' => [ 'email'=> 'buyer@trustshare.co' ],
-					  'fee_flat' => 7500,
+					  'currency' => 'eur',
+					  'from' => [ 
+					  	'email'=> 'julienreignierr@gmail.com',
+					  	'name'=> 'Julien REIGNIER',
+					  	'type'=> 'individual',
+					   ],
 					  'settlements' => [
 					    [
 					      'type' => 'escrow',
-					      'to' => [ 'email'=> 'seller@lumber.com' ],
-					      'description' => 'Lumber - Pine Planks',
-					      'amount' => 750000,
+					      'to' => [ 'email'=> 'seller@lumber.com', 'name' => 'Vendeur 1' ],
+					      'description' => 'Gamme Coco Youarda.C',
+					      'amount' => 7500,
+					      'fee_percentage' => 0.08,
 					    ],
 					    [
 					      'type' => 'escrow',
-					      'to' => [ 'email'=> 'seller@bricks.com' ],
-					      'description' => 'Welsh Stone Bricks',
-					      'summary' => 'Quantity: 1400 - Weight: 1.2t',
-					      'amount' => 250000,
-					      'fee_flat' => 5000,
+					      'to' => [ 'email'=> 'seller@bricks.com', 'name' => 'Vendeur 2'  ],
+					      'description' => 'Gamme Caviar Youarda.C',
+					      'summary' => 'Quantity: 2 - Poids: 1kg',
+					      'amount' => 2500,
+					      'fee_flat' => 50,
 					    ]
 					  ]
 					]
