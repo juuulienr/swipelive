@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "04ad6be0ee7864b6584d85f0c561bb0e",
+    "content-hash": "11001675b52285577754590826ecc41f",
     "packages": [
         {
             "name": "bugsnag/bugsnag",
@@ -2559,66 +2559,6 @@
                 }
             ],
             "time": "2022-08-28T14:45:39+00:00"
-        },
-        {
-            "name": "imbue/sendcloud-api-php",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/juuulienr/sendcloud-api-php.git",
-                "reference": "d0c36b6bcd0fb68e14cd031a815b5a60af3e9d7c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/juuulienr/sendcloud-api-php/zipball/d0c36b6bcd0fb68e14cd031a815b5a60af3e9d7c",
-                "reference": "d0c36b6bcd0fb68e14cd031a815b5a60af3e9d7c",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": "~4.0|~5.0|~6.0|~7.0",
-                "php": "^7.2 || ^7.3"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^5.7 || ^6.5 || ^7.1"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Imbue\\SendCloud\\": "src/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "Tests\\": "tests"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "./vendor/bin/phpunit tests"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Liam Boer",
-                    "email": "liam.boer@outlook.com"
-                }
-            ],
-            "description": "SendCloud API client library for PHP. SendCloud is a European shipping software for e-commerce",
-            "homepage": "https://github.com/imbue/sendcloud-api-php",
-            "keywords": [
-                "php",
-                "sendcloud",
-                "shipping",
-                "shipping software"
-            ],
-            "support": {
-                "source": "https://github.com/juuulienr/sendcloud-api-php/tree/master"
-            },
-            "time": "2022-05-11T09:43:53+00:00"
         },
         {
             "name": "intervention/image",
@@ -11734,7 +11674,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "imbue/sendcloud-api-php": 20,
         "sngrl/php-firebase-cloud-messaging": 20,
         "symfony/lts": 20
     },

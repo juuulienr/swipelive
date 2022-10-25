@@ -14,7 +14,6 @@
         "doctrine/orm": "~2.7",
         "facebook/graph-sdk": "~5.7",
         "guzzlehttp/guzzle": "^7.2",
-        "imbue/sendcloud-api-php": "dev-master",
         "intervention/image": "^2.5",
         "lexik/jwt-authentication-bundle": "~2.9",
         "nelmio/cors-bundle": "^2.1",
@@ -72,16 +71,6 @@
             "App\\Tests\\": "tests/"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@github.com:juuulienr/sendcloud-api-php"
-        },
-		    {
-		      "type": "git",
-		      "url": "https://github.com/juuulienr/trustshare-api-php.git"
-		    }
-    ],
     "replace": {
         "symfony/polyfill-iconv": "*",
         "symfony/polyfill-php71": "*",

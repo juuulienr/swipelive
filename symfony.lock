@@ -113,9 +113,6 @@
     "guzzlehttp/psr7": {
         "version": "1.6.1"
     },
-    "imbue/sendcloud-api-php": {
-        "version": "dev-master"
-    },
     "intervention/image": {
         "version": "2.5.1"
     },

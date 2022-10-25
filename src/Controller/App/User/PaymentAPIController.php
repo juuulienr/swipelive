@@ -152,78 +152,32 @@ class PaymentAPIController extends Controller {
       //   "mobilePayEnabled"=> true
       // ];
 
-  	// $ch = curl_init();
-  	// $data = [
-  	// 	'type' => 'checkout',
-  	// 	'currency' => 'eur',
-  	// 	'from' => [ 
-  	// 		'email'=> 'julienreignierr@gmail.com',
-  	// 		'name'=> 'Julien REIGNIER',
-  	// 		'type'=> 'individual',
-  	// 	],
-  	// 	'settlements' => [
-  	// 		[
-  	// 			'type' => 'escrow',
-  	// 			'to' => [ 'email'=> 'seller@lumber.com', 'name' => 'Vendeur 1' ],
-  	// 			'description' => 'Gamme Coco Youarda.C',
-  	// 			'amount' => 7500,
-  	// 			'fee_percentage' => 0.08,
-  	// 		],
-  	// 		[
-  	// 			'type' => 'escrow',
-  	// 			'to' => [ 'email'=> 'seller@bricks.com', 'name' => 'Vendeur 2'  ],
-  	// 			'description' => 'Gamme Caviar Youarda.C',
-  	// 			'summary' => 'Quantity: 2 - Poids: 1kg',
-  	// 			'amount' => 2500,
-  	// 			'fee_flat' => 50,
-  	// 		]
-  	// 	]
-  	// ];
-
-  	// try {
-  	// 	curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Authorization: sandbox_api_m5dZIkcoIqZ960aek04bWNJNGSpVAZmQMkLZbnbFC44BWP5ixYq6LKeSCHFCqPO0"]);
-  	// 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  	// 	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-  	// 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-  	// 	curl_setopt($ch, CURLOPT_URL, "https://rest.trustshare.io/v1/intents/payment");
-
-  	// 	$result = curl_exec($ch);
-  	// 	$result = json_decode($result);
-  	// 	curl_close($ch);
-
-  	// 	if ($result && $result->client_secret) {
-  	// 		return $this->json($result->client_secret, 200);
-  	// 	} else {
-  	// 		return $this->json("Une erreur est survenue", 404);
-  	// 	}
-  	// } catch (Exception $e) {
-  	// 	return $this->json($e->getMessage(), 404);
-  	// }
-
-
-
   	$ch = curl_init();
   	$data = [
-  		'id' => 'participant_wvpE3Zqm46'
-  		// 'type' => 'individual',
-  		// 'email' => 'julienreignierr@gmail.com' 
-  		// 'settlements' => [
-  		// 	[
-  		// 		'type' => 'escrow',
-  		// 		'to' => [ 'email'=> 'seller@lumber.com', 'name' => 'Vendeur 1' ],
-  		// 		'description' => 'Gamme Coco Youarda.C',
-  		// 		'amount' => 7500,
-  		// 		'fee_percentage' => 0.08,
-  		// 	],
-  		// 	[
-  		// 		'type' => 'escrow',
-  		// 		'to' => [ 'email'=> 'seller@bricks.com', 'name' => 'Vendeur 2'  ],
-  		// 		'description' => 'Gamme Caviar Youarda.C',
-  		// 		'summary' => 'Quantity: 2 - Poids: 1kg',
-  		// 		'amount' => 2500,
-  		// 		'fee_flat' => 50,
-  		// 	]
-  		// ]
+  		'type' => 'checkout',
+  		'currency' => 'eur',
+  		'from' => [ 
+  			'email'=> 'julienreignierr@gmail.com',
+  			'name'=> 'Julien REIGNIER',
+  			'type'=> 'individual',
+  		],
+  		'settlements' => [
+  			[
+  				'type' => 'escrow',
+  				'to' => [ 'email'=> 'seller@lumber.com', 'name' => 'Vendeur 1' ],
+  				'description' => 'Gamme Coco Youarda.C',
+  				'amount' => 7500,
+  				'fee_percentage' => 0.08,
+  			],
+  			[
+  				'type' => 'escrow',
+  				'to' => [ 'email'=> 'seller@bricks.com', 'name' => 'Vendeur 2'  ],
+  				'description' => 'Gamme Caviar Youarda.C',
+  				'summary' => 'Quantity: 2 - Poids: 1kg',
+  				'amount' => 2500,
+  				'fee_flat' => 50,
+  			]
+  		]
   	];
 
   	try {
@@ -231,7 +185,7 @@ class PaymentAPIController extends Controller {
   		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
   		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-  		curl_setopt($ch, CURLOPT_URL, "https://rest.trustshare.io/v1/verifications");
+  		curl_setopt($ch, CURLOPT_URL, "https://rest.trustshare.io/v1/intents/payment");
 
   		$result = curl_exec($ch);
   		$result = json_decode($result);
@@ -245,6 +199,52 @@ class PaymentAPIController extends Controller {
   	} catch (Exception $e) {
   		return $this->json($e->getMessage(), 404);
   	}
+
+
+
+  	// $ch = curl_init();
+  	// $data = [
+  	// 	'id' => 'participant_wvpE3Zqm46'
+  	// 	// 'type' => 'individual',
+  	// 	// 'email' => 'julienreignierr@gmail.com' 
+  	// 	// 'settlements' => [
+  	// 	// 	[
+  	// 	// 		'type' => 'escrow',
+  	// 	// 		'to' => [ 'email'=> 'seller@lumber.com', 'name' => 'Vendeur 1' ],
+  	// 	// 		'description' => 'Gamme Coco Youarda.C',
+  	// 	// 		'amount' => 7500,
+  	// 	// 		'fee_percentage' => 0.08,
+  	// 	// 	],
+  	// 	// 	[
+  	// 	// 		'type' => 'escrow',
+  	// 	// 		'to' => [ 'email'=> 'seller@bricks.com', 'name' => 'Vendeur 2'  ],
+  	// 	// 		'description' => 'Gamme Caviar Youarda.C',
+  	// 	// 		'summary' => 'Quantity: 2 - Poids: 1kg',
+  	// 	// 		'amount' => 2500,
+  	// 	// 		'fee_flat' => 50,
+  	// 	// 	]
+  	// 	// ]
+  	// ];
+
+  	// try {
+  	// 	curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Authorization: sandbox_api_m5dZIkcoIqZ960aek04bWNJNGSpVAZmQMkLZbnbFC44BWP5ixYq6LKeSCHFCqPO0"]);
+  	// 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  	// 	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+  	// 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+  	// 	curl_setopt($ch, CURLOPT_URL, "https://rest.trustshare.io/v1/verifications");
+
+  	// 	$result = curl_exec($ch);
+  	// 	$result = json_decode($result);
+  	// 	curl_close($ch);
+
+  	// 	if ($result && $result->client_secret) {
+  	// 		return $this->json($result->client_secret, 200);
+  	// 	} else {
+  	// 		return $this->json("Une erreur est survenue", 404);
+  	// 	}
+  	// } catch (Exception $e) {
+  	// 	return $this->json($e->getMessage(), 404);
+  	// }
     
     return $this->json(false, 404);
   }
