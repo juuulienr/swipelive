@@ -316,9 +316,6 @@
     "sngrl/php-firebase-cloud-messaging": {
         "version": "dev-master"
     },
-    "stripe/stripe-php": {
-        "version": "v6.29.1"
-    },
     "swiftmailer/swiftmailer": {
         "version": "v6.1.2"
     },

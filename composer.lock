@@ -4,60 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3a797ade3409e5b113e80f1759198b91",
+    "content-hash": "04ad6be0ee7864b6584d85f0c561bb0e",
     "packages": [
-        {
-            "name": "asplinsol/trustshare-api-php",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/juuulienr/trustshare-api-php.git",
-                "reference": "ef037158131719c11e262251352eaff38c93da6e"
-            },
-            "require": {
-                "ext-curl": "*",
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "guzzlehttp/guzzle": "^7.0",
-                "php": ">=5.5"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.0",
-                "phpunit/phpunit": "^4.8",
-                "squizlabs/php_codesniffer": "~2.6"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Swagger\\Client\\": "lib/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "Swagger\\Client\\": "test/"
-                }
-            },
-            "license": [
-                "LGPL-2.1"
-            ],
-            "authors": [
-                {
-                    "name": "Swagger and contributors",
-                    "homepage": "https://github.com/swagger-api/swagger-codegen"
-                }
-            ],
-            "description": "PHP library for access to TrustShare API",
-            "homepage": "https://github.com/asplinsol",
-            "keywords": [
-                "TrustShare",
-                "api",
-                "php",
-                "sdk",
-                "swagger"
-            ],
-            "time": "2022-10-21T06:34:14+00:00"
-        },
         {
             "name": "bugsnag/bugsnag",
             "version": "v3.29.0",
@@ -123,20 +71,20 @@
         },
         {
             "name": "bugsnag/bugsnag-symfony",
-            "version": "v1.12.0",
+            "version": "v1.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bugsnag/bugsnag-symfony.git",
-                "reference": "0cb1831f3feafc6801d94463cdb8bcf231127520"
+                "reference": "be4bb456f002e9662594eb281694e4ce06e2d6ca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bugsnag/bugsnag-symfony/zipball/0cb1831f3feafc6801d94463cdb8bcf231127520",
-                "reference": "0cb1831f3feafc6801d94463cdb8bcf231127520",
+                "url": "https://api.github.com/repos/bugsnag/bugsnag-symfony/zipball/be4bb456f002e9662594eb281694e4ce06e2d6ca",
+                "reference": "be4bb456f002e9662594eb281694e4ce06e2d6ca",
                 "shasum": ""
             },
             "require": {
-                "bugsnag/bugsnag": "^3.28.0",
+                "bugsnag/bugsnag": "^3.29.0",
                 "php": ">=5.5",
                 "symfony/config": "^2.7|^3|^4|^5|^6",
                 "symfony/console": "^2.7|^3|^4|^5|^6",
@@ -183,9 +131,9 @@
             ],
             "support": {
                 "issues": "https://github.com/bugsnag/bugsnag-symfony/issues",
-                "source": "https://github.com/bugsnag/bugsnag-symfony/tree/v1.12.0"
+                "source": "https://github.com/bugsnag/bugsnag-symfony/tree/v1.13.0"
             },
-            "time": "2022-05-20T14:09:00+00:00"
+            "time": "2022-10-24T10:25:35+00:00"
         },
         {
             "name": "cocur/slugify",
@@ -4247,66 +4195,6 @@
                 "source": "https://github.com/sngrl/php-firebase-cloud-messaging/tree/master"
             },
             "time": "2017-06-26T15:58:02+00:00"
-        },
-        {
-            "name": "stripe/stripe-php",
-            "version": "v7.128.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/stripe/stripe-php.git",
-                "reference": "c704949c49b72985c76cc61063aa26fefbd2724e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/c704949c49b72985c76cc61063aa26fefbd2724e",
-                "reference": "c704949c49b72985c76cc61063aa26fefbd2724e",
-                "shasum": ""
-            },
-            "require": {
-                "ext-curl": "*",
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "php": ">=5.6.0"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "3.5.0",
-                "phpstan/phpstan": "^1.2",
-                "phpunit/phpunit": "^5.7 || ^9.0",
-                "squizlabs/php_codesniffer": "^3.3"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Stripe\\": "lib/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Stripe and contributors",
-                    "homepage": "https://github.com/stripe/stripe-php/contributors"
-                }
-            ],
-            "description": "Stripe PHP Library",
-            "homepage": "https://stripe.com/",
-            "keywords": [
-                "api",
-                "payment processing",
-                "stripe"
-            ],
-            "support": {
-                "issues": "https://github.com/stripe/stripe-php/issues",
-                "source": "https://github.com/stripe/stripe-php/tree/v7.128.0"
-            },
-            "time": "2022-05-05T17:18:02+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -11846,7 +11734,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "asplinsol/trustshare-api-php": 20,
         "imbue/sendcloud-api-php": 20,
         "sngrl/php-firebase-cloud-messaging": 20,
         "symfony/lts": 20
