@@ -47,11 +47,6 @@ class User implements UserInterface
     private $createdAt;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $stripeCustomer;
-
-    /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Email(message="L'adresse mail est invalide !")
      * @Groups("user:read")
@@ -239,18 +234,6 @@ class User implements UserInterface
     public function setPicture(?string $picture): self
     {
         $this->picture = $picture;
-
-        return $this;
-    }
-
-    public function getStripeCustomer(): ?string
-    {
-        return $this->stripeCustomer;
-    }
-
-    public function setStripeCustomer(?string $stripeCustomer): self
-    {
-        $this->stripeCustomer = $stripeCustomer;
 
         return $this;
     }

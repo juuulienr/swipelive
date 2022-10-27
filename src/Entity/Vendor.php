@@ -27,16 +27,6 @@ class Vendor
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $stripeAcc;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $personId;
-
-    /**
      * @ORM\OneToMany(targetEntity=Live::class, mappedBy="vendor")
      * @Groups("user:read")
      */
@@ -376,19 +366,6 @@ class Vendor
 
         return $this;
     }
-
-    public function getStripeAcc(): ?string
-    {
-        return $this->stripeAcc;
-    }
-
-    public function setStripeAcc(?string $stripeAcc): self
-    {
-        $this->stripeAcc = $stripeAcc;
-
-        return $this;
-    }
-
   
     /**
      * @return Collection|Order[]
@@ -524,18 +501,6 @@ class Vendor
                 $bankAccount->setVendor(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getPersonId(): ?string
-    {
-        return $this->personId;
-    }
-
-    public function setPersonId(?string $personId): self
-    {
-        $this->personId = $personId;
 
         return $this;
     }

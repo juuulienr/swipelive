@@ -56,28 +56,7 @@ class AccountAPIController extends Controller {
 
           if ($param['businessType'] == "company" | $param['businessType'] == "individual") {
             try {
-              $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
-              $response = $stripe->accounts->create([
-                'country' => 'FR',
-                'type' => 'custom',
-                'capabilities' => [
-                  'transfers' => ['requested' => true],
-                ],
-                'business_profile' => [
-                  'product_description' => $param['summary'],
-                ],
-                'account_token' => $param['tokenAccount'],
-                'settings' => [
-                  'payouts' => [
-                    'schedule' => [
-                      'interval' => 'manual'
-                    ]
-                  ]
-                ]
-              ]);
-
               $vendor = new Vendor();
-              $vendor->setStripeAcc($response->id);
               $vendor->setBusinessName($param['businessName']);
               $vendor->setBusinessType($param['businessType']);
               $vendor->setSummary($param['summary']);
@@ -94,15 +73,8 @@ class AccountAPIController extends Controller {
 
               if ($param['businessType'] == "company") {
                 try {
-                  \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
-
-                  $person = \Stripe\Account::createPerson($response->id, [
-                    'person_token' => $param['tokenPerson'],
-                  ]);
-
                   $vendor->setCompany($param['company']);
                   $vendor->setSiren($param['siren']);
-                  $vendor->setPersonId($person->id);
                   $manager->flush();
 
                 } catch (Exception $e) {
