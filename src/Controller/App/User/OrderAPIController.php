@@ -36,7 +36,7 @@ class OrderAPIController extends Controller {
    * @Route("/user/api/orders", name="user_api_orders", methods={"GET"})
    */
   public function orders(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
-    $sales = $orderRepo->findBy([ "user" => $this->getUser(), "status" => "succeeded" ]);
+    $sales = $orderRepo->findBy([ "vendor" => $this->getUser(), "status" => "succeeded" ]);
     $purchases = $orderRepo->findByBuyer([ "buyer" => $this->getUser(), "status" => "succeeded" ]);
 
     $array = [

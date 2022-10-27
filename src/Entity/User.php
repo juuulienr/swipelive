@@ -74,6 +74,7 @@ class User implements UserInterface
      * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $picture;
 
@@ -128,7 +129,7 @@ class User implements UserInterface
     }
 
     public function getFullName() {
-        return "{$this->firstName} {$this->lastName}";
+        return "{$this->firstname} {$this->lastname}";
     }
 
     public function getId(): ?int

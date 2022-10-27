@@ -38,12 +38,11 @@ class PaymentAPIController extends Controller {
 	    $param = json_decode($json, true);
 
 	    if ($param) {
-	      $buyer = $this->getUser();
-	      $customer = $buyer->getStripeCustomer();
+	      $customer = $this->getUser();
 	      $param["quantity"] ? $quantity = $param["quantity"] : $quantity = 1;
 
 	      $order = new Order();
-	      $order->setBuyer($buyer);
+	      $order->setBuyer($customer);
 	      $manager->persist($order);
 
 	      if ($param["variant"]) {
@@ -52,7 +51,7 @@ class PaymentAPIController extends Controller {
 	        if ($variant) {
 	          $title = $variant->getProduct()->getTitle() . " - " . $variant->getTitle();
 	          $total = $variant->getPrice() * $quantity;
-	          // $stripeAcc = $variant->getProduct()->getVendor()->getStripeAcc();
+	      		$vendor = $variant->getProduct()->getVendor();
 
 	          $lineItem = new LineItem();
 	          $lineItem->setQuantity($quantity);
@@ -64,7 +63,7 @@ class PaymentAPIController extends Controller {
 	          $lineItem->setOrderId($order);
 	          $manager->persist($lineItem);
 
-	          $order->setVendor($variant->getProduct()->getVendor());
+	          $order->setVendor($vendor);
 	        } else {
 	          return $this->json("Le variant est introuvable", 404); 
 	        }
@@ -74,7 +73,7 @@ class PaymentAPIController extends Controller {
 	        if ($product) {
 	          $title = $product->getTitle();
 	          $total = $product->getPrice() * $quantity;
-	          // $stripeAcc = $product->getVendor()->getStripeAcc();
+	      		$vendor = $product->getVendor();
 
 	          $lineItem = new LineItem();
 	          $lineItem->setQuantity($quantity);
@@ -85,7 +84,7 @@ class PaymentAPIController extends Controller {
 	          $lineItem->setOrderId($order);
 	          $manager->persist($lineItem);
 
-	          $order->setVendor($product->getVendor());
+	          $order->setVendor($vendor);
 	        } else {
 	          return $this->json("Le produit est introuvable", 404); 
 	        }
@@ -93,63 +92,28 @@ class PaymentAPIController extends Controller {
 	        return $this->json("Un produit ou un variant est obligatoire", 404); 
 	      }
 
-
-	      $fees = 70 + str_replace(',', '', $total) * 8;
-
-	      $intent = \Stripe\PaymentIntent::create([
-	        'amount' => str_replace(',', '', $total) * 100,
-	        'customer' => $customer,
-	        'description' => $title,
-	        'currency' => 'eur',
-	        'automatic_payment_methods' => [
-	         'enabled' => 'true',
-	        ],
-	        'payment_method_options' => [
-	         'card' => [
-	            'setup_future_usage' => 'off_session',
-	          ],
-	        ],
-	        'application_fee_amount' => $fees,
-	        'transfer_data' => [
-	         'destination' => $stripeAcc,
-	        ],
-	      ]);
-
-	      $profit = $fees - (25 + str_replace(',', '', $total) * 1.4);
-
-	      $order->setPaymentId($intent->id);
-	      $order->setSubTotal($total);
-	      $order->setTotal($total);
-	      $order->setFees($fees / 100);
-	      $order->setProfit($profit / 100);
-	      $order->setStatus("created");
-	      $manager->flush();
-
-
+	      $fees = str_replace(',', '', $total) * 8;
+	      $amount = str_replace(',', '', $total) * 100;
+	      $summary = "Quantité : " . $quantity;
 		  	$ch = curl_init();
+
 		  	$data = [
 		  		'type' => 'checkout',
 		  		'currency' => 'eur',
 		  		'from' => [ 
-		  			'email'=> 'julienreignierr@gmail.com',
-		  			'name'=> 'Julien REIGNIER',
+		  			'email'=> $customer->getEmail(),
+		  			'name'=> $customer->getFullName(),
 		  			'type'=> 'individual',
 		  		],
 		  		'settlements' => [
 		  			[
 		  				'type' => 'escrow',
-		  				'to' => [ 'email'=> 'seller@lumber.com', 'name' => 'Vendeur 1' ],
-		  				'description' => 'Gamme Coco Youarda.C',
-		  				'amount' => 7500,
+		  				'to' => [ 'email'=> $vendor->getUser()->getEmail(), 'name' => $vendor->getBusinessName() ],
+		  				'description' => $title,
+		  				'summary' => $summary,
+		  				'amount' => $amount,
 		  				'fee_percentage' => 0.08,
-		  			],
-		  			[
-		  				'type' => 'escrow',
-		  				'to' => [ 'email'=> 'seller@bricks.com', 'name' => 'Vendeur 2'  ],
-		  				'description' => 'Gamme Caviar Youarda.C',
-		  				'summary' => 'Quantity: 2 - Poids: 1kg',
-		  				'amount' => 2500,
-		  				'fee_flat' => 50,
+		  				// 'redirect_url' => "https://swipelive.fr/complete"
 		  			]
 		  		]
 		  	];
@@ -166,6 +130,16 @@ class PaymentAPIController extends Controller {
 		  		curl_close($ch);
 
 		  		if ($result && $result->client_secret) {
+			      // $profit = $fees - (20 + str_replace(',', '', $total) * 1.5);
+			      // $order->setProfit($profit / 100);
+
+			      $order->setPaymentId($result->id);
+			      $order->setSubTotal($total);
+			      $order->setTotal($total);
+			      $order->setFees($fees / 100);
+			      $order->setStatus("created");
+			      $manager->flush();
+
 		  			return $this->json($result->client_secret, 200);
 		  		} else {
 		  			return $this->json("Une erreur est survenue", 404);
@@ -173,34 +147,34 @@ class PaymentAPIController extends Controller {
 		  	} catch (Exception $e) {
 		  		return $this->json($e->getMessage(), 404);
 		  	}
-
-
-	  	// $ch = curl_init();
-	  	// $data = [ 'id' => 'participant_wvpE3Zqm46' ];
-
-	  	// try {
-	  	// 	curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Authorization: sandbox_api_m5dZIkcoIqZ960aek04bWNJNGSpVAZmQMkLZbnbFC44BWP5ixYq6LKeSCHFCqPO0"]);
-	  	// 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	  	// 	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-	  	// 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-	  	// 	curl_setopt($ch, CURLOPT_URL, "https://rest.trustshare.io/v1/verifications");
-
-	  	// 	$result = curl_exec($ch);
-	  	// 	$result = json_decode($result);
-	  	// 	curl_close($ch);
-
-	  	// 	if ($result && $result->client_secret) {
-	  	// 		return $this->json($result->client_secret, 200);
-	  	// 	} else {
-	  	// 		return $this->json("Une erreur est survenue", 404);
-	  	// 	}
-	  	// } catch (Exception $e) {
-	  	// 	return $this->json($e->getMessage(), 404);
-	  	// }
-	    
 		  }
 		}
-		  
+
     return $this->json(false, 404);
   }
+
+
+
+	// $ch = curl_init();
+	// $data = [ 'id' => 'participant_wvpE3Zqm46' ];
+
+	// try {
+	// 	curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Authorization: sandbox_api_m5dZIkcoIqZ960aek04bWNJNGSpVAZmQMkLZbnbFC44BWP5ixYq6LKeSCHFCqPO0"]);
+	// 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	// 	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+	// 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+	// 	curl_setopt($ch, CURLOPT_URL, "https://rest.trustshare.io/v1/verifications");
+
+	// 	$result = curl_exec($ch);
+	// 	$result = json_decode($result);
+	// 	curl_close($ch);
+
+	// 	if ($result && $result->client_secret) {
+	// 		return $this->json($result->client_secret, 200);
+	// 	} else {
+	// 		return $this->json("Une erreur est survenue", 404);
+	// 	}
+	// } catch (Exception $e) {
+	// 	return $this->json($e->getMessage(), 404);
+	// }
 }

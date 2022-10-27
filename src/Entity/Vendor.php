@@ -42,6 +42,7 @@ class Vendor
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("order:read")
      */
     private $company;
 
@@ -74,6 +75,7 @@ class Vendor
      * @Groups("clip:read")
      * @Groups("live:read")
      * @Groups("product:read")
+     * @Groups("order:read")
      */
     private $businessName;
 
@@ -154,6 +156,7 @@ class Vendor
      * @ORM\OneToOne(targetEntity=User::class, mappedBy="vendor", cascade={"persist", "remove"})
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $user;
 

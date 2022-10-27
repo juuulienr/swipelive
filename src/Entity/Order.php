@@ -77,7 +77,7 @@ class Order
     private $fees;
 
     /**
-     * @ORM\Column(type="decimal", precision=8, scale=2)
+     * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
      * @Groups("order:read")
      * @Groups("user:read")
      */
