@@ -113,7 +113,6 @@ class PaymentAPIController extends Controller {
 		  				'summary' => $summary,
 		  				'amount' => $amount,
 		  				'fee_percentage' => 0.08,
-		  				// 'redirect_url' => "https://swipelive.fr/complete"
 		  			]
 		  		]
 		  	];

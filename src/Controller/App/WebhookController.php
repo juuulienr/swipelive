@@ -147,40 +147,89 @@ class WebhookController extends Controller {
 
 
   /**
-   * Webhooks Stripe Connect
+   * Trustshare Weebhook
    *
-   * @Route("/api/stripe/webhooks/connect", name="api_stripe_webhooks_connect", methods={"POST"})
+   * @Route("/api/trustshare/webhooks", name="api_trustshare_webhooks", methods={"POST"})
    */
   public function stripeConnect(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
+    
+    $this->get('bugsnag')->notifyException(new Exception($result));
+    $this->get('bugsnag')->notifyException(new Exception($result["type"]));
 
     // account
-    if ($result["object"] == "event") {
-      switch ($result["type"]) {
-        case 'account.updated':
-          // $account = $result["data"]["object"];
-          break;
+    switch ($result["type"]) {
+      case 'intent_confirmed':
+        // $account = $result["data"]["object"];
+        break;
 
-        case 'account.external_account.updated':
-          // $externalAccount = $result["data"]["object"];
-          break;
+      case 'checkout_initiated':
+        // $externalAccount = $result["data"]["object"];
+        break;
 
-        case 'balance.available':
-          // $balance = $result["data"]["object"];
-          break;
+      case 'checkout_failed':
+        // $balance = $result["data"]["object"];
+        break;
 
-        case 'payout.failed':
-          // $payout = $result["data"]["object"];
-          break;
+      case 'checkout_cancelled':
+        // $payout = $result["data"]["object"];
+        break;
 
-        case 'person.updated':
-          // $person = $result["data"]["object"];
-          break;
-          
-        default:
-          $this->get('bugsnag')->notifyException(new Exception($result["type"]));
-          break;
-      }
+      case 'checkout_rejected':
+        // $person = $result["data"]["object"];
+        break;
+
+      case 'checkout_abandoned':
+        // $person = $result["data"]["object"];
+        break;
+
+      case 'checkout_settling':
+        // $person = $result["data"]["object"];
+        break;
+
+      case 'checkout_settled':
+        // $person = $result["data"]["object"];
+        break;
+
+      case 'inbound_settled':
+        // $person = $result["data"]["object"];
+        break;
+
+      case 'settlement_settled':
+        // $person = $result["data"]["object"];
+        break;
+
+      case 'settlement_executing':
+        // $person = $result["data"]["object"];
+        break;
+
+      case 'settlement_executed':
+        // $person = $result["data"]["object"];
+        break;
+
+      case 'outbound_paused':
+        // $person = $result["data"]["object"];
+        break;
+
+      case 'outbound_failed':
+        // $person = $result["data"]["object"];
+        break;
+
+      case 'outbound_executing':
+        // $person = $result["data"]["object"];
+        break;
+
+      case 'outbound_executed':
+        // $person = $result["data"]["object"];
+        break;
+
+      case 'participant_verified':
+        // $person = $result["data"]["payload"];
+        break;
+        
+      default:
+        $this->get('bugsnag')->notifyException(new Exception($result["type"]));
+        break;
     }
 
     return $this->json(true, 200);
