@@ -151,10 +151,9 @@ class WebhookController extends Controller {
    *
    * @Route("/api/trustshare/webhooks", name="api_trustshare_webhooks", methods={"POST"})
    */
-  public function stripeConnect(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+  public function trustshare(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
-    
-    $this->get('bugsnag')->notifyException(new Exception($result));
+
     $this->get('bugsnag')->notifyException(new Exception($result["type"]));
 
     // account
