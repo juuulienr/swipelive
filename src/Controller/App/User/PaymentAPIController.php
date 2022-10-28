@@ -92,10 +92,10 @@ class PaymentAPIController extends Controller {
 	        return $this->json("Un produit ou un variant est obligatoire", 404); 
 	      }
 
-	      $fees = str_replace(',', '', $total) * 8;
-	      $amount = str_replace(',', '', $total) * 100;
+	      $fees = str_replace('.', '', $total) * 8;
+	      $amount = str_replace('.', '', $total) * 100;
+
 	      $summary = "Quantité : " . $quantity;
-		  	$ch = curl_init();
 
 		  	$data = [
 		  		'type' => 'checkout',
@@ -118,6 +118,7 @@ class PaymentAPIController extends Controller {
 		  	];
 
 		  	try {
+		  		$ch = curl_init();
 		  		curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Authorization: sandbox_api_m5dZIkcoIqZ960aek04bWNJNGSpVAZmQMkLZbnbFC44BWP5ixYq6LKeSCHFCqPO0"]);
 		  		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		  		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
@@ -129,10 +130,7 @@ class PaymentAPIController extends Controller {
 		  		curl_close($ch);
 
 		  		if ($result && $result->client_secret) {
-			      // $profit = $fees - (20 + str_replace(',', '', $total) * 1.5);
-			      // $order->setProfit($profit / 100);
-
-			      $order->setPaymentId($result->id);
+		  			$order->setPaymentId($result->id);
 			      $order->setSubTotal($total);
 			      $order->setTotal($total);
 			      $order->setFees($fees / 100);

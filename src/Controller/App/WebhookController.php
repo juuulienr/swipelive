@@ -159,6 +159,9 @@ class WebhookController extends Controller {
 	    $id = $result["id"];
 	    $payload = $result["payload"];
 
+      // $profit = $fees - (20 + str_replace(',', '', $total) * 1.5);
+      // $order->setProfit($profit / 100);
+
 	    // account
 	    switch ($result["type"]) {
 	      case 'intent_confirmed':
@@ -233,11 +236,9 @@ class WebhookController extends Controller {
 	        $this->get('bugsnag')->notifyException(new Exception($result["type"]));
 	        break;
 	    }
-    	
-    	return $this->json(true, 200);
     }
-
-    return $this->json(false, 404);
+    
+    return $this->json(true, 200);
   }
 
 
