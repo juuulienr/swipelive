@@ -1,0 +1,26 @@
+{% extends 'web/base.html.twig' %}
+
+{% block title %} Mentions légales {% endblock %}
+
+{% block metadata %}{% endblock %}
+    
+{% block stylesheets %}
+    <link rel="stylesheet" href="css/style.css">
+{% endblock %}
+
+
+{% block body %}
+    <div id="root-terms">
+      <div id="header-terms">
+        <a href="{{ path('landing') }}">
+          <img height="50" src="img/logo.png" alt="Logo Swipe Live"/>
+        </a>
+      </div>
+      <div>
+      	Le paiement a été effectué avec succès. 
+      	Vous allez etre redirigé automatiquement.
+      </div>
+    </div>
+
+
+{% endblock %}
