@@ -87,7 +87,7 @@ class WithdrawAPIController extends Controller {
 
       // check amount payout
       $withdraw = new Withdraw();
-      $withdraw->setPayoutId($payout->id);
+      // $withdraw->setPayoutId($payout->id);
       $withdraw->setAmount($user->getAvailable());
       $withdraw->setStatus("completed");
       $withdraw->setLast4($user->getBankAccounts()[0]->getLast4());

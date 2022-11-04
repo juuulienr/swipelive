@@ -146,6 +146,30 @@ class WebhookController extends Controller {
   }
 
 
+
+  /**
+   * Sendcloud Weebhook
+   *
+   * @Route("/api/sendcloud/webhooks", name="api_sendcloud_webhooks")", methods={"POST"})
+   */
+  public function sendcloud(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+    $result = json_decode($request->getContent(), true);
+    $this->get('bugsnag')->notifyException(new Exception("Sendcloud"));
+
+    // update parcel status
+    if ($result["action"] == "parcel_status_changed") {
+      $this->get('bugsnag')->notifyException(new Exception($result["parcel"]["id"]));
+      $parcelId = $result["parcel"]["id"];
+      $tracking_number = $result["parcel"]["tracking_number"];
+      $statusId = $result["parcel"]["status"]["id"];
+      $statusMessage = $result["parcel"]["status"]["message"];
+    }
+
+    return $this->json(true, 200);
+  }
+
+  
+
   /**
    * Trustshare Weebhook
    *
@@ -153,7 +177,7 @@ class WebhookController extends Controller {
    */
   public function trustshare(Request $request) {
     $result = json_decode($request->getContent(), true);
-	  $this->get('bugsnag')->notifyException(new Exception($result["type"]));
+	  // $this->get('bugsnag')->notifyException(new Exception($result["type"]));
 	  
 
     if ($result) {
@@ -230,33 +254,10 @@ class WebhookController extends Controller {
 	        break;
 	        
 	      default:
-	        $this->get('bugsnag')->notifyException(new Exception($result["type"]));
 	        break;
 	    }
     }
     
-    return $this->json(true, 200);
-  }
-
-
-  /**
-   * Sendcloud Weebhook
-   *
-   * @Route("/api/sendcloud/webhooks", name="api_sendcloud_webhooks")", methods={"POST"})
-   */
-  public function sendcloud(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
-    $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyException(new Exception("Sendcloud"));
-
-    // update parcel status
-    if ($result["action"] == "parcel_status_changed") {
-      $this->get('bugsnag')->notifyException(new Exception($result["parcel"]["id"]));
-      $parcelId = $result["parcel"]["id"];
-      $tracking_number = $result["parcel"]["tracking_number"];
-      $statusId = $result["parcel"]["status"]["id"];
-      $statusMessage = $result["parcel"]["status"]["message"];
-    }
-
     return $this->json(true, 200);
   }
 }

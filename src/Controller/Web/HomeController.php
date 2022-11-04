@@ -35,18 +35,5 @@ class HomeController extends Controller {
   public function privacy(){
     return $this->render('web/privacy.html.twig');
   }
-
-  /**
-   * @Route("/payment/success", name="payment_success")
-   */
-  public function success(Request $request){
-  	$project_id = $request->query->get('project_id');
-  	$checkout_id = $request->query->get('checkout_id');
-
-    return $this->render('web/success.html.twig', [ 
-    	"project_id" => $project_id,
-    	"checkout_id" => $checkout_id
-    ]);
-  }
 }
 
