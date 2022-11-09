@@ -97,6 +97,6 @@ class ShippingAPIController extends Controller {
     $tracking = $sendCloud->tracking->get('SCCWF3BVYJ7W');
     dump($tracking);
 
-    die();
+    return true;
   }
 }

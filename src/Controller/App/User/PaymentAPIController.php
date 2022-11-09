@@ -96,56 +96,13 @@ class PaymentAPIController extends Controller {
 	      $amount = str_replace('.', '', $total) * 100;
 	      $summary = "Quantité : " . $quantity;
 
-		  	// $data = [
-		  	// 	'type' => 'checkout',
-		  	// 	'currency' => 'eur',
-		  	// 	'from' => [ 
-		  	// 		'id'=> "participant_y0RX4fhgF5",
-		  	// 		// 'email'=> $customer->getEmail(),
-		  	// 		// 'name'=> $customer->getFullName(),
-		  	// 		// 'type'=> 'individual',
-		  	// 	],
-		  	// 	'settlements' => [
-		  	// 		[
-		  	// 			'type' => 'escrow',
-		  	// 			'to' => [ 'email'=> $vendor->getUser()->getEmail(), 'name' => $vendor->getBusinessName() ],
-		  	// 			'description' => $title,
-		  	// 			'summary' => $summary,
-		  	// 			'amount' => $amount,
-		  	// 			'fee_percentage' => 0.08,
-		  	// 		]
-		  	// 	]
-		  	// ];
+	      $order->setSubTotal($total);
+	      $order->setTotal($total);
+	      $order->setFees($fees / 100);
+	      $order->setStatus("created");
+	      $manager->flush();
 
-		  	// try {
-		  	// 	$ch = curl_init();
-		  	// 	curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Authorization: sandbox_api_m5dZIkcoIqZ960aek04bWNJNGSpVAZmQMkLZbnbFC44BWP5ixYq6LKeSCHFCqPO0"]);
-		  	// 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		  	// 	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-		  	// 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-		  	// 	curl_setopt($ch, CURLOPT_URL, "https://rest.trustshare.io/v1/intents/payment");
-
-		  	// 	$result = curl_exec($ch);
-		  	// 	$result = json_decode($result);
-
-		  	// 	curl_close($ch);
-
-		  		// if ($result && $result->client_secret) {
-		  			// $order->setPaymentId($result->id);
-			      $order->setSubTotal($total);
-			      $order->setTotal($total);
-			      $order->setFees($fees / 100);
-			      $order->setStatus("created");
-			      $manager->flush();
-
-		  			return $this->json(true, 200);
-		  			// return $this->json($result->client_secret, 200);
-		  		// } else {
-		  		// 	return $this->json("Une erreur est survenue", 404);
-		  		// }
-		  	// } catch (Exception $e) {
-		  	// 	return $this->json($e->getMessage(), 404);
-		  	// }
+				return $this->json(true, 200);
 		  }
 		}
 

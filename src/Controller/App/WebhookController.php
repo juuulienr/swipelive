@@ -159,6 +159,7 @@ class WebhookController extends Controller {
     // update parcel status
     if ($result["action"] == "parcel_status_changed") {
       $this->get('bugsnag')->notifyException(new Exception($result["parcel"]["id"]));
+
       $parcelId = $result["parcel"]["id"];
       $tracking_number = $result["parcel"]["tracking_number"];
       $statusId = $result["parcel"]["status"]["id"];
@@ -167,97 +168,6 @@ class WebhookController extends Controller {
 
     return $this->json(true, 200);
   }
-
-  
-
-  /**
-   * Trustshare Weebhook
-   *
-   * @Route("/api/trustshare/webhooks", name="api_trustshare_webhooks", methods={"POST"})
-   */
-  public function trustshare(Request $request) {
-    $result = json_decode($request->getContent(), true);
-	  // $this->get('bugsnag')->notifyException(new Exception($result["type"]));
-	  
-
-    if ($result) {
-	    // $id = $result["id"];
-	    // $payload = $result["payload"];
-	    // account
-	    switch ($result["type"]) {
-	      case 'intent_confirmed':
-	        // $account = $result["data"]["object"];
-	        break;
-
-	      case 'checkout_initiated':
-	        // $externalAccount = $result["data"]["object"];
-	        break;
-
-	      case 'checkout_failed':
-	        // $balance = $result["data"]["object"];
-	        break;
-
-	      case 'checkout_cancelled':
-	        // $payout = $result["data"]["object"];
-	        break;
-
-	      case 'checkout_rejected':
-	        // $person = $result["data"]["object"];
-	        break;
-
-	      case 'checkout_abandoned':
-	        // $person = $result["data"]["object"];
-	        break;
-
-	      case 'checkout_settling':
-	        // $person = $result["data"]["object"];
-	        break;
-
-	      case 'checkout_settled':
-	        // $person = $result["data"]["object"];
-	        break;
-
-	      case 'inbound_settled':
-	        // $person = $result["data"]["object"];
-	        break;
-
-	      case 'settlement_settled':
-	        // $person = $result["data"]["object"];
-	        break;
-
-	      case 'settlement_executing':
-	        // $person = $result["data"]["object"];
-	        break;
-
-	      case 'settlement_executed':
-	        // $person = $result["data"]["object"];
-	        break;
-
-	      case 'outbound_paused':
-	        // $person = $result["data"]["object"];
-	        break;
-
-	      case 'outbound_failed':
-	        // $person = $result["data"]["object"];
-	        break;
-
-	      case 'outbound_executing':
-	        // $person = $result["data"]["object"];
-	        break;
-
-	      case 'outbound_executed':
-	        // $person = $result["data"]["object"];
-	        break;
-
-	      case 'participant_verified':
-	        // $person = $result["data"]["payload"];
-	        break;
-	        
-	      default:
-	        break;
-	    }
-    }
-    
-    return $this->json(true, 200);
-  }
 }
+
+
