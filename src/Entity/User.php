@@ -116,6 +116,11 @@ class User implements UserInterface
      * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="user", orphanRemoval=true)
      */
     private $comments;
+
+    /**
+     * @ORM\OneToMany(targetEntity=ShippingAddress::class, mappedBy="user", orphanRemoval=true)
+     */
+    private $shippingAddresses;
     
 
     public function __construct()
@@ -126,6 +131,7 @@ class User implements UserInterface
         $this->comments = new ArrayCollection();
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->type = "user";
+        $this->shippingAddresses = new ArrayCollection();
     }
 
     public function getFullName() {
@@ -378,6 +384,36 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($comment->getUser() === $this) {
                 $comment->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ShippingAddress[]
+     */
+    public function getShippingAddresses(): Collection
+    {
+        return $this->shippingAddresses;
+    }
+
+    public function addShippingAddress(ShippingAddress $shippingAddress): self
+    {
+        if (!$this->shippingAddresses->contains($shippingAddress)) {
+            $this->shippingAddresses[] = $shippingAddress;
+            $shippingAddress->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShippingAddress(ShippingAddress $shippingAddress): self
+    {
+        if ($this->shippingAddresses->removeElement($shippingAddress)) {
+            // set the owning side to null (unless already changed)
+            if ($shippingAddress->getUser() === $this) {
+                $shippingAddress->setUser(null);
             }
         }
 

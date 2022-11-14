@@ -160,6 +160,16 @@ class Vendor
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $country;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $countryCode;
+
     
     public function __construct()
     {
@@ -538,6 +548,30 @@ class Vendor
         }
 
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getCountry(): ?string
+    {
+        return $this->country;
+    }
+
+    public function setCountry(?string $country): self
+    {
+        $this->country = $country;
+
+        return $this;
+    }
+
+    public function getCountryCode(): ?string
+    {
+        return $this->countryCode;
+    }
+
+    public function setCountryCode(?string $countryCode): self
+    {
+        $this->countryCode = $countryCode;
 
         return $this;
     }

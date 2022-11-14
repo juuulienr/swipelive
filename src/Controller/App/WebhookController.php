@@ -158,8 +158,6 @@ class WebhookController extends Controller {
 
     // update parcel status
     if ($result["action"] == "parcel_status_changed") {
-      $this->get('bugsnag')->notifyException(new Exception($result["parcel"]["id"]));
-
       $parcelId = $result["parcel"]["id"];
       $tracking_number = $result["parcel"]["tracking_number"];
       $statusId = $result["parcel"]["status"]["id"];

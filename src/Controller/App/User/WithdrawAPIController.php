@@ -36,36 +36,36 @@ class WithdrawAPIController extends Controller {
    * @Route("/user/api/bank/add", name="user_api_bank_add")
    */
   public function addBank(Request $request, ObjectManager $manager){
-    if ($json = $request->getContent()) {
-      $param = json_decode($json, true);
+  	if ($json = $request->getContent()) {
+  		$param = json_decode($json, true);
 
-      if ($param) {
-        $vendor = $this->getUser()->getVendor();
-        $oldBank = $bankRepo->findOneByVendor($vendor);
+  		if ($param) {
+  			$vendor = $this->getUser()->getVendor();
+  			$oldBank = $bankRepo->findOneByVendor($vendor);
 
-        if ($vendor->getStripeAcc() && $param["number"]) {
-          $bank = new BankAccount();
-          $bank->setBankId($result->id);
-          $bank->setLast4($result->last4);
-          $bank->setCountry("FR");
-          $bank->setCurrency("eur");
-          $bank->setNumber($param["number"]);
-          $bank->setVendor($vendor);
-          
-          $manager->persist($bank);
-          $manager->flush();
+				if ($param["number"]) {
+					$bank = new BankAccount();
+					$bank->setBankId($result->id);
+					$bank->setLast4($result->last4);
+					$bank->setCountry("FR");
+					$bank->setCurrency("eur");
+					$bank->setNumber($param["number"]);
+					$bank->setVendor($vendor);
+					
+					$manager->persist($bank);
+					$manager->flush();
 
-          if ($oldBank) {
-            $manager->remove($oldBank);
-            $manager->flush();
-          }
+					if ($oldBank) {
+						$manager->remove($oldBank);
+						$manager->flush();
+					}
 
-          return $this->json(true, 200);
-        }
-      }
-    }
+					return $this->json(true, 200);
+	  		}
+	  	}
+  	}
 
-    return $this->json(false, 404);
+  	return $this->json(false, 404);
   }
 
 
@@ -73,32 +73,31 @@ class WithdrawAPIController extends Controller {
    * @Route("/user/api/withdraw", name="user_api_withdraw")
    */
   public function withdraw(Request $request, ObjectManager $manager){
-    $user = $this->getUser();
+  	$user = $this->getUser();
 
-    if ($user->getStripeAcc() && sizeof($user->getBankAccounts()->toArray()) > 0) {
-      if ($available == ($user->getAvailable() * 100)) {
-        // dump("identique");
-      } else {
-        // dump($available);
-        // dump($user->getAvailable() * 100);
-      }
+  	if (sizeof($user->getBankAccounts()->toArray()) > 0) {
+  		// if ($available == ($user->getAvailable() * 100)) {
+  		// 	dump("identique");
+  		// } else {
+  		// 	dump($available);
+  		// 	dump($user->getAvailable() * 100);
+  		// }
 
-      // $user->setAvailable("0.00");
+			$user->setAvailable("0.00");
 
       // check amount payout
-      $withdraw = new Withdraw();
-      // $withdraw->setPayoutId($payout->id);
-      $withdraw->setAmount($user->getAvailable());
-      $withdraw->setStatus("completed");
-      $withdraw->setLast4($user->getBankAccounts()[0]->getLast4());
-      $withdraw->setVendor($user);
+  		$withdraw = new Withdraw();
+  		$withdraw->setAmount($user->getAvailable());
+  		$withdraw->setStatus("completed");
+  		$withdraw->setLast4($user->getBankAccounts()[0]->getLast4());
+  		$withdraw->setVendor($user);
 
-      $manager->persist($withdraw);
-      $manager->flush();
+  		$manager->persist($withdraw);
+  		$manager->flush();
 
-      return $this->json(true, 200);
-    }
+  		return $this->json(true, 200);
+  	}
 
-    return $this->json(false, 404);
+  	return $this->json(false, 404);
   }
 }

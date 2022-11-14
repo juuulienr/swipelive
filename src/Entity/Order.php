@@ -84,11 +84,6 @@ class Order
     private $profit;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $eventId;
-
-    /**
      * @ORM\Column(type="datetime", nullable=true)
      * @Groups("order:read")
      * @Groups("user:read")
@@ -100,6 +95,41 @@ class Order
      * @ORM\JoinColumn(nullable=false)
      */
     private $buyer;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $shippingName;
+
+    /**
+     * @ORM\Column(type="integer")
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $shippingMethodId;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $shippingCarrier;
+
+    /**
+     * @ORM\Column(type="decimal", precision=8, scale=2)
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $shippingPrice;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $servicePointId;
 
 
     public function __construct()
@@ -251,18 +281,6 @@ class Order
         return $this;
     }
 
-    public function getEventId(): ?string
-    {
-        return $this->eventId;
-    }
-
-    public function setEventId(?string $eventId): self
-    {
-        $this->eventId = $eventId;
-
-        return $this;
-    }
-
     public function getUpdatedAt(): ?\DateTimeInterface
     {
         return $this->updatedAt;
@@ -271,6 +289,66 @@ class Order
     public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getShippingName(): ?string
+    {
+        return $this->shippingName;
+    }
+
+    public function setShippingName(string $shippingName): self
+    {
+        $this->shippingName = $shippingName;
+
+        return $this;
+    }
+
+    public function getShippingMethodId(): ?int
+    {
+        return $this->shippingMethodId;
+    }
+
+    public function setShippingMethodId(int $shippingMethodId): self
+    {
+        $this->shippingMethodId = $shippingMethodId;
+
+        return $this;
+    }
+
+    public function getShippingCarrier(): ?string
+    {
+        return $this->shippingCarrier;
+    }
+
+    public function setShippingCarrier(string $shippingCarrier): self
+    {
+        $this->shippingCarrier = $shippingCarrier;
+
+        return $this;
+    }
+
+    public function getShippingPrice(): ?string
+    {
+        return $this->shippingPrice;
+    }
+
+    public function setShippingPrice(string $shippingPrice): self
+    {
+        $this->shippingPrice = $shippingPrice;
+
+        return $this;
+    }
+
+    public function getServicePointId(): ?int
+    {
+        return $this->servicePointId;
+    }
+
+    public function setServicePointId(?int $servicePointId): self
+    {
+        $this->servicePointId = $servicePointId;
 
         return $this;
     }
