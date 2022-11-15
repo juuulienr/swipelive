@@ -71,8 +71,8 @@ class APIController extends Controller {
    * @Route("/user/api/feed", name="api_feed2", methods={"GET"})
    */
   public function feed2(Request $request, ObjectManager $manager, ClipRepository $clipRepo, LiveRepository $liveRepo, SerializerInterface $serializer) {
-    $lives = $liveRepo->findByLive($this->getUser());
-    $clips = $clipRepo->findByClip($this->getUser());
+    $lives = $liveRepo->findByLive($this->getUser()->getVendor());
+    $clips = $clipRepo->findByClip($this->getUser()->getVendor());
     $array = [];
 
     if ($lives) {
@@ -129,7 +129,7 @@ class APIController extends Controller {
    */
   public function trending2(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
   {
-    $clips = $clipRepo->findByClip($this->getUser());
+    $clips = $clipRepo->findByClip($this->getUser()->getVendor());
 
     return $this->json($clips, 200, [], [
     	'groups' => 'clip:read', 
