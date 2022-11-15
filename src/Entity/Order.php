@@ -93,6 +93,7 @@ class Order
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="purchases")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("order:read")
      */
     private $buyer;
 
@@ -130,6 +131,13 @@ class Order
      * @Groups("user:read")
      */
     private $servicePointId;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $number;
 
 
     public function __construct()
@@ -349,6 +357,18 @@ class Order
     public function setServicePointId(?int $servicePointId): self
     {
         $this->servicePointId = $servicePointId;
+
+        return $this;
+    }
+
+    public function getNumber(): ?int
+    {
+        return $this->number;
+    }
+
+    public function setNumber(?int $number): self
+    {
+        $this->number = $number;
 
         return $this;
     }

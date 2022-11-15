@@ -65,15 +65,71 @@ class APIController extends Controller {
     return $this->json($array);
   }
 
+  /**
+   * Afficher le feed
+   *
+   * @Route("/user/api/feed", name="api_feed2", methods={"GET"})
+   */
+  public function feed2(Request $request, ObjectManager $manager, ClipRepository $clipRepo, LiveRepository $liveRepo, SerializerInterface $serializer) {
+    $lives = $liveRepo->findByLive($this->getUser());
+    $clips = $clipRepo->findByClip($this->getUser());
+    $array = [];
+
+    if ($lives) {
+    	foreach ($lives as $live) {
+    		$array[] = [ "type" => "live", "value" => $serializer->serialize($live, "json", [
+    			'groups' => 'live:read', 
+    			'circular_reference_limit' => 1, 
+    			'circular_reference_handler' => function ($object) {
+    				return $object->getId();
+    			} 
+    		])];
+    	}
+    }
+
+    if ($clips) {
+    	foreach ($clips as $clip) {
+    		$array[] = [ "type" => "clip", "value" => $serializer->serialize($clip, "json", [
+    			'groups' => 'clip:read', 
+    			'circular_reference_limit' => 1, 
+    			'circular_reference_handler' => function ($object) {
+    				return $object->getId();
+    			} 
+    		])];
+    	} 
+    }
+
+    return $this->json($array);
+  }
+
 
   /**
-   * Afficher 10 clips tendances
+   * Afficher clips tendances
    *
    * @Route("/api/clips/trending", name="api_clips_trending", methods={"GET"})
    */
   public function trending(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
   {
-    $clips = $clipRepo->findBy([ "status" => "available"], [ "createdAt" => "DESC" ]);
+    $clips = $clipRepo->findByClip();
+
+    return $this->json($clips, 200, [], [
+    	'groups' => 'clip:read', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
+  }
+
+
+  /**
+   * Afficher clips tendances
+   *
+   * @Route("/user/api/clips/trending", name="api_clips_trending2", methods={"GET"})
+   */
+  public function trending2(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
+  {
+    $clips = $clipRepo->findByClip($this->getUser());
 
     return $this->json($clips, 200, [], [
     	'groups' => 'clip:read', 

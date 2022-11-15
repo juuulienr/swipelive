@@ -10,6 +10,7 @@ use App\Entity\Vendor;
 use App\Entity\Message;
 use App\Entity\Product;
 use App\Entity\Category;
+use App\Entity\LineItem;
 use App\Repository\OrderRepository;
 use App\Repository\ClipRepository;
 use App\Repository\CategoryRepository;
@@ -31,15 +32,20 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 class OrderAPIController extends Controller {
 
   /**
-   * @Route("/user/api/orders/new", name="user_api_orders_new")
+   * @Route("/user/api/orders/success", name="user_api_orders_success")
    */
-  public function new(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo) {
+  public function success(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo) {
     if ($json = $request->getContent()) {
 	    $param = json_decode($json, true);
 
 	    if ($param) {
 	    	$customer = $this->getUser();
 	      $param["quantity"] ? $quantity = $param["quantity"] : $quantity = 1;
+	      $shippingPrice = 3.95;
+	      $shippingName = $param["shippingName"];
+	      $shippingMethodId = $param["shippingMethodId"];
+	      $shippingCarrier = $param["shippingCarrier"];
+	      $servicePointId = $param["servicePointId"];
 
 	      $order = new Order();
 	      $order->setBuyer($customer);
@@ -48,9 +54,9 @@ class OrderAPIController extends Controller {
 	      if ($param["variant"]) {
 	        $variant = $variantRepo->findOneById($param["variant"]);
 
-	        if ($variant) {
+	        if ($variant && $variant->getQuantity() > 0) {
 	          $title = $variant->getProduct()->getTitle() . " - " . $variant->getTitle();
-	          $total = $variant->getPrice() * $quantity;
+	          $subTotal = $variant->getPrice() * $quantity;
 	      		$vendor = $variant->getProduct()->getVendor();
 
 	          $lineItem = new LineItem();
@@ -58,11 +64,12 @@ class OrderAPIController extends Controller {
 	          $lineItem->setProduct($variant->getProduct());
 	          $lineItem->setVariant($variant);
 	          $lineItem->setPrice($variant->getPrice());
-	          $lineItem->setTotal($total);
+	          $lineItem->setTotal($subTotal);
 	          $lineItem->setTitle($title);
 	          $lineItem->setOrderId($order);
 	          $manager->persist($lineItem);
 
+	          $variant->setQuantity($variant->getQuantity() - 1);
 	          $order->setVendor($vendor);
 	        } else {
 	          return $this->json("Le variant est introuvable", 404); 
@@ -70,9 +77,9 @@ class OrderAPIController extends Controller {
 	      } elseif ($param["product"]) {
 	        $product = $productRepo->findOneById($param["product"]);
 
-	        if ($product) {
+	        if ($product && $product->getQuantity() > 0) {
 	          $title = $product->getTitle();
-	          $total = $product->getPrice() * $quantity;
+	          $subTotal = $product->getPrice() * $quantity;
 	      		$vendor = $product->getVendor();
 
 	          $lineItem = new LineItem();
@@ -80,10 +87,12 @@ class OrderAPIController extends Controller {
 	          $lineItem->setProduct($product);
 	          $lineItem->setTitle($title);
 	          $lineItem->setPrice($product->getPrice());
-	          $lineItem->setTotal($total);
+	          $lineItem->setTotal($subTotal);
 	          $lineItem->setOrderId($order);
 	          $manager->persist($lineItem);
 
+
+	          $product->setQuantity($product->getQuantity() - 1);
 	          $order->setVendor($vendor);
 	        } else {
 	          return $this->json("Le produit est introuvable", 404); 
@@ -92,14 +101,23 @@ class OrderAPIController extends Controller {
 	        return $this->json("Un produit ou un variant est obligatoire", 404); 
 	      }
 
-	      $fees = str_replace('.', '', $total) * 8;
-	      $amount = str_replace('.', '', $total) * 100;
-	      $summary = "Quantité : " . $quantity;
+	      $fees = $subTotal * 0.08; // commission
+	      $profit = $subTotal * 0.06; // commission - frais paiement (2%)
+	      $total = $subTotal + $shippingPrice;
 
-	      $order->setSubTotal($total);
+	      $order->setSubTotal($subTotal);
+	      $order->setShippingPrice($shippingPrice);
+	      $order->setShippingName($shippingName);
+	      $order->setShippingMethodId($shippingMethodId);
+	      $order->setShippingCarrier($shippingCarrier);
+	      $order->setServicePointId($servicePointId);
 	      $order->setTotal($total);
-	      $order->setFees($fees / 100);
-	      $order->setStatus("created");
+	      $order->setFees($fees);
+	      $order->setProfit($profit);
+	      $order->setStatus("succeeded");
+	      $manager->flush();
+
+	      $order->setNumber(100000 + sizeof($vendor->getSales()->toArray()));
 	      $manager->flush();
 
 				return $this->json(true, 200);
@@ -124,7 +142,8 @@ class OrderAPIController extends Controller {
       "purchases" => $purchases
     ];
 
-    return $this->json($array, 200, [], ['groups' => 'order:read']);
+    return $this->json($array, 200, [], ['groups' => 'order:read', 
+    	'datetime_format' => 'd F Y' ]);
   }
 
 
@@ -134,6 +153,7 @@ class OrderAPIController extends Controller {
    * @Route("/user/api/orders/{id}", name="user_api_order", methods={"GET"})
    */
   public function order(Order $order, Request $request, ObjectManager $manager) {
-    return $this->json($order, 200, [], ['groups' => 'order:read']);
+    return $this->json($order, 200, [], ['groups' => 'order:read', 
+    	'datetime_format' => 'd F Y' ]);
   }
 }

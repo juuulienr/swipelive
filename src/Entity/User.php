@@ -28,6 +28,7 @@ class User implements UserInterface
      * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $id;
 
@@ -58,6 +59,7 @@ class User implements UserInterface
      * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $firstname;
 
@@ -66,6 +68,7 @@ class User implements UserInterface
      * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $lastname;
 
@@ -119,6 +122,7 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=ShippingAddress::class, mappedBy="user", orphanRemoval=true)
+     * @Groups("user:read")
      */
     private $shippingAddresses;
     

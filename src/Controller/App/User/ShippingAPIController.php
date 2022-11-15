@@ -11,6 +11,7 @@ use App\Entity\Product;
 use App\Entity\Category;
 use App\Entity\Order;
 use App\Entity\LineItem;
+use App\Entity\ShippingAddress;
 use App\Repository\ClipRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
@@ -26,7 +27,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use GuzzleHttp\Client;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 
 class ShippingAPIController extends Controller {
@@ -127,6 +128,42 @@ class ShippingAPIController extends Controller {
     return $this->json(false, 404);
   }
 
+
+  /**
+   * Ajouter une adresse
+   *
+   * @Route("/user/api/shipping/address", name="user_api_shipping_address", methods={"POST"})
+   */
+  public function addShippingAddress(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $shippingAddress = $serializer->deserialize($json, ShippingAddress::class, "json");
+      $shippingAddress->setUser($this->getUser());
+
+      $manager->persist($shippingAddress);
+      $manager->flush();
+
+      return $this->json(true, 200);
+    }
+
+    return $this->json([ "error" => "Une erreur est survenue"], 404);
+  }
+
+
+  /**
+   * Editier une adresse
+   *
+   * @Route("/user/api/shipping/address/edit/{id}", name="user_api_shipping_address_edit", methods={"POST"})
+   */
+  public function editShippingAddress(ShippingAddress $shippingAddress, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $serializer->deserialize($json, ShippingAddress::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $shippingAddress]);
+      $manager->flush();
+
+      return $this->json(true, 200);
+    }
+
+    return $this->json([ "error" => "Une erreur est survenue"], 404);
+  }
 
 
   /**

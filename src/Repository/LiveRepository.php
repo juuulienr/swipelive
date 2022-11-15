@@ -20,12 +20,15 @@ class LiveRepository extends ServiceEntityRepository
     }
 
 
-    public function findByLive(){
+    public function findByLive($vendor = null){
         return $this->createQueryBuilder('l')
+                    ->join('l.vendor', 'v')
                     ->andWhere('l.resourceUri IS NOT NULL')
                     ->andWhere('l.status = 1')
+                    ->andWhere('v.id != :vendor')
+                    ->setParameter('vendor', $vendor)
                     ->orderBy('RAND()')
-                    ->setMaxResults(10)
+                    // ->setMaxResults(20)
                     ->getQuery()
                     ->getResult();
     }
