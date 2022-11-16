@@ -104,7 +104,17 @@ class Variant
     private $option2;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="variants")
+     */
+    private $product;
+
+    /**
+     * @ORM\OneToMany(targetEntity=LineItem::class, mappedBy="variant")
+     */
+    private $lineItems;
+
+    /**
+     * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
      * @Groups("product:read")
      * @Groups("user:read")
      * @Groups("clip:read")
@@ -115,19 +125,21 @@ class Variant
     private $weight;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="variants")
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("product:read")
+     * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("order:read")
      */
-    private $product;
-
-    /**
-     * @ORM\OneToMany(targetEntity=LineItem::class, mappedBy="variant")
-     */
-    private $lineItems;
+    private $weightUnit;
 
     public function __construct()
     {
-        $this->quantity = 0;
         $this->lineItems = new ArrayCollection();
+        $this->quantity = 0;
+        $this->weightUnit = "kg";
     }
 
     public function getId(): ?int
@@ -219,18 +231,6 @@ class Variant
         return $this;
     }
 
-    public function getWeight(): ?string
-    {
-        return $this->weight;
-    }
-
-    public function setWeight(string $weight): self
-    {
-        $this->weight = $weight;
-
-        return $this;
-    }
-
     public function getProduct(): ?Product
     {
         return $this->product;
@@ -269,6 +269,30 @@ class Variant
                 $lineItem->setVariant(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getWeight(): ?string
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(?string $weight): self
+    {
+        $this->weight = $weight;
+
+        return $this;
+    }
+
+    public function getWeightUnit(): ?string
+    {
+        return $this->weightUnit;
+    }
+
+    public function setWeightUnit(?string $weightUnit): self
+    {
+        $this->weightUnit = $weightUnit;
 
         return $this;
     }

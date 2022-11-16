@@ -112,15 +112,6 @@ class Product
     private $liveProducts;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("product:read")
-     * @Groups("user:read")
-     * @Groups("live:read")
-     * @Groups("clip:read")
-     */
-    private $weight;
-
-    /**
      * @ORM\Column(type="boolean", nullable=true)
      * @Groups("product:read")
      * @Groups("user:read")
@@ -129,6 +120,26 @@ class Product
      * @Groups("live:read")
      */
     private $archived;
+
+    /**
+     * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+     * @Groups("product:read")
+     * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     */
+    private $weight;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("product:read")
+     * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     */
+    private $weightUnit;
 
     /**
      * @ORM\OneToMany(targetEntity=Option::class, mappedBy="product", cascade={"persist"})
@@ -157,6 +168,7 @@ class Product
      * @ORM\OneToMany(targetEntity=LineItem::class, mappedBy="product")
      */
     private $lineItems;
+    
 
     public function __construct() {
         $this->uploads = new ArrayCollection();
@@ -164,9 +176,10 @@ class Product
         $this->liveProducts = new ArrayCollection();
         $this->options = new ArrayCollection();
         $this->variants = new ArrayCollection();
+        $this->lineItems = new ArrayCollection();
         $this->archived = 0;
         $this->quantity = 0;
-        $this->lineItems = new ArrayCollection();
+        $this->weightUnit = "kg";
     }
 
     public function getId(): ?int
@@ -360,18 +373,6 @@ class Product
         return $this;
     }
 
-    public function getWeight(): ?string
-    {
-        return $this->weight;
-    }
-
-    public function setWeight(?string $weight): self
-    {
-        $this->weight = $weight;
-
-        return $this;
-    }
-
     /**
      * @return Collection|Option[]
      */
@@ -458,6 +459,30 @@ class Product
                 $lineItem->setProduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getWeight(): ?string
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(?string $weight): self
+    {
+        $this->weight = $weight;
+
+        return $this;
+    }
+
+    public function getWeightUnit(): ?string
+    {
+        return $this->weightUnit;
+    }
+
+    public function setWeightUnit(?string $weightUnit): self
+    {
+        $this->weightUnit = $weightUnit;
 
         return $this;
     }
