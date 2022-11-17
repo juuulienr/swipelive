@@ -41,15 +41,25 @@ class OrderAPIController extends Controller {
 	    if ($param) {
 	    	$customer = $this->getUser();
 	      $param["quantity"] ? $quantity = $param["quantity"] : $quantity = 1;
-	      $shippingPrice = 3.95;
+	      $shippingPrice = $param["shippingPrice"];
 	      $shippingName = $param["shippingName"];
 	      $shippingMethodId = $param["shippingMethodId"];
 	      $shippingCarrier = $param["shippingCarrier"];
 	      $servicePointId = $param["servicePointId"];
+	    	$weight = $param["weight"];
+	    	$weightUnit = $param["weightUnit"];
 
 	      $order = new Order();
 	      $order->setBuyer($customer);
 	      $manager->persist($order);
+	      
+	      if (!$weight || !$weightUnit) {
+	        return $this->json("Le poids est obligatoire", 404); 
+	      }
+
+	      if ($weightUnit == "g") {
+	      	$weight = round($weight / 1000, 2);
+	      }
 
 	      if ($param["variant"]) {
 	        $variant = $variantRepo->findOneById($param["variant"]);
@@ -105,6 +115,11 @@ class OrderAPIController extends Controller {
 	      $profit = $subTotal * 0.06; // commission - frais paiement (2%)
 	      $total = $subTotal + $shippingPrice;
 
+	      if (sizeof($customer->getShippingAddresses()->toArray())) {
+		      $order->setShippingAddress($customer->getShippingAddresses()->toArray()[0]);
+	      }
+
+	      $order->setWeight($weight);
 	      $order->setSubTotal($subTotal);
 	      $order->setShippingPrice($shippingPrice);
 	      $order->setShippingName($shippingName);

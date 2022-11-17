@@ -42,23 +42,17 @@ class ShippingAPIController extends Controller {
 
 	    if ($param) {
 	    	$weight = $param["weight"];
+	    	$weightUnit = $param["weightUnit"];
 	    	$to_country = $param["countryShort"];
 
-	      if (!$weight) {
+	      if (!$weight || !$weightUnit) {
 	        return $this->json("Le poids est obligatoire", 404); 
 	      }
 
-	      switch ($weight) {
-	      	case "small":
-	      		$weight = 500;
-	      	break;
-	      	case "medium":
-	      		$weight = 1000;
-	      	break;
-	      	case "large":
-	      		$weight = 2000;
-	      	break;
-	      	default:
+	      if ($weightUnit == "kg") {
+	      	$weight = $weight * 1000;
+	      } else {
+	      	$weight = round($weight);
 	      }
 
 	      try {
@@ -66,8 +60,7 @@ class ShippingAPIController extends Controller {
 	      		"from_country" => "FR",
 	      		"to_country" => $to_country,
 	      		"weight" => $weight,
-	      		"weight_unit" => "gram",
-	      		"contract_pricing" => true 
+	      		"weight_unit" => "gram"
 	      	];
 	      	$url = "https://panel.sendcloud.sc/api/v2/shipping-products" . '?' . http_build_query($params);
 	      	$curl = curl_init();
@@ -97,20 +90,83 @@ class ShippingAPIController extends Controller {
 	      			foreach ($value->methods as $method) {
 	      				if (str_contains($method->name, 'Chrono Shop2Shop') || str_contains($method->name, 'Colissimo Service Point') || str_contains($method->name, 'Mondial Relay Point Relais') || (str_contains($method->name, 'Colissimo Home') && !str_contains($method->name, 'Colissimo Home Signature'))) {
 	      					if (str_contains($method->name, 'Colissimo Home')) {
+
+	      						$params = [
+	      							"from_country" => "FR",
+	      							"to_country" => $to_country,
+	      							"weight" => $weight,
+	      							"weight_unit" => "gram",
+	      							"shipping_method_id" => $method->id 
+	      						];
+
+	      						$url = "https://panel.sendcloud.sc/api/v2/shipping-price" . '?' . http_build_query($params);
+	      						$curl = curl_init();
+
+	      						curl_setopt_array($curl, [
+	      							CURLOPT_URL => $url,
+	      							CURLOPT_RETURNTRANSFER => true,
+	      							CURLOPT_ENCODING => "",
+	      							CURLOPT_MAXREDIRS => 10,
+	      							CURLOPT_TIMEOUT => 30,
+	      							CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	      							CURLOPT_CUSTOMREQUEST => "GET",
+	      							CURLOPT_HTTPHEADER => [
+	      								"Authorization: Basic MzgyNjY4NmYyZGJjNDE4MzgwODk4Y2MyNTRmYzBkMjg6MDk2ZTQ0Y2I5YjI2NDMxYjkwY2M1YjVkZWZjOWU5MTU=",
+	      								"Content-Type: application/json"
+	      							],
+	      						]);
+
+	      						$response = curl_exec($curl);
+	      						curl_close($curl);
+
+	      						$result = json_decode($response);
+
 	      						$array["domicile"][] = [ 
 	      							"id" => $method->id,
 	      							"carrier" => $value->carrier,
 	      							"name" => $value->name,
-	      							"price" => $method->pricing->price,
-	      							"currency" => $method->pricing->currency
+	      							"price" => $result[0]->price,
+	      							"currency" => $result[0]->currency
 	      						];
+
 	      					} else {
+
+	      						$params = [
+	      							"from_country" => "FR",
+	      							"to_country" => $to_country,
+	      							"weight" => $weight,
+	      							"weight_unit" => "gram",
+	      							"shipping_method_id" => $method->id 
+	      						];
+
+	      						$url = "https://panel.sendcloud.sc/api/v2/shipping-price" . '?' . http_build_query($params);
+	      						$curl = curl_init();
+
+	      						curl_setopt_array($curl, [
+	      							CURLOPT_URL => $url,
+	      							CURLOPT_RETURNTRANSFER => true,
+	      							CURLOPT_ENCODING => "",
+	      							CURLOPT_MAXREDIRS => 10,
+	      							CURLOPT_TIMEOUT => 30,
+	      							CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	      							CURLOPT_CUSTOMREQUEST => "GET",
+	      							CURLOPT_HTTPHEADER => [
+	      								"Authorization: Basic MzgyNjY4NmYyZGJjNDE4MzgwODk4Y2MyNTRmYzBkMjg6MDk2ZTQ0Y2I5YjI2NDMxYjkwY2M1YjVkZWZjOWU5MTU=",
+	      								"Content-Type: application/json"
+	      							],
+	      						]);
+
+	      						$response = curl_exec($curl);
+	      						curl_close($curl);
+
+	      						$result = json_decode($response);
+
 	      						$array["service_point"][] = [ 
 	      							"id" => $method->id,
 	      							"carrier" => $value->carrier,
 	      							"name" => $value->name,
-	      							"price" => $method->pricing->price,
-	      							"currency" => $method->pricing->currency
+	      							"price" => $result[0]->price,
+	      							"currency" => $result[0]->currency
 	      						];
 	      					}
 	      				}
@@ -150,7 +206,7 @@ class ShippingAPIController extends Controller {
 
 
   /**
-   * Editier une adresse
+   * Editer une adresse
    *
    * @Route("/user/api/shipping/address/edit/{id}", name="user_api_shipping_address_edit", methods={"POST"})
    */
@@ -167,54 +223,75 @@ class ShippingAPIController extends Controller {
 
 
   /**
-   * @Route("/api/shipping", name="user_api_shipping")
+   * @Route("/user/api/shipping/create/{id}", name="user_api_create")
    */
-  public function shipping(Request $request, ObjectManager $manager){
-    // $sendCloud = new \Imbue\SendCloud\SendCloudApiClient();
-    // $sendCloud->setApiAuth('3826686f2dbc418380898cc254fc0d28', '096e44cb9b26431b90cc5b5defc9e915');
+  public function shipping(Order $order, Request $request, ObjectManager $manager) {
+  	$shippingAddress = $order->getShippingAddress();
+  	$vendor = $order->getVendor();
 
-    // // type of shipping method
-    // $shippingMethods = $sendCloud->shippingMethods->list();
-    // dump($shippingMethods);
+  	if ($vendor->getBusinessType() == "company") {
+  		$companyName = $vendor->getCompany();
+  	} else {
+  		$companyName = "";
+  	}
 
-    // foreach ($shippingMethods as $method) {
-    //  dump($method);
-    // }
-    
-    // // type of status
-    // $parcelStatuses = $sendCloud->parcelStatuses->list();
-    // dump($parcelStatuses);
+  	try {
+  		$data = [
+  			"parcel" => [
+  				"name" => $order->getBuyer()->getFullName(), 
+  				"address" => $shippingAddress->getAddress(), 
+  				"house_number" => $shippingAddress->getHouseNumber(), 
+  				"city" => $shippingAddress->getCity(), 
+  				"postal_code" => $shippingAddress->getZip(), 
+  				"country" => $shippingAddress->getCountryCode(), 
+  				"telephone" => $shippingAddress->getPhone(), 
+  				// "email" => "", 
+  				"order_number" => $order->getNumber(), 
+  				"weight" => $order->getWeight(), // kg
+  				"request_label" => true, 
+  				"shipment" => [
+  					// "id" => 8
+  					"id" => $order->getShippingMethodId()
+  				], 
+  				"parcel_items" => [], 
+  				"from_name" => $vendor->getUser()->getFullName(), 
+  				"from_company_name" => $companyName, 
+  				"from_address_1" => $vendor->getAddress(), 
+  				"from_address_2" => "", 
+  				"from_house_number" => "87", 
+  				"from_city" => $vendor->getCity(), 
+  				"from_postal_code" => $vendor->getZip(), 
+  				"from_country" => $vendor->getCountryCode(), 
+  				// "from_telephone" => "", 
+  				// "from_email" => "" 
+  			]
+  		]; 
 
-    // // parcel
-    // $parcels = $sendCloud->parcels->list();
-    // dump($parcels);
-    // $parcel = $sendCloud->parcels->get(180248575);
+  		$curl = curl_init();
+  		curl_setopt_array($curl, [
+  			CURLOPT_URL => "https://panel.sendcloud.sc/api/v2/parcels",
+  			CURLOPT_RETURNTRANSFER => true,
+  			CURLOPT_ENCODING => "",
+  			CURLOPT_MAXREDIRS => 10,
+  			CURLOPT_TIMEOUT => 30,
+  			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  			CURLOPT_CUSTOMREQUEST => "POST",
+  			CURLOPT_POSTFIELDS => json_encode($data),
+  			CURLOPT_HTTPHEADER => [
+  				"Authorization: Basic MzgyNjY4NmYyZGJjNDE4MzgwODk4Y2MyNTRmYzBkMjg6MDk2ZTQ0Y2I5YjI2NDMxYjkwY2M1YjVkZWZjOWU5MTU=",
+  				"Content-Type: application/json"
+  			],
+  		]);
 
-    // $parcel = $sendCloud->parcels->create([
-    //   'parcel' => [
-    //     'name' => 'Loic Rombai',
-    //     'company_name' => 'Loic SAS',
-    //     'address' => 'rue du coteau',
-    //     'house_number' => 54,
-    //     'city' => 'Miribel',
-    //     'postal_code' => '01700',
-    //     'telephone' => '+33666666666',
-    //     'request_label' => true,
-    //     'email' => 'neoglucogenese@gmail.com',
-    //     'country' => 'FR',
-    //     'shipment' => [
-    //       'id' => 8,
-    //     ],
-    //     'weight' => '1.000',
-    //     'order_number' => '1234567890',
-    //     // 'insured_value' => 2000,
-    //   ]
-    // ]);
-    // dd($parcel);
+  		$response = curl_exec($curl);
+  		$result = json_decode($response);
+  		curl_close($curl);
 
-    // $parcelId = $parcel->id();
-    // dump($parcelId);
-    // $parcels = $sendCloud->parcels->cancel();
+  		return $this->json($result->parcel, 200);
+  	} catch (\Exception $e) {
+  		return $this->json($e->getMessage(), 404);
+  	}
+
 
 
     // // create and print label
@@ -232,6 +309,5 @@ class ShippingAPIController extends Controller {
     // $tracking = $sendCloud->tracking->get('SCCWF3BVYJ7W');
     // dump($tracking);
 
-    return true;
   }
 }

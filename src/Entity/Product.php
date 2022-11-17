@@ -50,6 +50,7 @@ class Product
      * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="products")
      * @ORM\JoinColumn(nullable=false)
      * @Groups("product:read")
+     * @Groups("category:read")
      */
     private $vendor;
 
@@ -58,6 +59,7 @@ class Product
      * @Groups("product:read")
      * @Groups("live:read")
      * @Groups("clip:read")
+     * @Groups("category:read")
      */
     private $description;
 

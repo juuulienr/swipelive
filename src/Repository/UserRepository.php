@@ -39,10 +39,14 @@ class UserRepository extends ServiceEntityRepository
     	->getResult();
     }
 
-    public function findUserBySearch($search){
+    public function findUserBySearch($search, $vendor = null){
     	return $this->createQueryBuilder('u')
     	->join('u.vendor', 'v')
     	->andWhere('u.firstname LIKE :search OR u.lastname LIKE :search OR v.businessName LIKE :search')
+    	->andWhere('u.type == :type')
+      ->andWhere('v.id != :vendor')
+      ->setParameter('vendor', $vendor)
+    	->setParameter('type', 'vendor')
     	->setParameter('search', '%'.$search.'%')
     	->getQuery()
     	->getResult();

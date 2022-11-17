@@ -139,6 +139,23 @@ class Order
      */
     private $number;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $trackingNumber;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=ShippingAddress::class)
+     */
+    private $shippingAddress;
+
+    /**
+     * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+     */
+    private $weight;
+
 
     public function __construct()
     {
@@ -369,6 +386,42 @@ class Order
     public function setNumber(?int $number): self
     {
         $this->number = $number;
+
+        return $this;
+    }
+
+    public function getTrackingNumber(): ?string
+    {
+        return $this->trackingNumber;
+    }
+
+    public function setTrackingNumber(?string $trackingNumber): self
+    {
+        $this->trackingNumber = $trackingNumber;
+
+        return $this;
+    }
+
+    public function getShippingAddress(): ?ShippingAddress
+    {
+        return $this->shippingAddress;
+    }
+
+    public function setShippingAddress(?ShippingAddress $shippingAddress): self
+    {
+        $this->shippingAddress = $shippingAddress;
+
+        return $this;
+    }
+
+    public function getWeight(): ?string
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(?string $weight): self
+    {
+        $this->weight = $weight;
 
         return $this;
     }

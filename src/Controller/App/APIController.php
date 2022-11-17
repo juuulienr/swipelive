@@ -311,4 +311,29 @@ class APIController extends Controller {
 
     return $this->json("Une erreur est survenue", 404);
   }
+
+
+  /**
+   * Rechercher un vendeur
+   *
+   * @Route("/user/api/user/search", name="api_user_search")
+   */
+  public function userSearch2(Request $request, UserRepository $repo, ObjectManager $manager)
+  {
+    $search = $request->query->get('search');
+
+    if ($search || $search == "") {
+      $users = $repo->findUserBySearch($search, $this->getUser()->getVendor());
+
+	    return $this->json($users, 200, [], [
+	    	'groups' => 'user:read', 
+	    	'circular_reference_limit' => 1, 
+	    	'circular_reference_handler' => function ($object) {
+	    		return $object->getId();
+	    	} 
+	    ]);
+    }
+
+    return $this->json("Une erreur est survenue", 404);
+  }
 }

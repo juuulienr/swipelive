@@ -23,6 +23,8 @@ class Vendor
      * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("category:read")
+     * @Groups("order:read")
      */
     private $id;
 
