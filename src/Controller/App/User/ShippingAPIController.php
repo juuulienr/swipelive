@@ -88,7 +88,7 @@ class ShippingAPIController extends Controller {
 	      	if ($shippingProducts) {
 	      		foreach ($shippingProducts as $value) {
 	      			foreach ($value->methods as $method) {
-	      				if (str_contains($method->name, 'Chrono Shop2Shop') || str_contains($method->name, 'Colissimo Service Point') || str_contains($method->name, 'Mondial Relay Point Relais') || (str_contains($method->name, 'Colissimo Home') && !str_contains($method->name, 'Colissimo Home Signature'))) {
+	      				if (str_contains($method->name, 'Chrono Shop2Shop') || str_contains($method->name, 'Mondial Relay Point Relais') || (str_contains($method->name, 'Colissimo Home') && !str_contains($method->name, 'Colissimo Home Signature'))) {
 	      					if (str_contains($method->name, 'Colissimo Home')) {
 
 	      						$params = [
@@ -245,9 +245,10 @@ class ShippingAPIController extends Controller {
   				"postal_code" => $shippingAddress->getZip(), 
   				"country" => $shippingAddress->getCountryCode(), 
   				"telephone" => $shippingAddress->getPhone(), 
-  				// "email" => "", 
+  				"email" => $order->getBuyer()->getEmail(), 
   				"order_number" => $order->getNumber(), 
-  				"weight" => $order->getWeight(), // kg
+  				"weight" => $order->getWeight(),
+  				"to_service_point" => $order->getServicePointId(),
   				"request_label" => true, 
   				"shipment" => [
   					// "id" => 8
@@ -256,14 +257,13 @@ class ShippingAPIController extends Controller {
   				"parcel_items" => [], 
   				"from_name" => $vendor->getUser()->getFullName(), 
   				"from_company_name" => $companyName, 
-  				"from_address_1" => $vendor->getAddress(), 
+  				"from_address_1" => trim($vendor->getAddress()), 
   				"from_address_2" => "", 
-  				"from_house_number" => "87", 
+  				"from_house_number" => "110", 
   				"from_city" => $vendor->getCity(), 
   				"from_postal_code" => $vendor->getZip(), 
   				"from_country" => $vendor->getCountryCode(), 
-  				// "from_telephone" => "", 
-  				// "from_email" => "" 
+  				"from_email" => $vendor->getUser()->getEmail(), 
   			]
   		]; 
 
@@ -286,8 +286,47 @@ class ShippingAPIController extends Controller {
   		$response = curl_exec($curl);
   		$result = json_decode($response);
   		curl_close($curl);
+  		// var_dump($response);
+  		// var_dump($response[0]);
+  		// var_dump($result->parcel->label);
 
-  		return $this->json($result->parcel, 200);
+  		if ($result && $result->parcel) {
+
+  			$id = $result->parcel->id;
+				$url = "https://panel.sendcloud.sc/api/v2/labels/normal_printer/" . $id;
+				$curl = curl_init();
+
+				curl_setopt_array($curl, [
+					CURLOPT_URL => $url,
+					CURLOPT_RETURNTRANSFER => true,
+					CURLOPT_ENCODING => "",
+					CURLOPT_MAXREDIRS => 10,
+					CURLOPT_TIMEOUT => 30,
+					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+					CURLOPT_CUSTOMREQUEST => "GET",
+					CURLOPT_HTTPHEADER => [
+						"Authorization: Basic MzgyNjY4NmYyZGJjNDE4MzgwODk4Y2MyNTRmYzBkMjg6MDk2ZTQ0Y2I5YjI2NDMxYjkwY2M1YjVkZWZjOWU5MTU=",
+						"Content-Type: application/json"
+					],
+				]);
+
+				$pdf = curl_exec($curl);
+				curl_close($curl);
+
+				if ($pdf) {
+			    $filename = md5(time().uniqid()). ".pdf"; 
+			    $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
+			    file_put_contents($filepath, $pdf);
+
+		  		$array = [
+		  			"id" => $result->parcel->id,
+		  			"tracking_number" => $result->parcel->tracking_number,
+		  			"pdf" => $filepath,
+		  		];
+
+  				return $this->json($array, 200);
+				}
+  		}
   	} catch (\Exception $e) {
   		return $this->json($e->getMessage(), 404);
   	}
