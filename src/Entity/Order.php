@@ -153,8 +153,24 @@ class Order
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+     * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $weight;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $pdf;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $parcelId;
 
 
     public function __construct()
@@ -422,6 +438,30 @@ class Order
     public function setWeight(?string $weight): self
     {
         $this->weight = $weight;
+
+        return $this;
+    }
+
+    public function getPdf(): ?string
+    {
+        return $this->pdf;
+    }
+
+    public function setPdf(?string $pdf): self
+    {
+        $this->pdf = $pdf;
+
+        return $this;
+    }
+
+    public function getParcelId(): ?int
+    {
+        return $this->parcelId;
+    }
+
+    public function setParcelId(?int $parcelId): self
+    {
+        $this->parcelId = $parcelId;
 
         return $this;
     }

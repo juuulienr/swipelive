@@ -251,7 +251,6 @@ class ShippingAPIController extends Controller {
   				"to_service_point" => $order->getServicePointId(),
   				"request_label" => true, 
   				"shipment" => [
-  					// "id" => 8
   					"id" => $order->getShippingMethodId()
   				], 
   				"parcel_items" => [], 
@@ -286,13 +285,11 @@ class ShippingAPIController extends Controller {
   		$response = curl_exec($curl);
   		$result = json_decode($response);
   		curl_close($curl);
-  		// var_dump($response);
-  		// var_dump($response[0]);
-  		// var_dump($result->parcel->label);
 
   		if ($result && $result->parcel) {
-
   			$id = $result->parcel->id;
+  			$tracking_number = $result->parcel->tracking_number;
+
 				$url = "https://panel.sendcloud.sc/api/v2/labels/normal_printer/" . $id;
 				$curl = curl_init();
 
@@ -310,19 +307,23 @@ class ShippingAPIController extends Controller {
 					],
 				]);
 
-				$pdf = curl_exec($curl);
+				$content = curl_exec($curl);
 				curl_close($curl);
 
-				if ($pdf) {
+				if ($content) {
 			    $filename = md5(time().uniqid()). ".pdf"; 
 			    $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
-			    file_put_contents($filepath, $pdf);
+			    file_put_contents($filepath, $content);
 
 		  		$array = [
-		  			"id" => $result->parcel->id,
-		  			"tracking_number" => $result->parcel->tracking_number,
-		  			"pdf" => $filepath,
+		  			"tracking_number" => $tracking_number,
+		  			"pdf" => $filename,
 		  		];
+
+	  			$order->setTrackingNumber($tracking_number);
+	  			$order->setParcelId($id);
+	  			$order->setPdf($filename);
+	  			$manager->flush();
 
   				return $this->json($array, 200);
 				}
@@ -330,23 +331,6 @@ class ShippingAPIController extends Controller {
   	} catch (\Exception $e) {
   		return $this->json($e->getMessage(), 404);
   	}
-
-
-
-    // // create and print label
-    // $parcelId = 180248575;
-    // $label = $sendCloud->labels->get($parcelId);
-    // dump($labels);
-    // $pdf = $sendCloud->labels->getLabelAsPdf($parcelId, 'label_printer');
-    // $filename = md5(time().uniqid()). ".pdf"; 
-    // $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
-    // file_put_contents($filepath, $pdf);
-
-
-    // // tracking parcel
-    // $tracking_number = $parcel->tracking_number();
-    // $tracking = $sendCloud->tracking->get('SCCWF3BVYJ7W');
-    // dump($tracking);
 
   }
 }
