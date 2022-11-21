@@ -172,11 +172,25 @@ class Order
      */
     private $parcelId;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $expectedDelivery;
+
+    /**
+     * @ORM\OneToMany(targetEntity=OrderStatus::class, mappedBy="shipping")
+     * @Groups("order:read")
+     */
+    private $orderStatuses;
+
 
     public function __construct()
     {
         $this->lineItems = new ArrayCollection();
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
+        $this->orderStatuses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -462,6 +476,48 @@ class Order
     public function setParcelId(?int $parcelId): self
     {
         $this->parcelId = $parcelId;
+
+        return $this;
+    }
+
+    public function getExpectedDelivery(): ?\DateTimeInterface
+    {
+        return $this->expectedDelivery;
+    }
+
+    public function setExpectedDelivery(?\DateTimeInterface $expectedDelivery): self
+    {
+        $this->expectedDelivery = $expectedDelivery;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|OrderStatus[]
+     */
+    public function getOrderStatuses(): Collection
+    {
+        return $this->orderStatuses;
+    }
+
+    public function addOrderStatus(OrderStatus $orderStatus): self
+    {
+        if (!$this->orderStatuses->contains($orderStatus)) {
+            $this->orderStatuses[] = $orderStatus;
+            $orderStatus->setShipping($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrderStatus(OrderStatus $orderStatus): self
+    {
+        if ($this->orderStatuses->removeElement($orderStatus)) {
+            // set the owning side to null (unless already changed)
+            if ($orderStatus->getShipping() === $this) {
+                $orderStatus->setShipping(null);
+            }
+        }
 
         return $this;
     }

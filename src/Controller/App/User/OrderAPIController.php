@@ -11,6 +11,8 @@ use App\Entity\Message;
 use App\Entity\Product;
 use App\Entity\Category;
 use App\Entity\LineItem;
+use App\Entity\OrderStatus;
+use App\Repository\OrderStatusRepository;
 use App\Repository\OrderRepository;
 use App\Repository\ClipRepository;
 use App\Repository\CategoryRepository;
@@ -167,8 +169,54 @@ class OrderAPIController extends Controller {
    *
    * @Route("/user/api/orders/{id}", name="user_api_order", methods={"GET"})
    */
-  public function order(Order $order, Request $request, ObjectManager $manager) {
+  public function order(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo) {
+    if ($order->getTrackingNumber()) {
+      $url = "https://panel.sendcloud.sc/api/v2/tracking/" . $order->getTrackingNumber();
+      $curl = curl_init();
+
+      curl_setopt_array($curl, [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "GET",
+        CURLOPT_HTTPHEADER => [
+          "Authorization: Basic MzgyNjY4NmYyZGJjNDE4MzgwODk4Y2MyNTRmYzBkMjg6MDk2ZTQ0Y2I5YjI2NDMxYjkwY2M1YjVkZWZjOWU5MTU=",
+          "Content-Type: application/json"
+        ],
+      ]);
+
+      $response = curl_exec($curl);
+      curl_close($curl);
+
+      $result = json_decode($response);
+
+      if ($result && array_key_exists("expected_delivery_date",$result)) {
+        $order->setExpectedDelivery(new \Datetime($result->expected_delivery_date));
+        $manager->flush();
+
+        foreach ($result->statuses as $status) {
+          $orderStatus = $statusRepo->findOneByStatusId($status->parcel_status_history_id);
+
+          if (!$orderStatus) {
+            $orderStatus = new OrderStatus();
+            $orderStatus->setUpdateAt(new \Datetime($status->carrier_update_timestamp));
+            $orderStatus->setMessage($status->carrier_message);
+            $orderStatus->setStatus($status->parent_status);
+            $orderStatus->setCode($status->carrier_code);
+            $orderStatus->setStatusId($status->parcel_status_history_id);
+            $orderStatus->setShipping($order);
+            
+            $manager->persist($orderStatus);
+            $manager->flush();
+          }
+        }
+      }
+    }
+
     return $this->json($order, 200, [], ['groups' => 'order:read', 
-    	'datetime_format' => 'd F Y' ]);
+    	'datetime_format' => 'd F Y H:i' ]);
   }
 }

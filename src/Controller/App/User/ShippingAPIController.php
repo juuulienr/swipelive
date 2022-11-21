@@ -248,7 +248,7 @@ class ShippingAPIController extends Controller {
   				"email" => $order->getBuyer()->getEmail(), 
   				"order_number" => $order->getNumber(), 
   				"weight" => $order->getWeight(),
-  				"to_service_point" => $order->getServicePointId(),
+  				// "to_service_point" => $order->getServicePointId(),
   				"request_label" => true, 
   				"shipment" => [
   					"id" => $order->getShippingMethodId()
@@ -258,13 +258,14 @@ class ShippingAPIController extends Controller {
   				"from_company_name" => $companyName, 
   				"from_address_1" => trim($vendor->getAddress()), 
   				"from_address_2" => "", 
-  				"from_house_number" => "110", 
+  				"from_house_number" => "110",
   				"from_city" => $vendor->getCity(), 
   				"from_postal_code" => $vendor->getZip(), 
   				"from_country" => $vendor->getCountryCode(), 
   				"from_email" => $vendor->getUser()->getEmail(), 
   			]
   		]; 
+
 
   		$curl = curl_init();
   		curl_setopt_array($curl, [
@@ -286,7 +287,7 @@ class ShippingAPIController extends Controller {
   		$result = json_decode($response);
   		curl_close($curl);
 
-  		if ($result && $result->parcel) {
+  		if ($result && array_key_exists("parcel",$result)) {
   			$id = $result->parcel->id;
   			$tracking_number = $result->parcel->tracking_number;
 
@@ -327,7 +328,9 @@ class ShippingAPIController extends Controller {
 
   				return $this->json($array, 200);
 				}
-  		}
+  		} else {
+        return $this->json($result->error->message, 404);
+      }
   	} catch (\Exception $e) {
   		return $this->json($e->getMessage(), 404);
   	}

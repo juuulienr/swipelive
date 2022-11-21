@@ -154,14 +154,52 @@ class WebhookController extends Controller {
    */
   public function sendcloud(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyException(new Exception("Sendcloud"));
+    $this->get('bugsnag')->notifyException(new Exception($result["action"]));
 
     // update parcel status
     if ($result["action"] == "parcel_status_changed") {
       $parcelId = $result["parcel"]["id"];
-      $tracking_number = $result["parcel"]["tracking_number"];
-      $statusId = $result["parcel"]["status"]["id"];
-      $statusMessage = $result["parcel"]["status"]["message"];
+
+      $order = $orderRepo->findOneByParcelId($parcelId);
+
+      if ($order) {
+        if ($order->getTrackingNumber()) {
+
+          $url = "https://panel.sendcloud.sc/api/v2/tracking" . '?' . $order->getTrackingNumber();
+          $curl = curl_init();
+
+          curl_setopt_array($curl, [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => [
+              "Authorization: Basic MzgyNjY4NmYyZGJjNDE4MzgwODk4Y2MyNTRmYzBkMjg6MDk2ZTQ0Y2I5YjI2NDMxYjkwY2M1YjVkZWZjOWU5MTU=",
+              "Content-Type: application/json"
+            ],
+          ]);
+
+          $response = curl_exec($curl);
+          curl_close($curl);
+
+          $result = json_decode($response);
+          // $this->get('bugsnag')->notifyException(new Exception($result));
+
+          if ($result) {
+            $order->setExpectedDelivery($result[0]->expected_delivery_date);
+
+          }
+
+
+
+        }
+      }
+      // $tracking_number = $result["parcel"]["tracking_number"];
+      // $statusId = $result["parcel"]["status"]["id"];
+      // $statusMessage = $result["parcel"]["status"]["message"];
     }
 
     return $this->json(true, 200);
