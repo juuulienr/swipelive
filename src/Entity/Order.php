@@ -185,6 +185,21 @@ class Order
      */
     private $orderStatuses;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $trackingUrl;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $shippingStatus;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $paymentStatus;
+
 
     public function __construct()
     {
@@ -518,6 +533,42 @@ class Order
                 $orderStatus->setShipping(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTrackingUrl(): ?string
+    {
+        return $this->trackingUrl;
+    }
+
+    public function setTrackingUrl(?string $trackingUrl): self
+    {
+        $this->trackingUrl = $trackingUrl;
+
+        return $this;
+    }
+
+    public function getShippingStatus(): ?string
+    {
+        return $this->shippingStatus;
+    }
+
+    public function setShippingStatus(?string $shippingStatus): self
+    {
+        $this->shippingStatus = $shippingStatus;
+
+        return $this;
+    }
+
+    public function getPaymentStatus(): ?string
+    {
+        return $this->paymentStatus;
+    }
+
+    public function setPaymentStatus(?string $paymentStatus): self
+    {
+        $this->paymentStatus = $paymentStatus;
 
         return $this;
     }

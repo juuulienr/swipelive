@@ -131,7 +131,8 @@ class OrderAPIController extends Controller {
 	      $order->setTotal($total);
 	      $order->setFees($fees);
 	      $order->setProfit($profit);
-	      $order->setStatus("succeeded");
+	      $order->setPaymentStatus("paid");
+        $order->setStatus("open");
 	      $manager->flush();
 
 	      $order->setNumber(100000 + sizeof($vendor->getSales()->toArray()));
@@ -151,16 +152,12 @@ class OrderAPIController extends Controller {
    * @Route("/user/api/orders", name="user_api_orders", methods={"GET"})
    */
   public function orders(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
-    $sales = $orderRepo->findBy([ "vendor" => $this->getUser(), "status" => "succeeded" ]);
-    $purchases = $orderRepo->findByBuyer([ "buyer" => $this->getUser(), "status" => "succeeded" ]);
+    $orders = $orderRepo->findByVendorOrBuyer($this->getUser());
 
-    $array = [
-      "sales" => $sales,
-      "purchases" => $purchases
-    ];
-
-    return $this->json($array, 200, [], ['groups' => 'order:read', 
-    	'datetime_format' => 'd F Y' ]);
+    return $this->json($orders, 200, [], [
+      'groups' => 'order:read', 
+      'datetime_format' => 'd F Y à H:i' 
+    ]);
   }
 
 
@@ -189,11 +186,10 @@ class OrderAPIController extends Controller {
       ]);
 
       $response = curl_exec($curl);
+      $result = json_decode($response);
       curl_close($curl);
 
-      $result = json_decode($response);
-
-      if ($result && array_key_exists("expected_delivery_date",$result)) {
+      if ($result && array_key_exists("expected_delivery_date", $result)) {
         $order->setExpectedDelivery(new \Datetime($result->expected_delivery_date));
         $manager->flush();
 
@@ -208,6 +204,8 @@ class OrderAPIController extends Controller {
             $orderStatus->setCode($status->carrier_code);
             $orderStatus->setStatusId($status->parcel_status_history_id);
             $orderStatus->setShipping($order);
+            $order->setShippingStatus($status->parent_status);
+            $order->setUpdatedAt(new \Datetime($status->carrier_update_timestamp));
             
             $manager->persist($orderStatus);
             $manager->flush();
@@ -216,7 +214,9 @@ class OrderAPIController extends Controller {
       }
     }
 
-    return $this->json($order, 200, [], ['groups' => 'order:read', 
-    	'datetime_format' => 'd F Y H:i' ]);
+    return $this->json($order, 200, [], [
+      'groups' => 'order:read', 
+      'datetime_format' => 'd F Y à H:i' 
+    ]);
   }
 }

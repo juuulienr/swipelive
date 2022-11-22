@@ -266,7 +266,6 @@ class AccountAPIController extends Controller {
   }
 
 
-
   /**
    * Récupérer les abonnés
    *
