@@ -51,6 +51,7 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255)
      * @Assert\Email(message="L'adresse mail est invalide !")
      * @Groups("user:read")
+     * @Groups("order:read")
      */
     private $email;
 

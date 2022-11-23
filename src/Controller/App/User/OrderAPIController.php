@@ -34,7 +34,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 class OrderAPIController extends Controller {
 
   /**
-   * @Route("/user/api/orders/success", name="user_api_orders_success")
+   * @Route("/user/api/orders/payment/success", name="user_api_orders_success")
    */
   public function success(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo) {
     if ($json = $request->getContent()) {
@@ -213,6 +213,24 @@ class OrderAPIController extends Controller {
         }
       }
     }
+
+    return $this->json($order, 200, [], [
+      'groups' => 'order:read', 
+      'datetime_format' => 'd F Y à H:i' 
+    ]);
+  }
+
+
+  /**
+   * Cloturer une commande
+   *
+   * @Route("/user/api/orders/{id}/closed", name="user_api_order_closed", methods={"GET"})
+   */
+  public function closed(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo) {
+    $order->setStatus('closed');
+    $manager->flush();
+
+    // payer le vendeur
 
     return $this->json($order, 200, [], [
       'groups' => 'order:read', 
