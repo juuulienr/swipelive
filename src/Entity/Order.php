@@ -182,6 +182,7 @@ class Order
     /**
      * @ORM\OneToMany(targetEntity=OrderStatus::class, mappedBy="shipping")
      * @Groups("order:read")
+     * @ORM\OrderBy({"updateAt" = "ASC"})
      */
     private $orderStatuses;
 

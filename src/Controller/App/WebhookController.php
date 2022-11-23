@@ -9,11 +9,13 @@ use App\Entity\Vendor;
 use App\Entity\Message;
 use App\Entity\Product;
 use App\Entity\Category;
+use App\Entity\OrderStatus;
 use App\Repository\ClipRepository;
 use App\Repository\OrderRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use App\Repository\LiveRepository;
+use App\Repository\OrderStatusRepository;
 use App\Repository\LiveProductsRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
@@ -152,19 +154,17 @@ class WebhookController extends Controller {
    *
    * @Route("/api/sendcloud/webhooks", name="api_sendcloud_webhooks")", methods={"POST"})
    */
-  public function sendcloud(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+  public function sendcloud(Request $request, ObjectManager $manager, OrderRepository $orderRepo, OrderStatusRepository $statusRepo) {
     $result = json_decode($request->getContent(), true);
     $this->get('bugsnag')->notifyException(new Exception($result["action"]));
 
     // update parcel status
     if ($result["action"] == "parcel_status_changed") {
       $parcelId = $result["parcel"]["id"];
-
       $order = $orderRepo->findOneByParcelId($parcelId);
 
       if ($order) {
         if ($order->getTrackingNumber()) {
-
           $url = "https://panel.sendcloud.sc/api/v2/tracking" . '?' . $order->getTrackingNumber();
           $curl = curl_init();
 
@@ -183,25 +183,35 @@ class WebhookController extends Controller {
           ]);
 
           $response = curl_exec($curl);
+          $result = json_decode($response);
           curl_close($curl);
 
-          $result = json_decode($response);
-          // $this->get('bugsnag')->notifyException(new Exception($result));
+          if ($result && array_key_exists("expected_delivery_date", $result)) {
+            $order->setExpectedDelivery(new \Datetime($result->expected_delivery_date));
+            $manager->flush();
 
-          if ($result) {
-            $order->setExpectedDelivery($result[0]->expected_delivery_date);
+            foreach ($result->statuses as $status) {
+              $orderStatus = $statusRepo->findOneByStatusId($status->parcel_status_history_id);
 
+              if (!$orderStatus) {
+                $orderStatus = new OrderStatus();
+                $orderStatus->setUpdateAt(new \Datetime($status->carrier_update_timestamp));
+                $orderStatus->setMessage($status->carrier_message);
+                $orderStatus->setStatus($status->parent_status);
+                $orderStatus->setCode($status->carrier_code);
+                $orderStatus->setStatusId($status->parcel_status_history_id);
+                $orderStatus->setShipping($order);
+                $order->setShippingStatus($status->parent_status);
+                $order->setUpdatedAt(new \Datetime($status->carrier_update_timestamp));
+
+                $manager->persist($orderStatus);
+                $manager->flush();
+              }
+            }
           }
-
-
-
         }
       }
-      // $tracking_number = $result["parcel"]["tracking_number"];
-      // $statusId = $result["parcel"]["status"]["id"];
-      // $statusMessage = $result["parcel"]["status"]["message"];
     }
-
     return $this->json(true, 200);
   }
 }

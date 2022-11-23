@@ -191,7 +191,7 @@ class ShippingAPIController extends Controller {
   /**
    * @Route("/user/api/shipping/create/{id}", name="user_api_create")
    */
-  public function shipping(Order $order, Request $request, ObjectManager $manager) {
+  public function shipping(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo) {
   	$shippingAddress = $order->getShippingAddress();
   	$vendor = $order->getVendor();
 
@@ -350,6 +350,5 @@ class ShippingAPIController extends Controller {
   	} catch (\Exception $e) {
   		return $this->json($e->getMessage(), 404);
   	}
-
   }
 }
