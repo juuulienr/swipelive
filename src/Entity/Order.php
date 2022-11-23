@@ -183,21 +183,29 @@ class Order
      * @ORM\OneToMany(targetEntity=OrderStatus::class, mappedBy="shipping")
      * @Groups("order:read")
      * @ORM\OrderBy({"updateAt" = "ASC"})
+     * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $orderStatuses;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $trackingUrl;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $shippingStatus;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $paymentStatus;
 

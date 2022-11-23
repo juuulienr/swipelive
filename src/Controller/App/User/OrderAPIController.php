@@ -103,7 +103,6 @@ class OrderAPIController extends Controller {
 	          $lineItem->setOrderId($order);
 	          $manager->persist($lineItem);
 
-
 	          $product->setQuantity($product->getQuantity() - 1);
 	          $order->setVendor($vendor);
 	        } else {
@@ -131,7 +130,8 @@ class OrderAPIController extends Controller {
 	      $order->setTotal($total);
 	      $order->setFees($fees);
 	      $order->setProfit($profit);
-	      $order->setPaymentStatus("paid");
+	      $order->setShippingStatus("ready-to-send");
+        $order->setPaymentStatus("paid");
         $order->setStatus("open");
 	      $manager->flush();
 
