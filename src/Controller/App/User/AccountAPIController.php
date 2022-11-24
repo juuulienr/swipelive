@@ -54,7 +54,7 @@ class AccountAPIController extends Controller {
           $manager->persist($user);
           $manager->flush();
 
-          if ($param['businessType'] == "company" | $param['businessType'] == "individual") {
+          if ($param['businessType'] == "company" || $param['businessType'] == "individual") {
             try {
               $vendor = new Vendor();
               $vendor->setBusinessName($param['businessName']);
@@ -64,6 +64,8 @@ class AccountAPIController extends Controller {
               $vendor->setAddress($param['address']);
               $vendor->setCity($param['city']);
               $vendor->setZip($param['zip']);
+              $vendor->setCountry($param['country']);
+              $vendor->setCountryCode($param['countryShort']);
 
               $user->setType("vendor");
               $user->setVendor($vendor);
@@ -72,14 +74,9 @@ class AccountAPIController extends Controller {
               $manager->flush();
 
               if ($param['businessType'] == "company") {
-                try {
-                  $vendor->setCompany($param['company']);
-                  $vendor->setSiren($param['siren']);
-                  $manager->flush();
-
-                } catch (Exception $e) {
-                  return $this->json($e->getMessage(), 404);
-                }
+                $vendor->setCompany($param['company']);
+                $vendor->setSiren($param['siren']);
+                $manager->flush();
               }
             } catch (Exception $e) {
               return $this->json($e->getMessage(), 404);

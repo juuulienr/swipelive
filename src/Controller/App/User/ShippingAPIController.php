@@ -46,6 +46,7 @@ class ShippingAPIController extends Controller {
 	    	$weight = $param["weight"];
 	    	$weightUnit = $param["weightUnit"];
 	    	$to_country = $param["countryShort"];
+        $quantity = $param["quantity"];
 
 	      if (!$weight || !$weightUnit) {
 	        return $this->json("Le poids est obligatoire", 404); 
@@ -56,6 +57,10 @@ class ShippingAPIController extends Controller {
 	      } else {
 	      	$weight = round($weight);
 	      }
+
+        if ($quantity) {
+          $weight = $weight * $quantity;
+        }
 
 	      try {
 	      	$params = [
@@ -82,15 +87,15 @@ class ShippingAPIController extends Controller {
 	      	]);
 
 	      	$response = curl_exec($curl);
+          $shippingProducts = json_decode($response);
+          $array = [];
 	      	curl_close($curl);
 
-	      	$shippingProducts = json_decode($response);
-	      	$array = [];
 
 	      	if ($shippingProducts) {
 	      		foreach ($shippingProducts as $value) {
 	      			foreach ($value->methods as $method) {
-	      				if (str_contains($method->name, 'Chrono Shop2Shop') || str_contains($method->name, 'Mondial Relay Point Relais') || (str_contains($method->name, 'Colissimo Home') && !str_contains($method->name, 'Colissimo Home Signature'))) {
+	      				if ($value->code == 'colissimo:europe-home' || $value->code == 'mondial_relay:home_international' || $value->code == 'mondial_relay:service_point,international' || $value->code == 'chronopost:shop2shop' || ($value->code == 'colissimo:home/fr' && !str_contains($method->name, 'Colissimo Home Signature')) || $value->code == 'mondial_relay:service_point' || $value->code == 'chronopost:service_point_abroad') {
 
                   $params = [
                     "from_country" => "FR",
@@ -99,7 +104,6 @@ class ShippingAPIController extends Controller {
                     "weight_unit" => "gram",
                     "shipping_method_id" => $method->id 
                   ];
-
                   $url = "https://panel.sendcloud.sc/api/v2/shipping-price" . '?' . http_build_query($params);
                   $curl = curl_init();
 
@@ -121,27 +125,38 @@ class ShippingAPIController extends Controller {
                   $result = json_decode($response);
                   curl_close($curl);
 
-	      					if (str_contains($method->name, 'Colissimo Home')) {
-	      						$array["domicile"][] = [ 
-	      							"id" => $method->id,
-	      							"carrier" => $value->carrier,
-	      							"name" => $value->name,
-	      							"price" => (string) round($result[0]->price * 1.2, 2),
-	      							"currency" => $result[0]->currency
-	      						];
+                  $data = [ 
+                    "id" => $method->id,
+                    "carrier" => $value->carrier,
+                    "name" => $value->name,
+                    "code" => $value->code,
+                    "price" => (string) round($result[0]->price * 1.2, 2),
+                    "currency" => $result[0]->currency
+                  ];
+
+	      					if ($value->code == 'colissimo:europe-home' || $value->code == 'colissimo:home/fr' || $value->code == 'mondial_relay:home_international') {
+	      						$array["domicile"][] = $data;
 	      					} else {
-	      						$array["service_point"][] = [ 
-	      							"id" => $method->id,
-	      							"carrier" => $value->carrier,
-	      							"name" => $value->name,
-	      							"price" => (string) round($result[0]->price * 1.2, 2),
-	      							"currency" => $result[0]->currency
-	      						];
+	      						$array["service_point"][] = $data;
 	      					}
 	      				}
 	      			}
 	      		}
 	      	}
+
+          $price = array_column($array["service_point"], 'price');
+          array_multisort($price, SORT_ASC, $array["service_point"]);
+
+          $price = array_column($array["domicile"], 'price');
+          array_multisort($price, SORT_ASC, $array["domicile"]);
+          if (array_key_exists('domicile', $array) && sizeof($array["domicile"]) > 1) {
+            foreach ($array["domicile"] as $key => $value) {
+              if ($value["code"] != "mondial_relay:home_international") {
+                unset($array["domicile"][$key]);
+              }
+            }
+          }
+
 	      	return $this->json($array, 200);
 	      } catch (Exception $e) {
 	      	return $this->json($e, 500);

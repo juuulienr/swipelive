@@ -34,6 +34,21 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 class OrderAPIController extends Controller {
 
   /**
+   * Récupérer les commandes
+   *
+   * @Route("/user/api/orders", name="user_api_orders", methods={"GET"})
+   */
+  public function orders(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+    $orders = $orderRepo->findByVendorOrBuyer($this->getUser());
+
+    return $this->json($orders, 200, [], [
+      'groups' => 'order:read', 
+      'datetime_format' => 'd F Y à H:i' 
+    ]);
+  }
+
+  
+  /**
    * @Route("/user/api/orders/payment/success", name="user_api_orders_success")
    */
   public function success(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo) {
@@ -143,21 +158,6 @@ class OrderAPIController extends Controller {
 		}
 
     return $this->json(false, 404);
-  }
-
-
-  /**
-   * Récupérer les commandes
-   *
-   * @Route("/user/api/orders", name="user_api_orders", methods={"GET"})
-   */
-  public function orders(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
-    $orders = $orderRepo->findByVendorOrBuyer($this->getUser());
-
-    return $this->json($orders, 200, [], [
-      'groups' => 'order:read', 
-      'datetime_format' => 'd F Y à H:i' 
-    ]);
   }
 
 

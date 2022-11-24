@@ -185,6 +185,7 @@ class Vendor
         $this->pending = "0.00";
         $this->available = "0.00";
         $this->verified = false;
+        $this->countryCode = "FR";
     }
 
 
