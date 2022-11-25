@@ -51,6 +51,8 @@ class Product
      * @ORM\JoinColumn(nullable=false)
      * @Groups("product:read")
      * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("clip:read")
      */
     private $vendor;
 
