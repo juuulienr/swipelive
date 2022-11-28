@@ -171,8 +171,8 @@ class ProductAPIController extends Controller {
         $result = (new UploadApi())->upload($filepath, [
           'public_id' => $filename,
           'use_filename' => TRUE,
-          "height" => 512, 
-          "width" => 512, 
+          "height" => 750, 
+          "width" => 750, 
           "crop" => "thumb"
         ]);
 
@@ -216,8 +216,8 @@ class ProductAPIController extends Controller {
         $result = (new UploadApi())->upload($filepath, [
           'public_id' => $filename,
           'use_filename' => TRUE,
-          "height" => 512, 
-          "width" => 512, 
+          "height" => 750, 
+          "width" => 750, 
           "crop" => "thumb"
         ]);
 
