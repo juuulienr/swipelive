@@ -197,9 +197,9 @@ class ProductAPIController extends Controller {
   /**
    * Ajouter une image sur un produit
    *
-   * @Route("/user/api/products/edit/upload/add/{id}", name="user_api_edit_upload_add", methods={"POST"})
+   * @Route("/user/api/products/edit/upload/{id}", name="user_api_edit_upload_add", methods={"POST"})
    */
-  public function addUploadProduct(Product $product, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function editUploadProduct(Product $product, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($request->files->get('picture')) {
       $file = $request->files->get('picture');
 
@@ -228,6 +228,7 @@ class ProductAPIController extends Controller {
 
       $upload = new Upload();
       $upload->setFilename($fullname);
+      $product->setUpload($upload);
 
       $manager->persist($upload);
       $manager->flush();
@@ -245,11 +246,14 @@ class ProductAPIController extends Controller {
    * @Route("/user/api/products/upload/delete/{id}", name="user_api_upload_delete", methods={"GET"})
    */
   public function deleteUpload(Upload $upload, Request $request, ObjectManager $manager) {
-    $filePath = $this->getParameter('uploads_directory') . '/' . $upload->getFilename();
+    if ($upload->getFilename()) {
+      $oldFilename = explode(".", $upload->getFilename());
 
-    if (file_exists($filePath)) {
-      $filesystem = new Filesystem();
-      $filesystem->remove($filePath);
+      try {
+        $result = (new AdminApi())->deleteAssets($oldFilename[0], []);
+      } catch (\Exception $e) {
+        return $this->json($e->getMessage(), 404);
+      }
 
       $manager->remove($upload);
       $manager->flush();
