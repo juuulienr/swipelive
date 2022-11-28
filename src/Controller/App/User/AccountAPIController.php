@@ -196,7 +196,7 @@ class AccountAPIController extends Controller {
       }
 
       $filename = md5(time().uniqid()); 
-      $fullname = $fileName.'.'.$file->guessExtension();
+      $fullname = $filename.'.'.$file->guessExtension();
       $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
       file_put_contents($filepath, file_get_contents($file));
 
