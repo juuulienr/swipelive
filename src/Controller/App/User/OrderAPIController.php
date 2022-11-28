@@ -57,75 +57,92 @@ class OrderAPIController extends Controller {
 
 	    if ($param) {
 	    	$customer = $this->getUser();
-	      $param["quantity"] ? $quantity = $param["quantity"] : $quantity = 1;
+        $lineItems = $param["lineItems"];
 	      $shippingPrice = $param["shippingPrice"];
 	      $shippingName = $param["shippingName"];
 	      $shippingMethodId = $param["shippingMethodId"];
 	      $shippingCarrier = $param["shippingCarrier"];
 	      $servicePointId = $param["servicePointId"];
-	    	$weight = $param["weight"];
-	    	$weightUnit = $param["weightUnit"];
+        $totalWeight = 0;
+        $subTotal = 0;
 
 	      $order = new Order();
 	      $order->setBuyer($customer);
 	      $manager->persist($order);
 	      
-	      if (!$weight || !$weightUnit) {
-	        return $this->json("Le poids est obligatoire", 404); 
+	      if (!$lineItems) {
+	        return $this->json("Un produit est obligatoire !", 404); 
 	      }
 
-	      if ($weightUnit == "g") {
-	      	$weight = round($weight / 1000, 2);
-	      }
+        foreach ($lineItems as $lineItem) {
+          if ($lineItem["variant"]) {
+            $variant = $variantRepo->findOneById($lineItem["variant"]);
 
-	      if ($param["variant"]) {
-	        $variant = $variantRepo->findOneById($param["variant"]);
+            if ($variant && $variant->getQuantity() > 0) {
+              $weightUnit = $lineItem["variant"]["weightUnit"];
+              $weight = $lineItem["variant"]["weight"];
+              $quantity = $lineItem["quantity"];
+              $title = $variant->getProduct()->getTitle() . " - " . $variant->getTitle();
+              $lineTotal = $variant->getPrice() * $quantity;
+              $vendor = $variant->getProduct()->getVendor();
+              $subTotal += $lineTotal;
 
-	        if ($variant && $variant->getQuantity() > 0) {
-	          $title = $variant->getProduct()->getTitle() . " - " . $variant->getTitle();
-	          $subTotal = $variant->getPrice() * $quantity;
-	      		$vendor = $variant->getProduct()->getVendor();
+              if ($weightUnit == "g") {
+                $totalWeight += round($weight / 1000, 2);
+              } else {
+                $totalWeight += $weight;
+              }
 
-	          $lineItem = new LineItem();
-	          $lineItem->setQuantity($quantity);
-	          $lineItem->setProduct($variant->getProduct());
-	          $lineItem->setVariant($variant);
-	          $lineItem->setPrice($variant->getPrice());
-	          $lineItem->setTotal($subTotal);
-	          $lineItem->setTitle($title);
-	          $lineItem->setOrderId($order);
-	          $manager->persist($lineItem);
+              $lineItem = new LineItem();
+              $lineItem->setQuantity($quantity);
+              $lineItem->setProduct($variant->getProduct());
+              $lineItem->setVariant($variant);
+              $lineItem->setPrice($variant->getPrice());
+              $lineItem->setTotal($lineTotal);
+              $lineItem->setTitle($title);
+              $lineItem->setOrderId($order);
+              $manager->persist($lineItem);
 
-	          $variant->setQuantity($variant->getQuantity() - 1);
-	          $order->setVendor($vendor);
-	        } else {
-	          return $this->json("Le variant est introuvable", 404); 
-	        }
-	      } elseif ($param["product"]) {
-	        $product = $productRepo->findOneById($param["product"]);
+              $variant->setQuantity($variant->getQuantity() - 1);
+              $order->setVendor($vendor);
+            } else {
+              return $this->json("Stock épuisé", 404); 
+            }
 
-	        if ($product && $product->getQuantity() > 0) {
-	          $title = $product->getTitle();
-	          $subTotal = $product->getPrice() * $quantity;
-	      		$vendor = $product->getVendor();
+          } elseif ($lineItem["product"]) {
+            $product = $productRepo->findOneById($lineItem["product"]);
 
-	          $lineItem = new LineItem();
-	          $lineItem->setQuantity($quantity);
-	          $lineItem->setProduct($product);
-	          $lineItem->setTitle($title);
-	          $lineItem->setPrice($product->getPrice());
-	          $lineItem->setTotal($subTotal);
-	          $lineItem->setOrderId($order);
-	          $manager->persist($lineItem);
+            if ($product && $product->getQuantity() > 0) {
+              $weightUnit = $lineItem["product"]["weightUnit"];
+              $weight = $lineItem["product"]["weight"];
+              $quantity = $lineItem["quantity"];
+              $title = $product->getTitle();
+              $lineTotal = $product->getPrice() * $quantity;
+              $vendor = $product->getVendor();
+              $subTotal += $lineTotal;
 
-	          $product->setQuantity($product->getQuantity() - 1);
-	          $order->setVendor($vendor);
-	        } else {
-	          return $this->json("Le produit est introuvable", 404); 
-	        }
-	      } else {
-	        return $this->json("Un produit ou un variant est obligatoire", 404); 
-	      }
+              if ($weightUnit == "g") {
+                $totalWeight += round($weight / 1000, 2);
+              } else {
+                $totalWeight += $weight;
+              }
+
+              $lineItem = new LineItem();
+              $lineItem->setQuantity($quantity);
+              $lineItem->setProduct($product);
+              $lineItem->setTitle($title);
+              $lineItem->setPrice($product->getPrice());
+              $lineItem->setTotal($lineTotal);
+              $lineItem->setOrderId($order);
+              $manager->persist($lineItem);
+
+              $product->setQuantity($product->getQuantity() - 1);
+              $order->setVendor($vendor);
+            } else {
+              return $this->json("Le produit est introuvable", 404); 
+            }
+          }
+        }
 
 	      $fees = $subTotal * 0.08; // commission
 	      $profit = $subTotal * 0.06; // commission - frais paiement (2%)
@@ -135,7 +152,7 @@ class OrderAPIController extends Controller {
 		      $order->setShippingAddress($customer->getShippingAddresses()->toArray()[0]);
 	      }
 
-	      $order->setWeight($weight);
+	      $order->setWeight($totalWeight);
 	      $order->setSubTotal($subTotal);
 	      $order->setShippingPrice($shippingPrice);
 	      $order->setShippingName($shippingName);

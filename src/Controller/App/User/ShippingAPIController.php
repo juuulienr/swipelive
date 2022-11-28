@@ -43,30 +43,36 @@ class ShippingAPIController extends Controller {
 	    $param = json_decode($json, true);
 
 	    if ($param) {
-	    	$weight = $param["weight"];
-	    	$weightUnit = $param["weightUnit"];
+	    	$lineItems = $param["lineItems"];
 	    	$to_country = $param["countryShort"];
-        $quantity = $param["quantity"];
+        $totalWeight = 0;
 
-	      if (!$weight || !$weightUnit) {
-	        return $this->json("Le poids est obligatoire", 404); 
+	      if (!$lineItems) {
+	        return $this->json("Un produit est obligatoire !", 404); 
 	      }
 
-	      if ($weightUnit == "kg") {
-	      	$weight = $weight * 1000;
-	      } else {
-	      	$weight = round($weight);
-	      }
+        foreach ($lineItems as $lineItem) {
+          if ($lineItem["variant"]) {
+            $weightUnit = $lineItem["variant"]["weightUnit"];
+            $weight = $lineItem["variant"]["weight"];
+          } else {
+            $weightUnit = $lineItem["product"]["weightUnit"];
+            $weight = $lineItem["product"]["weight"];
+          }
+          $quantity = $lineItem["quantity"];
 
-        if ($quantity) {
-          $weight = $weight * $quantity;
+          if ($weightUnit == "kg") {
+            $totalWeight += round($weight * 1000 * $quantity);
+          } else {
+            $totalWeight += round($weight * $quantity);
+          }
         }
 
 	      try {
 	      	$params = [
 	      		"from_country" => "FR",
 	      		"to_country" => $to_country,
-	      		"weight" => $weight,
+	      		"weight" => $totalWeight,
 	      		"weight_unit" => "gram"
 	      	];
 	      	$url = "https://panel.sendcloud.sc/api/v2/shipping-products" . '?' . http_build_query($params);
@@ -100,7 +106,7 @@ class ShippingAPIController extends Controller {
                   $params = [
                     "from_country" => "FR",
                     "to_country" => $to_country,
-                    "weight" => $weight,
+                    "weight" => $totalWeight,
                     "weight_unit" => "gram",
                     "shipping_method_id" => $method->id 
                   ];

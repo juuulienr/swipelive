@@ -196,6 +196,18 @@ class AccountAPIController extends Controller {
       $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
       file_put_contents($filepath, file_get_contents($file));
 
+      try {
+        $result = (new UploadApi())->upload($filepath, [
+          'public_id' => $filename,
+          'use_filename' => TRUE,
+          "height" => 256, 
+          "width" => 256, 
+          "crop" => "thumb"
+        ]);
+      } catch (\Exception $e) {
+        return $this->json("Une erreur est survenue pendant la compression", 404);
+      }
+
       $user = $this->getUser();
       $user->setPicture($filename);
       $manager->flush();
