@@ -280,11 +280,26 @@ class APIController extends Controller {
         return $this->json("L'image est introuvable !", 404);
       }
 
-      $filename = md5(time().uniqid()). "." . $file->guessExtension(); 
-      $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
+      $filename = md5(time().uniqid()); 
+      $fullname = $filename.'.'.$file->guessExtension();
+      $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
       file_put_contents($filepath, file_get_contents($file));
 
-      return $this->json($filename, 200);
+      try {
+        $result = (new UploadApi())->upload($filepath, [
+          'public_id' => $filename,
+          'use_filename' => TRUE,
+          "height" => 256, 
+          "width" => 256, 
+          "crop" => "thumb"
+        ]);
+
+        unlink($filepath);
+      } catch (\Exception $e) {
+        return $this->json($e->getMessage(), 404);
+      }
+
+      return $this->json($fullname, 200);
     }
 
     return $this->json("L'image est introuvable !", 404);

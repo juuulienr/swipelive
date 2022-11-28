@@ -190,6 +190,8 @@ class AccountAPIController extends Controller {
   public function picture(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($request->files->get('picture')) {
       $file = $request->files->get('picture');
+      $user = $this->getUser();
+      $oldFilename = $user->getPicture();
 
       if (!$file) {
         return $this->json("L'image est introuvable !", 404);
@@ -208,11 +210,17 @@ class AccountAPIController extends Controller {
           "width" => 256, 
           "crop" => "thumb"
         ]);
+
+        unlink($filepath);
       } catch (\Exception $e) {
         return $this->json($e->getMessage(), 404);
       }
 
-      $user = $this->getUser();
+      if ($oldFilename) {
+        $oldFilename = explode(".", $oldFilename);
+        $result = (new AdminApi())->deleteAssets($oldFilename[0], []);
+      }
+
       $user->setPicture($fullname);
       $manager->flush();
       
