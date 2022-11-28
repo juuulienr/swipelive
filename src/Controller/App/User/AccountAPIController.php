@@ -208,7 +208,7 @@ class AccountAPIController extends Controller {
           "crop" => "thumb"
         ]);
       } catch (\Exception $e) {
-        return $this->json("Une erreur est survenue pendant la compression", 404);
+        return $this->json($e->getMessage(), 404);
       }
 
       $user = $this->getUser();
