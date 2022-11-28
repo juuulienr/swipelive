@@ -195,8 +195,9 @@ class AccountAPIController extends Controller {
         return $this->json("L'image est introuvable !", 404);
       }
 
-      $filename = md5(time().uniqid()). "." . $file->guessExtension(); 
-      $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
+      $filename = md5(time().uniqid()); 
+      $fullname = $fileName.'.'.$file->guessExtension();
+      $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
       file_put_contents($filepath, file_get_contents($file));
 
       try {
@@ -212,7 +213,7 @@ class AccountAPIController extends Controller {
       }
 
       $user = $this->getUser();
-      $user->setPicture($filename);
+      $user->setPicture($fullname);
       $manager->flush();
       
 	    return $this->json($this->getUser(), 200, [], [
