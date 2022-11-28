@@ -233,7 +233,13 @@ class ProductAPIController extends Controller {
       $manager->persist($upload);
       $manager->flush();
 
-      return $this->json($upload, 200);
+      return $this->json($upload, 200, [], [
+        'groups' => 'upload:read',
+        'circular_reference_limit' => 1, 
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ], 200);
     }
 
     return $this->json("L'image est introuvable !", 404);
