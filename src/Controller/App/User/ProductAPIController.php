@@ -162,21 +162,30 @@ class ProductAPIController extends Controller {
         return $this->json("L'image est introuvable !", 404);
       }
 
-      $filename = md5(time().uniqid()). "." . $file->guessExtension(); 
-      $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
+      $filename = md5(time().uniqid()); 
+      $fullname = $filename.'.'.$file->guessExtension();
+      $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
       file_put_contents($filepath, file_get_contents($file));
 
+      try {
+        $result = (new UploadApi())->upload($filepath, [
+          'public_id' => $filename,
+          'use_filename' => TRUE,
+          "height" => 512, 
+          "width" => 512, 
+          "crop" => "thumb"
+        ]);
+
+        unlink($filepath);
+      } catch (\Exception $e) {
+        return $this->json($e->getMessage(), 404);
+      }
+
       $upload = new Upload();
-      $upload->setFilename($filename);
+      $upload->setFilename($fullname);
 
       $manager->persist($upload);
       $manager->flush();
-
-      // \Cloudinary::config([ 
-      // 	"cloud_name" => "dxlsenc2r", 
-      // 	"api_key" => "461186889242285", 
-      // 	"api_secret" => "ZUiL6ovY92-do6u1Rr0-pcQqCMg", 
-      // 	"secure" => true]);
 
       return $this->json($upload, 200);
     }
@@ -198,13 +207,27 @@ class ProductAPIController extends Controller {
         return $this->json("L'image est introuvable !", 404);
       }
 
-      $filename = md5(time().uniqid()). "." . $file->guessExtension(); 
-      $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
+      $filename = md5(time().uniqid()); 
+      $fullname = $filename.'.'.$file->guessExtension();
+      $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
       file_put_contents($filepath, file_get_contents($file));
 
+      try {
+        $result = (new UploadApi())->upload($filepath, [
+          'public_id' => $filename,
+          'use_filename' => TRUE,
+          "height" => 512, 
+          "width" => 512, 
+          "crop" => "thumb"
+        ]);
+
+        unlink($filepath);
+      } catch (\Exception $e) {
+        return $this->json($e->getMessage(), 404);
+      }
+
       $upload = new Upload();
-      $upload->setFilename($filename);
-      $product->setUpload($upload);
+      $upload->setFilename($fullname);
 
       $manager->persist($upload);
       $manager->flush();

@@ -305,10 +305,22 @@ class ShippingAPIController extends Controller {
 				curl_close($curl);
 
 				if ($content) {
-			    $filename = md5(time().uniqid()). ".pdf"; 
-			    $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
-			    file_put_contents($filepath, $content);
+          $filename = md5(time().uniqid()); 
+          $fullname = $filename. ".pdf"; 
+          $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
+          file_put_contents($filepath, $content);
 
+          try {
+            $result = (new UploadApi())->upload($filepath, [
+              'public_id' => $filename,
+              'use_filename' => TRUE,
+            ]);
+
+            unlink($filepath);
+          } catch (\Exception $e) {
+            return $this->json($e->getMessage(), 404);
+          }
+      
 	  			$order->setTrackingUrl($tracking_url);
           $order->setTrackingNumber($tracking_number);
 	  			$order->setParcelId($id);
