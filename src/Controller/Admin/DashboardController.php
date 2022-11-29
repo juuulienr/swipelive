@@ -16,7 +16,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class DashboardController extends Controller {
 
   /**
-   * @Route("/admin/dashboard", name="dashboard")
+   * @Route("/admin/dashboard", name="admin_dashboard")
    */
   public function dashboard(){
     return $this->render('admin/dashboard.html.twig');
@@ -24,7 +24,7 @@ class DashboardController extends Controller {
 
 
   /**
-   * @Route("/login", name="login")
+   * @Route("/admin/login", name="admin_login")
    */
   public function login(){
     return $this->render('admin/login.html.twig');
