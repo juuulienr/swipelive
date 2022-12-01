@@ -74,8 +74,8 @@ class APIController extends Controller {
    * @Route("/user/api/feed", name="api_feed2", methods={"GET"})
    */
   public function feed2(Request $request, ObjectManager $manager, ClipRepository $clipRepo, LiveRepository $liveRepo, SerializerInterface $serializer) {
-    $lives = $liveRepo->findByLive($this->getUser()->getVendor());
-    $clips = $clipRepo->findByClip($this->getUser()->getVendor());
+    $lives = $liveRepo->findByLiveAndVendor($this->getUser()->getVendor());
+    $clips = $clipRepo->findByClipAndVendor($this->getUser()->getVendor());
     $array = [];
 
     if ($lives) {
