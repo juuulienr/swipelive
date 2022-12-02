@@ -235,7 +235,11 @@ class APIController extends Controller {
     $search = $request->query->get('search');
 
     if ($search || $search == "") {
-      $users = $repo->findUserBySearch($search, $this->getUser()->getVendor());
+      if ($this->getUser()->getVendor()) {
+        $users = $repo->findUserBySearchExceptSelf($search, $this->getUser()->getVendor());
+      } else {
+        $users = $repo->findUserBySearch($search);
+      }
 
 	    return $this->json($users, 200, [], [
 	    	'groups' => 'user:read', 
