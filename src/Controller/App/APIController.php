@@ -34,11 +34,16 @@ class APIController extends Controller {
   /**
    * Afficher le feed
    *
-   * @Route("/api/feed", name="api_feed", methods={"GET"})
+   * @Route("/user/api/feed", name="api_feed", methods={"GET"})
    */
   public function feed(Request $request, ObjectManager $manager, ClipRepository $clipRepo, LiveRepository $liveRepo, SerializerInterface $serializer) {
-    $lives = $liveRepo->findByLive();
-    $clips = $clipRepo->findByClip();
+    if ($this->getUser()->getVendor()) {
+      $lives = $liveRepo->findByLiveAndVendor($this->getUser()->getVendor());
+      $clips = $clipRepo->findByClipAndVendor($this->getUser()->getVendor());
+    } else {
+      $lives = $liveRepo->findByLive();
+      $clips = $clipRepo->findByClip();
+    }
     $array = [];
 
     if ($lives) {
@@ -68,69 +73,14 @@ class APIController extends Controller {
     return $this->json($array);
   }
 
-  /**
-   * Afficher le feed
-   *
-   * @Route("/user/api/feed", name="api_feed2", methods={"GET"})
-   */
-  public function feed2(Request $request, ObjectManager $manager, ClipRepository $clipRepo, LiveRepository $liveRepo, SerializerInterface $serializer) {
-    $lives = $liveRepo->findByLiveAndVendor($this->getUser()->getVendor());
-    $clips = $clipRepo->findByClipAndVendor($this->getUser()->getVendor());
-    $array = [];
-
-    if ($lives) {
-    	foreach ($lives as $live) {
-    		$array[] = [ "type" => "live", "value" => $serializer->serialize($live, "json", [
-    			'groups' => 'live:read', 
-    			'circular_reference_limit' => 1, 
-    			'circular_reference_handler' => function ($object) {
-    				return $object->getId();
-    			} 
-    		])];
-    	}
-    }
-
-    if ($clips) {
-    	foreach ($clips as $clip) {
-    		$array[] = [ "type" => "clip", "value" => $serializer->serialize($clip, "json", [
-    			'groups' => 'clip:read', 
-    			'circular_reference_limit' => 1, 
-    			'circular_reference_handler' => function ($object) {
-    				return $object->getId();
-    			} 
-    		])];
-    	} 
-    }
-
-    return $this->json($array);
-  }
 
 
   /**
    * Afficher clips tendances
    *
-   * @Route("/api/clips/trending", name="api_clips_trending", methods={"GET"})
+   * @Route("/user/api/clips/trending", name="api_clips_trending", methods={"GET"})
    */
   public function trending(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
-  {
-    $clips = $clipRepo->findByClip();
-
-    return $this->json($clips, 200, [], [
-    	'groups' => 'clip:read', 
-    	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => function ($object) {
-    		return $object->getId();
-    	} 
-    ]);
-  }
-
-
-  /**
-   * Afficher clips tendances
-   *
-   * @Route("/user/api/clips/trending", name="api_clips_trending2", methods={"GET"})
-   */
-  public function trending2(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
   {
     $clips = $clipRepo->findByClip($this->getUser()->getVendor());
 
@@ -235,37 +185,6 @@ class APIController extends Controller {
   }
 
 
-  /**
-   * Mettre à jour les vues sur un live
-   *
-   * @Route("/api/live/{id}/update/viewers", name="api_live_update_viewers", methods={"PUT"})
-   */
-  public function updateViewers(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
-    $info = $pusher->getChannelInfo($live->getChannel(), ['info' => 'subscription_count']);
-    $count = $info->subscription_count;
-
-    if ($count) {
-      $count = $count - 1;
-      $live->setViewers($count);
-      $manager->flush();
-    }
-
-    $data = [ 
-      "viewers" => $count,
-    ];
-
-    $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
-
-    return $this->json($live, 200, [], [
-    	'groups' => 'live:read', 
-    	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => function ($object) {
-    		return $object->getId();
-    	} 
-    ]);
-  }
-
 
   /**
    * Modifier image du profil
@@ -309,34 +228,9 @@ class APIController extends Controller {
   /**
    * Rechercher un vendeur
    *
-   * @Route("/api/user/search", name="api_user_search")
-   */
-  public function userSearch(Request $request, UserRepository $repo, ObjectManager $manager)
-  {
-    $search = $request->query->get('search');
-
-    if ($search || $search == "") {
-      $users = $repo->findUserBySearch($search);
-
-	    return $this->json($users, 200, [], [
-	    	'groups' => 'user:read', 
-	    	'circular_reference_limit' => 1, 
-	    	'circular_reference_handler' => function ($object) {
-	    		return $object->getId();
-	    	} 
-	    ]);
-    }
-
-    return $this->json("Une erreur est survenue", 404);
-  }
-
-
-  /**
-   * Rechercher un vendeur
-   *
    * @Route("/user/api/user/search", name="api_user_search")
    */
-  public function userSearch2(Request $request, UserRepository $repo, ObjectManager $manager)
+  public function search(Request $request, UserRepository $repo, ObjectManager $manager)
   {
     $search = $request->query->get('search');
 
