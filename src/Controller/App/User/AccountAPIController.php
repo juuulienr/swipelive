@@ -57,35 +57,6 @@ class AccountAPIController extends Controller {
           $manager->persist($user);
           $manager->flush();
 
-          if ($param['businessType'] == "company" || $param['businessType'] == "individual") {
-            try {
-              $vendor = new Vendor();
-              $vendor->setBusinessName($param['businessName']);
-              $vendor->setBusinessType($param['businessType']);
-              $vendor->setSummary($param['summary']);
-              $vendor->setDob(new \DateTime($param['dob']));
-              $vendor->setAddress($param['address']);
-              $vendor->setCity($param['city']);
-              $vendor->setZip($param['zip']);
-              $vendor->setCountry($param['country']);
-              $vendor->setCountryCode($param['countryShort']);
-
-              $user->setType("vendor");
-              $user->setVendor($vendor);
-
-              $manager->persist($vendor);
-              $manager->flush();
-
-              if ($param['businessType'] == "company") {
-                $vendor->setCompany($param['company']);
-                $vendor->setSiren($param['siren']);
-                $manager->flush();
-              }
-            } catch (Exception $e) {
-              return $this->json($e->getMessage(), 404);
-            }
-          }
-
 			    return $this->json($user, 200, [], [
 			    	'groups' => 'user:read', 
 			    	'circular_reference_limit' => 1, 
@@ -134,7 +105,6 @@ class AccountAPIController extends Controller {
   public function profile(Request $request, ObjectManager $manager) {
     return $this->json($this->getUser(), 200, [], [
     	'groups' => 'user:read', 
-    	'datetime_format' => 'd/m/Y', 
     	'circular_reference_limit' => 1, 
     	'circular_reference_handler' => function ($object) {
     		return $object->getId();
@@ -159,10 +129,11 @@ class AccountAPIController extends Controller {
         $vendor = $this->getUser()->getVendor();
         $vendor->setBusinessName($param['businessName']);
         $vendor->setSummary($param['summary']);
-        $vendor->setDob(new \DateTime($param['dob']));
         $vendor->setAddress($param['address']);
         $vendor->setCity($param['city']);
         $vendor->setZip($param['zip']);
+        $vendor->setCountry($param['country']);
+        $vendor->setCountryCode($param['countryCode']);
         $vendor->setCompany($param['company']);
         $vendor->setSiren($param['siren']);
         $manager->flush();
@@ -170,12 +141,59 @@ class AccountAPIController extends Controller {
 
 	    return $this->json($this->getUser(), 200, [], [
 	    	'groups' => 'user:read', 
-	    	'datetime_format' => 'd/m/Y', 
 	    	'circular_reference_limit' => 1, 
 	    	'circular_reference_handler' => function ($object) {
 	    		return $object->getId();
 	    	} 
 	    ]);
+    }
+
+    return $this->json([ "error" => "Une erreur est survenue"], 404);
+  }
+
+
+  /**
+   * Devenir vendeur
+   *
+  * @Route("/user/api/vendor", name="user_api_vendor", methods={"POST"})
+  */
+  public function vendor(Request $request, ObjectManager $manager, UserRepository $userRepo, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $user = $this->getUser();
+      $param = json_decode($json, true);
+      $serializer->deserialize($json, User::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $user]);
+      $manager->flush();
+
+      if ($param && !$user->getVendor())
+      $vendor = new Vendor();
+      $vendor->setBusinessName($param['businessName']);
+      $vendor->setBusinessType($param['businessType']);
+      $vendor->setSummary($param['summary']);
+      $vendor->setAddress($param['address']);
+      $vendor->setCity($param['city']);
+      $vendor->setZip($param['zip']);
+      $vendor->setCountry($param['country']);
+      $vendor->setCountryCode($param['countryShort']);
+
+      $user->setType("vendor");
+      $user->setVendor($vendor);
+
+      $manager->persist($vendor);
+      $manager->flush();
+
+      if ($param['businessType'] == "company") {
+        $vendor->setCompany($param['company']);
+        $vendor->setSiren($param['siren']);
+        $manager->flush();
+      }
+
+      return $this->json($user, 200, [], [
+        'groups' => 'user:read', 
+        'circular_reference_limit' => 1, 
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ]);
     }
 
     return $this->json([ "error" => "Une erreur est survenue"], 404);
@@ -226,7 +244,6 @@ class AccountAPIController extends Controller {
       
 	    return $this->json($this->getUser(), 200, [], [
 	    	'groups' => 'user:read', 
-	    	'datetime_format' => 'd/m/Y', 
 	    	'circular_reference_limit' => 1, 
 	    	'circular_reference_handler' => function ($object) {
 	    		return $object->getId();
@@ -259,7 +276,6 @@ class AccountAPIController extends Controller {
       
     return $this->json($this->getUser(), 200, [], [
     	'groups' => 'user:read', 
-    	'datetime_format' => 'd/m/Y', 
     	'circular_reference_limit' => 1, 
     	'circular_reference_handler' => function ($object) {
     		return $object->getId();
@@ -278,7 +294,6 @@ class AccountAPIController extends Controller {
 
     return $this->json($following, 200, [], [
     	'groups' => 'user:read', 
-    	'datetime_format' => 'd/m/Y', 
     	'circular_reference_limit' => 1, 
     	'circular_reference_handler' => function ($object) {
     		return $object->getId();
@@ -297,7 +312,6 @@ class AccountAPIController extends Controller {
 
     return $this->json($followers, 200, [], [
     	'groups' => 'user:read', 
-    	'datetime_format' => 'd/m/Y', 
     	'circular_reference_limit' => 1, 
     	'circular_reference_handler' => function ($object) {
     		return $object->getId();

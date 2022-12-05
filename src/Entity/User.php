@@ -126,6 +126,30 @@ class User implements UserInterface
      * @Groups("user:read")
      */
     private $shippingAddresses;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("user:read")
+     */
+    private $phone;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("user:read")
+     */
+    private $day;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("user:read")
+     */
+    private $month;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("user:read")
+     */
+    private $year;
     
 
     public function __construct()
@@ -135,8 +159,8 @@ class User implements UserInterface
         $this->purchases = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
-        $this->type = "user";
         $this->shippingAddresses = new ArrayCollection();
+        $this->type = "user";
     }
 
     public function getFullName() {
@@ -421,6 +445,54 @@ class User implements UserInterface
                 $shippingAddress->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getDay(): ?string
+    {
+        return $this->day;
+    }
+
+    public function setDay(?string $day): self
+    {
+        $this->day = $day;
+
+        return $this;
+    }
+
+    public function getMonth(): ?string
+    {
+        return $this->month;
+    }
+
+    public function setMonth(?string $month): self
+    {
+        $this->month = $month;
+
+        return $this;
+    }
+
+    public function getYear(): ?string
+    {
+        return $this->year;
+    }
+
+    public function setYear(?string $year): self
+    {
+        $this->year = $year;
 
         return $this;
     }

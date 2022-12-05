@@ -82,12 +82,6 @@ class Vendor
     private $businessName;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
-     * @Groups("user:read")
-     */
-    private $dob;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("user:read")
      */
@@ -164,11 +158,13 @@ class Vendor
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("user:read")
      */
     private $country;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("user:read")
      */
     private $countryCode;
 
@@ -319,18 +315,6 @@ class Vendor
     public function setBusinessType(?string $businessType): self
     {
         $this->businessType = $businessType;
-
-        return $this;
-    }
-
-    public function getDob(): ?\DateTimeInterface
-    {
-        return $this->dob;
-    }
-
-    public function setDob(?\DateTimeInterface $dob): self
-    {
-        $this->dob = $dob;
 
         return $this;
     }
