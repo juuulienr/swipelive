@@ -214,7 +214,7 @@ class AccountAPIController extends Controller {
     if ($file && array_key_exists("picture", $file)) {
       $file = $file["picture"];
       $content = $file;
-      $extension = '.jpg';
+      $extension = 'jpg';
     } else if ($request->files->get('picture')) {
       $file = $request->files->get('picture');
       $content = file_get_contents($file);
@@ -225,7 +225,7 @@ class AccountAPIController extends Controller {
 
 
     $filename = md5(time().uniqid()); 
-    $fullname = $filename.$extension; 
+    $fullname = $filename . "." . $extension; 
     $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
     file_put_contents($filepath, $content);
 
