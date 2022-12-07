@@ -192,36 +192,41 @@ class APIController extends Controller {
    * @Route("/api/registration/picture", name="api_registration_picture")
    */
   public function registrationPicture(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    if ($request->files->get('picture')) {
+    $file = json_decode($request->getContent(), true);
+
+    if ($file && array_key_exists("picture", $file)) {
+      $file = $file["picture"];
+      $content = $file;
+      $extension = '.jpg';
+    } else if ($request->files->get('picture')) {
       $file = $request->files->get('picture');
-
-      if (!$file) {
-        return $this->json("L'image est introuvable !", 404);
-      }
-
-      $filename = md5(time().uniqid()); 
-      $fullname = $filename.'.'.$file->guessExtension();
-      $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
-      file_put_contents($filepath, file_get_contents($file));
-
-      try {
-        $result = (new UploadApi())->upload($filepath, [
-          'public_id' => $filename,
-          'use_filename' => TRUE,
-          "height" => 256, 
-          "width" => 256, 
-          "crop" => "thumb"
-        ]);
-
-        unlink($filepath);
-      } catch (\Exception $e) {
-        return $this->json($e->getMessage(), 404);
-      }
-
-      return $this->json($fullname, 200);
+      $content = file_get_contents($file);
+      $extension = $file->guessExtension();
+    } else {
+      return $this->json("L'image est introuvable !", 404);
     }
 
-    return $this->json("L'image est introuvable !", 404);
+
+    $filename = md5(time().uniqid()); 
+    $fullname = $filename.$extension; 
+    $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
+    file_put_contents($filepath, $content);
+
+    try {
+      $result = (new UploadApi())->upload($filepath, [
+        'public_id' => $filename,
+        'use_filename' => TRUE,
+        "height" => 256, 
+        "width" => 256, 
+        "crop" => "thumb"
+      ]);
+
+      unlink($filepath);
+    } catch (\Exception $e) {
+      return $this->json($e->getMessage(), 404);
+    }
+
+    return $this->json($fullname, 200);
   }
 
 

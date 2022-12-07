@@ -164,27 +164,28 @@ class AccountAPIController extends Controller {
       $serializer->deserialize($json, User::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $user]);
       $manager->flush();
 
-      if ($param && !$user->getVendor())
-      $vendor = new Vendor();
-      $vendor->setBusinessName($param['businessName']);
-      $vendor->setBusinessType($param['businessType']);
-      $vendor->setSummary($param['summary']);
-      $vendor->setAddress($param['address']);
-      $vendor->setCity($param['city']);
-      $vendor->setZip($param['zip']);
-      $vendor->setCountry($param['country']);
-      $vendor->setCountryCode($param['countryShort']);
+      if ($param && !$user->getVendor()) {
+        $vendor = new Vendor();
+        $vendor->setBusinessName($param['businessName']);
+        $vendor->setBusinessType($param['businessType']);
+        $vendor->setSummary($param['summary']);
+        $vendor->setAddress($param['address']);
+        $vendor->setCity($param['city']);
+        $vendor->setZip($param['zip']);
+        $vendor->setCountry($param['country']);
+        $vendor->setCountryCode($param['countryShort']);
 
-      $user->setType("vendor");
-      $user->setVendor($vendor);
+        $user->setType("vendor");
+        $user->setVendor($vendor);
 
-      $manager->persist($vendor);
-      $manager->flush();
-
-      if ($param['businessType'] == "company") {
-        $vendor->setCompany($param['company']);
-        $vendor->setSiren($param['siren']);
+        $manager->persist($vendor);
         $manager->flush();
+
+        if ($param['businessType'] == "company") {
+          $vendor->setCompany($param['company']);
+          $vendor->setSiren($param['siren']);
+          $manager->flush();
+        }
       }
 
       return $this->json($user, 200, [], [
@@ -206,52 +207,57 @@ class AccountAPIController extends Controller {
    * @Route("/user/api/profile/picture", name="user_api_profile_picture", methods={"POST"})
    */
   public function picture(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    if ($request->files->get('picture')) {
+    $file = json_decode($request->getContent(), true);
+    $user = $this->getUser();
+    $oldFilename = $user->getPicture();
+
+    if ($file && array_key_exists("picture", $file)) {
+      $file = $file["picture"];
+      $content = $file;
+      $extension = '.jpg';
+    } else if ($request->files->get('picture')) {
       $file = $request->files->get('picture');
-      $user = $this->getUser();
-      $oldFilename = $user->getPicture();
-
-      if (!$file) {
-        return $this->json("L'image est introuvable !", 404);
-      }
-
-      $filename = md5(time().uniqid()); 
-      $fullname = $filename.'.'.$file->guessExtension();
-      $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
-      file_put_contents($filepath, file_get_contents($file));
-
-      try {
-        $result = (new UploadApi())->upload($filepath, [
-          'public_id' => $filename,
-          'use_filename' => TRUE,
-          "height" => 256, 
-          "width" => 256, 
-          "crop" => "thumb"
-        ]);
-
-        unlink($filepath);
-      } catch (\Exception $e) {
-        return $this->json($e->getMessage(), 404);
-      }
-
-      if ($oldFilename) {
-        $oldFilename = explode(".", $oldFilename);
-        $result = (new AdminApi())->deleteAssets($oldFilename[0], []);
-      }
-
-      $user->setPicture($fullname);
-      $manager->flush();
-      
-	    return $this->json($this->getUser(), 200, [], [
-	    	'groups' => 'user:read', 
-	    	'circular_reference_limit' => 1, 
-	    	'circular_reference_handler' => function ($object) {
-	    		return $object->getId();
-	    	} 
-	    ]);
+      $content = file_get_contents($file);
+      $extension = $file->guessExtension();
+    } else {
+      return $this->json("L'image est introuvable !", 404);
     }
 
-    return $this->json("L'image est introuvable !", 404);
+
+    $filename = md5(time().uniqid()); 
+    $fullname = $filename.$extension; 
+    $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
+    file_put_contents($filepath, $content);
+
+    try {
+      $result = (new UploadApi())->upload($filepath, [
+        'public_id' => $filename,
+        'use_filename' => TRUE,
+        "height" => 256, 
+        "width" => 256, 
+        "crop" => "thumb"
+      ]);
+
+      unlink($filepath);
+    } catch (\Exception $e) {
+      return $this->json($e->getMessage(), 404);
+    }
+
+    if ($oldFilename) {
+      $oldFilename = explode(".", $oldFilename);
+      $result = (new AdminApi())->deleteAssets($oldFilename[0], []);
+    }
+
+    $user->setPicture($fullname);
+    $manager->flush();
+    
+    return $this->json($user, 200, [], [
+    	'groups' => 'user:read', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
   }
 
 
