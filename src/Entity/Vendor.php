@@ -183,7 +183,7 @@ class Vendor
         $this->verified = false;
         $this->countryCode = "FR";
     }
-
+    
 
     public function getId()
     {
