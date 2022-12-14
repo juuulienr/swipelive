@@ -13,6 +13,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\VendorRepository")
+ * @UniqueEntity(
+ *  fields={"businessName"},
+ *  message="Le pseudo est indisponible"
+ * )
  */
 class Vendor
 {

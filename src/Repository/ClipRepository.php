@@ -14,45 +14,49 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ClipRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-      parent::__construct($registry, Clip::class);
+  public function __construct(ManagerRegistry $registry)
+  {
+    parent::__construct($registry, Clip::class);
+  }
+
+
+  public function findByClip(){
+    return $this->createQueryBuilder('c')
+    ->andWhere('c.status = :status')
+    ->setParameter('status', "available")
+    ->orderBy('RAND()')
+    ->getQuery()
+    ->getResult();
+  }
+
+
+  public function findTrendingClips($vendor){
+    $query = $this->createQueryBuilder('c')
+    ->join('c.vendor', 'v')
+    ->andWhere('c.status = :status')
+    ->setParameter('status', "available");
+
+    if ($vendor) {
+      $query->andWhere('v.id != :vendor')
+      ->setParameter('vendor', $vendor);
     }
 
-
-    public function findByClip(){
-      return $this->createQueryBuilder('c')
-      ->andWhere('c.status = :status')
-      ->setParameter('status', "available")
-      ->orderBy('RAND()')
-      ->getQuery()
-      ->getResult();
-    }
+    return $query->orderBy('RAND()')
+    ->getQuery()
+    ->getResult();
+  }
 
 
-    public function findByClipAndVendor($vendor){
-      return $this->createQueryBuilder('c')
-      ->join('c.vendor', 'v')
-      ->andWhere('c.status = :status')
-      ->andWhere('v.id != :vendor')
-      ->setParameter('status', "available")
-      ->setParameter('vendor', $vendor)
-      ->orderBy('RAND()')
-      ->getQuery()
-      ->getResult();
-    }
-
-
-    public function retrieveClips($vendor){
-      return $this->createQueryBuilder('c')
-      ->join('c.vendor', 'v')
-      ->andWhere('v.id = :vendor')
-      ->andWhere('c.status = :status')
-      ->setParameter('vendor', $vendor)
-      ->setParameter('status', "available")
-      ->getQuery()
-      ->getResult();
-    }
+  public function retrieveClips($vendor){
+    return $this->createQueryBuilder('c')
+    ->join('c.vendor', 'v')
+    ->andWhere('v.id = :vendor')
+    ->andWhere('c.status = :status')
+    ->setParameter('vendor', $vendor)
+    ->setParameter('status', "available")
+    ->getQuery()
+    ->getResult();
+  }
 
 
 

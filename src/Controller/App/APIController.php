@@ -77,7 +77,7 @@ class APIController extends Controller {
    */
   public function trending(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
   {
-    $clips = $clipRepo->findByClip($this->getUser()->getVendor());
+    $clips = $clipRepo->findTrendingClips($this->getUser()->getVendor());
 
     return $this->json($clips, 200, [], [
     	'groups' => 'clip:read', 

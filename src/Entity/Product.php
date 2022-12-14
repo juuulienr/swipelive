@@ -181,9 +181,9 @@ class Product
         $this->options = new ArrayCollection();
         $this->variants = new ArrayCollection();
         $this->lineItems = new ArrayCollection();
+        $this->weightUnit = "kg";
         $this->archived = 0;
         $this->quantity = 0;
-        $this->weightUnit = "kg";
     }
 
     public function getId(): ?int
