@@ -24,6 +24,7 @@ class Follow
      * @ORM\JoinColumn(nullable=false)
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("user:read")
      */
     private $following;
 
@@ -32,6 +33,7 @@ class Follow
      * @ORM\JoinColumn(nullable=false)
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("user:read")
      */
     private $follower;
 

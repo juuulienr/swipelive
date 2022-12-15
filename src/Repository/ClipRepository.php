@@ -41,7 +41,7 @@ class ClipRepository extends ServiceEntityRepository
       ->setParameter('vendor', $vendor);
     }
 
-    return $query->orderBy('RAND()')
+    return $query->orderBy('c.createdAt', 'DESC')
     ->getQuery()
     ->getResult();
   }

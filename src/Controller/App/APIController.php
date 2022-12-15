@@ -233,23 +233,14 @@ class APIController extends Controller {
   public function search(Request $request, UserRepository $repo, ObjectManager $manager)
   {
     $search = $request->query->get('search');
+    $users = $repo->findUserBySearch($search, $this->getUser()->getVendor());
 
-    if ($search || $search == "") {
-      if ($this->getUser()->getVendor()) {
-        $users = $repo->findUserBySearchExceptSelf($search, $this->getUser()->getVendor());
-      } else {
-        $users = $repo->findUserBySearch($search);
-      }
-
-	    return $this->json($users, 200, [], [
-	    	'groups' => 'user:read', 
-	    	'circular_reference_limit' => 1, 
-	    	'circular_reference_handler' => function ($object) {
-	    		return $object->getId();
-	    	} 
-	    ]);
-    }
-
-    return $this->json("Une erreur est survenue", 404);
+    return $this->json($users, 200, [], [
+    	'groups' => 'user:read', 
+    	'circular_reference_limit' => 1, 
+    	'circular_reference_handler' => function ($object) {
+    		return $object->getId();
+    	} 
+    ]);
   }
 }

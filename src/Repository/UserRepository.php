@@ -39,29 +39,43 @@ class UserRepository extends ServiceEntityRepository
     	->getResult();
     }
 
-    public function findUserBySearch($search){
-    	return $this->createQueryBuilder('u')
+    public function findUserBySearch($search, $vendor){
+    	$query = $this->createQueryBuilder('u')
     	->join('u.vendor', 'v')
-    	->andWhere('u.firstname LIKE :search OR u.lastname LIKE :search OR v.businessName LIKE :search')
-    	->andWhere('u.type = :type')
-    	->setParameter('type', 'vendor')
-    	->setParameter('search', '%'.$search.'%')
+    	->andWhere('u.type = :type');
+
+      if ($search) {
+        $query->andWhere('u.firstname LIKE :search OR u.lastname LIKE :search OR v.businessName LIKE :search')
+        ->setParameter('search', '%'.$search.'%');
+      }
+
+      if ($vendor) {
+        $query->andWhere('v.id != :vendor')
+        ->setParameter('vendor', $vendor);
+      }
+
+    	return $query->setParameter('type', 'vendor')
     	->getQuery()
     	->getResult();
     }
 
-    public function findUserBySearchExceptSelf($search, $vendor = null){
-      return $this->createQueryBuilder('u')
-      ->join('u.vendor', 'v')
-      ->andWhere('u.firstname LIKE :search OR u.lastname LIKE :search OR v.businessName LIKE :search')
-      ->andWhere('u.type = :type')
-      ->andWhere('v.id != :vendor')
-      ->setParameter('vendor', $vendor)
-      ->setParameter('type', 'vendor')
-      ->setParameter('search', '%'.$search.'%')
+
+    public function findTrendingClips($vendor){
+      $query = $this->createQueryBuilder('c')
+      ->join('c.vendor', 'v')
+      ->andWhere('c.status = :status')
+      ->setParameter('status', "available");
+
+      if ($vendor) {
+        $query->andWhere('v.id != :vendor')
+        ->setParameter('vendor', $vendor);
+      }
+
+      return $query->orderBy('c.createdAt', 'DESC')
       ->getQuery()
       ->getResult();
     }
+
 
     // /**
     //  * @return User[] Returns an array of User objects

@@ -167,7 +167,7 @@ class OrderAPIController extends Controller {
         $order->setStatus("open");
 	      $manager->flush();
 
-	      $order->setNumber(100000 + sizeof($vendor->getSales()->toArray()));
+	      $order->setNumber(1000 + sizeof($vendor->getSales()->toArray()));
 	      $manager->flush();
 
 				return $this->json(true, 200);
