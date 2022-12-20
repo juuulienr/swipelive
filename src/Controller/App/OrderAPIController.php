@@ -43,7 +43,7 @@ class OrderAPIController extends Controller {
 
     return $this->json($orders, 200, [], [
       'groups' => 'order:read', 
-      'datetime_format' => 'd F Y à H:i' 
+      'datetime_format' => 'd/m/Y H:i' 
     ]);
   }
 
@@ -233,7 +233,7 @@ class OrderAPIController extends Controller {
 
     return $this->json($order, 200, [], [
       'groups' => 'order:read', 
-      'datetime_format' => 'd F Y à H:i' 
+      'datetime_format' => 'd/m/Y H:i' 
     ]);
   }
 
@@ -251,7 +251,7 @@ class OrderAPIController extends Controller {
 
     return $this->json($order, 200, [], [
       'groups' => 'order:read', 
-      'datetime_format' => 'd F Y à H:i' 
+      'datetime_format' => 'd/m/Y H:i' 
     ]);
   }
 }

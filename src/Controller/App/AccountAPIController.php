@@ -70,6 +70,7 @@ class AccountAPIController extends Controller {
       }
     }
 
+
     return $this->json([ "error" => "Une erreur est survenue"], 404);
   }
 
