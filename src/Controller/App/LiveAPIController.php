@@ -110,63 +110,68 @@ class LiveAPIController extends Controller {
       $broadcastId = $param["broadcastId"];
 
       if ($broadcastId && !$live->getBroadcastId() && $live->getStatus() != 2) {
-        $url = "https://api.bambuser.com/broadcasts/" . $broadcastId;
-        $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-        curl_setopt($ch, CURLOPT_URL, $url);
+        if ($broadcastId != "test") {
+          $url = "https://api.bambuser.com/broadcasts/" . $broadcastId;
+          $ch = curl_init();
 
-        $result = curl_exec($ch);
-        $result = json_decode($result);
-        curl_close($ch);
+          curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
+          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+          curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+          curl_setopt($ch, CURLOPT_URL, $url);
 
-        if ($result && $result->id) {
-          $unix = $result->created;
-          $gmdate = gmdate("d-m-Y H:i:s", $unix);
-          $createdAt = new \DateTime($gmdate);
-          $createdAt->modify('+2 hours');
+          $result = curl_exec($ch);
+          $result = json_decode($result);
+          curl_close($ch);
 
-          $live->setBroadcastId($broadcastId);
-          $live->setResourceUri($result->resourceUri);
-          $live->setPreview($result->preview);
-          $live->setCreatedAt($createdAt);
-          $live->setStatus(1);
-          $manager->flush();
 
-          $channel = "channel" . $live->getId();
-          $event = "event" . $live->getId();
-          $user = $this->getUser();
+          if ($result && $result->id) {
+            $unix = $result->created;
+            $gmdate = gmdate("d-m-Y H:i:s", $unix);
+            $createdAt = new \DateTime($gmdate);
+            $createdAt->modify('+2 hours');
 
-          $data = [
-            "comment" => [
-              "content" => "Début du live", 
-              "user" => [
-                "firstname" => $user->getFirstname(),
-                "lastname" => $user->getLastname(),
-                "picture" => $user->getPicture()
-              ]
-            ]
-          ];
-
-          $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
-          $pusher->trigger($channel, $event, $data);
-
-          $live->setChannel($channel);
-          $live->setEvent($event);
-          $manager->flush();
-
-	    		return $this->json($live, 200, [], [
-			    	'groups' => 'live:read', 
-			    	'circular_reference_limit' => 1, 
-			    	'circular_reference_handler' => function ($object) {
-			    		return $object->getId();
-			    	} 
-			    ]);
-        } else {
-          return $this->json(false, 404);
+            $live->setBroadcastId($broadcastId);
+            $live->setResourceUri($result->resourceUri);
+            $live->setPreview($result->preview);
+            $live->setCreatedAt($createdAt);
+            $live->setStatus(1);
+            $manager->flush();
+          } else {
+            return $this->json(false, 404);
+          }
         }
+
+        $channel = "channel" . $live->getId();
+        $event = "event" . $live->getId();
+        $user = $this->getUser();
+
+        $data = [
+          "comment" => [
+            "content" => "Début du live", 
+            "user" => [
+              "firstname" => $user->getFirstname(),
+              "lastname" => $user->getLastname(),
+              "picture" => $user->getPicture()
+            ]
+          ]
+        ];
+
+        $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+        $pusher->trigger($channel, $event, $data);
+
+        $live->setChannel($channel);
+        $live->setEvent($event);
+        $manager->flush();
+
+        return $this->json($live, 200, [], [
+          'groups' => 'live:read', 
+          'circular_reference_limit' => 1, 
+          'circular_reference_handler' => function ($object) {
+            return $object->getId();
+          } 
+        ]);
+      
       }
     }
   }
@@ -250,53 +255,56 @@ class LiveAPIController extends Controller {
     $live->setStatus(2);
     $manager->flush();
 
-    // créer le dernier clip
-    $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
 
-    if ($liveProduct) {
-      if ($live->getDisplay() == 1) {
-        $start = 5;
-      } else {
-        $start = $live->getDuration() + 1;
-      }
+    if ($live->getBroadcastId()) {
+      // créer le dernier clip
+      $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
 
-      $url = "https://api.bambuser.com/broadcasts/" . $live->getBroadcastId();
-      $ch = curl_init();
+      if ($liveProduct) {
+        if ($live->getDisplay() == 1) {
+          $start = 5;
+        } else {
+          $start = $live->getDuration() + 1;
+        }
 
-      curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-      curl_setopt($ch, CURLOPT_URL, $url);
+        $url = "https://api.bambuser.com/broadcasts/" . $live->getBroadcastId();
+        $ch = curl_init();
 
-      $result = curl_exec($ch);
-      $result = json_decode($result);
-      curl_close($ch);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($ch, CURLOPT_URL, $url);
 
-      if ($result && $result->id) {
-        $end = $result->length - 5;
-        $duration = $end - $start;
+        $result = curl_exec($ch);
+        $result = json_decode($result);
+        curl_close($ch);
 
-        if ($duration > 15) {
-          $clip = new Clip();
-          $clip->setVendor($this->getUser()->getVendor());
-          $clip->setLive($live);
-          $clip->setProduct($liveProduct->getProduct());
-          $clip->setPreview($live->getPreview());
-          $clip->setStart($start);
-          $clip->setEnd($end);
-          $clip->setDuration($duration);
+        if ($result && $result->id) {
+          $end = $result->length - 5;
+          $duration = $end - $start;
 
-          $manager->persist($clip);
-          $manager->flush();
+          if ($duration > 15) {
+            $clip = new Clip();
+            $clip->setVendor($this->getUser()->getVendor());
+            $clip->setLive($live);
+            $clip->setProduct($liveProduct->getProduct());
+            $clip->setPreview($live->getPreview());
+            $clip->setStart($start);
+            $clip->setEnd($end);
+            $clip->setDuration($duration);
 
-          $live->setDuration($end);
-          $comments = $commentRepo->findByLiveAndClipNull($live);
+            $manager->persist($clip);
+            $manager->flush();
 
-          foreach ($comments as $comment) {
-            $comment->setClip($clip);
+            $live->setDuration($end);
+            $comments = $commentRepo->findByLiveAndClipNull($live);
+
+            foreach ($comments as $comment) {
+              $comment->setClip($clip);
+            }
+
+            $manager->flush();
           }
-
-          $manager->flush();
         }
       }
     }
