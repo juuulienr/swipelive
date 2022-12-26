@@ -20,14 +20,22 @@ class ClipRepository extends ServiceEntityRepository
   }
 
 
-  public function findByClip(){
-    return $this->createQueryBuilder('c')
-    ->andWhere('c.status = :status')
-    ->setParameter('status', "available")
+  public function findByClip($vendor){
+    $query = $this->createQueryBuilder('c')
+    ->join('c.vendor', 'v')
+    ->andWhere('c.status = :status');
+
+    if ($vendor) {
+      $query->andWhere('v.id != :vendor')
+      ->setParameter('vendor', $vendor);
+    }
+
+    return $query->setParameter('status', "available")
     ->orderBy('RAND()')
     ->getQuery()
     ->getResult();
   }
+
 
 
   public function findTrendingClips($vendor){
