@@ -238,7 +238,7 @@ class ShippingAPIController extends Controller {
   				"city" => $shippingAddress->getCity(), 
   				"postal_code" => $shippingAddress->getZip(), 
   				"country" => $shippingAddress->getCountryCode(), 
-  				"telephone" => $shippingAddress->getPhone(), 
+  				"telephone" => $shippingAddress->getPhone() ? $shippingAddress->getPhone() : "", 
   				"email" => $order->getBuyer()->getEmail(), 
   				"order_number" => $order->getNumber(), 
   				"weight" => $order->getWeight(),

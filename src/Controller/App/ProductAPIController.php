@@ -50,7 +50,7 @@ class ProductAPIController extends Controller {
   /**
    * Récupérer un produit
    *
-   * @Route("/user/api/products/{id}", name="user_api_product", methods={"GET"})
+   * @Route("/user/api/product/{id}", name="user_api_product", methods={"GET"})
    */
   public function product(Product $product) {
     return $this->json($product, 200, [], ['groups' => 'product:read']);
@@ -60,7 +60,7 @@ class ProductAPIController extends Controller {
   /**
    * Ajouter un produit
    *
-   * @Route("/user/api/products/add", name="user_api_product_add", methods={"POST"})
+   * @Route("/user/api/product/add", name="user_api_product_add", methods={"POST"})
    */
   public function addProduct(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
@@ -84,7 +84,7 @@ class ProductAPIController extends Controller {
   /**
    * Editer un produit
    *
-   * @Route("/user/api/products/edit/{id}", name="user_api_product_edit", methods={"POST"})
+   * @Route("/user/api/product/edit/{id}", name="user_api_product_edit", methods={"PUT"})
    */
   public function editProduct(Product $product, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
@@ -101,7 +101,7 @@ class ProductAPIController extends Controller {
   /**
    * Supprimer un produit
    *
-   * @Route("/user/api/products/delete/{id}", name="user_api_product_delete", methods={"GET"})
+   * @Route("/user/api/product/delete/{id}", name="user_api_product_delete", methods={"GET"})
    */
   public function deleteProduct(Product $product, Request $request, ObjectManager $manager) {
     if ($product) {
@@ -152,104 +152,66 @@ class ProductAPIController extends Controller {
   /**
    * Ajouter une image
    *
-   * @Route("/user/api/products/upload/add", name="user_api_upload_add", methods={"POST"})
+   * @Route("/user/api/product/upload", name="user_api__product_upload", methods={"POST"})
    */
-  public function addUpload(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    if ($request->files->get('picture')) {
+  public function addPicture(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    $file = json_decode($request->getContent(), true);
+
+    if ($file && array_key_exists("picture", $file)) {
+      $file = $file["picture"];
+      $content = $file;
+      $extension = 'jpg';
+    } else if ($request->files->get('picture')) {
       $file = $request->files->get('picture');
-
-      if (!$file) {
-        return $this->json("L'image est introuvable !", 404);
-      }
-
-      $filename = md5(time().uniqid()); 
-      $fullname = $filename.'.'.$file->guessExtension();
-      $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
-      file_put_contents($filepath, file_get_contents($file));
-
-      try {
-        $result = (new UploadApi())->upload($filepath, [
-          'public_id' => $filename,
-          'use_filename' => TRUE,
-          "height" => 750, 
-          "width" => 750, 
-          "crop" => "thumb"
-        ]);
-
-        unlink($filepath);
-      } catch (\Exception $e) {
-        return $this->json($e->getMessage(), 404);
-      }
-
-      $upload = new Upload();
-      $upload->setFilename($fullname);
-
-      $manager->persist($upload);
-      $manager->flush();
-
-      return $this->json($upload, 200);
+      $content = file_get_contents($file);
+      $extension = $file->guessExtension();
+    } else {
+      return $this->json("L'image est introuvable !", 404);
     }
 
-    return $this->json("L'image est introuvable !", 404);
-  }
+    $filename = md5(time().uniqid()); 
+    $fullname = $filename . "." . $extension; 
+    $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
+    file_put_contents($filepath, $content);
 
+    try {
+      $result = (new UploadApi())->upload($filepath, [
+        'public_id' => $filename,
+        'use_filename' => TRUE,
+        "height" => 750, 
+        "width" => 750, 
+        "crop" => "thumb"
+      ]);
 
-  /**
-   * Ajouter une image sur un produit
-   *
-   * @Route("/user/api/products/edit/upload/{id}", name="user_api_edit_upload_add", methods={"POST"})
-   */
-  public function editUploadProduct(Product $product, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    if ($request->files->get('picture')) {
-      $file = $request->files->get('picture');
-
-      if (!$file) {
-        return $this->json("L'image est introuvable !", 404);
-      }
-
-      $filename = md5(time().uniqid()); 
-      $fullname = $filename.'.'.$file->guessExtension();
-      $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
-      file_put_contents($filepath, file_get_contents($file));
-
-      try {
-        $result = (new UploadApi())->upload($filepath, [
-          'public_id' => $filename,
-          'use_filename' => TRUE,
-          "height" => 750, 
-          "width" => 750, 
-          "crop" => "thumb"
-        ]);
-
-        unlink($filepath);
-      } catch (\Exception $e) {
-        return $this->json($e->getMessage(), 404);
-      }
-
-      $upload = new Upload();
-      $upload->setFilename($fullname);
-      $upload->setProduct($product);
-
-      $manager->persist($upload);
-      $manager->flush();
-
-      return $this->json($upload, 200, [], [
-        'groups' => 'upload:read',
-        'circular_reference_limit' => 1, 
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
-      ], 200);
+      unlink($filepath);
+    } catch (\Exception $e) {
+      return $this->json($e->getMessage(), 404);
     }
 
-    return $this->json("L'image est introuvable !", 404);
+    $upload = new Upload();
+    $upload->setFilename($fullname);
+
+    // if ($product) {
+    //   $upload->setProduct($product);
+    // }
+
+    $manager->persist($upload);
+    $manager->flush();
+
+    return $this->json($upload, 200, [], [
+      'groups' => 'upload:read',
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ], 200);
   }
 
 
   /**
    * Supprimer une image
    *
-   * @Route("/user/api/products/upload/delete/{id}", name="user_api_upload_delete", methods={"GET"})
+   * @Route("/user/api/product/upload/delete/{id}", name="user_api_upload_delete", methods={"GET"})
    */
   public function deleteUpload(Upload $upload, Request $request, ObjectManager $manager) {
     if ($upload->getFilename()) {
