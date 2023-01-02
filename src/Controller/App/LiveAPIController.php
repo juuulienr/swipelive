@@ -144,6 +144,24 @@ class LiveAPIController extends Controller {
 
         $channel = "channel" . $live->getId();
         $event = "event" . $live->getId();
+        $user = $this->getUser();
+
+        $data = [
+          "comment" => [
+            "content" => "Début du live", 
+            "user" => [
+              "vendor" => [
+                "businessName" => $user->getVendor()->getBusinessName(),
+              ],
+              "firstname" => $user->getFirstname(),
+              "lastname" => $user->getLastname(),
+              "picture" => $user->getPicture()
+            ]
+          ]
+        ];       
+
+        $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+        $pusher->trigger($channel, $event, $data);
 
         $live->setChannel($channel);
         $live->setEvent($event);
@@ -374,9 +392,11 @@ class LiveAPIController extends Controller {
       $manager->flush();
     }
 
-    $pusher->trigger($live->getChannel(), $live->getEvent(), [
+    $data = [
       "viewers" => $count
-    ]);
+    ];
+
+    $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
 		return $this->json($live, 200, [], [
     	'groups' => 'live:read', 
