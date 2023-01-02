@@ -399,7 +399,7 @@ class LiveAPIController extends Controller {
     $manager->flush();
 
     $pusher->trigger($live->getChannel(), $live->getEvent(), [
-      "likes" => true
+      "likes" => $this->getUser()->getId()
     ]);
 
     return $this->json($live, 200, [], [
