@@ -118,6 +118,11 @@ class Live
      */
     private $comments;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $totalLikes;
+
     
     public function __construct()
     {
@@ -126,6 +131,7 @@ class Live
         $this->liveProducts = new ArrayCollection();
         $this->viewers = 0;
         $this->totalViewers = 0;
+        $this->totalLikes = 0;
         $this->status = 0;
         $this->display = 1;
         $this->comments = new ArrayCollection();
@@ -379,6 +385,18 @@ class Live
                 $comment->setLive(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTotalLikes(): ?int
+    {
+        return $this->totalLikes;
+    }
+
+    public function setTotalLikes(?int $totalLikes): self
+    {
+        $this->totalLikes = $totalLikes;
 
         return $this;
     }

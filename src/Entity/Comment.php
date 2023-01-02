@@ -50,17 +50,10 @@ class Comment
      */
     private $createdAt;
 
-    /**
-     * @ORM\Column(type="boolean")
-     * @Groups("live:read")
-     * @Groups("clip:read")
-     */
-    private $isVendor;
 
     public function __construct()
     {
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
-        $this->isVendor = false;
     }
 
     public function getId(): ?int
@@ -124,18 +117,6 @@ class Comment
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getIsVendor(): ?bool
-    {
-        return $this->isVendor;
-    }
-
-    public function setIsVendor(bool $isVendor): self
-    {
-        $this->isVendor = $isVendor;
 
         return $this;
     }

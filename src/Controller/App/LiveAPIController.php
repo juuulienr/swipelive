@@ -144,21 +144,6 @@ class LiveAPIController extends Controller {
 
         $channel = "channel" . $live->getId();
         $event = "event" . $live->getId();
-        $user = $this->getUser();
-
-        $data = [
-          "comment" => [
-            "content" => "Début du live", 
-            "user" => [
-              "firstname" => $user->getFirstname(),
-              "lastname" => $user->getLastname(),
-              "picture" => $user->getPicture()
-            ]
-          ]
-        ];
-
-        $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
-        $pusher->trigger($channel, $event, $data);
 
         $live->setChannel($channel);
         $live->setEvent($event);
@@ -335,22 +320,25 @@ class LiveAPIController extends Controller {
       $comment->setContent($content);
       $comment->setUser($user);
       $comment->setLive($live);
-
-      if ($user->getVendor() && $user->getVendor()->getBusinessName() == $live->getVendor()->getBusinessName()) {
-        $comment->setIsVendor(true);
-      }
-
       $manager->persist($comment);
       $manager->flush();
+
+      if ($user->getVendor()) {
+        $vendor = [
+          "businessName" => $user->getVendor()->getBusinessName(),
+        ];
+      } else {
+        $vendor = null;
+      }
 
       $data = [
         "comment" => [
           "content" => $content, 
           "user" => [
+            "vendor" => $vendor,
             "firstname" => $user->getFirstname(),
             "lastname" => $user->getLastname(),
-            "picture" => $user->getPicture(),
-            "vendor" => $comment->getIsVendor()
+            "picture" => $user->getPicture()
           ]
         ]
       ];
@@ -375,7 +363,6 @@ class LiveAPIController extends Controller {
    * @Route("/user/api/live/{id}/update/viewers", name="user_api_live_update_viewers", methods={"PUT"})
    */
   public function updateViewers(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    $user = $this->getUser();
     $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $info = $pusher->getChannelInfo($live->getChannel(), ['info' => 'subscription_count']);
     $count = $info->subscription_count;
@@ -387,11 +374,9 @@ class LiveAPIController extends Controller {
       $manager->flush();
     }
 
-    $data = [
+    $pusher->trigger($live->getChannel(), $live->getEvent(), [
       "viewers" => $count
-    ];
-
-    $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
+    ]);
 
 		return $this->json($live, 200, [], [
     	'groups' => 'live:read', 
@@ -399,6 +384,30 @@ class LiveAPIController extends Controller {
     	'circular_reference_handler' => function ($object) {
     		return $object->getId();
     	} 
+    ]);
+  }
+
+
+  /**
+   * Mettre à jour les likes
+   *
+   * @Route("/user/api/live/{id}/update/likes", name="user_api_live_update_likes", methods={"PUT"})
+   */
+  public function updateLikes(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $live->setTotalLikes($live->getTotalLikes() + 1);
+    $manager->flush();
+
+    $pusher->trigger($live->getChannel(), $live->getEvent(), [
+      "likes" => true
+    ]);
+
+    return $this->json($live, 200, [], [
+      'groups' => 'live:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
     ]);
   }
 

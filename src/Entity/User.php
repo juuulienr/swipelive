@@ -112,6 +112,8 @@ class User implements UserInterface
     /**
      * @ORM\OneToOne(targetEntity=Vendor::class, cascade={"persist", "remove"})
      * @Groups("user:read")
+     * @Groups("live:read")
+     * @Groups("clip:read")
      */
     private $vendor;
 
