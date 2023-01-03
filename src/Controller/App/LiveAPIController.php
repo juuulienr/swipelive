@@ -432,41 +432,6 @@ class LiveAPIController extends Controller {
   }
 
 
-  /**
-   * Supprimer les lives en attente
-   *
-   * @Route("/user/api/live/remove/waiting", name="user_api_live_waiting", methods={"GET"})
-   */
-  public function removeWaitingLive(Request $request, ObjectManager $manager, LiveRepository $liveRepo) {
-    $user = $this->getUser();
-    $lives = $liveRepo->findByVendor($user->getVendor());
-
-    if ($lives) {
-      foreach ($lives as $live) {
-        if ($live->getStatus() == 0) {
-          $liveProducts = $live->getLiveProducts();
-
-          if ($liveProducts) {
-            foreach ($liveProducts as $liveProduct) {
-              $manager->remove($liveProduct);
-            }
-          }
-          $manager->remove($live);         
-        }
-      }
-      $manager->flush();
-    }
-    
-		return $this->json($user, 200, [], [
-    	'groups' => 'user:read', 
-    	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => function ($object) {
-    		return $object->getId();
-    	} 
-    ]);
-  }
-
-
   function dateIntervalToSeconds($dateInterval) {
     $reference = new \DateTimeImmutable;
     $endTime = $reference->add($dateInterval);

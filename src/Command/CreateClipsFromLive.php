@@ -36,7 +36,7 @@ class CreateClipsFromLive extends ContainerAwareCommand {
       foreach ($clips as $clip) {
         $createdAt = $clip->getCreatedAt();
 
-                // creation du clip sur bambuser
+        // creation du clip sur bambuser
         if (!$clip->getBroadcastId() && $createdAt->modify('+10 minutes') < $now) {
           $data = [
             "source" => [

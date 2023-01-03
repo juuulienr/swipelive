@@ -34,18 +34,26 @@ class RemoveWaitingLive extends ContainerAwareCommand
   {
     $lives = $this->repo->findAll();
     $now = new \DateTime('now', timezone_open('Europe/Paris'));
-    $now->modify('-1 day');
+    $now->modify('-3 days');
 
     if ($lives) {
       foreach ($lives as $live) {
         if ($live->getCreatedAt() < $now && $live->getStatus() == 0) {
           $liveProducts = $live->getLiveProducts();
+          $comments = $live->getComments();
 
           if ($liveProducts) {
             foreach ($liveProducts as $liveProduct) {
               $this->manager->remove($liveProduct);
             }
           }
+
+          if ($comments) {
+            foreach ($comments as $comment) {
+              $this->manager->remove($comment);
+            }
+          }
+
           $this->manager->remove($live);
         }             
       }
