@@ -77,14 +77,15 @@ class OrderAPIController extends Controller {
         foreach ($lineItems as $lineItem) {
           if ($lineItem["variant"]) {
             $variant = $variantRepo->findOneById($lineItem["variant"]);
+            $product = $productRepo->findOneById($lineItem["product"]);
 
             if ($variant && $variant->getQuantity() > 0) {
               $weightUnit = $lineItem["variant"]["weightUnit"];
               $weight = $lineItem["variant"]["weight"];
               $quantity = $lineItem["quantity"];
-              $title = $variant->getProduct()->getTitle() . " - " . $variant->getTitle();
+              $title = $product->getTitle() . " - " . $variant->getTitle();
               $lineTotal = $variant->getPrice() * $quantity;
-              $vendor = $variant->getProduct()->getVendor();
+              $vendor = $product->getVendor();
               $subTotal += $lineTotal;
 
               if ($weightUnit == "g") {
@@ -95,7 +96,7 @@ class OrderAPIController extends Controller {
 
               $lineItem = new LineItem();
               $lineItem->setQuantity($quantity);
-              $lineItem->setProduct($variant->getProduct());
+              $lineItem->setProduct($product);
               $lineItem->setVariant($variant);
               $lineItem->setPrice($variant->getPrice());
               $lineItem->setTotal($lineTotal);
@@ -144,7 +145,7 @@ class OrderAPIController extends Controller {
           }
         }
 
-	      $fees = $subTotal * 0.08; // commission
+	      $fees = $subTotal * 0.09; // commission
 	      $profit = $subTotal * 0.06; // commission - frais paiement (2%)
 	      $total = $subTotal + $shippingPrice;
 
@@ -170,7 +171,10 @@ class OrderAPIController extends Controller {
 	      $order->setNumber(1000 + sizeof($vendor->getSales()->toArray()));
 	      $manager->flush();
 
-				return $this->json(true, 200);
+        return $this->json($order, 200, [], [
+          'groups' => 'order:read', 
+          'datetime_format' => 'd/m/Y H:i' 
+        ]);
 		  }
 		}
 

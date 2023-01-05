@@ -9,6 +9,7 @@ use App\Entity\Category;
 use App\Entity\Comment;
 use App\Entity\Follow;
 use App\Entity\Product;
+use App\Entity\Order;
 use App\Entity\LiveProducts;
 use App\Entity\Upload;
 use App\Repository\LiveProductsRepository;
@@ -18,6 +19,7 @@ use App\Repository\ClipRepository;
 use App\Repository\ProductRepository;
 use App\Repository\CommentRepository;
 use App\Repository\LiveRepository;
+use App\Repository\OrderRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -110,7 +112,6 @@ class LiveAPIController extends Controller {
       $broadcastId = $param["broadcastId"];
 
       if ($broadcastId && !$live->getBroadcastId() && $live->getStatus() != 2) {
-
         if ($broadcastId != "test") {
           $url = "https://api.bambuser.com/broadcasts/" . $broadcastId;
           $ch = curl_init();
@@ -174,7 +175,6 @@ class LiveAPIController extends Controller {
             return $object->getId();
           } 
         ]);
-      
       }
     }
   }
@@ -429,6 +429,62 @@ class LiveAPIController extends Controller {
         return $object->getId();
       } 
     ]);
+  }
+
+
+  /**
+   * Mettre à jour les commandes
+   *
+   * @Route("/user/api/live/{id}/update/orders/{orderId}", name="user_api_live_update_orders", methods={"GET"})
+   */
+  public function updateOrders(Live $live, $orderId, Request $request, ObjectManager $manager, OrderRepository $orderRepo, SerializerInterface $serializer) {
+    $order = $orderRepo->findOneById($orderId);
+
+    if ($order) {
+      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+
+      if ($order->getBuyer()->getVendor()) {
+        $vendor = [
+          "businessName" => $order->getBuyer()->getVendor()->getBusinessName(),
+        ];
+      } else {
+        $vendor = null;
+      }
+
+      if (sizeof($order->getLineItems()->toArray()[0]->getProduct()->getUploads()) > 0) {
+        $upload = $order->getLineItems()->toArray()[0]->getProduct()->getUploads()[0]->getFilename();
+      } else {
+        $upload = null;
+      }
+
+      $data = [
+        "order" => [
+          "number" => $order->getNumber(),
+          "createdAt" => $order->getCreatedAt()->format('d/m/Y H:i'),
+          "nbProducts" => sizeof($order->getLineItems()->toArray()),
+          "amount" => $order->getSubtotal(),
+          "upload" => $upload,
+          "buyer" => [
+            "vendor" => $vendor,
+            "firstname" => $order->getBuyer()->getFirstname(),
+            "lastname" => $order->getBuyer()->getLastname(),
+            "picture" => $order->getBuyer()->getPicture()
+          ]
+        ]
+      ];
+      
+      $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
+
+      return $this->json($live, 200, [], [
+        'groups' => 'live:read', 
+        'circular_reference_limit' => 1, 
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ]);
+    }
+
+    return $this->json([ "error" => "Impossible de trouver la commande"], 404);
   }
 
 

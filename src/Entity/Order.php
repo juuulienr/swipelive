@@ -78,8 +78,6 @@ class Order
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
-     * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $profit;
 

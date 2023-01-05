@@ -29,6 +29,7 @@ class Vendor
      * @Groups("live:read")
      * @Groups("category:read")
      * @Groups("order:read")
+     * @Groups("product:read")
      */
     private $id;
 
