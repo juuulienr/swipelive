@@ -70,113 +70,106 @@ class OrderAPIController extends Controller {
 	      $order->setBuyer($customer);
 	      $manager->persist($order);
 	      
-	      if (!$lineItems) {
-	        return $this->json("Un produit est obligatoire !", 404); 
-	      }
+        if ($lineItems) {
+          foreach ($lineItems as $item) {
+            $quantity = $item["quantity"];
+            $product = $item["product"];
 
-        foreach ($lineItems as $lineItem) {
-          if ($lineItem["variant"]) {
-            $variant = $variantRepo->findOneById($lineItem["variant"]);
-            $product = $productRepo->findOneById($lineItem["product"]);
+            if ($product) {
+              $product = $productRepo->findOneById($item["product"]["id"]);
 
-            if ($variant && $variant->getQuantity() > 0) {
-              $weightUnit = $lineItem["variant"]["weightUnit"];
-              $weight = $lineItem["variant"]["weight"];
-              $quantity = $lineItem["quantity"];
-              $title = $product->getTitle() . " - " . $variant->getTitle();
-              $lineTotal = $variant->getPrice() * $quantity;
-              $vendor = $product->getVendor();
-              $subTotal += $lineTotal;
+              if ($product) {
+                $quantity = $item["quantity"];
+                $vendor = $item["vendor"];
+                $variant = $item["variant"];
+                $lineItem = new LineItem();
 
-              if ($weightUnit == "g") {
-                $totalWeight += round($weight / 1000, 2);
-              } else {
-                $totalWeight += $weight;
+                if ($variant) {
+                  $variant = $variantRepo->findOneById($variant);
+
+                  if ($variant && $variant->getQuantity() > 0) {
+                    $weightUnit = $variant->getWeightUnit();
+                    $weight = $variant->getWeight();
+                    $title = $product->getTitle() . " - " . $variant->getTitle();
+                    $price = $variant->getPrice();
+                    $lineTotal = $variant->getPrice() * $quantity;
+                    $subTotal += $lineTotal;
+
+                    $variant->setQuantity($variant->getQuantity() - 1);
+                    $lineItem->setVariant($variant);
+                  } else {
+                    return $this->json("Stock épuisé", 404); 
+                  }
+                } elseif ($product && $product->getQuantity() > 0) {
+                  $weightUnit = $product->getWeightUnit();
+                  $weight = $product->getWeight();
+                  $title = $product->getTitle();
+                  $price = $product->getPrice();
+                  $lineTotal = $product->getPrice() * $quantity;
+                  $vendor = $product->getVendor();
+                  $subTotal += $lineTotal;
+               
+                  $product->setQuantity($product->getQuantity() - 1);
+                } else {
+                  return $this->json("Stock épuisé", 404); 
+                }
+
+                if ($weightUnit == "g") {
+                  $totalWeight += round($weight / 1000, 2);
+                } else {
+                  $totalWeight += $weight;
+                }
+
+                $lineItem->setQuantity($quantity);
+                $lineItem->setProduct($product);
+                $lineItem->setPrice($price);
+                $lineItem->setTotal($lineTotal);
+                $lineItem->setTitle($title);
+                $lineItem->setOrderId($order);
+                $manager->persist($lineItem);
+                
+                $order->setVendor($vendor);
               }
-
-              $lineItem = new LineItem();
-              $lineItem->setQuantity($quantity);
-              $lineItem->setProduct($product);
-              $lineItem->setVariant($variant);
-              $lineItem->setPrice($variant->getPrice());
-              $lineItem->setTotal($lineTotal);
-              $lineItem->setTitle($title);
-              $lineItem->setOrderId($order);
-              $manager->persist($lineItem);
-
-              $variant->setQuantity($variant->getQuantity() - 1);
-              $order->setVendor($vendor);
             } else {
-              return $this->json("Stock épuisé", 404); 
-            }
-
-          } elseif ($lineItem["product"]) {
-            $product = $productRepo->findOneById($lineItem["product"]);
-
-            if ($product && $product->getQuantity() > 0) {
-              $weightUnit = $lineItem["product"]["weightUnit"];
-              $weight = $lineItem["product"]["weight"];
-              $quantity = $lineItem["quantity"];
-              $title = $product->getTitle();
-              $lineTotal = $product->getPrice() * $quantity;
-              $vendor = $product->getVendor();
-              $subTotal += $lineTotal;
-
-              if ($weightUnit == "g") {
-                $totalWeight += round($weight / 1000, 2);
-              } else {
-                $totalWeight += $weight;
-              }
-
-              $lineItem = new LineItem();
-              $lineItem->setQuantity($quantity);
-              $lineItem->setProduct($product);
-              $lineItem->setTitle($title);
-              $lineItem->setPrice($product->getPrice());
-              $lineItem->setTotal($lineTotal);
-              $lineItem->setOrderId($order);
-              $manager->persist($lineItem);
-
-              $product->setQuantity($product->getQuantity() - 1);
-              $order->setVendor($vendor);
-            } else {
-              return $this->json("Le produit est introuvable", 404); 
+              return $this->json("Le produit est obligatoire", 404); 
             }
           }
+
+  	      $fees = $subTotal * 0.09; // commission
+  	      $profit = $subTotal * 0.06; // commission - frais paiement (3%)
+  	      $total = $subTotal + $shippingPrice;
+
+  	      if (sizeof($customer->getShippingAddresses()->toArray())) {
+  		      $order->setShippingAddress($customer->getShippingAddresses()->toArray()[0]);
+  	      }
+
+  	      $order->setWeight($totalWeight);
+  	      $order->setSubTotal($subTotal);
+  	      $order->setShippingPrice($shippingPrice);
+  	      $order->setShippingName($shippingName);
+  	      $order->setShippingMethodId($shippingMethodId);
+  	      $order->setShippingCarrier($shippingCarrier);
+  	      $order->setServicePointId($servicePointId);
+  	      $order->setTotal($total);
+  	      $order->setFees($fees);
+  	      $order->setProfit($profit);
+  	      $order->setShippingStatus("ready-to-send");
+          $order->setPaymentStatus("paid");
+          $order->setStatus("open");
+  	      $manager->flush();
+
+  	      $order->setNumber(1000 + sizeof($vendor->getSales()->toArray()));
+  	      $manager->flush();
+
+          return $this->json($order, 200, [], [
+            'groups' => 'order:read', 
+            'datetime_format' => 'd/m/Y H:i' 
+          ]);
+  		  } else {
+          return $this->json("Le panier est obligatoire", 404); 
         }
-
-	      $fees = $subTotal * 0.09; // commission
-	      $profit = $subTotal * 0.06; // commission - frais paiement (2%)
-	      $total = $subTotal + $shippingPrice;
-
-	      if (sizeof($customer->getShippingAddresses()->toArray())) {
-		      $order->setShippingAddress($customer->getShippingAddresses()->toArray()[0]);
-	      }
-
-	      $order->setWeight($totalWeight);
-	      $order->setSubTotal($subTotal);
-	      $order->setShippingPrice($shippingPrice);
-	      $order->setShippingName($shippingName);
-	      $order->setShippingMethodId($shippingMethodId);
-	      $order->setShippingCarrier($shippingCarrier);
-	      $order->setServicePointId($servicePointId);
-	      $order->setTotal($total);
-	      $order->setFees($fees);
-	      $order->setProfit($profit);
-	      $order->setShippingStatus("ready-to-send");
-        $order->setPaymentStatus("paid");
-        $order->setStatus("open");
-	      $manager->flush();
-
-	      $order->setNumber(1000 + sizeof($vendor->getSales()->toArray()));
-	      $manager->flush();
-
-        return $this->json($order, 200, [], [
-          'groups' => 'order:read', 
-          'datetime_format' => 'd/m/Y H:i' 
-        ]);
-		  }
-		}
+      }
+    }
 
     return $this->json(false, 404);
   }

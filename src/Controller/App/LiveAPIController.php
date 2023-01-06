@@ -439,6 +439,7 @@ class LiveAPIController extends Controller {
    */
   public function updateOrders(Live $live, $orderId, Request $request, ObjectManager $manager, OrderRepository $orderRepo, SerializerInterface $serializer) {
     $order = $orderRepo->findOneById($orderId);
+    $upload = null; $vendor = null; $nbProducts = 0;
 
     if ($order) {
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
@@ -447,21 +448,21 @@ class LiveAPIController extends Controller {
         $vendor = [
           "businessName" => $order->getBuyer()->getVendor()->getBusinessName(),
         ];
-      } else {
-        $vendor = null;
       }
 
       if (sizeof($order->getLineItems()->toArray()[0]->getProduct()->getUploads()) > 0) {
         $upload = $order->getLineItems()->toArray()[0]->getProduct()->getUploads()[0]->getFilename();
-      } else {
-        $upload = null;
+      }
+
+      foreach ($order->getLineItems()->toArray() as $lineItem) {
+        $nbProducts = $nbProducts + $lineItem->getQuantity();
       }
 
       $data = [
         "order" => [
           "number" => $order->getNumber(),
           "createdAt" => $order->getCreatedAt()->format('d/m/Y H:i'),
-          "nbProducts" => sizeof($order->getLineItems()->toArray()),
+          "nbProducts" => $nbProducts,
           "amount" => $order->getSubtotal(),
           "upload" => $upload,
           "buyer" => [
