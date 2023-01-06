@@ -325,4 +325,27 @@ class AccountAPIController extends Controller {
     	} 
     ]);
   }
+
+
+  /**
+   * Supprimer un abonné
+   *
+   * @Route("/user/api/followers/remove/{id}", name="user_api_followers_remove", methods={"GET"})
+   */
+  public function removeFollower(User $user, Request $request, ObjectManager $manager, UserRepository $userRepo, FollowRepository $followRepo) {
+    $follow = $followRepo->findOneBy(['following' => $this->getUser(), 'follower' => $user ]);
+
+    if ($follow) {
+      $manager->remove($follow);
+      $manager->flush();
+    }
+
+    return $this->json($this->getUser(), 200, [], [
+      'groups' => 'user:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
+  }
 }
