@@ -51,12 +51,13 @@ class OrderAPIController extends Controller {
   /**
    * @Route("/user/api/orders/payment/success", name="user_api_orders_success")
    */
-  public function success(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo) {
+  public function success(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo) {
     if ($json = $request->getContent()) {
 	    $param = json_decode($json, true);
 
 	    if ($param) {
 	    	$customer = $this->getUser();
+        $nbOrders = sizeof($orderRepo->findAll());
         $lineItems = $param["lineItems"];
 	      $shippingPrice = $param["shippingPrice"];
 	      $shippingName = $param["shippingName"];
@@ -65,6 +66,7 @@ class OrderAPIController extends Controller {
 	      $servicePointId = $param["servicePointId"];
         $totalWeight = 0;
         $subTotal = 0;
+        $soldOut = false;
 
 	      $order = new Order();
 	      $order->setBuyer($customer);
@@ -73,19 +75,17 @@ class OrderAPIController extends Controller {
         if ($lineItems) {
           foreach ($lineItems as $item) {
             $quantity = $item["quantity"];
-            $product = $item["product"];
+            $productItem = $item["product"];
+            $variantItem = $item["variant"];
+            $lineItem = new LineItem();
+            $soldOut = false;
 
-            if ($product) {
-              $product = $productRepo->findOneById($item["product"]["id"]);
+            if ($productItem) {
+              $product = $productRepo->findOneById($productItem["id"]);
 
               if ($product) {
-                $quantity = $item["quantity"];
-                $vendor = $item["vendor"];
-                $variant = $item["variant"];
-                $lineItem = new LineItem();
-
-                if ($variant) {
-                  $variant = $variantRepo->findOneById($variant);
+                if ($variantItem) {
+                  $variant = $variantRepo->findOneById($variantItem["id"]);
 
                   if ($variant && $variant->getQuantity() > 0) {
                     $weightUnit = $variant->getWeightUnit();
@@ -98,7 +98,7 @@ class OrderAPIController extends Controller {
                     $variant->setQuantity($variant->getQuantity() - 1);
                     $lineItem->setVariant($variant);
                   } else {
-                    return $this->json("Stock épuisé", 404); 
+                    $soldOut = true; 
                   }
                 } elseif ($product && $product->getQuantity() > 0) {
                   $weightUnit = $product->getWeightUnit();
@@ -106,35 +106,40 @@ class OrderAPIController extends Controller {
                   $title = $product->getTitle();
                   $price = $product->getPrice();
                   $lineTotal = $product->getPrice() * $quantity;
-                  $vendor = $product->getVendor();
                   $subTotal += $lineTotal;
                
                   $product->setQuantity($product->getQuantity() - 1);
                 } else {
-                  return $this->json("Stock épuisé", 404); 
+                  $soldOut = true; 
                 }
 
-                if ($weightUnit == "g") {
-                  $totalWeight += round($weight / 1000, 2);
-                } else {
-                  $totalWeight += $weight;
-                }
+                if (!$soldOut) {
+                  if ($weightUnit == "g") {
+                    $totalWeight += round($weight / 1000, 2);
+                  } else {
+                    $totalWeight += $weight;
+                  }
 
-                $lineItem->setQuantity($quantity);
-                $lineItem->setProduct($product);
-                $lineItem->setPrice($price);
-                $lineItem->setTotal($lineTotal);
-                $lineItem->setTitle($title);
-                $lineItem->setOrderId($order);
-                $manager->persist($lineItem);
-                
-                $order->setVendor($vendor);
+                  $lineItem->setQuantity($quantity);
+                  $lineItem->setProduct($product);
+                  $lineItem->setPrice($price);
+                  $lineItem->setTotal($lineTotal);
+                  $lineItem->setTitle($title);
+                  $lineItem->setOrderId($order);
+                  $manager->persist($lineItem);
+                  
+                  $order->setVendor($product->getVendor());
+                }
               }
             } else {
               return $this->json("Le produit est obligatoire", 404); 
             }
           }
 
+          if ($soldOut && sizeof($lineItems) == 1) {
+            return $this->json("Le produit est épuisé", 404); 
+          }
+          
   	      $fees = $subTotal * 0.09; // commission
   	      $profit = $subTotal * 0.06; // commission - frais paiement (3%)
   	      $total = $subTotal + $shippingPrice;
@@ -158,7 +163,7 @@ class OrderAPIController extends Controller {
           $order->setStatus("open");
   	      $manager->flush();
 
-  	      $order->setNumber(1000 + sizeof($vendor->getSales()->toArray()));
+  	      $order->setNumber(1000 + $nbOrders);
   	      $manager->flush();
 
           return $this->json($order, 200, [], [

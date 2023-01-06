@@ -384,16 +384,39 @@ class LiveAPIController extends Controller {
     $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $info = $pusher->getChannelInfo($live->getChannel(), ['info' => 'subscription_count']);
     $count = $info->subscription_count;
+    $user = $this->getUser();
+    $count = $count - 1;
 
-    if ($count) {
-      $count = $count - 1;
-      $live->setViewers($count);
-	    $live->setTotalViewers($live->getTotalViewers() + 1);
-      $manager->flush();
+    if ($user->getVendor()) {
+      $vendor = [
+        "businessName" => $user->getVendor()->getBusinessName(),
+      ];
+    } else {
+      $vendor = null;
     }
 
+    if ($live->getViewers() > $count) {
+      $type = "remove";
+    } else {
+      $type = "add";
+    }
+
+    $live->setViewers($count);
+    $live->setTotalViewers($live->getTotalViewers() + 1);
+    $manager->flush();
+
     $data = [
-      "viewers" => $count
+      "viewers" => [
+        "count" => $count, 
+        "type" => $type, 
+        "user" => [
+          "id" => $user->getId(),
+          "vendor" => $vendor,
+          "firstname" => $user->getFirstname(),
+          "lastname" => $user->getLastname(),
+          "picture" => $user->getPicture()
+        ]
+      ]
     ];
 
     $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
