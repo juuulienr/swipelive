@@ -95,7 +95,7 @@ class OrderAPIController extends Controller {
                     $lineTotal = $variant->getPrice() * $quantity;
                     $subTotal += $lineTotal;
 
-                    $variant->setQuantity($variant->getQuantity() - 1);
+                    $variant->setQuantity($variant->getQuantity() - $quantity);
                     $lineItem->setVariant($variant);
                   } else {
                     $soldOut = true; 
@@ -108,7 +108,7 @@ class OrderAPIController extends Controller {
                   $lineTotal = $product->getPrice() * $quantity;
                   $subTotal += $lineTotal;
                
-                  $product->setQuantity($product->getQuantity() - 1);
+                  $product->setQuantity($product->getQuantity() - $quantity);
                 } else {
                   $soldOut = true; 
                 }
