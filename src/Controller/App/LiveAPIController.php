@@ -456,6 +456,34 @@ class LiveAPIController extends Controller {
 
 
   /**
+   * Muter un viewer
+   *
+   * @Route("/user/api/live/{id}/update/mute/{userId}", name="user_api_live_update_mute", methods={"PUT"})
+   */
+  public function muteViewer(Live $live, $userId, Request $request, ObjectManager $manager, FollowRepository $followRepo, SerializerInterface $serializer) {
+    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $follow = $followRepo->findOneBy(['following' => $live->getVendor()->getUser(), 'follower' => $userId ]);
+
+    if ($follow) {
+      $manager->remove($follow);
+      $manager->flush();
+    }
+
+    $pusher->trigger($live->getChannel(), $live->getEvent(), [
+      "mute" => $userId
+    ]);
+
+    return $this->json($live, 200, [], [
+      'groups' => 'live:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
+  }
+
+
+  /**
    * Mettre à jour les commandes
    *
    * @Route("/user/api/live/{id}/update/orders/{orderId}", name="user_api_live_update_orders", methods={"GET"})

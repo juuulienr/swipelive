@@ -137,7 +137,7 @@ class OrderAPIController extends Controller {
           }
 
           if ($soldOut && sizeof($lineItems) == 1) {
-            return $this->json("Le produit est épuisé", 404); 
+            return $this->json("Le produit est en rupture de stock", 404); 
           }
           
   	      $fees = $subTotal * 0.09; // commission
