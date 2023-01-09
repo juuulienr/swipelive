@@ -458,7 +458,7 @@ class LiveAPIController extends Controller {
   /**
    * Muter un viewer
    *
-   * @Route("/user/api/live/{id}/update/mute/{userId}", name="user_api_live_update_mute", methods={"PUT"})
+   * @Route("/user/api/live/{id}/update/mute/{userId}", name="user_api_live_update_mute", methods={"GET"})
    */
   public function muteViewer(Live $live, $userId, Request $request, ObjectManager $manager, FollowRepository $followRepo, SerializerInterface $serializer) {
     $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
