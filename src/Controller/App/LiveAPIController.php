@@ -458,9 +458,9 @@ class LiveAPIController extends Controller {
   /**
    * Muter un viewer
    *
-   * @Route("/user/api/live/{id}/update/mute/{userId}", name="user_api_live_update_mute", methods={"GET"})
+   * @Route("/user/api/live/{id}/update/banned/{userId}", name="user_api_live_update_banned", methods={"GET"})
    */
-  public function muteViewer(Live $live, $userId, Request $request, ObjectManager $manager, FollowRepository $followRepo, SerializerInterface $serializer) {
+  public function bannedViewer(Live $live, $userId, Request $request, ObjectManager $manager, FollowRepository $followRepo, SerializerInterface $serializer) {
     $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $follow = $followRepo->findOneBy(['following' => $live->getVendor()->getUser(), 'follower' => $userId ]);
 
@@ -470,7 +470,7 @@ class LiveAPIController extends Controller {
     }
 
     $pusher->trigger($live->getChannel(), $live->getEvent(), [
-      "mute" => $userId
+      "banned" => $userId
     ]);
 
     return $this->json($live, 200, [], [
