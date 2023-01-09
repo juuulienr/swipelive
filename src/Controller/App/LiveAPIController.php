@@ -460,9 +460,25 @@ class LiveAPIController extends Controller {
    *
    * @Route("/user/api/live/{id}/update/orders/{orderId}", name="user_api_live_update_orders", methods={"GET"})
    */
-  public function updateOrders(Live $live, $orderId, Request $request, ObjectManager $manager, OrderRepository $orderRepo, SerializerInterface $serializer) {
+  public function updateOrders(Live $live, $orderId, Request $request, ObjectManager $manager, OrderRepository $orderRepo, LiveProductsRepository $liveProductRepo, SerializerInterface $serializer) {
     $order = $orderRepo->findOneById($orderId);
-    $upload = null; $vendor = null; $nbProducts = 0;
+    $upload = null; $vendor = null; $nbProducts = 0; $available = null;
+    $display = $live->getDisplay();
+    $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $display ]);
+
+
+    if ($liveProduct) {
+      $product = $liveProduct->getProduct();
+
+      if ($product && sizeof($product->getVariants()->toArray()) > 0) {
+        foreach ($product->getVariants() as $variant) {
+          $available = $available + $variant->getQuantity();
+        }
+      } else {
+        $available = $product->getQuantity();
+      }
+    }
+
 
     if ($order) {
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
@@ -483,6 +499,7 @@ class LiveAPIController extends Controller {
 
       $data = [
         "order" => [
+          "available" => $available,
           "number" => $order->getNumber(),
           "createdAt" => $order->getCreatedAt()->format('d/m/Y H:i'),
           "nbProducts" => $nbProducts,
