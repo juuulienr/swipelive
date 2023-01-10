@@ -163,13 +163,7 @@ class AccountAPIController extends Controller {
           $userExist->setFacebookId($facebookId);
           $manager->flush();
 
-          return $this->json(false, 200, [], [
-            'groups' => 'user:read', 
-            'circular_reference_limit' => 1, 
-            'circular_reference_handler' => function ($object) {
-              return $object->getId();
-            } 
-          ]);
+          return $this->json(false, 200);
         } else if (!$user) {
           $user = $serializer->deserialize($json, User::class, "json");
           $hash = $encoder->encodePassword($user, $password);
@@ -179,15 +173,9 @@ class AccountAPIController extends Controller {
           $manager->persist($user);
           $manager->flush();
 
-          return $this->json(true, 200, [], [
-            'groups' => 'user:read', 
-            'circular_reference_limit' => 1, 
-            'circular_reference_handler' => function ($object) {
-              return $object->getId();
-            } 
-          ]);
+          return $this->json(true, 200);
         } else {
-          return $this->json("Le compte est associé avec Facebook", 200);
+          return $this->json(true, 200);
         }
       }
     }
