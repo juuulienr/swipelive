@@ -127,6 +127,7 @@ class AccountAPIController extends Controller {
         $facebookId = $param['facebookId'];
         $picture = $param['picture'];
         $email = $param['email'];
+        $password = $param['password'];
         $filename = md5(uniqid()).'.jpg';
         $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
         file_put_contents($filepath, file_get_contents($picture));
@@ -149,6 +150,8 @@ class AccountAPIController extends Controller {
         $user = $userRepo->findOneByFacebookId($facebookId);
 
         if ($userExist) {
+          $userExist->encodePassword($user, $password);
+          $userExist->setHash($hash);
           $userExist->setPicture($filename);
           $userExist->setFacebookId($facebookId);
           $manager->flush();
@@ -162,7 +165,7 @@ class AccountAPIController extends Controller {
           ]);
         } else if (!$user) {
           $user = $serializer->deserialize($json, User::class, "json");
-          $hash = $encoder->encodePassword($user, $param['password']);
+          $hash = $encoder->encodePassword($user, $password);
           $user->setHash($hash);
           $user->setPicture($filename);
 
