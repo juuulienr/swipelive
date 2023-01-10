@@ -114,6 +114,20 @@ class AccountAPIController extends Controller {
   }
 
 
+
+  /**
+   * Récupérer le profil
+   *
+   * @Route("/api/facebook/oauth", name="user_api_facebook")
+   */
+  public function facebook(Request $request, ObjectManager $manager) {
+    $this->get('bugsnag')->notifyException(new Exception("facebook login"));
+
+
+    return true;
+  }
+
+
   /**
    * Edition du profil
    *
