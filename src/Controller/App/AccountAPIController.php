@@ -150,7 +150,7 @@ class AccountAPIController extends Controller {
         $user = $userRepo->findOneByFacebookId($facebookId);
 
         if ($userExist) {
-          $userExist->encodePassword($user, $password);
+          $hash = $encoder->encodePassword($userExist, $password);
           $userExist->setHash($hash);
           $userExist->setPicture($filename);
           $userExist->setFacebookId($facebookId);
