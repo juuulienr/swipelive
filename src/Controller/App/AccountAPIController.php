@@ -38,7 +38,7 @@ class AccountAPIController extends Controller {
 
 
   /**
-   * Inscription vendeur
+   * Inscription utilisateur
    *
   * @Route("/api/user/register", name="user_api_register")
   */
@@ -114,16 +114,86 @@ class AccountAPIController extends Controller {
   }
 
 
+  /**
+   * Accès avec Facebook
+   *
+  * @Route("/api/authentication/facebook", name="api_facebook_authentification")
+  */
+  public function facebookAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
+
+      if ($param) {
+        $facebookId = $param['facebookId'];
+        $picture = $param['picture'];
+        $email = $param['email'];
+        $filename = md5(uniqid()).'.jpg';
+        $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
+        file_put_contents($filepath, file_get_contents($picture));
+
+        try {
+          $result = (new UploadApi())->upload($filepath, [
+            'public_id' => $filename,
+            'use_filename' => TRUE,
+            "height" => 256, 
+            "width" => 256, 
+            "crop" => "thumb"
+          ]);
+
+          unlink($filepath);
+        } catch (\Exception $e) {
+          return $this->json($e->getMessage(), 404);
+        }
+
+        $userExist = $userRepo->findOneByEmail($email);
+        $user = $userRepo->findOneByFacebookId($facebookId);
+
+        if ($userExist) {
+          $userExist->setPicture($filename);
+          $userExist->setFacebookId($facebookId);
+          $manager->flush();
+
+          return $this->json($user, 200, [], [
+            'groups' => 'user:read', 
+            'circular_reference_limit' => 1, 
+            'circular_reference_handler' => function ($object) {
+              return $object->getId();
+            } 
+          ]);
+        } else if (!$user) {
+          $user = $serializer->deserialize($json, User::class, "json");
+          $hash = $encoder->encodePassword($user, $param['password']);
+          $user->setHash($hash);
+          $user->setPicture($filename);
+
+
+          $manager->persist($user);
+          $manager->flush();
+
+          return $this->json($user, 200, [], [
+            'groups' => 'user:read', 
+            'circular_reference_limit' => 1, 
+            'circular_reference_handler' => function ($object) {
+              return $object->getId();
+            } 
+          ]);
+        } else {
+          return $this->json("Le compte est associé avec Facebook", 200);
+        }
+      }
+    }
+
+    return $this->json([ "error" => "Une erreur est survenue"], 404);
+  }
+
+
 
   /**
-   * Récupérer le profil
+   * Redirection authentification avec facebook
    *
-   * @Route("/api/facebook/oauth", name="user_api_facebook")
+   * @Route("/api/facebook/oauth", name="api_facebook_oauth")
    */
-  public function facebook(Request $request, ObjectManager $manager) {
-    $this->get('bugsnag')->notifyException(new Exception("facebook login"));
-
-
+  public function facebookOauth(Request $request, ObjectManager $manager) {
     return true;
   }
 

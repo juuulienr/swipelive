@@ -151,6 +151,11 @@ class User implements UserInterface
      * @Groups("user:read")
      */
     private $year;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $facebookId;
     
 
     public function __construct()
@@ -494,6 +499,18 @@ class User implements UserInterface
     public function setYear(?string $year): self
     {
         $this->year = $year;
+
+        return $this;
+    }
+
+    public function getFacebookId(): ?string
+    {
+        return $this->facebookId;
+    }
+
+    public function setFacebookId(?string $facebookId): self
+    {
+        $this->facebookId = $facebookId;
 
         return $this;
     }
