@@ -148,11 +148,15 @@ class AccountAPIController extends Controller {
           return $this->json($e->getMessage(), 404);
         }
 
-
         $userExist = $userRepo->findOneByEmail($email);
         $user = $userRepo->findOneByFacebookId($facebookId);
 
         if ($userExist) {
+          if ($userExist->getPicture()) {
+            $oldFilename = explode(".", $userExist->getPicture());
+            $result = (new AdminApi())->deleteAssets($oldFilename[0], []);
+          }
+
           $hash = $encoder->encodePassword($userExist, $password);
           $userExist->setHash($hash);
           $userExist->setPicture($filename);
