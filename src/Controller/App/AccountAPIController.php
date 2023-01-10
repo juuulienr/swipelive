@@ -163,7 +163,7 @@ class AccountAPIController extends Controller {
           $userExist->setFacebookId($facebookId);
           $manager->flush();
 
-          return $this->json($user, 200, [], [
+          return $this->json(false, 200, [], [
             'groups' => 'user:read', 
             'circular_reference_limit' => 1, 
             'circular_reference_handler' => function ($object) {
@@ -176,11 +176,10 @@ class AccountAPIController extends Controller {
           $user->setHash($hash);
           $user->setPicture($filename);
 
-
           $manager->persist($user);
           $manager->flush();
 
-          return $this->json($user, 200, [], [
+          return $this->json(true, 200, [], [
             'groups' => 'user:read', 
             'circular_reference_limit' => 1, 
             'circular_reference_handler' => function ($object) {
