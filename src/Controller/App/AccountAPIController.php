@@ -128,8 +128,10 @@ class AccountAPIController extends Controller {
         $picture = $param['picture'];
         $email = $param['email'];
         $password = $param['password'];
-        $filename = md5(uniqid()).'.jpg';
-        $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
+
+        $filename = md5(uniqid());
+        $fullname = $filename . ".jpg"; 
+        $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
         file_put_contents($filepath, file_get_contents($picture));
 
         try {
@@ -145,6 +147,7 @@ class AccountAPIController extends Controller {
         } catch (\Exception $e) {
           return $this->json($e->getMessage(), 404);
         }
+
 
         $userExist = $userRepo->findOneByEmail($email);
         $user = $userRepo->findOneByFacebookId($facebookId);
