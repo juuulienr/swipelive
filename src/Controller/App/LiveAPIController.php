@@ -110,9 +110,11 @@ class LiveAPIController extends Controller {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
       $broadcastId = $param["broadcastId"];
+      $fbStreamUrl = $param["fbStreamUrl"];
 
       if ($broadcastId && !$live->getBroadcastId() && $live->getStatus() != 2) {
         if ($broadcastId != "test") {
+          // create broadcast
           $url = "https://api.bambuser.com/broadcasts/" . $broadcastId;
           $ch = curl_init();
 
@@ -142,6 +144,65 @@ class LiveAPIController extends Controller {
             return $this->json(false, 404);
           }
         }
+
+
+        // stream sur facebook
+        if ($fbStreamUrl) {
+
+          // create pipeline
+          $ch = curl_init();
+          curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
+          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+          curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+          curl_setopt($ch, CURLOPT_URL, "https://api.bambuser.com/pipelines");
+
+          $result = curl_exec($ch);
+          $result = json_decode($result);
+          curl_close($ch);
+
+          if ($result && $result->id) {
+            // update pipeline
+            $pipelineId = $result->id;
+            $url = "https://api.bambuser.com/pipelines/" . $pipelineId;
+            $data = [ 
+              "broadcastId" => $broadcastId, 
+              "closeOnEnd" => true 
+            ];
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($ch, CURLOPT_URL, $url);
+
+            $result = curl_exec($ch);
+            $result = json_decode($result);
+            curl_close($ch);
+
+
+            // new RMTP
+            $url = "https://api.bambuser.com/pipelines/" . $pipelineId . "/outputs";
+            $data = [ 
+              "destination" => $fbStreamUrl, 
+              "rtmpStreamId" => "",
+              "resolution" => "720x1280",
+              "framerate" => 30,
+            ];
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($ch, CURLOPT_URL, $url);
+
+            $result = curl_exec($ch);
+            $result = json_decode($result);
+            curl_close($ch);
+          }
+        }
+
 
         $channel = "channel" . $live->getId();
         $event = "event" . $live->getId();
