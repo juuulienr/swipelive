@@ -13,7 +13,7 @@
         "doctrine/doctrine-fixtures-bundle": "~3.0",
         "doctrine/doctrine-migrations-bundle": "~3.0",
         "doctrine/orm": "~2.7",
-        "facebook/graph-sdk": "~5.7",
+        "facebook/graph-sdk": "^5.7",
         "guzzlehttp/guzzle": "^7.2",
         "intervention/image": "^2.5",
         "lexik/jwt-authentication-bundle": "~2.9",
