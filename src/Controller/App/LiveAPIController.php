@@ -110,48 +110,50 @@ class LiveAPIController extends Controller {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
       // $broadcastId = $param["broadcastId"];
-      $broadcastId = "e8084f5e-fe7a-4cd4-b3bd-18f420469824";
+      $broadcastId = "a4c4cc28-dc1d-4884-bd51-474de6cea078";
       // $fbUserId = $param["fbUserId"];
-      $fbUserId = "5830704467012048";
+      // $fbUserId = "5830704467012048";
+      $fbUserId = "106638281743661";
       // $fbToken = $param["fbToken"];
-      $fbToken = "EAANUL41N2bIBAGfr6JmeJEZA6GRlZB1AU9Wo7qFH9ezzAjT6KwHD8K2ZCzEHeYLjZCGuSdQpHH2tbTWZAzJZAjbLLxmihZB2lKlYpV6KNmxIyTCQ9FAyyinyuE4pTMMUj0YN3BuNNIZCTuyniSKfj2TJQdGCDg08klqA2Ax4uI82JZCm7folVZB1dkEX6FujRMKIhZBeMW9O6B4j5mR8tfZCEB00feA7BqkLFhW4MQeL4qC4cJ8fxSb5RXZAfebLFdOGpoy4ZD";
+      $fbToken = "EAANUL41N2bIBAPcsIRwZAXFPQbsS1pEk2WJc7ZComVY23oy3T8xtU276f1ZA6seNlFx978Qob9glyXCOAJek2imgB5Py4Of1HyD9PhUsPv0cETB9Vg2ir52Is4xT0clXXwGN6p0oZCBSp3PqCkTNl6oTec5GHu6ufxyZAPGTVG1hs8IXTDAuFMvkqIRnvYlJgG2E1GeCjEAqgT7sUdfeGH0WjnKZB9hWAZD";
+      $fbTokenPage = "EAANUL41N2bIBAPcsIRwZAXFPQbsS1pEk2WJc7ZComVY23oy3T8xtU276f1ZA6seNlFx978Qob9glyXCOAJek2imgB5Py4Of1HyD9PhUsPv0cETB9Vg2ir52Is4xT0clXXwGN6p0oZCBSp3PqCkTNl6oTec5GHu6ufxyZAPGTVG1hs8IXTDAuFMvkqIRnvYlJgG2E1GeCjEAqgT7sUdfeGH0WjnKZB9hWAZD";
 
-      if ($broadcastId && !$live->getBroadcastId() && $live->getStatus() != 2) {
-        if ($broadcastId != "test") {
-          // create broadcast
-          $url = "https://api.bambuser.com/broadcasts/" . $broadcastId;
-          $ch = curl_init();
+      // if ($broadcastId && !$live->getBroadcastId() && $live->getStatus() != 2) {
+      //   if ($broadcastId != "test") {
+      //     // create broadcast
+      //     $url = "https://api.bambuser.com/broadcasts/" . $broadcastId;
+      //     $ch = curl_init();
 
-          curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
-          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-          curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-          curl_setopt($ch, CURLOPT_URL, $url);
+      //     curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
+      //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      //     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+      //     curl_setopt($ch, CURLOPT_URL, $url);
 
-          $result = curl_exec($ch);
-          $result = json_decode($result);
-          curl_close($ch);
+      //     $result = curl_exec($ch);
+      //     $result = json_decode($result);
+      //     curl_close($ch);
 
 
-          if ($result && $result->id) {
-            $unix = $result->created;
-            $gmdate = gmdate("d-m-Y H:i:s", $unix);
-            $createdAt = new \DateTime($gmdate);
-            $createdAt->modify('+2 hours');
+      //     if ($result && $result->id) {
+      //       $unix = $result->created;
+      //       $gmdate = gmdate("d-m-Y H:i:s", $unix);
+      //       $createdAt = new \DateTime($gmdate);
+      //       $createdAt->modify('+2 hours');
 
-            $live->setBroadcastId($broadcastId);
-            $live->setResourceUri($result->resourceUri);
-            $live->setPreview($result->preview);
-            $live->setCreatedAt($createdAt);
-            $live->setStatus(1);
-            $manager->flush();
-          } else {
-            return $this->json(false, 404);
-          }
-        }
+      //       $live->setBroadcastId($broadcastId);
+      //       $live->setResourceUri($result->resourceUri);
+      //       $live->setPreview($result->preview);
+      //       $live->setCreatedAt($createdAt);
+      //       $live->setStatus(1);
+      //       $manager->flush();
+      //     } else {
+      //       return $this->json(false, 404);
+      //     }
+      //   }
 
 
         // stream sur facebook
-        if ($fbUserId) {
+      if ($fbUserId) {
 
           // create fb stream
           $fb = new \Facebook\Facebook([
@@ -181,7 +183,6 @@ class LiveAPIController extends Controller {
 
           // var_dump($response);
           $result = $response->getGraphNode();
-
           if ($result) {
             $fbStreamId = $result["id"];
             $fbStreamUrl = $result["secure_stream_url"];
@@ -244,30 +245,30 @@ class LiveAPIController extends Controller {
         }
 
 
-        $channel = "channel" . $live->getId();
-        $event = "event" . $live->getId();
-        $user = $this->getUser();
+        // $channel = "channel" . $live->getId();
+        // $event = "event" . $live->getId();
+        // $user = $this->getUser();
 
-        $data = [
-          "comment" => [
-            "content" => "Début du live", 
-            "user" => [
-              "vendor" => [
-                "businessName" => $user->getVendor()->getBusinessName(),
-              ],
-              "firstname" => $user->getFirstname(),
-              "lastname" => $user->getLastname(),
-              "picture" => $user->getPicture()
-            ]
-          ]
-        ];       
+        // $data = [
+        //   "comment" => [
+        //     "content" => "Début du live", 
+        //     "user" => [
+        //       "vendor" => [
+        //         "businessName" => $user->getVendor()->getBusinessName(),
+        //       ],
+        //       "firstname" => $user->getFirstname(),
+        //       "lastname" => $user->getLastname(),
+        //       "picture" => $user->getPicture()
+        //     ]
+        //   ]
+        // ];       
 
-        $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
-        $pusher->trigger($channel, $event, $data);
+        // $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+        // $pusher->trigger($channel, $event, $data);
 
-        $live->setChannel($channel);
-        $live->setEvent($event);
-        $manager->flush();
+        // $live->setChannel($channel);
+        // $live->setEvent($event);
+        // $manager->flush();
 
         return $this->json($live, 200, [], [
           'groups' => 'live:read', 
@@ -277,7 +278,9 @@ class LiveAPIController extends Controller {
           } 
         ]);
       }
-    }
+    // }
+    
+    return $this->json(false, 404);
   }
 
 
@@ -358,6 +361,8 @@ class LiveAPIController extends Controller {
   public function stopLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo, CommentRepository $commentRepo) {
     $live->setStatus(2);
     $manager->flush();
+    $fbStreamId = $param["fbStreamId"];
+    $fbToken = $param["fbToken"];
 
 
     if ($live->getBroadcastId()) {
@@ -409,6 +414,29 @@ class LiveAPIController extends Controller {
 
             $manager->flush();
           }
+        }
+      }
+
+
+
+      // stream sur facebook
+      if ($fbStreamId) {
+
+        // stop fb stream
+        $fb = new \Facebook\Facebook([
+          'app_id' => '936988141017522',
+          'app_secret' => '025a5522cd75e464437fb048ee3cfe23',
+          'default_graph_version' => 'v2.10',
+        ]);
+
+        $url = $fbStreamId . "/?end_live_video=true";
+
+        try {
+          $response = $fb->post($url, $data, $fbToken);
+        } catch(\Facebook\Exceptions\FacebookResponseException $e) {
+          return $this->json("Graph returned an error: " . $e->getMessage(), 404);
+        } catch(\Facebook\Exceptions\FacebookSDKException $e) {
+          return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
         }
       }
     }
