@@ -315,7 +315,7 @@ class LiveAPIController extends Controller {
           ],
         ];
 
-        $url = $fbIdentifier . "/live_videos";
+        $url = $fbIdentifier . "/live_videos?fields=id,permalink_url,secure_stream_url";
 
         try {
           $response = $fb->post($url, $data, $fbToken);
@@ -330,10 +330,10 @@ class LiveAPIController extends Controller {
         if ($result) {
           $fbStreamId = $result["id"];
           $fbStreamUrl = $result["secure_stream_url"];
-          $username = "juuulienr";
+          $fbPermalinkUrl = $result["permalink_url"];
 
           $group_id = '1125055514835995';
-          $post_url = 'https://www.facebook.com/' . $username . '/videos/' . $fbStreamId;
+          $post_url = 'https://www.facebook.com' . $fbPermalinkUrl;
           $url = '/' . $group_id . '/feed';
 
           try {
