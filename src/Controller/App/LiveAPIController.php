@@ -276,7 +276,7 @@ class LiveAPIController extends Controller {
           } 
         ]);
       }
-    // }
+    }
     
     return $this->json(false, 404);
   }
