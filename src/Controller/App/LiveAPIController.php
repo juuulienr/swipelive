@@ -326,26 +326,21 @@ class LiveAPIController extends Controller {
         }
 
         $result = $response->getGraphNode();
+
         if ($result) {
           $fbStreamId = $result["id"];
           $fbStreamUrl = $result["secure_stream_url"];
 
           $group_id = '1125055514835995';
           $post_url = 'https://www.facebook.com/' . $fbStreamId;
-
+          $url = '/' . $group_id . '/feed';
 
           try {
-            $response = $facebook->post(
-              '/' . $group_id . '/feed',
-              array(
-                'link' => $post_url,
-              ),
-              $fbToken
-            );
+            $response = $fb->post($url, [ 'link' => $post_url, "message" => "Partage du live" ], $fbToken);
           } catch (Facebook\Exceptions\FacebookResponseException $e) {
             return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
           } catch (Facebook\Exceptions\FacebookSDKException $e) {
-          return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
+            return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
           }
 
 
