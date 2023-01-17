@@ -330,9 +330,10 @@ class LiveAPIController extends Controller {
         if ($result) {
           $fbStreamId = $result["id"];
           $fbStreamUrl = $result["secure_stream_url"];
+          $username = "juuulienr";
 
           $group_id = '1125055514835995';
-          $post_url = 'https://www.facebook.com/' . $fbStreamId;
+          $post_url = 'https://www.facebook.com/' . $username . '/videos/' . $fbStreamId;
           $url = '/' . $group_id . '/feed';
 
           try {
