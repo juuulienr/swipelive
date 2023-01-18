@@ -195,10 +195,9 @@ class LiveAPIController extends Controller {
       $broadcastId = $param["broadcastId"];
       $fbIdentifier = $param["fbIdentifier"];
       $fbToken = $param["fbToken"];
-      $fbPageToken = $param["fbPageToken"];
+      $fbTokenPage = $param["fbTokenPage"];
       $groups = $param["groups"];
       // $fbIdentifier = "5830704467012048";
-      // $fbIdentifier = "106638281743661";
 
 
       // stream sur facebook
