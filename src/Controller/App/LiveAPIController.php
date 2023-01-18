@@ -406,6 +406,8 @@ class LiveAPIController extends Controller {
    * @Route("/user/api/live/stop/{id}", name="user_api_live_stop", methods={"PUT"})
    */
   public function stopLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo, CommentRepository $commentRepo) {
+    $json = $request->getContent();
+    $param = json_decode($json, true);
     $live->setStatus(2);
     $manager->flush();
     $fbStreamId = $param["fbStreamId"];
@@ -463,7 +465,6 @@ class LiveAPIController extends Controller {
           }
         }
       }
-
 
 
       // stream sur facebook

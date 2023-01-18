@@ -153,7 +153,7 @@ class WebhookController extends Controller {
   /**
    * Facebook Live Video Weebhook
    *
-   * @Route("/api/facebook/webhooks", name="api_facebook_webhooks")", methods={"POST"})
+   * @Route("/api/facebook/webhooks", name="api_facebook_webhooks")")
    */
   public function facebook(Request $request, ObjectManager $manager, CommentRepository $commentRepo) {
     $result = json_decode($request->getContent(), true);
@@ -165,7 +165,7 @@ class WebhookController extends Controller {
         "received" => true,
       ]
 
-      return $this->json($data, 200);
+      return $this->json([ "value" => $result['hub_challenge'] ], 200);
       exit;
     }
 
