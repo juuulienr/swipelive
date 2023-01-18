@@ -310,21 +310,21 @@ class LiveAPIController extends Controller {
             $result = json_decode($result);
             curl_close($ch);
           }
+
+          $live->setFbStreamId($fbStreamId);
+          $live->setFbStreamUrl($fbStreamUrl);
+          $live->setPostUrl($postUrl);
+          $manager->flush();
+
+          return $this->json([ "fbStreamId" => $fbStreamId ], 200, [], [
+            'groups' => 'live:read',
+            'circular_reference_limit' => 1,
+            'circular_reference_handler' => function ($object) {
+              return $object->getId();
+            } 
+          ]);
         }
       }
-
-
-      // $live->setChannel($channel);
-      // $live->setEvent($event);
-      // $manager->flush();
-
-      return $this->json(["fbStreamId" => $fbStreamId], 200, [], [
-        'groups' => 'live:read', 
-        'circular_reference_limit' => 1, 
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
-      ]);
     }
     
     return $this->json(false, 404);

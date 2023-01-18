@@ -123,6 +123,21 @@ class Live
      */
     private $totalLikes;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $fbStreamId;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $fbStreamUrl;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $postUrl;
+
     
     public function __construct()
     {
@@ -397,6 +412,42 @@ class Live
     public function setTotalLikes(?int $totalLikes): self
     {
         $this->totalLikes = $totalLikes;
+
+        return $this;
+    }
+
+    public function getFbStreamId(): ?string
+    {
+        return $this->fbStreamId;
+    }
+
+    public function setFbStreamId(?string $fbStreamId): self
+    {
+        $this->fbStreamId = $fbStreamId;
+
+        return $this;
+    }
+
+    public function getFbStreamUrl(): ?string
+    {
+        return $this->fbStreamUrl;
+    }
+
+    public function setFbStreamUrl(?string $fbStreamUrl): self
+    {
+        $this->fbStreamUrl = $fbStreamUrl;
+
+        return $this;
+    }
+
+    public function getPostUrl(): ?string
+    {
+        return $this->postUrl;
+    }
+
+    public function setPostUrl(?string $postUrl): self
+    {
+        $this->postUrl = $postUrl;
 
         return $this;
     }
