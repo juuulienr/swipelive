@@ -41,20 +41,18 @@ class DashboardController extends Controller {
       'default_graph_version' => 'v10.0',
     ]);
 
-    $live_video_id = 'LIVE_VIDEO_ID';
+    $live_video_id = '5855435604538934';
+    $access_token = 'EAANUL41N2bIBAOLhx8ca9ZBuZAJUu9DpGA9XDXGTZCm6SOvJOZC0gxaVzIuyQWmVZB4S7GtfDJRMSRZC9ppp71LQz2oGZBrX3MUzgd2svgYW7430t4RFIVoevsKJ8MCeNsX0uQ3NIoBTgM6OVluUBWfykhQQJs38BMKsN9dpINI7xm6DBQU0iaZAzKFbXJIKqjkEKzmbQWJ08RGvNMFgRgmdoDMnLgrvyEBkcFTpZCgd8jVQfS9DAd34dFBnOZBn7cExYZD';
+    $appToken = '936988141017522|5Jia8pEjLLz2StmJ2EIpp6e8ZR8';
+    $url = '/' . '936988141017522' . '/subscriptions';
 
     try {
     // Subscribe to live_comments webhook
-      $response = $facebook->post(
-        '/' . '936988141017522' . '/subscriptions',
-        array(
-          'object' => 'live_video',
+      $response = $facebook->post($url, [ 'object' => 'live_video',
           'callback_url' => 'https://swipelive.fr/api/facebook/webhooks',
           'fields' => 'comments',
-          'verify_token' => 'knsdofi4d4sdf8fsq4q6e32d1sqd5sqd4f8',
-        ),
-        '025a5522cd75e464437fb048ee3cfe23'
-      );
+          'verify_token' => 'thisisaverifystring'
+        ],$appToken);
       var_dump("Successfully subscribed to live_comments webhook.");
 
     // Get live video comments
