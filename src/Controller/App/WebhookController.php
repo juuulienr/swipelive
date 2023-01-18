@@ -11,6 +11,7 @@ use App\Entity\Product;
 use App\Entity\Category;
 use App\Entity\OrderStatus;
 use App\Repository\ClipRepository;
+use App\Repository\CommentRepository;
 use App\Repository\OrderRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
@@ -141,6 +142,41 @@ class WebhookController extends Controller {
           $manager->remove($live);
           $manager->flush();
         }
+      }
+    }
+
+    return $this->json(true, 200);
+  }
+
+
+
+  /**
+   * Facebook Live Video Weebhook
+   *
+   * @Route("/api/facebook/webhooks", name="api_facebook_webhooks")", methods={"POST"})
+   */
+  public function facebook(Request $request, ObjectManager $manager, CommentRepository $commentRepo) {
+    $this->get('bugsnag')->notifyException(new Exception("test facebook"));
+    $result = json_decode($request->getContent(), true);
+
+    // update parcel status
+    if ($result["entry"]) {
+      $live_video_id = $input['entry'][0]['id'];
+
+      $facebook = new Facebook\Facebook([
+        'app_id' => 'APP_ID',
+        'app_secret' => 'APP_SECRET',
+        'default_graph_version' => 'v10.0',
+      ]);
+
+      $comments = $facebook->get(
+        '/' . $live_video_id . '/comments',
+        $access_token
+      )->getGraphEdge();
+
+      foreach ($comments as $comment) {
+        $this->get('bugsnag')->notifyException(new Exception($comment));
+        // echo "Comment: " . $comment->getField('message') . "\n";
       }
     }
 

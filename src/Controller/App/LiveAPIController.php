@@ -214,9 +214,9 @@ class LiveAPIController extends Controller {
           'title' => 'Titre de la vidéo',
           'description' => 'Description de la vidéo',
           'status' => 'LIVE_NOW',
-          'privacy' => [
-            'value' => "EVERYONE"
-          ]
+          // 'privacy' => [
+            // 'value' => "EVERYONE"
+          // ]
         ];
 
         $url = $fbIdentifier . "/live_videos?fields=id,permalink_url,secure_stream_url";
