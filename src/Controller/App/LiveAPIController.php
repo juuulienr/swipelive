@@ -241,16 +241,18 @@ class LiveAPIController extends Controller {
           $fbPermalinkUrl = $result["permalink_url"];
           $postUrl = 'https://www.facebook.com' . $fbPermalinkUrl;
 
-          if ($groups) {
+          if ($groups && sizeof($groups) > 0) {
             foreach ($groups as $group) {
-              $url = '/' . $group['id'] . '/feed';
+              if ($group["name"] == "Test Live") {
+                $url = '/' . $group['id'] . '/feed';
 
-              try {
-                $response = $fb->post($url, [ 'link' => $postUrl, "message" => "Partage du live" ], $fbToken);
-              } catch (Facebook\Exceptions\FacebookResponseException $e) {
-                return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
-              } catch (Facebook\Exceptions\FacebookSDKException $e) {
-                return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
+                try {
+                  $response = $fb->post($url, [ 'link' => $postUrl, "message" => "Partage du live" ], $fbToken);
+                } catch (Facebook\Exceptions\FacebookResponseException $e) {
+                  return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
+                } catch (Facebook\Exceptions\FacebookSDKException $e) {
+                  return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
+                }
               }
             }
           }
