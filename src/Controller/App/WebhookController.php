@@ -157,15 +157,10 @@ class WebhookController extends Controller {
    */
   public function facebook(Request $request, ObjectManager $manager, CommentRepository $commentRepo) {
     $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyException(new Exception($result['hub_verify_token']));
+    $this->get('bugsnag')->notifyException(new Exception($result['hub_challenge']));
 
     if (isset($result['hub_verify_token']) && $result['hub_verify_token'] === 'swipelive_token_verification') {
-      $data = [ 
-        "value" => $result['hub_challenge'],
-        "received" => true,
-      ]
-
-      return $this->json([ "value" => $result['hub_challenge'] ], 200);
+      return $this->json($result['hub_challenge'], 200);
       exit;
     }
 
