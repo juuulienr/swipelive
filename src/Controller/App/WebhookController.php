@@ -160,7 +160,12 @@ class WebhookController extends Controller {
     $result = json_decode($request->getContent(), true);
 
     if (isset($result['hub_verify_token']) && $result['hub_verify_token'] === 'swipelive_token_verification') {
-      return $this->json($result['hub_challenge'], 200);
+      $data = [ 
+        "value" => $result['hub_challenge'],
+        "received" => true,
+      ]
+
+      return $this->json($data, 200);
       exit;
     }
 
