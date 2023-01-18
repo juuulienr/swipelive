@@ -159,7 +159,11 @@ class WebhookController extends Controller {
     $this->get('bugsnag')->notifyException(new Exception("test facebook"));
     $result = json_decode($request->getContent(), true);
 
-    // update parcel status
+    if (isset($result['hub_verify_token']) && $result['hub_verify_token'] === 'swipelive_token_verification') {
+      return $this->json($result['hub_challenge'], 200);
+      exit;
+    }
+
     if ($result["entry"]) {
       $live_video_id = $input['entry'][0]['id'];
 

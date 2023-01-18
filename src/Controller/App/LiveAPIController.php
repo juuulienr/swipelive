@@ -476,7 +476,7 @@ class LiveAPIController extends Controller {
           'default_graph_version' => 'v2.10',
         ]);
 
-        $url = $fbStreamId . "/?end_live_video=true";
+        $url = "/" . $fbStreamId . "/?end_live_video=true";
 
         try {
           $response = $fb->post($url, $data, $fbToken);

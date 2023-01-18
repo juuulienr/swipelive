@@ -32,9 +32,9 @@ class DashboardController extends Controller {
 
 
   /**
-   * @Route("/admin/test", name="admin_test")
+   * @Route("/admin/facebook", name="admin_facebook")
    */
-  public function test(){
+  public function facebook(){
     $facebook = new \Facebook\Facebook([
       'app_id' => '936988141017522',
       'app_secret' => '025a5522cd75e464437fb048ee3cfe23',
@@ -47,15 +47,14 @@ class DashboardController extends Controller {
     $url = '/' . '936988141017522' . '/subscriptions';
 
     try {
-    // Subscribe to live_comments webhook
+      // Subscribe to live_comments webhook
       $response = $facebook->post($url, [ 'object' => 'live_video',
           'callback_url' => 'https://swipelive.fr/api/facebook/webhooks',
           'fields' => 'comments',
           'verify_token' => 'thisisaverifystring'
-        ],$appToken);
-      var_dump("Successfully subscribed to live_comments webhook.");
+        ], $appToken);
 
-    // Get live video comments
+      // Get live video comments
       $comments = $facebook->get(
         '/' . $live_video_id . '/comments',
         $access_token
