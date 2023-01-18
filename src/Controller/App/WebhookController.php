@@ -162,26 +162,26 @@ class WebhookController extends Controller {
       exit;
     }
 
-    // $result = json_decode($request->getContent(), true);
-    // if ($result["entry"]) {
-    //   $live_video_id = $input['entry'][0]['id'];
+    $result = json_decode($request->getContent(), true);
+    if ($result["entry"]) {
+      $live_video_id = $input['entry'][0]['id'];
 
-    //   $facebook = new Facebook\Facebook([
-    //     'app_id' => 'APP_ID',
-    //     'app_secret' => 'APP_SECRET',
-    //     'default_graph_version' => 'v10.0',
-    //   ]);
+      $facebook = new Facebook\Facebook([
+        'app_id' => 'APP_ID',
+        'app_secret' => 'APP_SECRET',
+        'default_graph_version' => 'v10.0',
+      ]);
 
-    //   $comments = $facebook->get(
-    //     '/' . $live_video_id . '/comments',
-    //     $access_token
-    //   )->getGraphEdge();
+      $comments = $facebook->get(
+        '/' . $live_video_id . '/comments',
+        $access_token
+      )->getGraphEdge();
 
-    //   foreach ($comments as $comment) {
-    //     $this->get('bugsnag')->notifyException(new Exception($comment));
-    //     // echo "Comment: " . $comment->getField('message') . "\n";
-    //   }
-    // }
+      foreach ($comments as $comment) {
+        $this->get('bugsnag')->notifyException(new Exception($comment));
+        // echo "Comment: " . $comment->getField('message') . "\n";
+      }
+    }
 
     return $this->json(true, 200);
   }

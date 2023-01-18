@@ -480,7 +480,7 @@ class LiveAPIController extends Controller {
         $url = "/" . $fbStreamId . "/?end_live_video=true";
 
         try {
-          $response = $fb->post($url, $data, $fbToken);
+          $response = $fb->post($url, [], $fbToken);
         } catch(\Facebook\Exceptions\FacebookResponseException $e) {
           return $this->json("Graph returned an error: " . $e->getMessage(), 404);
         } catch(\Facebook\Exceptions\FacebookSDKException $e) {
