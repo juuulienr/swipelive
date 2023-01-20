@@ -194,14 +194,16 @@ class LiveAPIController extends Controller {
       $param = json_decode($json, true);
       $broadcastId = $param["broadcastId"];
       $fbIdentifier = $param["fbIdentifier"];
+      $showGroupsPage = $param["showGroupsPage"];
+      $fbPageIdentifier = $param["fbPageIdentifier"];
       $fbToken = $param["fbToken"];
       $fbTokenPage = $param["fbTokenPage"];
+      $pages = $param["pages"];
       $groups = $param["groups"];
-      // $fbIdentifier = "5830704467012048";
 
 
       // stream sur facebook
-      if ($broadcastId && $fbIdentifier && $fbToken) {
+      if ($broadcastId) {
 
         // create fb stream
         $fb = new \Facebook\Facebook([
@@ -211,20 +213,21 @@ class LiveAPIController extends Controller {
         ]);
 
         $data = [
-          'title' => 'Titre de la vidéo',
-          'description' => 'Description de la vidéo',
+          'title' => 'Live sur Swipe Live',
+          'description' => 'Live sur Swipe Live',
           'status' => 'LIVE_NOW',
-          'privacy' => [
-            'value' => "EVERYONE"
-          ]
+          // 'privacy' => [
+            // 'value' => "EVERYONE"
+          // ]
         ];
 
-        $url = $fbIdentifier . "/live_videos?fields=id,permalink_url,secure_stream_url";
 
         try {
-          if ($fbTokenPage) {
+          if ($fbTokenPage && $fbPageIdentifier) {
+            $url = $fbPageIdentifier . "/live_videos?fields=id,permalink_url,secure_stream_url";
             $response = $fb->post($url, $data, $fbTokenPage);
           } else {
+            $url = $fbIdentifier . "/live_videos?fields=id,permalink_url,secure_stream_url";
             $response = $fb->post($url, $data, $fbToken);
           }
         } catch(\Facebook\Exceptions\FacebookResponseException $e) {
