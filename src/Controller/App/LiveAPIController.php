@@ -215,7 +215,7 @@ class LiveAPIController extends Controller {
         $data = [
           'title' => 'Live sur Swipe Live',
           'description' => 'Live sur Swipe Live',
-          'status' => 'LIVE_NOW',
+          'status' => 'LIVE_NOW', 
           // 'privacy' => [
             // 'value' => "EVERYONE"
           // ]
