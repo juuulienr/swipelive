@@ -20,6 +20,7 @@ class Order
      * @ORM\Column(type="integer")
      * @Groups("order:read")
      * @Groups("user:read")
+     * @Groups("discussion:read")
      */
     private $id;
 
@@ -207,12 +208,18 @@ class Order
      */
     private $paymentStatus;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Discussion::class, mappedBy="purchase")
+     */
+    private $discussions;
+
 
     public function __construct()
     {
         $this->lineItems = new ArrayCollection();
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->orderStatuses = new ArrayCollection();
+        $this->discussions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -576,6 +583,36 @@ class Order
     public function setPaymentStatus(?string $paymentStatus): self
     {
         $this->paymentStatus = $paymentStatus;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Discussion[]
+     */
+    public function getDiscussions(): Collection
+    {
+        return $this->discussions;
+    }
+
+    public function addDiscussion(Discussion $discussion): self
+    {
+        if (!$this->discussions->contains($discussion)) {
+            $this->discussions[] = $discussion;
+            $discussion->setPurchase($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDiscussion(Discussion $discussion): self
+    {
+        if ($this->discussions->removeElement($discussion)) {
+            // set the owning side to null (unless already changed)
+            if ($discussion->getPurchase() === $this) {
+                $discussion->setPurchase(null);
+            }
+        }
 
         return $this;
     }

@@ -83,6 +83,7 @@ class Vendor
      * @Groups("live:read")
      * @Groups("product:read")
      * @Groups("order:read")
+     * @Groups("discussion:read")
      */
     private $businessName;
 

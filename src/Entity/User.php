@@ -28,6 +28,7 @@ class User implements UserInterface
      * @Groups("clip:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("discussion:read")
      */
     private $id;
 
@@ -60,6 +61,7 @@ class User implements UserInterface
      * @Groups("clip:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("discussion:read")
      */
     private $firstname;
 
@@ -69,6 +71,7 @@ class User implements UserInterface
      * @Groups("clip:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("discussion:read")
      */
     private $lastname;
 
@@ -78,6 +81,7 @@ class User implements UserInterface
      * @Groups("clip:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("discussion:read")
      */
     private $picture;
 
@@ -114,6 +118,7 @@ class User implements UserInterface
      * @Groups("user:read")
      * @Groups("live:read")
      * @Groups("clip:read")
+     * @Groups("discussion:read")
      */
     private $vendor;
 
@@ -154,8 +159,16 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("user:read")
      */
     private $facebookId;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Discussion::class, mappedBy="user")
+     * @Groups("user:read")
+     */
+    private $discussions;
+
     
 
     public function __construct()
@@ -167,6 +180,7 @@ class User implements UserInterface
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->shippingAddresses = new ArrayCollection();
         $this->type = "user";
+        $this->discussions = new ArrayCollection();
     }
 
     public function getFullName() {
@@ -511,6 +525,36 @@ class User implements UserInterface
     public function setFacebookId(?string $facebookId): self
     {
         $this->facebookId = $facebookId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Discussion[]
+     */
+    public function getDiscussions(): Collection
+    {
+        return $this->discussions;
+    }
+
+    public function addDiscussion(Discussion $discussion): self
+    {
+        if (!$this->discussions->contains($discussion)) {
+            $this->discussions[] = $discussion;
+            $discussion->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDiscussion(Discussion $discussion): self
+    {
+        if ($this->discussions->removeElement($discussion)) {
+            // set the owning side to null (unless already changed)
+            if ($discussion->getUser() === $this) {
+                $discussion->setUser(null);
+            }
+        }
 
         return $this;
     }
