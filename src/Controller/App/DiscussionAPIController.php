@@ -210,7 +210,6 @@ class DiscussionAPIController extends Controller {
       return $this->json("L'image est introuvable !", 404);
     }
 
-
     $filename = md5(time().uniqid()); 
     $fullname = $filename . "." . $extension; 
     $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
@@ -223,44 +222,54 @@ class DiscussionAPIController extends Controller {
       ]);
 
       unlink($filepath);
+
+      $message = new Message();
+      $message->setFromUser($user->getId());
+      $message->setDiscussion($discussion);
+      $message->setPicture($fullname);
+      $message->setText($fullname);
+
+      if ($result["width"] > $result["height"]) {
+        $message->setPictureType("landscape");
+      } else if ($result["width"] == $result["height"]) {
+        $message->setPictureType("rounded");
+      } else {
+        $message->setPictureType("portrait");
+      }
+
+      $manager->persist($message);
+      $manager->flush();
+
+
+      // update discussion
+      $discussion->setPreview("A envoyé une image");
+      $discussion->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
+
+      if ($discussion->getUser()->getId() == $user->getId()) {
+        $discussion->setUnseenVendor(true);
+      } else {
+        $discussion->setUnseen(true);
+      }
+
+      $manager->flush();
+
+      $array = $discussionRepo->findBy([ 'user' => $user ]);
+      $array2 = $discussionRepo->findBy([ 'vendor' => $user ]);
+      $discussions = $array + $array2;
+
+      return $this->json($discussions, 200, [], [
+        'groups' => 'discussion:read',
+        'datetime_format' => 'H:i',
+        'circular_reference_limit' => 1,
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ]);
+
     } catch (\Exception $e) {
       return $this->json($e->getMessage(), 404);
     }
 
-    $message = new Message();
-    $message->setFromUser($user->getId());
-    $message->setDiscussion($discussion);
-    $message->setPicture($fullname);
-    $message->setText($fullname);
-
-    $manager->persist($message);
-    $manager->flush();
-
-
-    // update discussion
-    $discussion->setPreview("A envoyé une image");
-    $discussion->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
-
-    if ($discussion->getUser()->getId() == $user->getId()) {
-      $discussion->setUnseenVendor(true);
-    } else {
-      $discussion->setUnseen(true);
-    }
-
-    $manager->flush();
-
-    $array = $discussionRepo->findBy([ 'user' => $user ]);
-    $array2 = $discussionRepo->findBy([ 'vendor' => $user ]);
-    $discussions = $array + $array2;
-
-    return $this->json($discussions, 200, [], [
-      'groups' => 'discussion:read',
-      'datetime_format' => 'H:i',
-      'circular_reference_limit' => 1,
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
-    ]);
   }
 
 

@@ -55,6 +55,13 @@ class Message
      */
     private $text;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("discussion:read")
+     * @Groups("user:read")
+     */
+    private $pictureType;
+
     
     public function __construct()
     {
@@ -123,6 +130,18 @@ class Message
     public function setText(?string $text): self
     {
         $this->text = $text;
+
+        return $this;
+    }
+
+    public function getPictureType(): ?string
+    {
+        return $this->pictureType;
+    }
+
+    public function setPictureType(?string $pictureType): self
+    {
+        $this->pictureType = $pictureType;
 
         return $this;
     }
