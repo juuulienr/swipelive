@@ -21,7 +21,7 @@ class Message
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="integer")
      * @Groups("discussion:read")
      * @Groups("user:read")
      */
@@ -49,7 +49,7 @@ class Message
     private $picture;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      * @Groups("discussion:read")
      * @Groups("user:read")
      */
@@ -67,12 +67,12 @@ class Message
         return $this->id;
     }
 
-    public function getFromUser(): ?string
+    public function getFromUser(): ?int
     {
         return $this->fromUser;
     }
 
-    public function setFromUser(string $fromUser): self
+    public function setFromUser(int $fromUser): self
     {
         $this->fromUser = $fromUser;
 
@@ -120,7 +120,7 @@ class Message
         return $this->text;
     }
 
-    public function setText(string $text): self
+    public function setText(?string $text): self
     {
         $this->text = $text;
 

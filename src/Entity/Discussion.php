@@ -44,7 +44,7 @@ class Discussion
   private $updatedAt;
 
   /**
-   * @ORM\OneToMany(targetEntity=Message::class, mappedBy="discussion", orphanRemoval=true)
+   * @ORM\OneToMany(targetEntity=Message::class, mappedBy="discussion", cascade={"persist"}), orphanRemoval=true)
    * @Groups("discussion:read")
    * @Groups("user:read")
    */

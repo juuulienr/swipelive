@@ -33,6 +33,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Cloudinary\Api\Upload\UploadApi;
+use Cloudinary\Api\Admin\AdminApi;
+use Cloudinary\Cloudinary;
+
 
 
 class DiscussionAPIController extends Controller {
@@ -59,26 +63,61 @@ class DiscussionAPIController extends Controller {
   }
 
 
-  // /**
-  //  * Créer une discussion
-  //  *
-  //  * @Route("/user/api/discussions/add/{id}", name="user_api_discussions_add", methods={"GET"})
-  //  */
-  // public function addDiscussion(Vendor $vendor, Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo) {
+  /**
+   * Créer une discussion
+   *
+   * @Route("/user/api/discussions/add", name="user_api_discussions_add", methods={"POST"})
+   */
+  public function addDiscussion(Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $discussion = $serializer->deserialize($json, Discussion::class, "json");
 
-  //   $discussion = new Discussion();
-    
-  //   $manager->flush();
+      if ($discussion) {
+        $exist = $discussionRepo->findOneBy([ 'user' => $discussion->getUser(), 'vendor' => $discussion->getVendor() ]);
 
-  //   return $this->json($discussionRepo->findAll(), 200, [], [
-  //     'groups' => 'discussion:read',
-  //     'datetime_format' => 'H:i',
-  //     'circular_reference_limit' => 1,
-  //     'circular_reference_handler' => function ($object) {
-  //       return $object->getId();
-  //     } 
-  //   ]);
-  // }
+        if (!$exist) {
+          $exist = $discussionRepo->findOneBy([ 'user' => $discussion->getVendor(), 'vendor' => $discussion->getUser() ]);
+        }
+
+        if (!$exist) {
+          $manager->persist($discussion);
+          $manager->flush();
+        } else {
+          $message = $discussion->getMessages()[0];
+          $message->setDiscussion($exist);
+
+          $manager->persist($message);
+          $manager->flush();
+
+
+          // update discussion
+          $exist->setPreview($message->getText());
+          $exist->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
+
+          if ($exist->getUser()->getId() == $this->getUser()->getId()) {
+            $exist->setUnseenVendor(true);
+          } else {
+            $exist->setUnseen(true);
+          }
+        }
+      }
+
+      $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
+      $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
+      $discussions = $array + $array2;
+
+      return $this->json($discussions, 200, [], [
+        'groups' => 'discussion:read',
+        'datetime_format' => 'H:i',
+        'circular_reference_limit' => 1,
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ]);
+    }
+
+    return $this->json([ "error" => "Une erreur est survenue"], 404);
+  }
 
 
   /**
@@ -95,7 +134,11 @@ class DiscussionAPIController extends Controller {
 
     $manager->flush();
 
-    return $this->json($discussionRepo->findAll(), 200, [], [
+    $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
+    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
+    $discussions = $array + $array2;
+
+    return $this->json($discussions, 200, [], [
       'groups' => 'discussion:read',
       'datetime_format' => 'H:i',
       'circular_reference_limit' => 1,
@@ -128,7 +171,11 @@ class DiscussionAPIController extends Controller {
       $manager->persist($message);
       $manager->flush();
 
-      return $this->json($discussionRepo->findAll(), 200, [], [
+      $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
+      $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
+      $discussions = $array + $array2;
+
+      return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',
         'datetime_format' => 'H:i',
         'circular_reference_limit' => 1,
@@ -140,4 +187,111 @@ class DiscussionAPIController extends Controller {
 
     return $this->json([ "error" => "Une erreur est survenue"], 404);
   }
+
+
+  /**
+   * Ajouter une photo
+   *
+   * @Route("/user/api/discussions/{id}/picture", name="user_api_discussions_picture", methods={"POST"})
+   */
+  public function addPicture(Discussion $discussion, Request $request, ObjectManager $manager, SerializerInterface $serializer, DiscussionRepository $discussionRepo) {
+    $file = json_decode($request->getContent(), true);
+    $user = $this->getUser();
+
+    if ($file && array_key_exists("picture", $file)) {
+      $file = $file["picture"];
+      $content = $file;
+      $extension = 'jpg';
+    } else if ($request->files->get('picture')) {
+      $file = $request->files->get('picture');
+      $content = file_get_contents($file);
+      $extension = $file->guessExtension();
+    } else {
+      return $this->json("L'image est introuvable !", 404);
+    }
+
+
+    $filename = md5(time().uniqid()); 
+    $fullname = $filename . "." . $extension; 
+    $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
+    file_put_contents($filepath, $content);
+
+    try {
+      $result = (new UploadApi())->upload($filepath, [
+        'public_id' => $filename,
+        'use_filename' => TRUE,
+        "height" => 256, 
+        "width" => 256, 
+        "crop" => "thumb"
+      ]);
+
+      unlink($filepath);
+    } catch (\Exception $e) {
+      return $this->json($e->getMessage(), 404);
+    }
+
+    $message = new Message();
+    $message->setFromUser($user->getId());
+    $message->setDiscussion($discussion);
+    $message->setPicture($fullname);
+    $message->setText($fullname);
+
+    $manager->persist($message);
+    $manager->flush();
+
+
+    // update discussion
+    $discussion->setPreview("A envoyé une image");
+    $discussion->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
+
+    if ($discussion->getUser()->getId() == $user->getId()) {
+      $discussion->setUnseenVendor(true);
+    } else {
+      $discussion->setUnseen(true);
+    }
+
+    $manager->flush();
+
+    $array = $discussionRepo->findBy([ 'user' => $user ]);
+    $array2 = $discussionRepo->findBy([ 'vendor' => $user ]);
+    $discussions = $array + $array2;
+
+    return $this->json($discussions, 200, [], [
+      'groups' => 'discussion:read',
+      'datetime_format' => 'H:i',
+      'circular_reference_limit' => 1,
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
+  }
+
+
+
+  /**
+   * Supprimer une discussion
+   *
+   * @Route("/user/api/discussions/{id}/delete", name="user_api_discussions_delete", methods={"DELETE"})
+   */
+  public function deleteDiscussion(Discussion $discussion, ObjectManager $manager, DiscussionRepository $discussionRepo, SerializerInterface $serializer) {
+    if ($discussion) {
+      if (sizeof($discussion->getMessages()->toArray())) {
+        foreach ($discussion->getMessages() as $message) {
+          $manager->remove($message);
+        }
+        $manager->flush();
+      }
+
+      $manager->remove($discussion);
+      $manager->flush();
+
+      return $this->json(true, 200);
+    }
+
+    return $this->json("La discussion est introuvable", 404);
+  }
+
+
+
+
 }
