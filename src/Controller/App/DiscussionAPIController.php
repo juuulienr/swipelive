@@ -171,6 +171,18 @@ class DiscussionAPIController extends Controller {
       $manager->persist($message);
       $manager->flush();
 
+      $data = [
+        "discussionId" => $discussion->getId(),
+        "message" => [
+          "fromUser" => $this->getUser()->getId(),
+          "picture" => null,
+          "text" => $message->getText(),
+        ],
+      ];
+
+      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher->trigger("discussion_channel", "new_message", $data);
+
       $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
       $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
       $discussions = $array + $array2;
@@ -227,7 +239,7 @@ class DiscussionAPIController extends Controller {
       $message->setFromUser($user->getId());
       $message->setDiscussion($discussion);
       $message->setPicture($fullname);
-      $message->setText($fullname);
+      $message->setText(null);
 
       if ($result["width"] > $result["height"]) {
         $message->setPictureType("landscape");
@@ -252,6 +264,21 @@ class DiscussionAPIController extends Controller {
       }
 
       $manager->flush();
+
+
+      $data = [
+        "discussionId" => $discussion->getId(),
+        "message" => [
+          "fromUser" => $user->getId(),
+          "picture" => $message->getPicture(),
+          "pictureType" => $message->getPictureType(),
+          "text" => null,
+        ],
+      ];
+
+      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher->trigger("discussion_channel", "new_message", $data);
+
 
       $array = $discussionRepo->findBy([ 'user' => $user ]);
       $array2 = $discussionRepo->findBy([ 'vendor' => $user ]);

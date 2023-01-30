@@ -160,7 +160,7 @@ class LiveAPIController extends Controller {
               "picture" => $user->getPicture()
             ]
           ]
-        ];       
+        ];
 
         $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
         $pusher->trigger($channel, $event, $data);
