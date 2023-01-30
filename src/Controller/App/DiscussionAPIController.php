@@ -176,6 +176,7 @@ class DiscussionAPIController extends Controller {
         "message" => [
           "fromUser" => $this->getUser()->getId(),
           "picture" => null,
+          "loading" => false,
           "text" => $message->getText(),
         ],
       ];
@@ -265,12 +266,12 @@ class DiscussionAPIController extends Controller {
 
       $manager->flush();
 
-
       $data = [
         "discussionId" => $discussion->getId(),
         "message" => [
           "fromUser" => $user->getId(),
           "picture" => $message->getPicture(),
+          "loading" => false,
           "pictureType" => $message->getPictureType(),
           "text" => null,
         ],
@@ -296,7 +297,6 @@ class DiscussionAPIController extends Controller {
     } catch (\Exception $e) {
       return $this->json($e->getMessage(), 404);
     }
-
   }
 
 
