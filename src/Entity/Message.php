@@ -62,10 +62,18 @@ class Message
      */
     private $pictureType;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups("discussion:read")
+     * @Groups("user:read")
+     */
+    private $loading;
+
     
     public function __construct()
     {
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
+        $this->loading = false;
     }
     
 
@@ -142,6 +150,18 @@ class Message
     public function setPictureType(?string $pictureType): self
     {
         $this->pictureType = $pictureType;
+
+        return $this;
+    }
+
+    public function getLoading(): ?bool
+    {
+        return $this->loading;
+    }
+
+    public function setLoading(?bool $loading): self
+    {
+        $this->loading = $loading;
 
         return $this;
     }
