@@ -232,6 +232,7 @@ class DiscussionAPIController extends Controller {
       $result = (new UploadApi())->upload($filepath, [
         'public_id' => $filename,
         'use_filename' => TRUE,
+        'height' => 720
       ]);
 
       unlink($filepath);
