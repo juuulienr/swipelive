@@ -8,11 +8,13 @@ use App\Entity\Clip;
 use App\Entity\Live;
 use App\Entity\Category;
 use App\Entity\Message;
+use App\Entity\SecurityUser;
 use App\Entity\Follow;
 use App\Entity\Product;
 use App\Entity\LiveProducts;
 use App\Entity\Upload;
 use App\Repository\FollowRepository;
+use App\Repository\SecurityUserRepository;
 use App\Repository\VendorRepository;
 use App\Repository\UserRepository;
 use App\Repository\ClipRepository;
@@ -55,6 +57,12 @@ class AccountAPIController extends Controller {
           $user->setHash($hash);
 
           $manager->persist($user);
+          $manager->flush();
+
+          $security = new Security();
+          $security->setUser($user);
+
+          $manager->persist($security);
           $manager->flush();
 
 			    return $this->json($user, 200, [], [
@@ -111,6 +119,24 @@ class AccountAPIController extends Controller {
     		return $object->getId();
     	} 
     ]);
+  }
+
+
+  /**
+   * Check si utilisateur est en ligne
+   *
+   * @Route("/user/api/ping", name="user_api_ping", methods={"GET"})
+   */
+  public function ping(Request $request, ObjectManager $manager, SecurityUserRepository $securityRepo) {
+    $user = $this->getUser(); 
+    $security = $securityRepo->findOneByUser($user);
+
+    if ($security) {
+      $security->setConnectedAt(new \DateTime('now', timezone_open('Europe/Paris')));
+      $manager->flush();
+    }
+
+    return $this->json(true, 200);
   }
 
 

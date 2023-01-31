@@ -169,6 +169,13 @@ class User implements UserInterface
      */
     private $discussions;
 
+    /**
+     * @ORM\OneToMany(targetEntity=SecurityUser::class, mappedBy="user", orphanRemoval=true)
+     * @Groups("user:read")
+     * @Groups("discussion:read")
+     */
+    private $securityUsers;
+
     
 
     public function __construct()
@@ -181,6 +188,7 @@ class User implements UserInterface
         $this->shippingAddresses = new ArrayCollection();
         $this->type = "user";
         $this->discussions = new ArrayCollection();
+        $this->securityUsers = new ArrayCollection();
     }
 
     public function getFullName() {
@@ -553,6 +561,36 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($discussion->getUser() === $this) {
                 $discussion->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|SecurityUser[]
+     */
+    public function getSecurityUsers(): Collection
+    {
+        return $this->securityUsers;
+    }
+
+    public function addSecurityUser(SecurityUser $securityUser): self
+    {
+        if (!$this->securityUsers->contains($securityUser)) {
+            $this->securityUsers[] = $securityUser;
+            $securityUser->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSecurityUser(SecurityUser $securityUser): self
+    {
+        if ($this->securityUsers->removeElement($securityUser)) {
+            // set the owning side to null (unless already changed)
+            if ($securityUser->getUser() === $this) {
+                $securityUser->setUser(null);
             }
         }
 

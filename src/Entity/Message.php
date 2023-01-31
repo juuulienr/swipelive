@@ -73,7 +73,6 @@ class Message
     public function __construct()
     {
         $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
-        $this->updatedAt = new \DateTime('now', timezone_open('Europe/Paris'));
         $this->loading = false;
     }
     

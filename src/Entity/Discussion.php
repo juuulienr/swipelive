@@ -90,6 +90,7 @@ class Discussion
   {
     $this->messages = new ArrayCollection();
     $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
+    $this->updatedAt = new \DateTime('now', timezone_open('Europe/Paris'));
   }
 
   public function getId(): ?int

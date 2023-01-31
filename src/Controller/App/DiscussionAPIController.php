@@ -54,7 +54,6 @@ class DiscussionAPIController extends Controller {
 
     return $this->json($discussions, 200, [], [
       'groups' => 'discussion:read',
-      'datetime_format' => 'H:i',
       'circular_reference_limit' => 1,
       'circular_reference_handler' => function ($object) {
         return $object->getId();
@@ -108,7 +107,6 @@ class DiscussionAPIController extends Controller {
 
       return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',
-        'datetime_format' => 'H:i',
         'circular_reference_limit' => 1,
         'circular_reference_handler' => function ($object) {
           return $object->getId();
@@ -140,7 +138,6 @@ class DiscussionAPIController extends Controller {
 
     return $this->json($discussions, 200, [], [
       'groups' => 'discussion:read',
-      'datetime_format' => 'H:i',
       'circular_reference_limit' => 1,
       'circular_reference_handler' => function ($object) {
         return $object->getId();
@@ -170,6 +167,12 @@ class DiscussionAPIController extends Controller {
 
       $manager->persist($message);
       $manager->flush();
+      
+      // "discussion" => [
+      //   "id" => $discussion->getId(),
+      //   "preview" => $discussion->getPreview(),
+      //   "updatedAt" => $discussion->getUpdatedAt(),
+      // ],
 
       $data = [
         "discussionId" => $discussion->getId(),
@@ -190,7 +193,6 @@ class DiscussionAPIController extends Controller {
 
       return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',
-        'datetime_format' => 'H:i',
         'circular_reference_limit' => 1,
         'circular_reference_handler' => function ($object) {
           return $object->getId();
@@ -288,7 +290,6 @@ class DiscussionAPIController extends Controller {
 
       return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',
-        'datetime_format' => 'H:i',
         'circular_reference_limit' => 1,
         'circular_reference_handler' => function ($object) {
           return $object->getId();
