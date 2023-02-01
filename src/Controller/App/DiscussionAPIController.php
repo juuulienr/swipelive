@@ -100,10 +100,10 @@ class DiscussionAPIController extends Controller {
           }
         }
       }
-
+      
       $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
       $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
-      $discussions = $array + $array2;
+      $discussions = array_merge($array, $array2);
 
       return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',
@@ -131,10 +131,10 @@ class DiscussionAPIController extends Controller {
     }
 
     $manager->flush();
-
+      
     $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
     $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
-    $discussions = $array + $array2;
+    $discussions = array_merge($array, $array2);
 
     return $this->json($discussions, 200, [], [
       'groups' => 'discussion:read',
@@ -189,7 +189,7 @@ class DiscussionAPIController extends Controller {
 
       $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
       $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
-      $discussions = $array + $array2;
+      $discussions = array_merge($array, $array2);
 
       return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',
@@ -283,10 +283,9 @@ class DiscussionAPIController extends Controller {
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger("discussion_channel", "new_message", $data);
 
-
-      $array = $discussionRepo->findBy([ 'user' => $user ]);
-      $array2 = $discussionRepo->findBy([ 'vendor' => $user ]);
-      $discussions = $array + $array2;
+      $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
+      $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
+      $discussions = array_merge($array, $array2);
 
       return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',
@@ -325,7 +324,4 @@ class DiscussionAPIController extends Controller {
 
     return $this->json("La discussion est introuvable", 404);
   }
-
-
-
 }
