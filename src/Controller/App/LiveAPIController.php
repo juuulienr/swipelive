@@ -709,7 +709,7 @@ class LiveAPIController extends Controller {
         "order" => [
           "available" => $available,
           "number" => $order->getNumber(),
-          "createdAt" => $order->getCreatedAt()->format('d/m/Y H:i'),
+          "createdAt" => $order->getCreatedAt(),
           "nbProducts" => $nbProducts,
           "amount" => $order->getSubtotal(),
           "upload" => $upload,

@@ -171,8 +171,8 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=SecurityUser::class, mappedBy="user", orphanRemoval=true)
-     * @Groups("user:read")
      * @Groups("discussion:read")
+     * @Groups("user:read")
      */
     private $securityUsers;
 

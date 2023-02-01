@@ -42,8 +42,7 @@ class OrderAPIController extends Controller {
     $orders = $orderRepo->findByVendorOrBuyer($this->getUser());
 
     return $this->json($orders, 200, [], [
-      'groups' => 'order:read', 
-      'datetime_format' => 'd/m/Y H:i' 
+      'groups' => 'order:read'
     ]);
   }
 
@@ -168,7 +167,6 @@ class OrderAPIController extends Controller {
 
           return $this->json($order, 200, [], [
             'groups' => 'order:read', 
-            'datetime_format' => 'd/m/Y H:i' 
           ]);
   		  } else {
           return $this->json("Le panier est obligatoire", 404); 
@@ -235,7 +233,6 @@ class OrderAPIController extends Controller {
 
     return $this->json($order, 200, [], [
       'groups' => 'order:read', 
-      'datetime_format' => 'd/m/Y H:i' 
     ]);
   }
 
@@ -253,7 +250,6 @@ class OrderAPIController extends Controller {
 
     return $this->json($order, 200, [], [
       'groups' => 'order:read', 
-      'datetime_format' => 'd/m/Y H:i' 
     ]);
   }
 }

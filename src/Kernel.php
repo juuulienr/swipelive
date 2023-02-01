@@ -17,8 +17,8 @@ class Kernel extends BaseKernel
     public function boot()
     {
         parent::boot();
-        $this->container->get('bugsnag')->registerCallback(function ($report) {
-        });
+        date_default_timezone_set('UTC');
+        $this->container->get('bugsnag')->registerCallback(function ($report) {});
     }
 
     const CONFIG_EXTS = '.{php,xml,yaml,yml}';

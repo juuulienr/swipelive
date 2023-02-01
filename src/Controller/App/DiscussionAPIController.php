@@ -50,7 +50,7 @@ class DiscussionAPIController extends Controller {
   public function discussions(Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo) {
     $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
     $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
-    $discussions = $array + $array2;
+    $discussions = array_merge($array, $array2);
 
     return $this->json($discussions, 200, [], [
       'groups' => 'discussion:read',
@@ -325,7 +325,6 @@ class DiscussionAPIController extends Controller {
 
     return $this->json("La discussion est introuvable", 404);
   }
-
 
 
 
