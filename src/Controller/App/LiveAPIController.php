@@ -130,7 +130,7 @@ class LiveAPIController extends Controller {
           if ($result && $result->id) {
             $unix = $result->created;
             $gmdate = gmdate("d-m-Y H:i:s", $unix);
-            $createdAt = new \DateTime($gmdate);
+            $createdAt = new \DateTime($gmdate, timezone_open('UTC'));
             $createdAt->modify('+2 hours');
 
             $live->setBroadcastId($broadcastId);
@@ -363,7 +363,7 @@ class LiveAPIController extends Controller {
         }
 
         $created = $live->getCreatedAt();
-        $now = new \DateTime('now', timezone_open('Europe/Paris'));
+        $now = new \DateTime('now', timezone_open('UTC'));
         $diff = $now->diff($created);
         $end = $this->dateIntervalToSeconds($diff);
         $duration = $end - $start;

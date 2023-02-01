@@ -184,7 +184,7 @@ class User implements UserInterface
         $this->following = new ArrayCollection();
         $this->purchases = new ArrayCollection();
         $this->comments = new ArrayCollection();
-        $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
+        $this->createdAt = new \DateTime('now', timezone_open('UTC'));
         $this->shippingAddresses = new ArrayCollection();
         $this->type = "user";
         $this->discussions = new ArrayCollection();

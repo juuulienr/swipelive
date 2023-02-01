@@ -40,8 +40,8 @@ class SecurityUser
 
     public function __construct()
     {
-      $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
-      $this->connectedAt = new \DateTime('now', timezone_open('Europe/Paris'));
+      $this->createdAt = new \DateTime('now', timezone_open('UTC'));
+      $this->connectedAt = new \DateTime('now', timezone_open('UTC'));
     }
 
     public function getId(): ?int

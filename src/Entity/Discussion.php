@@ -89,8 +89,8 @@ class Discussion
   public function __construct()
   {
     $this->messages = new ArrayCollection();
-    $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
-    $this->updatedAt = new \DateTime('now', timezone_open('Europe/Paris'));
+    $this->createdAt = new \DateTime('now', timezone_open('UTC'));
+    $this->updatedAt = new \DateTime('now', timezone_open('UTC'));
   }
 
   public function getId(): ?int

@@ -30,7 +30,7 @@ class CreateClipsFromLive extends ContainerAwareCommand {
 
   protected function execute(InputInterface $input, OutputInterface $output) {
     $clips = $this->repo->findBy([ "status" => "waiting" ]);
-    $now = new \DateTime('now', timezone_open('Europe/Paris'));
+    $now = new \DateTime('now', timezone_open('UTC'));
 
     if ($clips) {
       foreach ($clips as $clip) {

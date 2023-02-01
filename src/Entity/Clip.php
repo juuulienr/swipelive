@@ -109,7 +109,7 @@ class Clip
     public function __construct()
     {
         $this->status = "waiting";
-        $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
+        $this->createdAt = new \DateTime('now', timezone_open('UTC'));
         $this->comments = new ArrayCollection();
     }
 

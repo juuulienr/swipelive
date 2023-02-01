@@ -63,7 +63,7 @@ class Upload
     
     public function __construct()
     {
-        $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
+        $this->createdAt = new \DateTime('now', timezone_open('UTC'));
     }
 
     public function getId(): ?int

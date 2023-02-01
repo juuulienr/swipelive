@@ -217,7 +217,7 @@ class Order
     public function __construct()
     {
         $this->lineItems = new ArrayCollection();
-        $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
+        $this->createdAt = new \DateTime('now', timezone_open('UTC'));
         $this->orderStatuses = new ArrayCollection();
         $this->discussions = new ArrayCollection();
     }

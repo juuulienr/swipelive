@@ -91,7 +91,7 @@ class DiscussionAPIController extends Controller {
 
           // update discussion
           $exist->setPreview($message->getText());
-          $exist->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
+          $exist->setUpdatedAt(new \DateTime('now', timezone_open('UTC')));
 
           if ($exist->getUser()->getId() == $this->getUser()->getId()) {
             $exist->setUnseenVendor(true);
@@ -157,7 +157,7 @@ class DiscussionAPIController extends Controller {
       $message->setDiscussion($discussion);
 
       $discussion->setPreview($message->getText());
-      $discussion->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
+      $discussion->setUpdatedAt(new \DateTime('now', timezone_open('UTC')));
 
       if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
         $discussion->setUnseenVendor(true);
@@ -259,7 +259,7 @@ class DiscussionAPIController extends Controller {
 
       // update discussion
       $discussion->setPreview("A envoyé une image");
-      $discussion->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
+      $discussion->setUpdatedAt(new \DateTime('now', timezone_open('UTC')));
 
       if ($discussion->getUser()->getId() == $user->getId()) {
         $discussion->setUnseenVendor(true);

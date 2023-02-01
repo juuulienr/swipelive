@@ -33,7 +33,7 @@ class RemoveWaitingLive extends ContainerAwareCommand
   protected function execute(InputInterface $input, OutputInterface $output)
   {
     $lives = $this->repo->findAll();
-    $now = new \DateTime('now', timezone_open('Europe/Paris'));
+    $now = new \DateTime('now', timezone_open('UTC'));
     $now->modify('-3 days');
 
     if ($lives) {

@@ -141,7 +141,7 @@ class Live
     
     public function __construct()
     {
-        $this->createdAt = new \DateTime('now', timezone_open('Europe/Paris'));
+        $this->createdAt = new \DateTime('now', timezone_open('UTC'));
         $this->clips = new ArrayCollection();
         $this->liveProducts = new ArrayCollection();
         $this->viewers = 0;

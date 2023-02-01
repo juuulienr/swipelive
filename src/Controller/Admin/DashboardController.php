@@ -27,6 +27,10 @@ class DashboardController extends Controller {
    * @Route("/admin/login", name="admin_login")
    */
   public function login(){
+
+    $test =  new \DateTime('now', timezone_open('UTC'));
+    dd($test);
+
     return $this->render('admin/login.html.twig');
   }
 }

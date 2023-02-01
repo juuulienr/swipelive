@@ -59,7 +59,7 @@ class AccountAPIController extends Controller {
           $manager->persist($user);
           $manager->flush();
 
-          $security = new Security();
+          $security = new SecurityUser();
           $security->setUser($user);
 
           $manager->persist($security);
@@ -132,7 +132,7 @@ class AccountAPIController extends Controller {
     $security = $securityRepo->findOneByUser($user);
 
     if ($security) {
-      $security->setConnectedAt(new \DateTime('now', timezone_open('Europe/Paris')));
+      $security->setConnectedAt(new \DateTime('now', timezone_open('UTC')));
       $manager->flush();
     }
 
