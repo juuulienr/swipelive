@@ -52,6 +52,18 @@ class DiscussionAPIController extends Controller {
     $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
     $discussions = array_merge($array, $array2);
 
+    if ($discussions) {
+      foreach ($discussions as $discussion) {
+        if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
+          $discussion->setUnseen(false);
+        } else {
+          $discussion->setUnseenVendor(false);
+        }
+
+        $manager->flush();
+      }
+    }
+
     return $this->json($discussions, 200, [], [
       'groups' => 'discussion:read',
       'circular_reference_limit' => 1,
