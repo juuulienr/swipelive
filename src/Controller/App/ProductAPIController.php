@@ -191,10 +191,6 @@ class ProductAPIController extends Controller {
     $upload = new Upload();
     $upload->setFilename($fullname);
 
-    // if ($product) {
-    //   $upload->setProduct($product);
-    // }
-
     $manager->persist($upload);
     $manager->flush();
 

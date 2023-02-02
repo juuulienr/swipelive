@@ -168,12 +168,6 @@ class DiscussionAPIController extends Controller {
       $manager->persist($message);
       $manager->flush();
       
-      // "discussion" => [
-      //   "id" => $discussion->getId(),
-      //   "preview" => $discussion->getPreview(),
-      //   "updatedAt" => $discussion->getUpdatedAt(),
-      // ],
-
       $data = [
         "discussionId" => $discussion->getId(),
         "message" => [
@@ -201,6 +195,68 @@ class DiscussionAPIController extends Controller {
     }
 
     return $this->json([ "error" => "Une erreur est survenue"], 404);
+  }
+
+
+  /**
+   * Utilisateur en train d'écrire
+   *
+   * @Route("/user/api/discussions/{id}/writing", name="user_api_discussions_writing", methods={"GET"})
+   */
+  public function writing(Discussion $discussion, Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo) {
+    $data = [
+      "discussionId" => $discussion->getId(),
+      "message" => [
+        "fromUser" => $this->getUser()->getId(),
+        "writing" => true,
+      ],
+    ];
+
+    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $pusher->trigger("discussion_channel", "new_message", $data);
+
+    $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
+    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
+    $discussions = array_merge($array, $array2);
+
+    return $this->json($discussions, 200, [], [
+      'groups' => 'discussion:read',
+      'circular_reference_limit' => 1,
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
+  }
+
+
+  /**
+   * Utilisateur n'écrit plus
+   *
+   * @Route("/user/api/discussions/{id}/writing/stop", name="user_api_discussions_writing_stop", methods={"GET"})
+   */
+  public function stopWriting(Discussion $discussion, Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo) {
+    $data = [
+      "discussionId" => $discussion->getId(),
+      "message" => [
+        "fromUser" => $this->getUser()->getId(),
+        "stopWriting" => false,
+      ],
+    ];
+
+    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $pusher->trigger("discussion_channel", "new_message", $data);
+
+    $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
+    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
+    $discussions = array_merge($array, $array2);
+
+    return $this->json($discussions, 200, [], [
+      'groups' => 'discussion:read',
+      'circular_reference_limit' => 1,
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
   }
 
 
