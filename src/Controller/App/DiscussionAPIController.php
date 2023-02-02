@@ -370,7 +370,7 @@ class DiscussionAPIController extends Controller {
       if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
         $discussion->setArchive(true);
       } else {
-        $discussion->setArchiveVendor(false);
+        $discussion->setArchiveVendor(true);
       }
       $manager->flush();
 
