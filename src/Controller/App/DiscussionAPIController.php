@@ -48,21 +48,9 @@ class DiscussionAPIController extends Controller {
    * @Route("/user/api/discussions", name="user_api_discussions", methods={"GET"})
    */
   public function discussions(Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo) {
-    $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
-    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
+    $array = $discussionRepo->findBy([ 'user' => $this->getUser(), 'archive' => false ]);
+    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser(), 'archiveVendor' => false ]);
     $discussions = array_merge($array, $array2);
-
-    if ($discussions) {
-      foreach ($discussions as $discussion) {
-        if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
-          $discussion->setUnseen(false);
-        } else {
-          $discussion->setUnseenVendor(false);
-        }
-
-        $manager->flush();
-      }
-    }
 
     return $this->json($discussions, 200, [], [
       'groups' => 'discussion:read',
@@ -112,9 +100,9 @@ class DiscussionAPIController extends Controller {
           }
         }
       }
-      
-      $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
-      $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
+
+      $array = $discussionRepo->findBy([ 'user' => $this->getUser(), 'archive' => false ]);
+      $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser(), 'archiveVendor' => false ]);
       $discussions = array_merge($array, $array2);
 
       return $this->json($discussions, 200, [], [
@@ -143,9 +131,9 @@ class DiscussionAPIController extends Controller {
     }
 
     $manager->flush();
-      
-    $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
-    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
+
+    $array = $discussionRepo->findBy([ 'user' => $this->getUser(), 'archive' => false ]);
+    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser(), 'archiveVendor' => false ]);
     $discussions = array_merge($array, $array2);
 
     return $this->json($discussions, 200, [], [
@@ -193,8 +181,8 @@ class DiscussionAPIController extends Controller {
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger("discussion_channel", "new_message", $data);
 
-      $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
-      $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
+      $array = $discussionRepo->findBy([ 'user' => $this->getUser(), 'archive' => false ]);
+      $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser(), 'archiveVendor' => false ]);
       $discussions = array_merge($array, $array2);
 
       return $this->json($discussions, 200, [], [
@@ -227,9 +215,10 @@ class DiscussionAPIController extends Controller {
     $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $pusher->trigger("discussion_channel", "new_message", $data);
 
-    $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
-    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
+    $array = $discussionRepo->findBy([ 'user' => $this->getUser(), 'archive' => false ]);
+    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser(), 'archiveVendor' => false ]);
     $discussions = array_merge($array, $array2);
+
 
     return $this->json($discussions, 200, [], [
       'groups' => 'discussion:read',
@@ -258,9 +247,10 @@ class DiscussionAPIController extends Controller {
     $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $pusher->trigger("discussion_channel", "new_message", $data);
 
-    $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
-    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
+    $array = $discussionRepo->findBy([ 'user' => $this->getUser(), 'archive' => false ]);
+    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser(), 'archiveVendor' => false ]);
     $discussions = array_merge($array, $array2);
+
 
     return $this->json($discussions, 200, [], [
       'groups' => 'discussion:read',
@@ -351,8 +341,8 @@ class DiscussionAPIController extends Controller {
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger("discussion_channel", "new_message", $data);
 
-      $array = $discussionRepo->findBy([ 'user' => $this->getUser() ]);
-      $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser() ]);
+      $array = $discussionRepo->findBy([ 'user' => $this->getUser(), 'archive' => false ]);
+      $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser(), 'archiveVendor' => false ]);
       $discussions = array_merge($array, $array2);
 
       return $this->json($discussions, 200, [], [
@@ -373,18 +363,15 @@ class DiscussionAPIController extends Controller {
   /**
    * Supprimer une discussion
    *
-   * @Route("/user/api/discussions/{id}/delete", name="user_api_discussions_delete", methods={"DELETE"})
+   * @Route("/user/api/discussions/{id}/archive", name="user_api_discussions_archive", methods={"DELETE"})
    */
-  public function deleteDiscussion(Discussion $discussion, ObjectManager $manager, DiscussionRepository $discussionRepo, SerializerInterface $serializer) {
+  public function archive(Discussion $discussion, ObjectManager $manager, DiscussionRepository $discussionRepo, SerializerInterface $serializer) {
     if ($discussion) {
-      if (sizeof($discussion->getMessages()->toArray())) {
-        foreach ($discussion->getMessages() as $message) {
-          $manager->remove($message);
-        }
-        $manager->flush();
+      if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
+        $discussion->setArchive(true);
+      } else {
+        $discussion->setArchiveVendor(false);
       }
-
-      $manager->remove($discussion);
       $manager->flush();
 
       return $this->json(true, 200);

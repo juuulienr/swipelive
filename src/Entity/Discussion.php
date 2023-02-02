@@ -85,12 +85,24 @@ class Discussion
    */
   private $purchase;
 
+  /**
+   * @ORM\Column(type="boolean", nullable=true)
+   */
+  private $archive;
+
+  /**
+   * @ORM\Column(type="boolean", nullable=true)
+   */
+  private $archiveVendor;
+
 
   public function __construct()
   {
     $this->messages = new ArrayCollection();
     $this->createdAt = new \DateTime('now', timezone_open('UTC'));
     $this->updatedAt = new \DateTime('now', timezone_open('UTC'));
+    $this->archiveVendor = false;
+    $this->archive = false;
   }
 
   public function getId(): ?int
@@ -222,5 +234,29 @@ class Discussion
     $this->purchase = $purchase;
 
     return $this;
+  }
+
+  public function getArchive(): ?bool
+  {
+      return $this->archive;
+  }
+
+  public function setArchive(?bool $archive): self
+  {
+      $this->archive = $archive;
+
+      return $this;
+  }
+
+  public function getArchiveVendor(): ?bool
+  {
+      return $this->archiveVendor;
+  }
+
+  public function setArchiveVendor(?bool $archiveVendor): self
+  {
+      $this->archiveVendor = $archiveVendor;
+
+      return $this;
   }
 }
