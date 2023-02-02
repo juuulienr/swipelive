@@ -158,6 +158,8 @@ class DiscussionAPIController extends Controller {
 
       $discussion->setPreview($message->getText());
       $discussion->setUpdatedAt(new \DateTime('now', timezone_open('UTC')));
+      $discussion->setArchive(false);
+      $discussion->setArchiveVendor(false);
 
       if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
         $discussion->setUnseenVendor(true);
@@ -318,6 +320,8 @@ class DiscussionAPIController extends Controller {
       // update discussion
       $discussion->setPreview("A envoyé une image");
       $discussion->setUpdatedAt(new \DateTime('now', timezone_open('UTC')));
+      $discussion->setArchive(false);
+      $discussion->setArchiveVendor(false);
 
       if ($discussion->getUser()->getId() == $user->getId()) {
         $discussion->setUnseenVendor(true);
@@ -361,7 +365,7 @@ class DiscussionAPIController extends Controller {
 
 
   /**
-   * Supprimer une discussion
+   * Archiver une discussion
    *
    * @Route("/user/api/discussions/{id}/archive", name="user_api_discussions_archive", methods={"DELETE"})
    */
