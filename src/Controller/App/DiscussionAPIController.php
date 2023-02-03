@@ -158,8 +158,8 @@ class DiscussionAPIController extends Controller {
 
       $discussion->setPreview($message->getText());
       $discussion->setUpdatedAt(new \DateTime('now', timezone_open('UTC')));
-      $discussion->setArchive(false);
       $discussion->setArchiveVendor(false);
+      $discussion->setArchive(false);
 
       if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
         $discussion->setUnseenVendor(true);

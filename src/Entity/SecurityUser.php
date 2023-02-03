@@ -37,6 +37,56 @@ class SecurityUser
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $wifiIPAddress;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $carrierIPAddress;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $connection;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $model;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $platform;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $uuid;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $version;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $manufacturer;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isVirtual;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $serial;
+
 
     public function __construct()
     {
@@ -81,6 +131,126 @@ class SecurityUser
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getWifiIPAddress(): ?string
+    {
+        return $this->wifiIPAddress;
+    }
+
+    public function setWifiIPAddress(?string $wifiIPAddress): self
+    {
+        $this->wifiIPAddress = $wifiIPAddress;
+
+        return $this;
+    }
+
+    public function getCarrierIPAddress(): ?string
+    {
+        return $this->carrierIPAddress;
+    }
+
+    public function setCarrierIPAddress(?string $carrierIPAddress): self
+    {
+        $this->carrierIPAddress = $carrierIPAddress;
+
+        return $this;
+    }
+
+    public function getConnection(): ?string
+    {
+        return $this->connection;
+    }
+
+    public function setConnection(?string $connection): self
+    {
+        $this->connection = $connection;
+
+        return $this;
+    }
+
+    public function getModel(): ?string
+    {
+        return $this->model;
+    }
+
+    public function setModel(?string $model): self
+    {
+        $this->model = $model;
+
+        return $this;
+    }
+
+    public function getPlatform(): ?string
+    {
+        return $this->platform;
+    }
+
+    public function setPlatform(?string $platform): self
+    {
+        $this->platform = $platform;
+
+        return $this;
+    }
+
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(?string $uuid): self
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    public function getVersion(): ?string
+    {
+        return $this->version;
+    }
+
+    public function setVersion(?string $version): self
+    {
+        $this->version = $version;
+
+        return $this;
+    }
+
+    public function getManufacturer(): ?string
+    {
+        return $this->manufacturer;
+    }
+
+    public function setManufacturer(?string $manufacturer): self
+    {
+        $this->manufacturer = $manufacturer;
+
+        return $this;
+    }
+
+    public function getIsVirtual(): ?bool
+    {
+        return $this->isVirtual;
+    }
+
+    public function setIsVirtual(?bool $isVirtual): self
+    {
+        $this->isVirtual = $isVirtual;
+
+        return $this;
+    }
+
+    public function getSerial(): ?string
+    {
+        return $this->serial;
+    }
+
+    public function setSerial(?string $serial): self
+    {
+        $this->serial = $serial;
 
         return $this;
     }

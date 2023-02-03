@@ -125,27 +125,6 @@ class APIController extends Controller {
   }
 
 
-  /**
-   * Afficher les produits du vendeur
-   *
-   * @Route("/api/profile/{id}/products", name="api_profile_products", methods={"GET"})
-   */
-  public function products(User $user, Request $request, ObjectManager $manager, ProductRepository $productRepo) {
-    $products = $productRepo->findBy([ "user" => $user, "archived" => false ]);
-
-    return $this->json($products, 200, [], ['groups' => 'product:read']);
-  }
-
-
-  /**
-   * Récupérer un produit
-   *
-   * @Route("/api/products/{id}", name="api_product", methods={"GET"})
-   */
-  public function product(Product $product, Request $request, ObjectManager $manager) {
-    return $this->json($product, 200, [], ['groups' => 'product:read']);
-  }
-
 
   /**
    * Afficher les catégories
@@ -155,7 +134,13 @@ class APIController extends Controller {
   public function categories(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
     $categories = $categoryRepo->findAll();
 
-    return $this->json($categories, 200, [], ['groups' => 'category:read']);
+    return $this->json($categories, 200, [], [
+      'groups' => 'category:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
   }
 
 
@@ -170,7 +155,7 @@ class APIController extends Controller {
 
 
   /**
-   * Récupérer les produits dans une catégorie
+   * Afficher les produits dans une catégorie
    *
    * @Route("/api/categories/{id}/products", name="api_category_products", methods={"GET"})
    */

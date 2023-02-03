@@ -176,6 +176,12 @@ class User implements UserInterface
      */
     private $securityUsers;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Favoris::class, mappedBy="user", orphanRemoval=true)
+     * @Groups("user:read")
+     */
+    private $favoris;
+
     
 
     public function __construct()
@@ -189,6 +195,7 @@ class User implements UserInterface
         $this->type = "user";
         $this->discussions = new ArrayCollection();
         $this->securityUsers = new ArrayCollection();
+        $this->favoris = new ArrayCollection();
     }
 
     public function getFullName() {
@@ -591,6 +598,36 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($securityUser->getUser() === $this) {
                 $securityUser->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Favoris[]
+     */
+    public function getFavoris(): Collection
+    {
+        return $this->favoris;
+    }
+
+    public function addFavori(Favoris $favori): self
+    {
+        if (!$this->favoris->contains($favori)) {
+            $this->favoris[] = $favori;
+            $favori->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFavori(Favoris $favori): self
+    {
+        if ($this->favoris->removeElement($favori)) {
+            // set the owning side to null (unless already changed)
+            if ($favori->getUser() === $this) {
+                $favori->setUser(null);
             }
         }
 

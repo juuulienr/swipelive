@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\Vendor;
 use App\Entity\Clip;
 use App\Entity\Live;
+use App\Entity\Favoris;
 use App\Entity\Category;
 use App\Entity\Message;
 use App\Entity\SecurityUser;
@@ -13,6 +14,7 @@ use App\Entity\Follow;
 use App\Entity\Product;
 use App\Entity\LiveProducts;
 use App\Entity\Upload;
+use App\Repository\FavorisRepository;
 use App\Repository\FollowRepository;
 use App\Repository\SecurityUserRepository;
 use App\Repository\VendorRepository;
@@ -61,6 +63,19 @@ class AccountAPIController extends Controller {
 
           $security = new SecurityUser();
           $security->setUser($user);
+          $security->setWifiIPAddress($param['wifiIPAddress']);
+          $security->setCarrierIPAddress($param['carrierIPAddress']);
+          $security->setConnection($param['connection']);
+
+          if ($param['device'] && $param['device'] != null) {
+            $security->setModel($param['device']['model']);
+            $security->setPlatform($param['device']['platform']);
+            $security->setUuid($param['device']['uuid']);
+            $security->setVersion($param['device']['version']);
+            $security->setManufacturer($param['device']['manufacturer']);
+            $security->setIsVirtual($param['device']['isVirtual']);
+            $security->setSerial($param['device']['serial']);
+          }
 
           $manager->persist($security);
           $manager->flush();
@@ -447,6 +462,53 @@ class AccountAPIController extends Controller {
       $manager->flush();
     }
 
+    return $this->json($this->getUser(), 200, [], [
+      'groups' => 'user:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
+  }
+
+
+  // /**
+  //  * Récupérer les favoris
+  //  *
+  //  * @Route("/user/api/favoris", name="user_api_favoris", methods={"GET"})
+  //  */
+  // public function followers(Request $request, ObjectManager $manager, UserRepository $userRepo) {
+  //   $followers = $userRepo->findUserFollowers($this->getUser());
+
+  //   return $this->json($followers, 200, [], [
+  //     'groups' => 'user:read', 
+  //     'circular_reference_limit' => 1, 
+  //     'circular_reference_handler' => function ($object) {
+  //       return $object->getId();
+  //     } 
+  //   ]);
+  // }
+
+
+  /**
+   * Ajouter/Enlever des favoris
+   *
+   * @Route("/user/api/favoris/{id}", name="user_api_favoris", methods={"GET"})
+   */
+  public function favoris(Product $product, Request $request, ObjectManager $manager, FavorisRepository $favorisRepo) {
+    $favoris = $favorisRepo->findOneBy(['user' => $this->getUser(), 'product' => $product ]);
+
+    if (!$favoris) {
+      $favoris = new Favoris();
+      $favoris->setUser($this->getUser());
+      $favoris->setProduct($product);
+      $manager->persist($favoris);
+    } else {
+      $manager->remove($favoris);
+    }
+
+    $manager->flush();
+      
     return $this->json($this->getUser(), 200, [], [
       'groups' => 'user:read', 
       'circular_reference_limit' => 1, 

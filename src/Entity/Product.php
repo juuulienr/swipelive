@@ -41,8 +41,11 @@ class Product
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="products", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      * @Groups("product:read")
+     * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("category:read")
      * @Groups("live:read")
+     * @Groups("order:read")
      */
     private $category;
 
@@ -172,6 +175,11 @@ class Product
      * @ORM\OneToMany(targetEntity=LineItem::class, mappedBy="product")
      */
     private $lineItems;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Favoris::class, mappedBy="product", orphanRemoval=true)
+     */
+    private $favoris;
     
 
     public function __construct() {
@@ -184,6 +192,7 @@ class Product
         $this->weightUnit = "kg";
         $this->archived = 0;
         $this->quantity = 0;
+        $this->favoris = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -487,6 +496,36 @@ class Product
     public function setWeightUnit(?string $weightUnit): self
     {
         $this->weightUnit = $weightUnit;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Favoris[]
+     */
+    public function getFavoris(): Collection
+    {
+        return $this->favoris;
+    }
+
+    public function addFavori(Favoris $favori): self
+    {
+        if (!$this->favoris->contains($favori)) {
+            $this->favoris[] = $favori;
+            $favori->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFavori(Favoris $favori): self
+    {
+        if ($this->favoris->removeElement($favori)) {
+            // set the owning side to null (unless already changed)
+            if ($favori->getProduct() === $this) {
+                $favori->setProduct(null);
+            }
+        }
 
         return $this;
     }
