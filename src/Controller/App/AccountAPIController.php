@@ -66,6 +66,8 @@ class AccountAPIController extends Controller {
           $security->setWifiIPAddress($param['wifiIPAddress']);
           $security->setCarrierIPAddress($param['carrierIPAddress']);
           $security->setConnection($param['connection']);
+          $security->setTimezone($param['timezone']);
+          $security->setLocale($param['locale']);
 
           if ($param['device'] && $param['device'] != null) {
             $security->setModel($param['device']['model']);
