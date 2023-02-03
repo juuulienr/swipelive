@@ -134,13 +134,7 @@ class APIController extends Controller {
   public function categories(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
     $categories = $categoryRepo->findAll();
 
-    return $this->json($categories, 200, [], [
-      'groups' => 'category:read', 
-      'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
-    ]);
+    return $this->json($categories, 200, [], ['groups' => 'category:read']);
   }
 
 

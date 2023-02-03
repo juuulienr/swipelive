@@ -41,11 +41,8 @@ class Product
      * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="products", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      * @Groups("product:read")
-     * @Groups("user:read")
      * @Groups("clip:read")
-     * @Groups("category:read")
      * @Groups("live:read")
-     * @Groups("order:read")
      */
     private $category;
 

@@ -18,24 +18,18 @@ class Category
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups("product:read")
+     * @Groups("category:read")
      * @Groups("user:read")
-     * @Groups("clip:read")
-     * @Groups("category:read")
-     * @Groups("live:read")
-     * @Groups("order:read")
-     * @Groups("category:read")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("category:read")
      * @Groups("product:read")
      * @Groups("user:read")
-     * @Groups("clip:read")
-     * @Groups("category:read")
      * @Groups("live:read")
-     * @Groups("order:read")
-     * @Groups("category:read")
+     * @Groups("clip:read")
      */
     private $name;
 
