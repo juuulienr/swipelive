@@ -90,6 +90,26 @@ class APIController extends Controller {
   }
 
 
+
+  /**
+   * Afficher produits tendances
+   *
+   * @Route("/api/products/trending", name="api_products_trending", methods={"GET"})
+   */
+  public function productTrending(Request $request, ObjectManager $manager, ProductRepository $productRepo)
+  {
+    $products = $productRepo->findBy([ "archived" => false ]);
+
+    return $this->json($products, 200, [], [
+      'groups' => 'product:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
+  }
+
+
   /**
    * Afficher le profil
    *
