@@ -42,6 +42,12 @@ class APIController extends Controller {
     $clips = $clipRepo->findByClip($vendor);
     $array = [];
 
+    try {
+      $this->functionFailsForSure();
+    } catch (\Throwable $exception) {
+      \Sentry\captureException($exception);
+    }
+
     if ($lives) {
     	foreach ($lives as $live) {
     		$array[] = [ "type" => "live", "value" => $serializer->serialize($live, "json", [

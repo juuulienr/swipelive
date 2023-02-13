@@ -158,7 +158,6 @@ class WebhookController extends Controller {
    */
   public function sendcloud(Request $request, ObjectManager $manager, OrderRepository $orderRepo, OrderStatusRepository $statusRepo) {
     $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyException(new Exception($result["action"]));
 
     // update parcel status
     if ($result["action"] == "parcel_status_changed") {
