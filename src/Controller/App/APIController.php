@@ -42,11 +42,9 @@ class APIController extends Controller {
     $clips = $clipRepo->findByClip($vendor);
     $array = [];
 
-    try {
-      $this->functionFailsForSure();
-    } catch (\Throwable $exception) {
-      \Sentry\captureException($exception);
-    }
+    \Sentry\configureScope(function (\Sentry\State\Scope $scope): void {
+        $scope->setUser(['email' => $this->getUser()->getEmail() ]);
+    });
 
     if ($lives) {
     	foreach ($lives as $live) {
@@ -98,13 +96,32 @@ class APIController extends Controller {
 
 
   /**
+   * Afficher les produits 
+   *
+   * @Route("/api/products/all", name="api_products_all", methods={"GET"})
+   */
+  public function allProducts(Request $request, ObjectManager $manager, ProductRepository $productRepo)
+  {
+    $products = $productRepo->findBy([ "archived" => false ]);
+
+    return $this->json($products, 200, [], [
+      'groups' => 'product:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
+  }
+
+
+  /**
    * Afficher produits tendances
    *
    * @Route("/api/products/trending", name="api_products_trending", methods={"GET"})
    */
   public function productTrending(Request $request, ObjectManager $manager, ProductRepository $productRepo)
   {
-    $products = $productRepo->findBy([ "archived" => false ]);
+    $products = $productRepo->findBy([ "archived" => false ], [], 20);
 
     return $this->json($products, 200, [], [
       'groups' => 'product:read', 

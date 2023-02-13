@@ -38,6 +38,14 @@ class WebhookController extends Controller {
    */
   public function bambuser(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager, LiveProductsRepository $liveProductRepo) {
     $result = json_decode($request->getContent(), true);
+    
+     \Sentry\captureException("Bambuser");
+
+    // try {
+    //   $this->functionFailsForSure();
+    // } catch (\Throwable $exception) {
+    //   \Sentry\captureException($exception);
+    // }
 
     // broadcast
     if ($result["collection"] == "broadcast") {
