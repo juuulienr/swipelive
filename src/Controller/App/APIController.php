@@ -80,17 +80,45 @@ class APIController extends Controller {
    *
    * @Route("/user/api/clips/trending", name="api_clips_trending", methods={"GET"})
    */
-  public function trending(Request $request, ObjectManager $manager, ClipRepository $clipRepo)
+  public function trending(Request $request, ObjectManager $manager, ClipRepository $clipRepo, SerializerInterface $serializer)
   {
-    $clips = $clipRepo->findTrendingClips($this->getUser()->getVendor());
+    $vendor = $this->getUser()->getVendor();
+    $clips = $clipRepo->findTrendingClips($vendor);
 
     return $this->json($clips, 200, [], [
-    	'groups' => 'clip:read', 
-    	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => function ($object) {
-    		return $object->getId();
-    	} 
+      'groups' => 'clip:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
     ]);
+  }
+
+
+  /**
+   * Afficher clips tendances feed
+   *
+   * @Route("/user/api/clips/trending/feed", name="api_clips_trending_feed", methods={"GET"})
+   */
+  public function trendingFeed(Request $request, ObjectManager $manager, ClipRepository $clipRepo, SerializerInterface $serializer)
+  {
+    $vendor = $this->getUser()->getVendor();
+    $clips = $clipRepo->findTrendingClips($vendor);
+    $array = [];
+
+    if ($clips) {
+      foreach ($clips as $clip) {
+        $array[] = [ "type" => "clip", "value" => $serializer->serialize($clip, "json", [
+          'groups' => 'clip:read', 
+          'circular_reference_limit' => 1, 
+          'circular_reference_handler' => function ($object) {
+            return $object->getId();
+          } 
+        ])];
+      } 
+    }
+
+    return $this->json($array);
   }
 
 
@@ -117,7 +145,7 @@ class APIController extends Controller {
   /**
    * Afficher produits tendances
    *
-   * @Route("/api/products/trending", name="api_products_trending", methods={"GET"})
+   * @Route("/user/api/products/trending", name="api_products_trending", methods={"GET"})
    */
   public function productTrending(Request $request, ObjectManager $manager, ProductRepository $productRepo)
   {
@@ -155,16 +183,23 @@ class APIController extends Controller {
    *
    * @Route("/api/profile/{id}/clips", name="api_profile_clips", methods={"GET"})
    */
-  public function profileClips(User $user, Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
+  public function profileClips(User $user, Request $request, ObjectManager $manager, ClipRepository $clipRepo, SerializerInterface $serializer) {
     $clips = $clipRepo->retrieveClips($user->getVendor());
+    $array = [];
 
-    return $this->json($clips, 200, [], [
-    	'groups' => 'clip:read', 
-    	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => function ($object) {
-    		return $object->getId();
-    	} 
-    ]);
+    if ($clips) {
+      foreach ($clips as $clip) {
+        $array[] = [ "type" => "clip", "value" => $serializer->serialize($clip, "json", [
+          'groups' => 'clip:read', 
+          'circular_reference_limit' => 1, 
+          'circular_reference_handler' => function ($object) {
+            return $object->getId();
+          } 
+        ])];
+      } 
+    }
+
+    return $this->json($array);
   }
 
 
