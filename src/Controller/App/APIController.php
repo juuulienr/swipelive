@@ -96,6 +96,26 @@ class APIController extends Controller {
 
 
   /**
+   * Afficher les nouveaux clips
+   *
+   * @Route("/user/api/clips/latest", name="api_clips_latest", methods={"GET"})
+   */
+  public function latest(Request $request, ObjectManager $manager, ClipRepository $clipRepo, SerializerInterface $serializer)
+  {
+    $vendor = $this->getUser()->getVendor();
+    $clips = $clipRepo->findLatestClips($vendor);
+
+    return $this->json($clips, 200, [], [
+      'groups' => 'clip:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
+  }
+
+
+  /**
    * Afficher clips tendances feed
    *
    * @Route("/user/api/clips/trending/feed", name="api_clips_trending_feed", methods={"GET"})
@@ -104,6 +124,33 @@ class APIController extends Controller {
   {
     $vendor = $this->getUser()->getVendor();
     $clips = $clipRepo->findTrendingClips($vendor);
+    $array = [];
+
+    if ($clips) {
+      foreach ($clips as $clip) {
+        $array[] = [ "type" => "clip", "value" => $serializer->serialize($clip, "json", [
+          'groups' => 'clip:read', 
+          'circular_reference_limit' => 1, 
+          'circular_reference_handler' => function ($object) {
+            return $object->getId();
+          } 
+        ])];
+      } 
+    }
+
+    return $this->json($array);
+  }
+
+
+  /**
+   * Afficher les nouveaux clips dans le feed
+   *
+   * @Route("/user/api/clips/latest/feed", name="api_clips_latest_feed", methods={"GET"})
+   */
+  public function latestFeed(Request $request, ObjectManager $manager, ClipRepository $clipRepo, SerializerInterface $serializer)
+  {
+    $vendor = $this->getUser()->getVendor();
+    $clips = $clipRepo->findLastestClips($vendor);
     $array = [];
 
     if ($clips) {

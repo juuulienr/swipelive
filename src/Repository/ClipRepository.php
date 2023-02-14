@@ -49,6 +49,23 @@ class ClipRepository extends ServiceEntityRepository
       ->setParameter('vendor', $vendor);
     }
 
+    return $query->orderBy('c.createdAt', 'ASC')
+    ->getQuery()
+    ->getResult();
+  }
+
+
+  public function findLatestClips($vendor){
+    $query = $this->createQueryBuilder('c')
+    ->join('c.vendor', 'v')
+    ->andWhere('c.status = :status')
+    ->setParameter('status', "available");
+
+    if ($vendor) {
+      $query->andWhere('v.id != :vendor')
+      ->setParameter('vendor', $vendor);
+    }
+
     return $query->orderBy('c.createdAt', 'DESC')
     ->getQuery()
     ->getResult();
