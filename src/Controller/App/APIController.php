@@ -263,28 +263,6 @@ class APIController extends Controller {
   }
 
 
-  /**
-   * Récupérer une catégorie
-   *
-   * @Route("/api/categories/{id}", name="api_category", methods={"GET"})
-   */
-  public function category(Category $category, Request $request, ObjectManager $manager) {
-    return $this->json($category, 200, [], ['groups' => 'category:read']);
-  }
-
-
-  /**
-   * Afficher les produits dans une catégorie
-   *
-   * @Route("/api/categories/{id}/products", name="api_category_products", methods={"GET"})
-   */
-  public function productsCategory(Category $category, Request $request, ObjectManager $manager, ProductRepository $productRepo) {
-    $products = $productRepo->findBy([ "category" => $category, "archived" => false ]);
-
-    return $this->json($products, 200, [], ['groups' => 'product:read']);
-  }
-
-
 
   /**
    * Modifier image du profil
