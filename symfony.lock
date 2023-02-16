@@ -1,7 +1,4 @@
 {
-    "cocur/slugify": {
-        "version": "v3.1"
-    },
     "composer/package-versions-deprecated": {
         "version": "1.11.99.5"
     },
@@ -103,9 +100,6 @@
     },
     "guzzlehttp/psr7": {
         "version": "1.6.1"
-    },
-    "intervention/image": {
-        "version": "2.5.1"
     },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"

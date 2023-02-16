@@ -5,12 +5,14 @@ namespace App\Controller\App;
 use App\Entity\Clip;
 use App\Entity\Live;
 use App\Entity\User;
+use App\Entity\Promotion;
 use App\Entity\Vendor;
 use App\Entity\Message;
 use App\Entity\Product;
 use App\Entity\Category;
 use App\Repository\ClipRepository;
 use App\Repository\CategoryRepository;
+use App\Repository\PromotionRepository;
 use App\Repository\ProductRepository;
 use App\Repository\LiveRepository;
 use App\Repository\UserRepository;
@@ -112,6 +114,85 @@ class APIController extends Controller {
         return $object->getId();
       } 
     ]);
+  }
+
+
+  /**
+   * Afficher les promotions
+   *
+   * @Route("/user/api/promotions", name="user_api_promotions", methods={"GET"})
+   */
+  public function promotions(Request $request, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer)
+  {
+    $promotions = $promotionRepo->findByVendor($this->getUser()->getVendor());
+    
+    return $this->json($promotions, 200, [], ['groups' => 'promotion:read'], 200);
+  }
+
+
+  /**
+   * Supprimer une promotion
+   *
+   * @Route("/user/api/promotion/delete/{id}", name="user_api_promotions_delete", methods={"GET"})
+   */
+  public function deletePromotion(Promotion $promotion, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer)
+  {
+    if ($promotion) {
+      $manager->remove($promotion);
+      $manager->flush();
+    }
+    
+    return $this->json(true, 200);
+  }
+
+  /**
+   * Ajouter une promotion
+   *
+   * @Route("/user/api/promotion/add", name="user_api_promotions_add", methods={"POST"})
+   */
+  public function addPromotion(Request $request, ObjectManager $manager, SerializerInterface $serializer, PromotionRepository $promotionRepo) {
+    if ($json = $request->getContent()) {
+      $promotions = $promotionRepo->findByVendor($this->getUser()->getVendor());
+
+      foreach ($promotions as $promo) {
+        $promo->setIsActive(false);
+        $manager->flush();
+      }
+
+      $promotion = $serializer->deserialize($json, Promotion::class, "json");
+      $manager->persist($promotion);
+      $manager->flush();
+
+      return $this->json($promotion, 200, [], ['groups' => 'promotion:read'], 200);
+    }
+
+    return $this->json([ "error" => "Une erreur est survenue"], 404);
+  }
+
+
+  /**
+   * Activer/desactiver une promotion
+   *
+   * @Route("/user/api/promotion/activate/{id}", name="user_api_promotions_activate", methods={"GET"})
+   */
+  public function activate(Promotion $promotion, Request $request, ObjectManager $manager, PromotionRepository $promotionRepo) {
+    $promotions = $promotionRepo->findByVendor($this->getUser()->getVendor());
+
+    if ($promotion->getIsActive() == true) {
+      $promotion->setIsActive(false);
+      $manager->flush();
+    } else {
+      if ($promotions) {
+        foreach ($promotions as $promo) {
+          $promo->setIsActive(false);
+          $manager->flush();
+        }
+      }
+      $promotion->setIsActive(true);
+      $manager->flush();
+    }
+
+    return $this->json(true, 200);
   }
 
 

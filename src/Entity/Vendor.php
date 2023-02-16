@@ -174,6 +174,15 @@ class Vendor
      */
     private $countryCode;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Promotion::class, mappedBy="vendor", orphanRemoval=true)
+     * @ORM\OrderBy({"createdAt" = "DESC"})
+     * @Groups("clip:read")
+     * @Groups("live:read")
+     * @Groups("user:read")
+     */
+    private $promotions;
+
     
     public function __construct()
     {
@@ -188,6 +197,7 @@ class Vendor
         $this->available = "0.00";
         $this->verified = false;
         $this->countryCode = "FR";
+        $this->promotions = new ArrayCollection();
     }
     
 
@@ -565,6 +575,36 @@ class Vendor
     public function setCountryCode(?string $countryCode): self
     {
         $this->countryCode = $countryCode;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Promotion[]
+     */
+    public function getPromotions(): Collection
+    {
+        return $this->promotions;
+    }
+
+    public function addPromotion(Promotion $promotion): self
+    {
+        if (!$this->promotions->contains($promotion)) {
+            $this->promotions[] = $promotion;
+            $promotion->setVendor($this);
+        }
+
+        return $this;
+    }
+
+    public function removePromotion(Promotion $promotion): self
+    {
+        if ($this->promotions->removeElement($promotion)) {
+            // set the owning side to null (unless already changed)
+            if ($promotion->getVendor() === $this) {
+                $promotion->setVendor(null);
+            }
+        }
 
         return $this;
     }
