@@ -19,6 +19,23 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+
+    public function findTrendingProducts($vendor){
+      $query = $this->createQueryBuilder('p')
+      ->join('p.vendor', 'v')
+      ->andWhere('p.archived = :archived')
+      ->setParameter('archived', false);
+
+      if ($vendor) {
+        $query->andWhere('v.id != :vendor')
+        ->setParameter('vendor', $vendor);
+      }
+
+      return $query->getQuery()
+      ->getResult();
+    }
+
+
     // /**
     //  * @return Product[] Returns an array of Product objects
     //  */

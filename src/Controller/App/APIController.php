@@ -277,7 +277,7 @@ class APIController extends Controller {
    */
   public function productTrending(Request $request, ObjectManager $manager, ProductRepository $productRepo)
   {
-    $products = $productRepo->findBy([ "archived" => false ], [], 20);
+    $products = $productRepo->findTrendingProducts($this->getUser()->getVendor());
 
     return $this->json($products, 200, [], [
       'groups' => 'product:read', 
