@@ -231,7 +231,7 @@ class APIController extends Controller {
   public function latestFeed(Request $request, ObjectManager $manager, ClipRepository $clipRepo, SerializerInterface $serializer)
   {
     $vendor = $this->getUser()->getVendor();
-    $clips = $clipRepo->findLastestClips($vendor);
+    $clips = $clipRepo->findLatestClips($vendor);
     $array = [];
 
     if ($clips) {

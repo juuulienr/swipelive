@@ -90,7 +90,7 @@ class AccountAPIController extends Controller {
 			    	} 
 			    ]);
         } else {
-          return $this->json("Un compte est associé à cette adresse mail", 404);
+          return $this->json("Un compte existe avec cette adresse mail", 404);
         }
       }
     }
