@@ -62,6 +62,7 @@ class Product
      * @Groups("live:read")
      * @Groups("clip:read")
      * @Groups("category:read")
+     * @Groups("user:read")
      */
     private $description;
 

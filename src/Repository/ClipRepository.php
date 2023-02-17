@@ -37,7 +37,6 @@ class ClipRepository extends ServiceEntityRepository
   }
 
 
-
   public function findTrendingClips($vendor){
     $query = $this->createQueryBuilder('c')
     ->join('c.vendor', 'v')
