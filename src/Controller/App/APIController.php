@@ -160,6 +160,7 @@ class APIController extends Controller {
       }
 
       $promotion = $serializer->deserialize($json, Promotion::class, "json");
+      $promotion->setVendor($this->getUser()->getVendor());
       $manager->persist($promotion);
       $manager->flush();
 

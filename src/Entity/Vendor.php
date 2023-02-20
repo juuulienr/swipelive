@@ -49,6 +49,7 @@ class Vendor
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("user:read")
      * @Groups("clip:read")
+     * @Groups("live:read")
      * @Groups("order:read")
      */
     private $company;
@@ -66,6 +67,7 @@ class Vendor
      * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("live:read")
      */
     private $products;
 
@@ -73,6 +75,8 @@ class Vendor
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("user:read")
      * @Groups("product:read")
+     * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $businessType;
 
