@@ -39,7 +39,20 @@ class OrderAPIController extends Controller {
    * @Route("/user/api/orders", name="user_api_orders", methods={"GET"})
    */
   public function orders(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
-    $orders = $orderRepo->findByVendorOrBuyer($this->getUser());
+    $orders = $orderRepo->findByVendor($this->getUser()->getVendor());
+
+    return $this->json($orders, 200, [], [
+      'groups' => 'order:read'
+    ]);
+  }
+
+  /**
+   * Récupérer les achats
+   *
+   * @Route("/user/api/purchases", name="user_api_purchases", methods={"GET"})
+   */
+  public function purchases(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+    $orders = $orderRepo->findByBuyer($this->getUser());
 
     return $this->json($orders, 200, [], [
       'groups' => 'order:read'

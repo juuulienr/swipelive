@@ -152,22 +152,28 @@ class APIController extends Controller {
    */
   public function addPromotion(Request $request, ObjectManager $manager, SerializerInterface $serializer, PromotionRepository $promotionRepo) {
     if ($json = $request->getContent()) {
-      $promotions = $promotionRepo->findByVendor($this->getUser()->getVendor());
+      $vendor = $this->getUser()->getVendor();
+      $promotions = $promotionRepo->findByVendor($vendor);
+      $promotion = $serializer->deserialize($json, Promotion::class, "json");
+      $exist = $promotionRepo->findOneBy([ "title" => $promotion->getTitle(), "vendor" => $vendor ]);
+
+      if ($exist) {
+        return $this->json($exist, 404);
+      }
+
+      $promotion->setVendor($vendor);
+      $manager->persist($promotion);
+      $manager->flush();
 
       foreach ($promotions as $promo) {
         $promo->setIsActive(false);
         $manager->flush();
       }
 
-      $promotion = $serializer->deserialize($json, Promotion::class, "json");
-      $promotion->setVendor($this->getUser()->getVendor());
-      $manager->persist($promotion);
-      $manager->flush();
-
       return $this->json($promotion, 200, [], ['groups' => 'promotion:read'], 200);
     }
 
-    return $this->json([ "error" => "Une erreur est survenue"], 404);
+    return $this->json("Une erreur est survenue", 404);
   }
 
 
