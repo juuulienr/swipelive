@@ -87,11 +87,15 @@ class Discussion
 
   /**
    * @ORM\Column(type="boolean", nullable=true)
+   * @Groups("discussion:read")
+   * @Groups("user:read")
    */
   private $archive;
 
   /**
    * @ORM\Column(type="boolean", nullable=true)
+   * @Groups("discussion:read")
+   * @Groups("user:read")
    */
   private $archiveVendor;
 
