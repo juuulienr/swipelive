@@ -38,18 +38,21 @@ class Clip
     /**
      * @ORM\Column(type="integer")
      * @Groups("clip:read")
+     * @Groups("user:read")
      */
     private $start;
 
     /**
      * @ORM\Column(type="integer")
      * @Groups("clip:read")
+     * @Groups("user:read")
      */
     private $end;
 
     /**
      * @ORM\Column(type="integer")
      * @Groups("clip:read")
+     * @Groups("user:read")
      */
     private $duration;
 
@@ -77,6 +80,7 @@ class Clip
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("user:read")
      */
     private $broadcastId;
 
@@ -90,6 +94,7 @@ class Clip
     /**
      * @ORM\Column(type="datetime", nullable=true)
      * @Groups("clip:read")
+     * @Groups("user:read")
      */
     private $createdAt;
 
