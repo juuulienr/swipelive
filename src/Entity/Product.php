@@ -117,16 +117,6 @@ class Product
     private $liveProducts;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
-     * @Groups("product:read")
-     * @Groups("user:read")
-     * @Groups("clip:read")
-     * @Groups("category:read")
-     * @Groups("live:read")
-     */
-    private $archived;
-
-    /**
      * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
      * @Groups("product:read")
      * @Groups("user:read")
@@ -187,10 +177,9 @@ class Product
         $this->options = new ArrayCollection();
         $this->variants = new ArrayCollection();
         $this->lineItems = new ArrayCollection();
-        $this->weightUnit = "kg";
-        $this->archived = 0;
-        $this->quantity = 0;
         $this->favoris = new ArrayCollection();
+        $this->weightUnit = "kg";
+        $this->quantity = 0;
     }
 
     public function getId(): ?int
@@ -368,18 +357,6 @@ class Product
                 $liveProduct->setProduct(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getArchived(): ?bool
-    {
-        return $this->archived;
-    }
-
-    public function setArchived(?bool $archived): self
-    {
-        $this->archived = $archived;
 
         return $this;
     }

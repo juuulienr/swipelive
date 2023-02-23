@@ -16,43 +16,49 @@ class LineItem
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $title;
 
     /**
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="lineItems")
-     * @ORM\JoinColumn(nullable=false)
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $product;
 
     /**
      * @ORM\ManyToOne(targetEntity=Variant::class, inversedBy="lineItems")
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $variant;
 
     /**
      * @ORM\Column(type="integer")
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $quantity;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $price;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $total;
 

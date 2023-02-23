@@ -16,6 +16,7 @@ use App\Entity\BankAccount;
 use App\Repository\ClipRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
+use App\Repository\BankAccountRepository;
 use App\Repository\LiveRepository;
 use App\Repository\VariantRepository;
 use App\Repository\LiveProductsRepository;
@@ -35,7 +36,7 @@ class WithdrawAPIController extends Controller {
   /**
    * @Route("/user/api/bank/add", name="user_api_bank_add")
    */
-  public function addBank(Request $request, ObjectManager $manager){
+  public function addBank(Request $request, ObjectManager $manager, BankAccountRepository $bankRepo){
   	if ($json = $request->getContent()) {
   		$param = json_decode($json, true);
 
@@ -43,25 +44,32 @@ class WithdrawAPIController extends Controller {
   			$vendor = $this->getUser()->getVendor();
   			$oldBank = $bankRepo->findOneByVendor($vendor);
 
-				if ($param["number"]) {
-					$bank = new BankAccount();
-					$bank->setBankId($result->id);
-					$bank->setLast4($result->last4);
-					$bank->setCountry("FR");
-					$bank->setCurrency("eur");
-					$bank->setNumber($param["number"]);
-					$bank->setVendor($vendor);
-					
-					$manager->persist($bank);
+				$bank = new BankAccount();
+				$bank->setLast4($param["last4"]);
+				$bank->setCountryCode($param["countryCode"]);
+				$bank->setCurrency("EUR");
+				$bank->setNumber($param["number"]);
+        $bank->setFirstname($param["firstname"]);
+        $bank->setLastname($param["lastname"]);
+        $bank->setBusinessName($param["businessName"]);
+				$bank->setVendor($vendor);
+        // $bank->setBankId($result->id);
+				
+				$manager->persist($bank);
+				$manager->flush();
+
+				if ($oldBank) {
+					$manager->remove($oldBank);
 					$manager->flush();
+				}
 
-					if ($oldBank) {
-						$manager->remove($oldBank);
-						$manager->flush();
-					}
-
-					return $this->json(true, 200);
-	  		}
+        return $this->json($this->getUser(), 200, [], [
+          'groups' => 'user:read', 
+          'circular_reference_limit' => 1, 
+          'circular_reference_handler' => function ($object) {
+            return $object->getId();
+          } 
+        ]);
 	  	}
   	}
 
@@ -70,34 +78,45 @@ class WithdrawAPIController extends Controller {
 
 
   /**
-   * @Route("/user/api/withdraw", name="user_api_withdraw")
-   */
-  public function withdraw(Request $request, ObjectManager $manager){
-  	$user = $this->getUser();
+  * @Route("/user/api/withdraw", name="user_api_withdraw")
+  */
+  public function withdraw(Request $request, ObjectManager $manager, BankAccountRepository $bankRepo){
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
 
-  	if (sizeof($user->getBankAccounts()->toArray()) > 0) {
-  		// if ($available == ($user->getAvailable() * 100)) {
-  		// 	dump("identique");
-  		// } else {
-  		// 	dump($available);
-  		// 	dump($user->getAvailable() * 100);
-  		// }
+      if ($param) {
+        $withdrawAmount = $param["withdrawAmount"];
+        $vendor = $this->getUser()->getVendor();
+        $bank = $bankRepo->findOneByVendor($vendor);
 
-			$user->setAvailable("0.00");
+        if ($bank) {
+          if ($vendor->getAvailable() >= $withdrawAmount) {
+            $vendor->setAvailable($vendor->getAvailable() - $withdrawAmount);
 
-      // check amount payout
-  		$withdraw = new Withdraw();
-  		$withdraw->setAmount($user->getAvailable());
-  		$withdraw->setStatus("completed");
-  		$withdraw->setLast4($user->getBankAccounts()[0]->getLast4());
-  		$withdraw->setVendor($user);
+            // check amount payout
+            $withdraw = new Withdraw();
+            $withdraw->setAmount($withdrawAmount);
+            $withdraw->setStatus("completed");
+            $withdraw->setLast4($bank->getLast4());
+            $withdraw->setVendor($vendor);
 
-  		$manager->persist($withdraw);
-  		$manager->flush();
+            $manager->persist($withdraw);
+            $manager->flush();
+    
+            return $this->json($this->getUser(), 200, [], [
+              'groups' => 'user:read', 
+              'circular_reference_limit' => 1, 
+              'circular_reference_handler' => function ($object) {
+                return $object->getId();
+              } 
+            ]);
+          } else {
+            return $this->json("Le montant demandé est supérieur à l'argent disponible", 404);
+          }
+        }
+      }
+    }
 
-  		return $this->json(true, 200);
-  	}
-
-  	return $this->json(false, 404);
+    return $this->json(false, 404);
   }
 }

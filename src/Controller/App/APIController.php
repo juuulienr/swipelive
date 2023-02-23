@@ -80,139 +80,73 @@ class APIController extends Controller {
   /**
    * Afficher clips tendances
    *
-   * @Route("/user/api/clips/trending", name="api_clips_trending", methods={"GET"})
+   * @Route("/user/api/home", name="api_home", methods={"GET"})
    */
-  public function trending(Request $request, ObjectManager $manager, ClipRepository $clipRepo, SerializerInterface $serializer)
+  public function home(Request $request, ObjectManager $manager, ClipRepository $clipRepo, ProductRepository $productRepo, CategoryRepository $categoryRepo, SerializerInterface $serializer)
   {
     $vendor = $this->getUser()->getVendor();
-    $clips = $clipRepo->findTrendingClips($vendor);
+    $trendingClips = $clipRepo->findTrendingClips($vendor);
+    $latestClips = $clipRepo->findLatestClips($vendor);
+    $trendingProducts = $productRepo->findTrendingProducts($vendor);
+    $allProducts = $productRepo->findAll();
+    $categories = $categoryRepo->findAll();
+    $array = [];
 
-    return $this->json($clips, 200, [], [
+    $array["trendingClips"] = $serializer->serialize($trendingClips, "json", [
       'groups' => 'clip:read', 
       'circular_reference_limit' => 1, 
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
     ]);
-  }
 
-
-  /**
-   * Afficher les nouveaux clips
-   *
-   * @Route("/user/api/clips/latest", name="api_clips_latest", methods={"GET"})
-   */
-  public function latest(Request $request, ObjectManager $manager, ClipRepository $clipRepo, SerializerInterface $serializer)
-  {
-    $vendor = $this->getUser()->getVendor();
-    $clips = $clipRepo->findLatestClips($vendor);
-
-    return $this->json($clips, 200, [], [
+    $array["latestClips"] = $serializer->serialize($latestClips, "json", [
       'groups' => 'clip:read', 
       'circular_reference_limit' => 1, 
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
     ]);
-  }
 
-
-  /**
-   * Afficher les promotions
-   *
-   * @Route("/user/api/promotions", name="user_api_promotions", methods={"GET"})
-   */
-  public function promotions(Request $request, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer)
-  {
-    $promotions = $promotionRepo->findByVendor($this->getUser()->getVendor());
-    
-    return $this->json($promotions, 200, [], ['groups' => 'promotion:read'], 200);
-  }
-
-
-  /**
-   * Supprimer une promotion
-   *
-   * @Route("/user/api/promotion/delete/{id}", name="user_api_promotions_delete", methods={"GET"})
-   */
-  public function deletePromotion(Promotion $promotion, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer)
-  {
-    if ($promotion) {
-      $manager->remove($promotion);
-      $manager->flush();
-    }
-    
-    return $this->json($this->getUser(), 200, [], [
-      'groups' => 'user:read', 
+    $array["allProducts"] = $serializer->serialize($allProducts, "json", [
+      'groups' => 'product:read', 
       'circular_reference_limit' => 1, 
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
     ]);
-  }
 
-  /**
-   * Ajouter une promotion
-   *
-   * @Route("/user/api/promotion/add", name="user_api_promotions_add", methods={"POST"})
-   */
-  public function addPromotion(Request $request, ObjectManager $manager, SerializerInterface $serializer, PromotionRepository $promotionRepo) {
-    if ($json = $request->getContent()) {
-      $vendor = $this->getUser()->getVendor();
-      $promotions = $promotionRepo->findByVendor($vendor);
-      $promotion = $serializer->deserialize($json, Promotion::class, "json");
-      $exist = $promotionRepo->findOneBy([ "title" => $promotion->getTitle(), "vendor" => $vendor ]);
+    $array["trendingProducts"] = $serializer->serialize($trendingProducts, "json", [
+      'groups' => 'product:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
 
-      if ($exist) {
-        return $this->json($exist, 404);
-      }
+    $array["categories"] = $serializer->serialize($categories, "json", [
+      'groups' => 'category:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
 
-      $promotion->setVendor($vendor);
-      $manager->persist($promotion);
-      $manager->flush();
-
-      foreach ($promotions as $promo) {
-        $promo->setIsActive(false);
-        $manager->flush();
-      }
-
-      return $this->json($this->getUser(), 200, [], [
-        'groups' => 'user:read', 
-        'circular_reference_limit' => 1, 
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
-      ]);
-    }
-
-    return $this->json("Une erreur est survenue", 404);
+    return $this->json($array);
   }
 
 
   /**
-   * Activer/desactiver une promotion
+   * Afficher les produits 
    *
-   * @Route("/user/api/promotion/activate/{id}", name="user_api_promotions_activate", methods={"GET"})
+   * @Route("/api/products/all", name="api_products_all", methods={"GET"})
    */
-  public function activate(Promotion $promotion, Request $request, ObjectManager $manager, PromotionRepository $promotionRepo) {
-    $promotions = $promotionRepo->findByVendor($this->getUser()->getVendor());
+  public function allProducts(Request $request, ObjectManager $manager, ProductRepository $productRepo)
+  {
+    $products = $productRepo->findAll();
 
-    if ($promotion->getIsActive() == true) {
-      $promotion->setIsActive(false);
-      $manager->flush();
-    } else {
-      if ($promotions) {
-        foreach ($promotions as $promo) {
-          $promo->setIsActive(false);
-          $manager->flush();
-        }
-      }
-      $promotion->setIsActive(true);
-      $manager->flush();
-    }
-
-    return $this->json($this->getUser(), 200, [], [
-      'groups' => 'user:read', 
+    return $this->json($products, 200, [], [
+      'groups' => 'product:read', 
       'circular_reference_limit' => 1, 
       'circular_reference_handler' => function ($object) {
         return $object->getId();
@@ -274,44 +208,6 @@ class APIController extends Controller {
     return $this->json($array);
   }
 
-
-
-  /**
-   * Afficher les produits 
-   *
-   * @Route("/api/products/all", name="api_products_all", methods={"GET"})
-   */
-  public function allProducts(Request $request, ObjectManager $manager, ProductRepository $productRepo)
-  {
-    $products = $productRepo->findBy([ "archived" => false ]);
-
-    return $this->json($products, 200, [], [
-      'groups' => 'product:read', 
-      'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
-    ]);
-  }
-
-
-  /**
-   * Afficher produits tendances
-   *
-   * @Route("/user/api/products/trending", name="api_products_trending", methods={"GET"})
-   */
-  public function productTrending(Request $request, ObjectManager $manager, ProductRepository $productRepo)
-  {
-    $products = $productRepo->findTrendingProducts($this->getUser()->getVendor());
-
-    return $this->json($products, 200, [], [
-      'groups' => 'product:read', 
-      'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
-    ]);
-  }
 
 
   /**

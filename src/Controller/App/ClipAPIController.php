@@ -148,9 +148,6 @@ class ClipAPIController extends Controller {
       $manager->flush();
   	}
 
-    $clips = $clipRepo->findByVendor($this->getUser()->getVendor());
-
-    
     return $this->json($this->getUser(), 200, [], [
       'groups' => 'user:read', 
       'circular_reference_limit' => 1, 

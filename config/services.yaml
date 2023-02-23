@@ -6,6 +6,7 @@
 parameters:
     locale: 'fr'
     uploads_directory: '%kernel.project_dir%/public/uploads'
+    environment: '%env(APP_ENV)%' # from .env file
 
 
 services:

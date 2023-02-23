@@ -32,6 +32,7 @@ class Order
     /**
      * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="sales")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("user:read")
      * @Groups("order:read")
      */
     private $vendor;
@@ -67,6 +68,7 @@ class Order
     /**
      * @ORM\OneToMany(targetEntity=LineItem::class, mappedBy="orderId")
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $lineItems;
 
@@ -92,6 +94,7 @@ class Order
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="purchases")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("user:read")
      * @Groups("order:read")
      */
     private $buyer;

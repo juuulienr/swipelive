@@ -13,6 +13,8 @@ use App\Entity\Product;
 use App\Entity\LiveProducts;
 use App\Entity\Upload;
 use App\Repository\FollowRepository;
+use App\Repository\LiveProductsRepository;
+use App\Repository\LineItemRepository;
 use App\Repository\VendorRepository;
 use App\Repository\ClipRepository;
 use App\Repository\ProductRepository;
@@ -41,7 +43,7 @@ class ProductAPIController extends Controller {
    * @Route("/user/api/products", name="user_api_products", methods={"GET"})
    */
   public function products(Request $request, ObjectManager $manager, ProductRepository $productRepo) {
-    $products = $productRepo->findBy([ "vendor" => $this->getUser()->getVendor(), "archived" => false ], [ "title" => "ASC" ]);
+    $products = $productRepo->findBy([ "vendor" => $this->getUser()->getVendor() ], [ "title" => "ASC" ]);
 
     return $this->json($products, 200, [], ['groups' => 'product:read']);
   }
@@ -103,9 +105,126 @@ class ProductAPIController extends Controller {
    *
    * @Route("/user/api/product/delete/{id}", name="user_api_product_delete", methods={"GET"})
    */
-  public function deleteProduct(Product $product, Request $request, ObjectManager $manager) {
+  public function deleteProduct(Product $product, Request $request, LiveProductsRepository $liveProductRepo, ClipRepository $clipRepo, LineItemRepository $lineItemRepo, ObjectManager $manager) {
     if ($product) {
-      $product->setArchived(true);
+      $clips = $clipRepo->findByProduct($product);
+      $env = $this->getParameter('environment');
+
+      if ($clips) {
+        foreach ($clips as $clip) {
+          $live = $clip->getLive();
+          $comments = $clip->getComments();
+
+          if ($comments) {
+            foreach ($comments as $comment) {
+              $manager->remove($comment);
+            }
+            $manager->flush();
+          }
+
+
+          if ($env == "prod") {
+            $url = "https://api.bambuser.com/broadcasts/" . $clip->getBroadcastId();
+            $ch = curl_init();
+
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+            curl_setopt($ch, CURLOPT_URL, $url);
+
+            $result = curl_exec($ch);
+            $result = json_decode($result);
+            curl_close($ch);
+          }
+
+          $manager->remove($clip);
+          $manager->flush();
+
+          if (!sizeof($live->getClips())) {
+            $liveProducts = $live->getLiveProducts();
+            $comments = $live->getComments();
+
+            if ($liveProducts) {
+              foreach ($liveProducts as $liveProduct) {
+                $manager->remove($liveProduct);
+              }
+              $manager->flush();
+            }
+
+            if ($comments) {
+              foreach ($comments as $comment) {
+                $manager->remove($comment);
+              }
+              $manager->flush();
+            }
+
+            if ($env == "prod") {
+              $url = "https://api.bambuser.com/broadcasts/" . $live->getBroadcastId();
+              $ch = curl_init();
+
+              curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
+              curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+              curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+              curl_setopt($ch, CURLOPT_URL, $url);
+
+              $result = curl_exec($ch);
+              $result = json_decode($result);
+              curl_close($ch);
+            }
+
+            $manager->remove($live);
+            $manager->flush();
+          }
+        }
+      }
+
+      $liveProducts = $liveProductRepo->findByProduct($product);
+      if ($liveProducts) {
+        foreach ($liveProducts as $liveProduct) {
+          $manager->remove($liveProduct);
+        }
+        $manager->flush();
+      }
+
+      foreach ($product->getOptions()->toArray() as $option) {
+        $manager->remove($option);
+      }
+
+
+      $lineItems = $lineItemRepo->findByProduct($product);
+      if ($lineItems) {
+        foreach ($lineItems as $lineItem) {
+          $lineItem->setProduct(null);
+
+          foreach ($product->getVariants()->toArray() as $variant) {
+            $lineItems2 = $lineItemRepo->findByVariant($variant);
+
+            foreach ($lineItems2 as $lineItem2) {
+              $lineItem2->setVariant(null);
+            }
+            $manager->flush();
+          }
+        }
+        $manager->flush();
+      }
+
+      foreach ($product->getVariants()->toArray() as $variant) {
+        $manager->remove($variant);
+      }
+
+      foreach ($product->getUploads()->toArray() as $upload) {
+        try {
+          $fileName = explode(".", $upload->getFilename());
+          $result = (new AdminApi())->deleteAssets($fileName[0], []);
+        } catch (\Exception $e) {
+          return $this->json($e->getMessage(), 404);
+        }
+
+        $manager->remove($upload);
+      }
+
+      $manager->flush();
+      $manager->remove($product);
       $manager->flush();
       
       return $this->json(true, 200);
@@ -139,7 +258,7 @@ class ProductAPIController extends Controller {
    */
   public function deleteVariant(Variant $variant, Request $request, ObjectManager $manager) {
     if ($variant) {
-      $variant->setProduct(null);
+      $manager->remove($variant);
       $manager->flush();
       
       return $this->json(true, 200);

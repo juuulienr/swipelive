@@ -24,7 +24,7 @@ class Withdraw
     private $vendor;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $payoutId;
 
@@ -80,7 +80,7 @@ class Withdraw
         return $this->payoutId;
     }
 
-    public function setPayoutId(string $payoutId): self
+    public function setPayoutId(?string $payoutId): self
     {
         $this->payoutId = $payoutId;
 

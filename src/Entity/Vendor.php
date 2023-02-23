@@ -67,7 +67,6 @@ class Vendor
      * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("live:read")
-     * @Groups("live:read")
      */
     private $products;
 
@@ -142,6 +141,7 @@ class Vendor
 
     /**
      * @ORM\OneToMany(targetEntity=Withdraw::class, mappedBy="vendor")
+     * @ORM\OrderBy({"createdAt" = "DESC"})
      * @Groups("user:read")
      */
     private $withdraws;
@@ -163,6 +163,7 @@ class Vendor
      * @Groups("clip:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("user:read")
      */
     private $user;
 

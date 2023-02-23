@@ -22,9 +22,7 @@ class ProductRepository extends ServiceEntityRepository
 
     public function findTrendingProducts($vendor){
       $query = $this->createQueryBuilder('p')
-      ->join('p.vendor', 'v')
-      ->andWhere('p.archived = :archived')
-      ->setParameter('archived', false);
+      ->join('p.vendor', 'v');
 
       if ($vendor) {
         $query->andWhere('v.id != :vendor')
