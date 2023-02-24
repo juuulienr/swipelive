@@ -64,7 +64,7 @@ class LiveAPIController extends Controller {
 	    ]);
     }
 
-    return $this->json([ "error" => "Une erreur est survenue"], 404);
+    return $this->json("Une erreur est survenue", 404);
   }
 
 

@@ -79,7 +79,7 @@ class ProductAPIController extends Controller {
       return $this->json($product, 200, [], ['groups' => 'product:read'], 200);
     }
 
-    return $this->json([ "error" => "Une erreur est survenue"], 404);
+    return $this->json("Une erreur est survenue", 404);
   }
 
 
@@ -96,7 +96,7 @@ class ProductAPIController extends Controller {
       return $this->json($product, 200, [], ['groups' => 'product:read'], 200);
     }
 
-    return $this->json([ "error" => "Une erreur est survenue"], 404);
+    return $this->json("Une erreur est survenue", 404);
   }
 
 
@@ -247,7 +247,7 @@ class ProductAPIController extends Controller {
       return $this->json($variant, 200, [], ['groups' => 'variant:read'], 200);
     }
 
-    return $this->json([ "error" => "Une erreur est survenue"], 404);
+    return $this->json("Une erreur est survenue", 404);
   }
 
 

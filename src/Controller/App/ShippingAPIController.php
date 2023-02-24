@@ -192,7 +192,7 @@ class ShippingAPIController extends Controller {
 
       return $this->json(true, 200);
     }
-    return $this->json([ "error" => "Une erreur est survenue"], 404);
+    return $this->json("Une erreur est survenue", 404);
   }
 
 
@@ -208,7 +208,7 @@ class ShippingAPIController extends Controller {
 
       return $this->json(true, 200);
     }
-    return $this->json([ "error" => "Une erreur est survenue"], 404);
+    return $this->json("Une erreur est survenue", 404);
   }
 
 

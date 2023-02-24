@@ -43,6 +43,7 @@ class Product
      * @Groups("product:read")
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("user:read")
      */
     private $category;
 
