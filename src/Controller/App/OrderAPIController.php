@@ -265,4 +265,19 @@ class OrderAPIController extends Controller {
       'groups' => 'order:read', 
     ]);
   }
+
+
+  /**
+   * Annuler une commande
+   *
+   * @Route("/user/api/orders/{id}/cancel", name="user_api_order_cancel", methods={"GET"})
+   */
+  public function cancel(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo) {
+    $order->setStatus('cancel');
+    $manager->flush();
+
+    return $this->json($order, 200, [], [
+      'groups' => 'order:read', 
+    ]);
+  }
 }

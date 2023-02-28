@@ -47,6 +47,19 @@ class PromotionAPIController extends Controller {
 
 
   /**
+   * Récupérer la promotion active
+   *
+   * @Route("/user/api/promotions/{id}/active", name="user_api_promotions_active", methods={"GET"})
+   */
+  public function active(Vendor $vendor, Request $request, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer)
+  {
+    $promotion = $promotionRepo->findOneBy([ "vendor" => $vendor, "isActive" => true ]);
+    
+    return $this->json($promotion, 200, [], ['groups' => 'promotion:read'], 200);
+  }
+
+
+  /**
    * Supprimer une promotion
    *
    * @Route("/user/api/promotion/delete/{id}", name="user_api_promotions_delete", methods={"GET"})

@@ -91,6 +91,11 @@ class ProductAPIController extends Controller {
   public function editProduct(Product $product, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $serializer->deserialize($json, Product::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $product]);
+
+      foreach ($product->getUploads() as $key => $upload) {
+        $upload->setPosition($key + 1);
+      }
+
       $manager->flush();
 
       return $this->json($product, 200, [], ['groups' => 'product:read'], 200);
