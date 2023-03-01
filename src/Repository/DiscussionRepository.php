@@ -19,6 +19,20 @@ class DiscussionRepository extends ServiceEntityRepository
         parent::__construct($registry, Discussion::class);
     }
 
+    public function findByVendorAndUser($user){
+      $query = $this->createQueryBuilder('d')
+      ->join('d.vendor', 'v')
+      ->join('d.user', 'u')
+      ->andWhere('v.id = :user OR u.id = :user')
+      ->setParameter('user', $user);
+
+      return $query->orderBy('d.updatedAt', 'DESC')
+      ->getQuery()
+      ->getResult();
+    }
+
+
+
     // /**
     //  * @return Discussion[] Returns an array of Discussion objects
     //  */

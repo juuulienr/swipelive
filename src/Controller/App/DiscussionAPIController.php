@@ -48,13 +48,9 @@ class DiscussionAPIController extends Controller {
    * @Route("/user/api/discussions", name="user_api_discussions", methods={"GET"})
    */
   public function discussions(Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo) {
-    $array = $discussionRepo->findBy([ 'user' => $this->getUser(), 'archive' => false ]);
-    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser(), 'archiveVendor' => false ]);
-    $discussions = array_merge($array, $array2);
-
-    return $this->json($discussions, 200, [], [
-      'groups' => 'discussion:read',
-      'circular_reference_limit' => 1,
+    return $this->json($this->getUser(), 200, [], [
+      'groups' => 'user:read', 
+      'circular_reference_limit' => 1, 
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
@@ -101,13 +97,9 @@ class DiscussionAPIController extends Controller {
         }
       }
 
-      $array = $discussionRepo->findBy([ 'user' => $this->getUser(), 'archive' => false ]);
-      $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser(), 'archiveVendor' => false ]);
-      $discussions = array_merge($array, $array2);
-
-      return $this->json($discussions, 200, [], [
-        'groups' => 'discussion:read',
-        'circular_reference_limit' => 1,
+      return $this->json($this->getUser(), 200, [], [
+        'groups' => 'user:read', 
+        'circular_reference_limit' => 1, 
         'circular_reference_handler' => function ($object) {
           return $object->getId();
         } 
@@ -131,14 +123,10 @@ class DiscussionAPIController extends Controller {
     }
 
     $manager->flush();
-
-    $array = $discussionRepo->findBy([ 'user' => $this->getUser(), 'archive' => false ]);
-    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser(), 'archiveVendor' => false ]);
-    $discussions = array_merge($array, $array2);
-
-    return $this->json($discussions, 200, [], [
-      'groups' => 'discussion:read',
-      'circular_reference_limit' => 1,
+    
+    return $this->json($this->getUser(), 200, [], [
+      'groups' => 'user:read', 
+      'circular_reference_limit' => 1, 
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
@@ -158,8 +146,6 @@ class DiscussionAPIController extends Controller {
 
       $discussion->setPreview($message->getText());
       $discussion->setUpdatedAt(new \DateTime('now', timezone_open('UTC')));
-      $discussion->setArchiveVendor(false);
-      $discussion->setArchive(false);
 
       if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
         $discussion->setUnseenVendor(true);
@@ -182,14 +168,10 @@ class DiscussionAPIController extends Controller {
 
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger("discussion_channel", "new_message", $data);
-
-      $array = $discussionRepo->findBy([ 'user' => $this->getUser(), 'archive' => false ]);
-      $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser(), 'archiveVendor' => false ]);
-      $discussions = array_merge($array, $array2);
-
-      return $this->json($discussions, 200, [], [
-        'groups' => 'discussion:read',
-        'circular_reference_limit' => 1,
+    
+      return $this->json($this->getUser(), 200, [], [
+        'groups' => 'user:read', 
+        'circular_reference_limit' => 1, 
         'circular_reference_handler' => function ($object) {
           return $object->getId();
         } 
@@ -216,15 +198,11 @@ class DiscussionAPIController extends Controller {
 
     $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $pusher->trigger("discussion_channel", "new_message", $data);
-
-    $array = $discussionRepo->findBy([ 'user' => $this->getUser(), 'archive' => false ]);
-    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser(), 'archiveVendor' => false ]);
-    $discussions = array_merge($array, $array2);
-
-
-    return $this->json($discussions, 200, [], [
-      'groups' => 'discussion:read',
-      'circular_reference_limit' => 1,
+    $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
+    
+    return $this->json($this->getUser(), 200, [], [
+      'groups' => 'user:read', 
+      'circular_reference_limit' => 1, 
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
@@ -248,15 +226,10 @@ class DiscussionAPIController extends Controller {
 
     $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $pusher->trigger("discussion_channel", "new_message", $data);
-
-    $array = $discussionRepo->findBy([ 'user' => $this->getUser(), 'archive' => false ]);
-    $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser(), 'archiveVendor' => false ]);
-    $discussions = array_merge($array, $array2);
-
-
-    return $this->json($discussions, 200, [], [
-      'groups' => 'discussion:read',
-      'circular_reference_limit' => 1,
+    
+    return $this->json($this->getUser(), 200, [], [
+      'groups' => 'user:read', 
+      'circular_reference_limit' => 1, 
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
@@ -320,8 +293,6 @@ class DiscussionAPIController extends Controller {
       // update discussion
       $discussion->setPreview("A envoyé une image");
       $discussion->setUpdatedAt(new \DateTime('now', timezone_open('UTC')));
-      $discussion->setArchive(false);
-      $discussion->setArchiveVendor(false);
 
       if ($discussion->getUser()->getId() == $user->getId()) {
         $discussion->setUnseenVendor(true);
@@ -344,14 +315,10 @@ class DiscussionAPIController extends Controller {
 
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger("discussion_channel", "new_message", $data);
-
-      $array = $discussionRepo->findBy([ 'user' => $this->getUser(), 'archive' => false ]);
-      $array2 = $discussionRepo->findBy([ 'vendor' => $this->getUser(), 'archiveVendor' => false ]);
-      $discussions = array_merge($array, $array2);
-
-      return $this->json($discussions, 200, [], [
-        'groups' => 'discussion:read',
-        'circular_reference_limit' => 1,
+    
+      return $this->json($this->getUser(), 200, [], [
+        'groups' => 'user:read', 
+        'circular_reference_limit' => 1, 
         'circular_reference_handler' => function ($object) {
           return $object->getId();
         } 
@@ -362,25 +329,4 @@ class DiscussionAPIController extends Controller {
     }
   }
 
-
-
-  /**
-   * Archiver une discussion
-   *
-   * @Route("/user/api/discussions/{id}/archive", name="user_api_discussions_archive", methods={"DELETE"})
-   */
-  public function archive(Discussion $discussion, ObjectManager $manager, DiscussionRepository $discussionRepo, SerializerInterface $serializer) {
-    if ($discussion) {
-      if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
-        $discussion->setArchive(true);
-      } else {
-        $discussion->setArchiveVendor(true);
-      }
-      $manager->flush();
-
-      return $this->json(true, 200);
-    }
-
-    return $this->json("La discussion est introuvable", 404);
-  }
 }
