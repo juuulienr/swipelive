@@ -31,18 +31,16 @@ class CreateClipsFromLive extends ContainerAwareCommand {
   protected function execute(InputInterface $input, OutputInterface $output) {
     $clips = $this->repo->findBy([ "status" => "waiting" ]);
     $now = new \DateTime('now', timezone_open('UTC'));
+    
+    // $created = $live->getCreatedAt();
+    // $now = new \DateTime('now', timezone_open('UTC'));
+    // $diff = $now->diff($created);
+    // var_dump($createdAt->modify('+10 minutes'));
+    // var_dump($now);
 
     if ($clips) {
       foreach ($clips as $clip) {
         $createdAt = $clip->getCreatedAt();
-
-        try {
-          $this->functionFailsForSure();
-        } catch (\Throwable $exception) {
-          \Sentry\captureMessage($createdAt->modify('+10 minutes'));
-          \Sentry\captureMessage($now);
-          \Sentry\captureMessage($createdAt->modify('+10 minutes') < $now);
-        }
 
         // creation du clip sur bambuser
         if (!$clip->getBroadcastId() && $createdAt->modify('+10 minutes') < $now) {
