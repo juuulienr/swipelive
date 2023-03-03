@@ -144,6 +144,7 @@ class Live
         $this->createdAt = new \DateTime('now', timezone_open('UTC'));
         $this->clips = new ArrayCollection();
         $this->liveProducts = new ArrayCollection();
+        $this->duration = 0;
         $this->viewers = 0;
         $this->totalViewers = 0;
         $this->totalLikes = 0;

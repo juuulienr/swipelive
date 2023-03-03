@@ -44,10 +44,6 @@ class APIController extends Controller {
     $clips = $clipRepo->findByClip($vendor);
     $array = [];
 
-    \Sentry\configureScope(function (\Sentry\State\Scope $scope): void {
-        $scope->setUser(['email' => $this->getUser()->getEmail() ]);
-    });
-
     if ($lives) {
     	foreach ($lives as $live) {
     		$array[] = [ "type" => "live", "value" => $serializer->serialize($live, "json", [
@@ -90,7 +86,11 @@ class APIController extends Controller {
     $trendingProducts = $productRepo->findTrendingProducts($vendor);
     $allProducts = $productRepo->findAll();
     $categories = $categoryRepo->findAll();
-    $array = [];
+    $array = [];   
+
+    \Sentry\configureScope(function (\Sentry\State\Scope $scope): void {
+      $scope->setUser(['email' => $this->getUser()->getEmail() ]);
+    });
 
     $array["trendingClips"] = $serializer->serialize($trendingClips, "json", [
       'groups' => 'clip:read', 
