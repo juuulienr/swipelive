@@ -362,7 +362,8 @@ class LiveAPIController extends Controller {
           $start = $live->getDuration() + 1;
         }
 
-        $created = $live->getCreatedAt();
+        $createdAt = $live->getCreatedAt()->format('Y-m-d H:i:s');
+        $created = new \DateTime($createdAt, timezone_open('UTC'));
         $now = new \DateTime('now', timezone_open('UTC'));
         $diff = $now->diff($created);
         $end = $this->dateIntervalToSeconds($diff);
