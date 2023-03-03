@@ -39,9 +39,6 @@ class CreateClipsFromLive extends ContainerAwareCommand {
         try {
           $this->functionFailsForSure();
         } catch (\Throwable $exception) {
-          \Sentry\captureException($createdAt->modify('+10 minutes'));
-          \Sentry\captureException($now);
-          \Sentry\captureException($createdAt->modify('+10 minutes') < $now);
           \Sentry\captureMessage($createdAt->modify('+10 minutes'));
           \Sentry\captureMessage($now);
           \Sentry\captureMessage($createdAt->modify('+10 minutes') < $now);
