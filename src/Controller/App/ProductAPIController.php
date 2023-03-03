@@ -235,7 +235,7 @@ class ProductAPIController extends Controller {
       return $this->json(true, 200);
     }
 
-    return $this->json([ "error" => "Le produit est introuvable"], 404);
+    return $this->json("Le produit est introuvable", 404);
   }
 
 
@@ -269,7 +269,7 @@ class ProductAPIController extends Controller {
       return $this->json(true, 200);
     }
 
-    return $this->json([ "error" => "Le variant est introuvable"], 404);
+    return $this->json("Le variant est introuvable", 404);
   }
 
 

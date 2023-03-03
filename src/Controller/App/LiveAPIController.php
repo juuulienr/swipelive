@@ -470,17 +470,14 @@ class LiveAPIController extends Controller {
       }
 
 
-      // stream sur facebook
+      // stop stream sur facebook
       if ($fbStreamId) {
-
-        // stop fb stream
+        $url = "/" . $fbStreamId . "/?end_live_video=true";
         $fb = new \Facebook\Facebook([
           'app_id' => '936988141017522',
           'app_secret' => '025a5522cd75e464437fb048ee3cfe23',
           'default_graph_version' => 'v2.10',
         ]);
-
-        $url = "/" . $fbStreamId . "/?end_live_video=true";
 
         try {
           $response = $fb->post($url, [], $fbToken);
@@ -492,12 +489,12 @@ class LiveAPIController extends Controller {
       }
     }
 
-		return $this->json($live, 200, [], [
-    	'groups' => 'live:read', 
-    	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => function ($object) {
-    		return $object->getId();
-    	} 
+    return $this->json($this->getUser(), 200, [], [
+      'groups' => 'user:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
     ]);
   }
 
@@ -621,9 +618,11 @@ class LiveAPIController extends Controller {
     $live->setTotalLikes($live->getTotalLikes() + 1);
     $manager->flush();
 
-    $pusher->trigger($live->getChannel(), $live->getEvent(), [
-      "likes" => $this->getUser()->getId()
-    ]);
+    if ($live->getChannel() && $live->getEvent()) {
+      $pusher->trigger($live->getChannel(), $live->getEvent(), [
+        "likes" => $this->getUser()->getId()
+      ]);
+    }
 
     return $this->json($live, 200, [], [
       'groups' => 'live:read', 
@@ -649,9 +648,11 @@ class LiveAPIController extends Controller {
       $manager->flush();
     }
 
-    $pusher->trigger($live->getChannel(), $live->getEvent(), [
-      "banned" => $userId
-    ]);
+    if ($live->getChannel() && $live->getEvent()) {
+      $pusher->trigger($live->getChannel(), $live->getEvent(), [
+        "banned" => $userId
+      ]);
+    }
 
     return $this->json($live, 200, [], [
       'groups' => 'live:read', 
@@ -687,14 +688,11 @@ class LiveAPIController extends Controller {
       }
     }
 
-
     if ($order) {
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
 
       if ($order->getBuyer()->getVendor()) {
-        $vendor = [
-          "businessName" => $order->getBuyer()->getVendor()->getBusinessName(),
-        ];
+        $vendor = [ "businessName" => $order->getBuyer()->getVendor()->getBusinessName() ];
       }
 
       if (sizeof($order->getLineItems()->toArray()[0]->getProduct()->getUploads()) > 0) {
@@ -733,7 +731,7 @@ class LiveAPIController extends Controller {
       ]);
     }
 
-    return $this->json([ "error" => "Impossible de trouver la commande"], 404);
+    return $this->json("Impossible de trouver la commande", 404);
   }
 
 

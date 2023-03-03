@@ -36,6 +36,17 @@ class CreateClipsFromLive extends ContainerAwareCommand {
       foreach ($clips as $clip) {
         $createdAt = $clip->getCreatedAt();
 
+        try {
+          $this->functionFailsForSure();
+        } catch (\Throwable $exception) {
+          \Sentry\captureException($createdAt->modify('+10 minutes'));
+          \Sentry\captureException($now);
+          \Sentry\captureException($createdAt->modify('+10 minutes') < $now);
+          \Sentry\captureMessage($createdAt->modify('+10 minutes'));
+          \Sentry\captureMessage($now);
+          \Sentry\captureMessage($createdAt->modify('+10 minutes') < $now);
+        }
+
         // creation du clip sur bambuser
         if (!$clip->getBroadcastId() && $createdAt->modify('+10 minutes') < $now) {
           $data = [

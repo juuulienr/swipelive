@@ -42,6 +42,7 @@ class Vendor
     /**
      * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="vendor")
      * @Groups("user:read")
+     * @Groups("clip:read")
      */
     private $clips;
 
