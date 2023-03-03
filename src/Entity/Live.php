@@ -141,16 +141,15 @@ class Live
     
     public function __construct()
     {
-        $this->createdAt = new \DateTime('now', timezone_open('UTC'));
-        $this->clips = new ArrayCollection();
-        $this->liveProducts = new ArrayCollection();
-        $this->duration = 0;
-        $this->viewers = 0;
-        $this->totalViewers = 0;
-        $this->totalLikes = 0;
-        $this->status = 0;
-        $this->display = 1;
-        $this->comments = new ArrayCollection();
+      $this->clips = new ArrayCollection();
+      $this->liveProducts = new ArrayCollection();
+      $this->comments = new ArrayCollection();
+      $this->duration = 0;
+      $this->viewers = 0;
+      $this->totalViewers = 0;
+      $this->totalLikes = 0;
+      $this->status = 0;
+      $this->display = 1;
     }
 
 
