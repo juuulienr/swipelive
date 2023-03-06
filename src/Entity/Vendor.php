@@ -58,7 +58,8 @@ class Vendor
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("user:read")
-     * @Groups("clip:edit")
+     * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $summary;
 

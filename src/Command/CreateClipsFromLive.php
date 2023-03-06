@@ -56,7 +56,7 @@ class CreateClipsFromLive extends ContainerAwareCommand {
           $result = json_decode($result);
           curl_close($ch);
 
-          if ($result && $httpcode !== 500) {
+          if ($result && $result->newBroadcastId && $httpcode !== 500) {
             if (!$clip->setBroadcastId()) {
               $clip->setBroadcastId($result->newBroadcastId);
             }
