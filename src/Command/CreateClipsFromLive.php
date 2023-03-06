@@ -56,12 +56,17 @@ class CreateClipsFromLive extends ContainerAwareCommand {
           $result = json_decode($result);
           curl_close($ch);
 
+          dump($result);
+          dump($result->newBroadcastId);
+
           if ($result && $result->newBroadcastId && $httpcode !== 500) {
-            if (!$clip->setBroadcastId()) {
+            if (!$clip->getBroadcastId()) {
               $clip->setBroadcastId($result->newBroadcastId);
             }
             if ($result->status == "ok") {
               $clip->setStatus("available");
+            } else {
+              $clip->setStatus($result->status);
             }
             $this->manager->flush();
           }
