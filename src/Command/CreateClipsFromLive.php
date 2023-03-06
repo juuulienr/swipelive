@@ -62,6 +62,8 @@ class CreateClipsFromLive extends ContainerAwareCommand {
             }
             if ($result->status == "ok") {
               $clip->setStatus("available");
+
+              // 
             } else {
               $clip->setStatus($result->status);
             }

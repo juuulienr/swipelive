@@ -58,7 +58,7 @@ class WebhookController extends Controller {
           $clip->setResourceUri($result["payload"]["resourceUri"]);
           $clip->setEventId($result["eventId"]);
 
-          if ($result["payload"]["preview"]) {
+          if (array_key_exists("preview", $result["payload"])) {
             $clip->setPreview($result["payload"]["preview"]);
           }
 
