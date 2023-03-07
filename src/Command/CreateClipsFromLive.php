@@ -29,7 +29,7 @@ class CreateClipsFromLive extends ContainerAwareCommand {
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
-    $clips = $this->repo->findBy([ "status" => "waiting" ]);
+    $clips = $this->repo->findAll();
     $now = new \DateTime('now', timezone_open('UTC'));
 
     if ($clips) {
@@ -56,12 +56,14 @@ class CreateClipsFromLive extends ContainerAwareCommand {
           $result = json_decode($result);
           curl_close($ch);
 
-          if ($result && $result->newBroadcastId && $httpcode !== 500) {
-            if (!$clip->getBroadcastId()) {
+          if ($result && $httpcode !== 500) {
+            if (!$clip->getBroadcastId() && $result->newBroadcastId) {
               $clip->setBroadcastId($result->newBroadcastId);
+              $this->manager->flush();
             }
+
+            // update broadcast
             if ($result->status == "ok") {
-              // update broadcast
               $url = "https://api.bambuser.com/broadcasts/" . $clip->getBroadcastId();
               $ch = curl_init();
 
@@ -74,7 +76,6 @@ class CreateClipsFromLive extends ContainerAwareCommand {
               $result = json_decode($result);
               curl_close($ch);
 
-
               if ($result && $result->resourceUri) {
                 $clip->setResourceUri($result->resourceUri);
                 $clip->setStatus("available");
@@ -86,7 +87,7 @@ class CreateClipsFromLive extends ContainerAwareCommand {
             } else {
               $clip->setStatus($result->status);
             }
-            
+
             $this->manager->flush();
           }
         }
