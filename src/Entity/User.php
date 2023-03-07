@@ -109,6 +109,7 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Order::class, mappedBy="buyer")
+     * @ORM\OrderBy({"createdAt" = "DESC"})
      * @Groups("user:read")
      */
     private $purchases;

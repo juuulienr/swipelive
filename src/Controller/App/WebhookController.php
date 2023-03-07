@@ -60,6 +60,8 @@ class WebhookController extends Controller {
 
           if (array_key_exists("preview", $result["payload"])) {
             $clip->setPreview($result["payload"]["preview"]);
+          } else {
+            $clip->setPreview($clip->getLive()->getPreview());
           }
 
           $manager->flush();
@@ -102,8 +104,8 @@ class WebhookController extends Controller {
         if ($clip) {
           $clip->setEventId($result["eventId"]);
 
-          if ($result["payload"]["status"]) {
-            $clip->setStatus($result["payload"]["status"]);
+          if (array_key_exists("status", $result["payload"])) {
+            $clip->setStatus("available");
           }
           
           $manager->flush();
