@@ -76,7 +76,13 @@ class ProductAPIController extends Controller {
       $manager->persist($product);
       $manager->flush();
 
-      return $this->json($product, 200, [], ['groups' => 'product:read'], 200);
+      return $this->json($this->getUser(), 200, [], [
+        'groups' => 'user:read', 
+        'circular_reference_limit' => 1, 
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ]);
     }
 
     return $this->json("Une erreur est survenue", 404);
@@ -98,7 +104,13 @@ class ProductAPIController extends Controller {
 
       $manager->flush();
 
-      return $this->json($product, 200, [], ['groups' => 'product:read'], 200);
+      return $this->json($this->getUser(), 200, [], [
+        'groups' => 'user:read', 
+        'circular_reference_limit' => 1, 
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ]);
     }
 
     return $this->json("Une erreur est survenue", 404);
