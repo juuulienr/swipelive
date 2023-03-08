@@ -25,8 +25,8 @@ class RemoveWaitingLive extends ContainerAwareCommand
   protected function configure()
   {
     $this
-    ->setName('remove:waiting:live')
-    ->setDescription('Supprimer les lives en attente')
+    ->setName('remove:lives')
+    ->setDescription('Supprimer les lives en attente ou terminés qui ont pas de clips')
     ;
   }
 
@@ -34,28 +34,34 @@ class RemoveWaitingLive extends ContainerAwareCommand
   {
     $lives = $this->repo->findAll();
     $now = new \DateTime('now', timezone_open('UTC'));
-    $now->modify('-3 days');
+    $now->modify('-1 day');
 
     if ($lives) {
       foreach ($lives as $live) {
-        if ($live->getCreatedAt() < $now && $live->getStatus() == 0) {
-          $liveProducts = $live->getLiveProducts();
-          $comments = $live->getComments();
+        if ($live->getCreatedAt() < $now) {
+          if ($live->getStatus() == 0 || $live->getStatus() == 2) {
+            $clips = $live->getClips()->toArray();
 
-          if ($liveProducts) {
-            foreach ($liveProducts as $liveProduct) {
-              $this->manager->remove($liveProduct);
+            if (!$clips) {
+              $liveProducts = $live->getLiveProducts();
+              $comments = $live->getComments();
+
+              if ($liveProducts) {
+                foreach ($liveProducts as $liveProduct) {
+                  $this->manager->remove($liveProduct);
+                }
+              }
+
+              if ($comments) {
+                foreach ($comments as $comment) {
+                  $this->manager->remove($comment);
+                }
+              }
+
+              $this->manager->remove($live);
             }
-          }
-
-          if ($comments) {
-            foreach ($comments as $comment) {
-              $this->manager->remove($comment);
-            }
-          }
-
-          $this->manager->remove($live);
-        }             
+          }             
+        }
       }
     }
     

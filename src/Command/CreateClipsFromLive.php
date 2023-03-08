@@ -63,7 +63,7 @@ class CreateClipsFromLive extends ContainerAwareCommand {
             }
 
             // update broadcast
-            if ($result->status == "ok") {
+            if ($result->status == "ok" && $clip->getCreatedAt()->modify('+10 minutes') < $now) {
               $url = "https://api.bambuser.com/broadcasts/" . $clip->getBroadcastId();
               $ch = curl_init();
 

@@ -193,10 +193,10 @@ class User implements UserInterface
         $this->comments = new ArrayCollection();
         $this->createdAt = new \DateTime('now', timezone_open('UTC'));
         $this->shippingAddresses = new ArrayCollection();
-        $this->type = "user";
         $this->discussions = new ArrayCollection();
         $this->securityUsers = new ArrayCollection();
         $this->favoris = new ArrayCollection();
+        $this->type = "user";
     }
 
     public function getFullName() {

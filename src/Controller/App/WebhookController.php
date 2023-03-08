@@ -103,11 +103,6 @@ class WebhookController extends Controller {
 
         if ($clip) {
           $clip->setEventId($result["eventId"]);
-
-          if (array_key_exists("status", $result["payload"])) {
-            $clip->setStatus("available");
-          }
-          
           $manager->flush();
         }
       }
