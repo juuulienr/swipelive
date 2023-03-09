@@ -85,7 +85,6 @@ class APIController extends Controller {
     $latestClips = $clipRepo->findLatestClips($vendor);
     $trendingProducts = $productRepo->findTrendingProducts($vendor);
     $allProducts = $productRepo->findAll();
-    $categories = $categoryRepo->findAll();
     $array = [];   
 
     \Sentry\configureScope(function (\Sentry\State\Scope $scope): void {
@@ -108,24 +107,8 @@ class APIController extends Controller {
       } 
     ]);
 
-    $array["allProducts"] = $serializer->serialize($allProducts, "json", [
-      'groups' => 'product:read', 
-      'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
-    ]);
-
     $array["trendingProducts"] = $serializer->serialize($trendingProducts, "json", [
       'groups' => 'product:read', 
-      'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
-    ]);
-
-    $array["categories"] = $serializer->serialize($categories, "json", [
-      'groups' => 'category:read', 
       'circular_reference_limit' => 1, 
       'circular_reference_handler' => function ($object) {
         return $object->getId();
