@@ -35,6 +35,22 @@ class ProductRepository extends ServiceEntityRepository
     }
 
 
+    public function findProductsNotCreatedByVendor($vendor){
+      $query = $this->createQueryBuilder('p')
+      ->join('p.vendor', 'v');
+
+      if ($vendor) {
+        $query->andWhere('v.id != :vendor')
+        ->setParameter('vendor', $vendor);
+      }
+
+      return $query->getQuery()
+      ->setMaxResults(100)
+      ->getResult();
+    }
+
+
+
     // /**
     //  * @return Product[] Returns an array of Product objects
     //  */

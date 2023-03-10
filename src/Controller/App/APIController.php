@@ -84,7 +84,6 @@ class APIController extends Controller {
     $trendingClips = $clipRepo->findTrendingClips($vendor);
     $latestClips = $clipRepo->findLatestClips($vendor);
     $trendingProducts = $productRepo->findTrendingProducts($vendor);
-    $allProducts = $productRepo->findAll();
     $array = [];   
 
     \Sentry\configureScope(function (\Sentry\State\Scope $scope): void {
@@ -123,11 +122,11 @@ class APIController extends Controller {
   /**
    * Afficher les produits 
    *
-   * @Route("/api/products/all", name="api_products_all", methods={"GET"})
+   * @Route("/user/api/products/all", name="api_products_all", methods={"GET"})
    */
   public function allProducts(Request $request, ObjectManager $manager, ProductRepository $productRepo)
   {
-    $products = $productRepo->findAll();
+    $products = $productRepo->findProductsNotCreatedByVendor($this->getUser()->getVendor());
 
     return $this->json($products, 200, [], [
       'groups' => 'product:read', 

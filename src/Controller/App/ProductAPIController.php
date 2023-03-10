@@ -243,8 +243,14 @@ class ProductAPIController extends Controller {
       $manager->flush();
       $manager->remove($product);
       $manager->flush();
-      
-      return $this->json(true, 200);
+
+      return $this->json($this->getUser(), 200, [], [
+        'groups' => 'user:read', 
+        'circular_reference_limit' => 1, 
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ]);
     }
 
     return $this->json("Le produit est introuvable", 404);

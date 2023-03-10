@@ -107,7 +107,7 @@ class PromotionAPIController extends Controller {
 
       return $this->json($this->getUser(), 200, [], [
         'groups' => 'user:read', 
-        'circular_reference_limit' => 1, 
+        'circular_reference_limit' => 1,  
         'circular_reference_handler' => function ($object) {
           return $object->getId();
         } 

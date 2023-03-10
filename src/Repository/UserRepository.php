@@ -55,7 +55,8 @@ class UserRepository extends ServiceEntityRepository
       }
 
     	return $query->setParameter('type', 'vendor')
-    	->getQuery()
+      ->getQuery()
+      ->setMaxResults(21)
     	->getResult();
     }
 
