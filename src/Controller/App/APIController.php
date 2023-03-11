@@ -76,45 +76,59 @@ class APIController extends Controller {
   /**
    * Afficher clips tendances
    *
-   * @Route("/user/api/home", name="api_home", methods={"GET"})
+   * @Route("/user/api/clips/trending", name="api_clips_trending", methods={"GET"})
    */
-  public function home(Request $request, ObjectManager $manager, ClipRepository $clipRepo, ProductRepository $productRepo, CategoryRepository $categoryRepo, SerializerInterface $serializer)
+  public function clipsTrending(Request $request, ObjectManager $manager, ClipRepository $clipRepo, ProductRepository $productRepo, CategoryRepository $categoryRepo, SerializerInterface $serializer)
   {
-    $vendor = $this->getUser()->getVendor();
-    $trendingClips = $clipRepo->findTrendingClips($vendor);
-    $latestClips = $clipRepo->findLatestClips($vendor);
-    $trendingProducts = $productRepo->findTrendingProducts($vendor);
-    $array = [];   
+    $clips = $clipRepo->findTrendingClips($this->getUser()->getVendor());
 
-    \Sentry\configureScope(function (\Sentry\State\Scope $scope): void {
-      $scope->setUser(['email' => $this->getUser()->getEmail() ]);
-    });
-
-    $array["trendingClips"] = $serializer->serialize($trendingClips, "json", [
+    return $this->json($clips, 200, [], [
       'groups' => 'clip:read', 
       'circular_reference_limit' => 1, 
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
     ]);
+  }
 
-    $array["latestClips"] = $serializer->serialize($latestClips, "json", [
+
+
+  /**
+   * Afficher les nouveaux clips
+   *
+   * @Route("/user/api/clips/latest", name="api_clips_latest", methods={"GET"})
+   */
+  public function clipsLatest(Request $request, ObjectManager $manager, ClipRepository $clipRepo, ProductRepository $productRepo, CategoryRepository $categoryRepo, SerializerInterface $serializer)
+  {
+    $clips = $clipRepo->findLatestClips($this->getUser()->getVendor());
+
+    return $this->json($clips, 200, [], [
       'groups' => 'clip:read', 
       'circular_reference_limit' => 1, 
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
     ]);
+  }
 
-    $array["trendingProducts"] = $serializer->serialize($trendingProducts, "json", [
+
+
+  /**
+   * Afficher les produits tendance
+   *
+   * @Route("/user/api/products/trending", name="api_products_trending", methods={"GET"})
+   */
+  public function productsTrending(Request $request, ObjectManager $manager, ClipRepository $clipRepo, ProductRepository $productRepo, CategoryRepository $categoryRepo, SerializerInterface $serializer)
+  {
+    $products = $productRepo->findTrendingProducts($this->getUser()->getVendor());
+
+    return $this->json($products, 200, [], [
       'groups' => 'product:read', 
       'circular_reference_limit' => 1, 
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
     ]);
-
-    return $this->json($array);
   }
 
 
