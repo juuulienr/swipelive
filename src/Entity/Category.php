@@ -35,7 +35,6 @@ class Category
 
     /**
      * @ORM\OneToMany(targetEntity=Product::class, mappedBy="category")
-     * @Groups("category:read")
      */
     private $products;
 
