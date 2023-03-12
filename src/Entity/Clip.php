@@ -31,7 +31,6 @@ class Clip
     /**
      * @ORM\ManyToOne(targetEntity=Live::class, inversedBy="clips")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups("clip:read")
      */
     private $live;
 
@@ -80,7 +79,6 @@ class Clip
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("user:read")
      */
     private $broadcastId;
 

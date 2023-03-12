@@ -35,14 +35,12 @@ class Vendor
 
     /**
      * @ORM\OneToMany(targetEntity=Live::class, mappedBy="vendor")
-     * @Groups("user:read")
      */
     private $lives;
 
     /**
      * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="vendor")
      * @Groups("user:read")
-     * @Groups("clip:read")
      */
     private $clips;
 
@@ -67,8 +65,6 @@ class Vendor
      * @ORM\OneToMany(targetEntity=Product::class, mappedBy="vendor")
      * @ORM\OrderBy({"title" = "ASC"})
      * @Groups("user:read")
-     * @Groups("clip:read")
-     * @Groups("live:read")
      */
     private $products;
 
@@ -119,7 +115,6 @@ class Vendor
     /**
      * @ORM\OneToMany(targetEntity=Order::class, mappedBy="vendor")
      * @ORM\OrderBy({"createdAt" = "DESC"})
-     * @Groups("user:read")
      */
     private $sales;
 
@@ -184,8 +179,6 @@ class Vendor
     /**
      * @ORM\OneToMany(targetEntity=Promotion::class, mappedBy="vendor", orphanRemoval=true)
      * @ORM\OrderBy({"createdAt" = "DESC"})
-     * @Groups("clip:read")
-     * @Groups("live:read")
      * @Groups("user:read")
      */
     private $promotions;
@@ -199,12 +192,12 @@ class Vendor
         $this->sales = new ArrayCollection();
         $this->withdraws = new ArrayCollection();
         $this->bankAccounts = new ArrayCollection();
+        $this->promotions = new ArrayCollection();
         $this->total = "0.00";
         $this->pending = "0.00";
         $this->available = "0.00";
         $this->verified = false;
         $this->countryCode = "FR";
-        $this->promotions = new ArrayCollection();
     }
     
 
