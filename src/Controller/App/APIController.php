@@ -98,7 +98,7 @@ class APIController extends Controller {
    *
    * @Route("/user/api/clips/latest", name="api_clips_latest", methods={"GET"})
    */
-  public function clipsLatest(Request $request, ObjectManager $manager, ClipRepository $clipRepo, ProductRepository $productRepo, CategoryRepository $categoryRepo, SerializerInterface $serializer)
+  public function clipsLatest(Request $request, ObjectManager $manager, ClipRepository $clipRepo, SerializerInterface $serializer)
   {
     $clips = $clipRepo->findLatestClips($this->getUser()->getVendor());
 
@@ -118,7 +118,7 @@ class APIController extends Controller {
    *
    * @Route("/user/api/products/trending", name="api_products_trending", methods={"GET"})
    */
-  public function productsTrending(Request $request, ObjectManager $manager, ClipRepository $clipRepo, ProductRepository $productRepo, CategoryRepository $categoryRepo, SerializerInterface $serializer)
+  public function productsTrending(Request $request, ObjectManager $manager, ProductRepository $productRepo, SerializerInterface $serializer)
   {
     $products = $productRepo->findTrendingProducts($this->getUser()->getVendor());
 
@@ -284,7 +284,7 @@ class APIController extends Controller {
     $users = $repo->findUserBySearch($search, $this->getUser()->getVendor());
 
     return $this->json($users, 200, [], [
-    	'groups' => 'user:read', 
+    	'groups' => 'user:follow', 
     	'circular_reference_limit' => 1, 
     	'circular_reference_handler' => function ($object) {
     		return $object->getId();
