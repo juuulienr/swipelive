@@ -154,6 +154,26 @@ class APIController extends Controller {
 
 
   /**
+   * Afficher les produits d'un vendeur
+   *
+   * @Route("/user/api/products/vendor/{id}", name="api_products_all_vendor", methods={"GET"})
+   */
+  public function allProductsVendor(Vendor $vendor, Request $request, ObjectManager $manager, ProductRepository $productRepo)
+  {
+    $products = $productRepo->findByVendor($vendor);
+
+    return $this->json($products, 200, [], [
+      'groups' => 'product:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
+  }
+
+
+
+  /**
    * Afficher le profil
    *
    * @Route("/api/profile/{id}", name="api_profile", methods={"GET"})

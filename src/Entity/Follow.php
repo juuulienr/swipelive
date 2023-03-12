@@ -16,6 +16,7 @@ class Follow
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups("user:read")
+     * @Groups("user:follow")
      */
     private $id;
 

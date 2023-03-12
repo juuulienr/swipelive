@@ -424,7 +424,7 @@ class AccountAPIController extends Controller {
     $following = $userRepo->findUserFollowing($this->getUser());
 
     return $this->json($following, 200, [], [
-    	'groups' => 'user:read', 
+    	'groups' => 'user:follow', 
     	'circular_reference_limit' => 1, 
     	'circular_reference_handler' => function ($object) {
     		return $object->getId();
@@ -442,7 +442,7 @@ class AccountAPIController extends Controller {
     $followers = $userRepo->findUserFollowers($this->getUser());
 
     return $this->json($followers, 200, [], [
-    	'groups' => 'user:read', 
+    	'groups' => 'user:follow', 
     	'circular_reference_limit' => 1, 
     	'circular_reference_handler' => function ($object) {
     		return $object->getId();

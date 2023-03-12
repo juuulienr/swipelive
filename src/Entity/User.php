@@ -24,6 +24,7 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("user:follow")
      * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("live:read")
@@ -62,6 +63,7 @@ class User implements UserInterface
      * @Groups("live:read")
      * @Groups("order:read")
      * @Groups("discussion:read")
+     * @Groups("user:follow")
      */
     private $firstname;
 
@@ -72,6 +74,7 @@ class User implements UserInterface
      * @Groups("live:read")
      * @Groups("order:read")
      * @Groups("discussion:read")
+     * @Groups("user:follow")
      */
     private $lastname;
 
@@ -82,6 +85,7 @@ class User implements UserInterface
      * @Groups("live:read")
      * @Groups("order:read")
      * @Groups("discussion:read")
+     * @Groups("user:follow")
      */
     private $picture;
 
@@ -90,6 +94,7 @@ class User implements UserInterface
      * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("user:follow")
      */
     private $followers;
 
@@ -117,6 +122,7 @@ class User implements UserInterface
      * @Groups("user:read")
      * @Groups("live:read")
      * @Groups("clip:read")
+     * @Groups("user:follow")
      * @Groups("discussion:read")
      */
     private $vendor;

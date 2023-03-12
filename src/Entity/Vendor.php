@@ -30,6 +30,7 @@ class Vendor
      * @Groups("category:read")
      * @Groups("order:read")
      * @Groups("product:read")
+     * @Groups("user:follow")
      */
     private $id;
 
@@ -50,6 +51,7 @@ class Vendor
      * @Groups("clip:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("user:follow")
      */
     private $company;
 
@@ -74,6 +76,7 @@ class Vendor
      * @Groups("product:read")
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("user:follow")
      */
     private $businessType;
 
@@ -85,6 +88,7 @@ class Vendor
      * @Groups("product:read")
      * @Groups("order:read")
      * @Groups("discussion:read")
+     * @Groups("user:follow")
      */
     private $businessName;
 
