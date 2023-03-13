@@ -189,8 +189,14 @@ class ShippingAPIController extends Controller {
 
       $manager->persist($shippingAddress);
       $manager->flush();
-
-      return $this->json(true, 200);
+      
+      return $this->json($this->getUser(), 200, [], [
+        'groups' => 'user:read', 
+        'circular_reference_limit' => 1, 
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ]);
     }
     return $this->json("Une erreur est survenue", 404);
   }
@@ -206,7 +212,13 @@ class ShippingAPIController extends Controller {
       $serializer->deserialize($json, ShippingAddress::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $shippingAddress]);
       $manager->flush();
 
-      return $this->json(true, 200);
+      return $this->json($this->getUser(), 200, [], [
+        'groups' => 'user:read', 
+        'circular_reference_limit' => 1, 
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ]);
     }
     return $this->json("Une erreur est survenue", 404);
   }

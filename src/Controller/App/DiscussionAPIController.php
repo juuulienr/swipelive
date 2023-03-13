@@ -48,9 +48,11 @@ class DiscussionAPIController extends Controller {
    * @Route("/user/api/discussions", name="user_api_discussions", methods={"GET"})
    */
   public function discussions(Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo) {
-    return $this->json($this->getUser(), 200, [], [
-      'groups' => 'user:read', 
-      'circular_reference_limit' => 1, 
+    $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
+
+    return $this->json($discussions, 200, [], [
+      'groups' => 'discussion:read',
+      'circular_reference_limit' => 1,
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
@@ -97,9 +99,11 @@ class DiscussionAPIController extends Controller {
         }
       }
 
-      return $this->json($this->getUser(), 200, [], [
-        'groups' => 'user:read', 
-        'circular_reference_limit' => 1, 
+      $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
+
+      return $this->json($discussions, 200, [], [
+        'groups' => 'discussion:read',
+        'circular_reference_limit' => 1,
         'circular_reference_handler' => function ($object) {
           return $object->getId();
         } 
@@ -124,9 +128,11 @@ class DiscussionAPIController extends Controller {
 
     $manager->flush();
     
-    return $this->json($this->getUser(), 200, [], [
-      'groups' => 'user:read', 
-      'circular_reference_limit' => 1, 
+    $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
+
+    return $this->json($discussions, 200, [], [
+      'groups' => 'discussion:read',
+      'circular_reference_limit' => 1,
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
@@ -168,10 +174,11 @@ class DiscussionAPIController extends Controller {
 
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger("discussion_channel", "new_message", $data);
-    
-      return $this->json($this->getUser(), 200, [], [
-        'groups' => 'user:read', 
-        'circular_reference_limit' => 1, 
+      $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
+
+      return $this->json($discussions, 200, [], [
+        'groups' => 'discussion:read',
+        'circular_reference_limit' => 1,
         'circular_reference_handler' => function ($object) {
           return $object->getId();
         } 
@@ -199,10 +206,10 @@ class DiscussionAPIController extends Controller {
     $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $pusher->trigger("discussion_channel", "new_message", $data);
     $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
-    
-    return $this->json($this->getUser(), 200, [], [
-      'groups' => 'user:read', 
-      'circular_reference_limit' => 1, 
+
+    return $this->json($discussions, 200, [], [
+      'groups' => 'discussion:read',
+      'circular_reference_limit' => 1,
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
@@ -226,10 +233,11 @@ class DiscussionAPIController extends Controller {
 
     $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
     $pusher->trigger("discussion_channel", "new_message", $data);
-    
-    return $this->json($this->getUser(), 200, [], [
-      'groups' => 'user:read', 
-      'circular_reference_limit' => 1, 
+    $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
+
+    return $this->json($discussions, 200, [], [
+      'groups' => 'discussion:read',
+      'circular_reference_limit' => 1,
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
@@ -315,15 +323,15 @@ class DiscussionAPIController extends Controller {
 
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger("discussion_channel", "new_message", $data);
-    
-      return $this->json($this->getUser(), 200, [], [
-        'groups' => 'user:read', 
-        'circular_reference_limit' => 1, 
+      $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
+
+      return $this->json($discussions, 200, [], [
+        'groups' => 'discussion:read',
+        'circular_reference_limit' => 1,
         'circular_reference_handler' => function ($object) {
           return $object->getId();
         } 
       ]);
-
     } catch (\Exception $e) {
       return $this->json($e->getMessage(), 404);
     }
