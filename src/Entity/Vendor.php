@@ -60,6 +60,7 @@ class Vendor
      * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("live:read")
+     * @Groups("user:follow")
      */
     private $summary;
 
