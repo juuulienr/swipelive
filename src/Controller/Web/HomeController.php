@@ -35,5 +35,12 @@ class HomeController extends Controller {
   public function privacy(){
     return $this->render('web/privacy.html.twig');
   }
+
+  /**
+   * @Route("/regles-communaute", name="rules")
+   */
+  public function rules(){
+    return $this->render('web/rules.html.twig');
+  }
 }
 

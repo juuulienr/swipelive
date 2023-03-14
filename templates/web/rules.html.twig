@@ -1,0 +1,111 @@
+{% extends 'web/base.html.twig' %}
+
+{% block title %} Règles de la communauté - Swipe Live {% endblock %}
+
+{% block metadata %}
+    <meta name="title" content="Règles de la communauté - Swipe Live"/>
+{% endblock %}
+    
+{% block stylesheets %}
+    <link rel="stylesheet" href="css/style.css">
+{% endblock %}
+
+
+{% block body %}
+    <div id="root-terms">
+      <div id="header-terms">
+        <a href="{{ path('landing') }}">
+          <img height="50" src="img/logo.png" alt="Logo Swipe Live"/>
+        </a>
+      </div>
+      
+      <div class="privacy">
+        <h2>Règles de la communauté</h2>
+        
+        <p>Swipe Live accueille et célèbre sur sa plateforme une communauté de vendeurs et d'acheteurs aux intérêts variés et aux origines diverses. Sans votre bonne humeur et la cohésion de votre communauté, Swipe Live ne serait pas l'application dynamique que nous sommes aujourd'hui. Nous nous efforçons d'amplifier cet esprit positif, mais réaliste, à mesure que nous nous développons. Pour cela, nous avons besoin de votre aide !</p>
+
+        <p>Pour garantir que Swipe Live soit un espace sûr pour tous nos utilisateurs, nous mettons en place de nouvelles directives communautaires et encourageons notre communauté à contribuer à la meilleure expérience Swipe Live possible. Veuillez prendre le temps de lire les directives de la communauté Swipe Live ci-dessous.</p>
+
+        <p>Nous avons une communauté diversifiée. Vous pouvez nous aider à la rendre exclusive pour tous les membres.</p>
+
+        <br>
+        <p><strong>Amusez- vous 🎉</strong></p>
+        <p>Les gens viennent sur Swipe Live pour s'amuser. Gardons l'esprit léger, et souhaitons le meilleur pour les autres.</p> 
+
+        <br>
+        <p><strong>Soyez respectueux 💙</strong></p>
+        <p>Soutenez-vous les uns les autres. Les vendeurs divertissent leur communauté et vendent des produits uniques. Cela exige de l'authenticité et de la vulnérabilité. De même, nos membres rendent notre communauté précieuse et enrichissante lorsqu'ils peuvent s'engager de manière authentique dans le chat et avec le vendeur en sachant que Swipe Live est un espace sûr pour tous. Nous vous demandons de vous soutenir mutuellement sur toutes les parties de la plateforme Swipe Live.</p> 
+
+        <br>
+        <p><strong>Se responsabiliser mutuellement 🤝</strong></p>
+        <p>Swipe Live travaille sur des outils permettant à la communauté de surveiller et de modérer les live sur notre plateforme. Ces outils permettront à tout un chacun de signaler toute activité qui violerait nos directives communautaires. Aujourd'hui, nous comptons sur notre public et certains membres de notre équipe pour surveiller activement les live Swipe Live. Si vous pensez qu'un membre de la communauté ou un vendeur ne respecte pas nos directives communautaires, veuillez signaler la transgression depuis le profil du vendeur.</p> 
+
+        <br>
+        <p><strong>A quoi sert Swipe Live 🤔</strong></p>
+        <p>Notre communauté continue de s'agrandir chaque semaine avec de nouveaux acheteurs curieux et intéressés par ce qu'est la vente en direct. Une partie de leur voyage sur Swipe Live consiste à rencontrer les présentateurs et leurs produits.</p> 
+
+        <br>
+        <p><strong>Un contenu créatif, divertissant et inspirant 😍</strong></p>
+        <p>Notre objectif est de fournir une plateforme permettant aux vendeurs de créer un contenu divertissant, inspiré par la créativité. Les fonctionnalités que nous développons, la culture que nous avons créée et les actions que nous menons quotidiennement sont au service de cet objectif.</p> 
+
+        <br>
+        <p><strong>Des clients curieux 👀</strong></p>
+        <p>Notre communauté continue de s'agrandir chaque semaine avec de nouveaux clients curieux et intéressés par ce qu'est la vente en direct. Une partie de leur voyage sur Swipe Live consiste à rencontrer les présentateurs et des présentatrices, les experts en la matière, les créateurs et les bâtisseurs de la communauté. Ils veulent connaître l'histoire qui se cache derrière les produits et soutenir les vendeurs et les marques.</p> 
+
+        <br>
+        <p><strong>Des vendeurs qui s’impliquent 👂</strong></p>
+        <p>Les vendeurs Swipe Live comptent parmi les personnes les plus créatives et les plus attentionnées. Ils veulent partager leur passion et créer un véritable lien avec leurs clients.</p> 
+
+        <br>
+        <p><strong>Des produits authentiques et uniques 🛍</strong></p>
+        <p>Sur Swipe Live, vous pouvez découvrir des produits qu'il est difficile de découvrir autrement. Lister des articles avec intégrité : toutes les informations associées à vos articles sur Swipe Live doivent être précises et honnêtes.</p> 
+
+        <br>
+        <p><strong>Conversations et engagement respectueux 🫶</strong></p>
+        <p>Il est de la responsabilité de chacun de contribuer à ce que le ton d’un live - que ce soit en direct ou dans les commentaires - reste positif et accueillant pour tous. Utilisez les fonctionnalités de l'application Swipe Live avec respect. Nous ne tolérons pas le spamming excessif du chat d'une émission, le phishing, l'utilisation d'automates ou la manipulation illégale des données d'une émission.</p> 
+
+        <br>
+        <h2>⚠️ Ce qu’il ne faut pas faire sur Swipe Live </h2>
+
+        <br>
+        <p><strong>⛔️ Pas de harcèlement ni de diffamation</strong></p>
+        <p>N'organisez pas, ne participez pas et n'encouragez pas le harcèlement et la diffamation d'autrui. Des désaccords peuvent survenir et sont à prévoir, mais les commentaires négatifs continus, répétitifs, diffamatoires ou graves ne sont pas acceptables.</p> 
+
+        <br>
+        <p><strong>⛔️ Pas d'intimidation</strong></p>
+        <p>Il est interdit d'intimider ou de tenir des propos négatifs (remarques racistes ou sexistes, commentaires empreints de préjugés, avances sexuelles, diffamation entre pairs, etc.) à l'égard d'autres vendeurs, clients ou membres de la communauté pendant un live (à la caméra ou dans le chat de commentaires).</p> 
+
+        <br>
+        <p><strong>⛔️ Pas de violation de la confidentialité</strong></p>
+        <p>Il n'y a pas de partage d'informations d'identification personnelles privées (PII) de quiconque dans la communauté sur notre plateforme. Limitez le partage d'informations d'identification personnelle en direct.</p> 
+
+        <br>
+        <p><strong>⛔️ Pas de discours haineux</strong></p>
+        <p>N'organisez pas, n'encouragez pas et ne coordonnez pas de discours haineux sur la plate-forme. Il est inacceptable d'attaquer une personne ou une communauté sur la base d'attributs tels que la race, l'origine ethnique, l'origine nationale, le sexe, le genre, l'orientation sexuelle, l'appartenance religieuse ou les handicaps.</p> 
+
+        <br>
+        <p><strong>⛔️ Pas de violence ni de menaces de violence</strong></p>
+        <p>La violence est strictement interdite pendant tout spectacle sur notre plateforme. Ne faites pas de menaces de violence ou de menaces de nuire à autrui ou à vous-même. Cela inclut les menaces indirectes, ainsi que le partage ou la menace de partager les informations personnelles privées de quelqu'un. Veuillez signaler tout incident de violence ou de menace de violence dès que possible sur le profil de la personne puis “signaler".</p> 
+
+        <br>
+        <p><strong>⛔️ Pas de contenu illégal</strong></p>
+        <p>De manière générale, vous ne devez pas promouvoir, encourager ou adopter un comportement illégal.</p> 
+
+        <br>
+        <p><strong>⛔️ Respecter la plateforme et les interventions communautaires</strong></p>
+        <p>Les communautés saines sont celles où les participants s'engagent en toute bonne foi, et en présumant de la bonne foi des autres. Swipe Live peut, à sa discrétion, intervenir pour mettre fin à une émission ou suspendre un compte lorsqu'elle estime que c'est dans le meilleur intérêt de la communauté ou de la plateforme. Cela ne devrait se produire que rarement, mais lorsque cela se produit, notre objectif est de garder la plate-forme inclusive et de donner au vendeur une chance de se calmer et de se conformer à nos directives.</p>
+        <p>Si les problèmes continuent à se produire, Swipe Live peut intervenir en prenant des mesures pour résoudre les problèmes. Les prochaines étapes seront évaluées et parfois une éducation pure et simple de la partie impliquée sera utile, mais ces actions pourraient potentiellement inclure des avertissements, une surveillance et une modération du live, une suspension du compte, ainsi qu'une suppression du compte. </p>
+        <p>Nous espérons que des actions permanentes ne seront jamais nécessaires, mais nous nous réservons le droit de prendre de telles mesures lorsque des situations extrêmes le justifient.</p>
+
+
+      </div><br><br>
+    </div>
+{% endblock %}
+
+
+
+
+
+
+
+

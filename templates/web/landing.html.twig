@@ -3,11 +3,11 @@
 {% block title %}Swipe Live - Le live shopping réinventé {% endblock %}
 
 {% block metadata %}
-    <meta name="title" content="Swipe Live - Le live shopping réinventé."/>
-    <meta name="description" content="Avec Swipe Live, vous pouvez acheter, vendre, presenter vos produits en live, imprimer vos bons de livraisons, suivre vos colis... C'est tellement plus fun ! Essayez maintenant." />
+    <meta name="title" content="Swipe Live - Achetez, Vendez, Swipez !"/>
+    <meta name="description" content="Swipe Live est une application de Live Shopping - Découvrez, intéragissez et achetez avec des vidéos en direct. Swipe Live est une app de diffusion en direct qui permet aux utilisateurs d'interagir avec les marques et les vendeurs en temps réel et de découvrir des produits à des prix réduits." />
     <meta property="og:image" content="{{ app.request.schemeAndHttpHost }}/img/share.jpg" />
-    <meta property="og:title" content="Swipe Live - Le live shopping réinventé."/>
-    <meta property="og:description" content="Avec Swipe Live, vous pouvez acheter, vendre, presenter vos produits en live, imprimer vos bons de livraisons, suivre vos colis... C'est tellement plus fun ! Essayez maintenant."/>
+    <meta property="og:title" content="Swipe Live - Achetez, Vendez, Swipez !"/>
+    <meta property="og:description" content="Swipe Live est une application de Live Shopping - Découvrez, intéragissez et achetez avec des vidéos en direct. Swipe Live est une app de diffusion en direct qui permet aux utilisateurs d'interagir avec les marques et les vendeurs en temps réel et de découvrir des produits à des prix réduits."/>
 {% endblock %}
     
 {% block stylesheets %}
@@ -36,8 +36,8 @@
             <div id="header" >
               <img id="logo" src="img/apple-touch-icon.png" alt="Logo Swipe Live" />
             </div>
-            <h1 class="Box-sc-1g1k12l-0 Text-sc-1be7qv6-0 eZYXYz">Le live shopping réinventé. <br>Dans une application.</h1>
-            <p class="Box-sc-1g1k12l-0 Text-sc-1be7qv6-0 jdrwwQ dChUYm">Avec Swipe Live, vous pouvez acheter, vendre, presenter vos produits en live, imprimer vos bons de livraisons, suivre vos colis... C'est tellement plus fun ! Essayez maintenant.</p>
+            <h1 class="Box-sc-1g1k12l-0 Text-sc-1be7qv6-0 eZYXYz">Le futur du e-commerce. <br>Dans une application.</h1>
+            <p class="Box-sc-1g1k12l-0 Text-sc-1be7qv6-0 jdrwwQ dChUYm">Achetez, vendez et présentez vos produits en live.  <br>Avec Swipe Live c'est tellement plus fun ! <br> Essayez maintenant.</p>
             <div class="flex" id="download">
               <div class="dl-btn">
                 <a href="#">
@@ -62,10 +62,13 @@
     <div id="scroll-indicator"></div>
     <div class="nav">
       <div>
-        <a href="{{ path('legal') }}">Mentions légales</a>
+        <a href="{{ path('legal') }}">Mentions</a>
       </div>
       <div>
         <a href="{{ path('privacy') }}">Confidentialité</a>
+      </div>
+      <div>
+        <a href="{{ path('rules') }}">Communauté</a>
       </div>
       <div>
         <a href="mailto:contact@swipelive.fr">Contact</a>
