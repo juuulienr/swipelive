@@ -57,6 +57,7 @@ class WebhookController extends Controller {
         if ($clip) {
           $clip->setResourceUri($result["payload"]["resourceUri"]);
           $clip->setEventId($result["eventId"]);
+          $clip->setTotalLikes($clip->getLive()->getTotalLikes());
 
           if (array_key_exists("preview", $result["payload"])) {
             $clip->setPreview($result["payload"]["preview"]);
@@ -87,6 +88,7 @@ class WebhookController extends Controller {
 
         if ($clip) {
           $clip->setEventId($result["eventId"]);
+          $clip->setTotalLikes($clip->getLive()->getTotalLikes());
 
           if (array_key_exists("preview", $result["payload"])) {
             $clip->setPreview($result["payload"]["preview"]);
@@ -103,6 +105,7 @@ class WebhookController extends Controller {
 
         if ($clip) {
           $clip->setEventId($result["eventId"]);
+          $clip->setTotalLikes($clip->getLive()->getTotalLikes());
           $manager->flush();
         }
       }

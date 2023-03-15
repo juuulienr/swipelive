@@ -81,6 +81,18 @@ class ClipAPIController extends Controller {
     }
   }
 
+  /**
+   * Mettre à jour les likes
+   *
+   * @Route("/user/api/clip/{id}/update/likes", name="user_api_clip_update_likes", methods={"PUT"})
+   */
+  public function updateLikes(Clip $clip, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+    $clip->setTotalLikes($clip->getTotalLikes() + 1);
+    $manager->flush();
+
+    return $this->json(true, 200);
+  }
+
 
   /**
    * Supprimer un clip

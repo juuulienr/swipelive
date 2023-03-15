@@ -108,12 +108,20 @@ class Clip
      */
     private $comments;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups("clip:read")
+     * @Groups("user:read")
+     */
+    private $totalLikes;
+
     
     public function __construct()
     {
         $this->status = "waiting";
         $this->createdAt = new \DateTime('now', timezone_open('UTC'));
         $this->comments = new ArrayCollection();
+        $this->totalLikes = 200;
     }
 
 
@@ -292,6 +300,18 @@ class Clip
                 $comment->setClip(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTotalLikes(): ?int
+    {
+        return $this->totalLikes;
+    }
+
+    public function setTotalLikes(?int $totalLikes): self
+    {
+        $this->totalLikes = $totalLikes;
 
         return $this;
     }
