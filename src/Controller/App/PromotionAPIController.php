@@ -51,8 +51,9 @@ class PromotionAPIController extends Controller {
    *
    * @Route("/user/api/promotions/{id}/active", name="user_api_promotions_active", methods={"GET"})
    */
-  public function active(Vendor $vendor, Request $request, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer)
+  public function active(Product $product, Request $request, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer)
   {
+    $vendor = $product->getVendor();
     $promotion = $promotionRepo->findOneBy([ "vendor" => $vendor, "isActive" => true ]);
     
     return $this->json($promotion, 200, [], ['groups' => 'promotion:read'], 200);
