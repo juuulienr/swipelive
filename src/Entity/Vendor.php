@@ -185,6 +185,8 @@ class Vendor
      * @ORM\OneToMany(targetEntity=Promotion::class, mappedBy="vendor", orphanRemoval=true)
      * @ORM\OrderBy({"createdAt" = "DESC"})
      * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $promotions;
 

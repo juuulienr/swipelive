@@ -17,6 +17,8 @@ class Follow
      * @ORM\Column(type="integer")
      * @Groups("user:read")
      * @Groups("user:follow")
+     * @Groups("clip:read")
+     * @Groups("live:read")
      */
     private $id;
 
