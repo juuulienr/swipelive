@@ -120,6 +120,7 @@ class Live
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups("live:read")
      */
     private $totalLikes;
 
