@@ -156,9 +156,9 @@ class APIController extends Controller {
   /**
    * Afficher les produits d'un vendeur
    *
-   * @Route("/user/api/products/vendor/{id}", name="api_products_all_vendor", methods={"GET"})
+   * @Route("/user/api/shop/{id}", name="api_shop_vendor", methods={"GET"})
    */
-  public function allProductsVendor(Vendor $vendor, Request $request, ObjectManager $manager, ProductRepository $productRepo)
+  public function shopVendor(Vendor $vendor, Request $request, ObjectManager $manager, ProductRepository $productRepo)
   {
     $products = $productRepo->findByVendor($vendor);
 
@@ -217,6 +217,26 @@ class APIController extends Controller {
 
 
   /**
+   * Récupérer les produits d'un profil
+   *
+   * @Route("/api/profile/{id}/products", name="api_profile_shop", methods={"GET"})
+   */
+  public function profileProducts(User $user, Request $request, ObjectManager $manager, ProductRepository $productRepo)
+  {
+    $products = $productRepo->findByVendor($user->getVendor());
+
+    return $this->json($products, 200, [], [
+      'groups' => 'product:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
+  }
+
+
+
+  /**
    * Afficher les catégories
    *
    * @Route("/api/categories", name="api_categories", methods={"GET"})
@@ -248,7 +268,6 @@ class APIController extends Controller {
     } else {
       return $this->json("L'image est introuvable !", 404);
     }
-
 
     $filename = md5(time().uniqid()); 
     $fullname = $filename . "." . $extension; 

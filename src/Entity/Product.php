@@ -23,17 +23,18 @@ class Product
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("product:read")
-     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $title;
 
@@ -43,7 +44,6 @@ class Product
      * @Groups("product:read")
      * @Groups("clip:read")
      * @Groups("live:read")
-     * @Groups("user:read")
      */
     private $category;
 
@@ -61,47 +61,47 @@ class Product
      * @Groups("live:read")
      * @Groups("clip:read")
      * @Groups("category:read")
-     * @Groups("user:read")
+     * @Groups("favoris:read")
      */
     private $description;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
      * @Groups("product:read")
-     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
+     * @Groups("favoris:read")
      */
     private $price;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
      * @Groups("product:read")
-     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
+     * @Groups("favoris:read")
      */
     private $compareAtPrice;
 
     /**
      * @ORM\Column(type="integer")
      * @Groups("product:read")
-     * @Groups("user:read")
      * @Groups("live:read")
      * @Groups("clip:read")
+     * @Groups("favoris:read")
      */
     private $quantity;
 
     /**
      * @ORM\OneToMany(targetEntity=Upload::class, mappedBy="product", cascade={"persist"})
      * @Groups("product:read")
-     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $uploads;
 
@@ -118,20 +118,20 @@ class Product
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
      * @Groups("product:read")
-     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
+     * @Groups("favoris:read")
      */
     private $weight;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("product:read")
-     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
+     * @Groups("favoris:read")
      */
     private $weightUnit;
 
@@ -139,22 +139,22 @@ class Product
      * @ORM\OneToMany(targetEntity=Option::class, mappedBy="product", cascade={"persist"})
      * @ORM\OrderBy({"position" = "ASC"})
      * @Groups("product:read")
-     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $options;
 
     /**
      * @ORM\OneToMany(targetEntity=Variant::class, mappedBy="product", cascade={"persist"})
      * @Groups("product:read")
-     * @Groups("user:read")
      * @Groups("clip:read")
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $variants;
 

@@ -50,7 +50,7 @@ class ClipRepository extends ServiceEntityRepository
     }
 
     return $query->orderBy('c.createdAt', 'ASC')
-    ->setMaxResults(20)
+    ->setMaxResults(18)
     ->getQuery()
     ->getResult();
   }
@@ -68,7 +68,7 @@ class ClipRepository extends ServiceEntityRepository
     }
 
     return $query->orderBy('c.createdAt', 'DESC')
-    ->setMaxResults(20)
+    ->setMaxResults(18)
     ->getQuery()
     ->getResult();
   }

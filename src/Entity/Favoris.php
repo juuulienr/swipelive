@@ -15,12 +15,15 @@ class Favoris
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("user:read")
+     * @Groups("favoris:read")
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="favoris")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups("favoris:read")
      * @Groups("user:read")
      */
     private $product;

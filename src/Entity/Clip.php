@@ -37,28 +37,24 @@ class Clip
     /**
      * @ORM\Column(type="integer")
      * @Groups("clip:read")
-     * @Groups("user:read")
      */
     private $start;
 
     /**
      * @ORM\Column(type="integer")
      * @Groups("clip:read")
-     * @Groups("user:read")
      */
     private $end;
 
     /**
      * @ORM\Column(type="integer")
      * @Groups("clip:read")
-     * @Groups("user:read")
      */
     private $duration;
 
     /**
      * @ORM\Column(type="text", nullable=true)
      * @Groups("clip:read")
-     * @Groups("user:read")
      */
     private $resourceUri;
 
@@ -66,14 +62,12 @@ class Clip
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="clips")
      * @ORM\JoinColumn(nullable=false)
      * @Groups("clip:read")
-     * @Groups("user:read")
      */
     private $product;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("clip:read")
-     * @Groups("user:read")
      */
     private $preview;
 
@@ -85,14 +79,12 @@ class Clip
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("clip:read")
-     * @Groups("user:read")
      */
     private $status;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      * @Groups("clip:read")
-     * @Groups("user:read")
      */
     private $createdAt;
 
@@ -111,7 +103,6 @@ class Clip
     /**
      * @ORM\Column(type="integer", nullable=true)
      * @Groups("clip:read")
-     * @Groups("user:read")
      */
     private $totalLikes;
 

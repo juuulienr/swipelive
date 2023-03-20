@@ -23,6 +23,7 @@ class Variant
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $id;
 
@@ -34,6 +35,7 @@ class Variant
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $title;
 
@@ -45,6 +47,7 @@ class Variant
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $price;
 
@@ -56,6 +59,7 @@ class Variant
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $compareAtPrice;
 
@@ -67,6 +71,7 @@ class Variant
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $quantity;
 
@@ -78,6 +83,7 @@ class Variant
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $position;
 
@@ -89,6 +95,7 @@ class Variant
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $option1;
 
@@ -100,6 +107,7 @@ class Variant
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $option2;
 
@@ -121,6 +129,7 @@ class Variant
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $weight;
 
@@ -132,6 +141,7 @@ class Variant
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $weightUnit;
 

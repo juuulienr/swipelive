@@ -25,63 +25,54 @@ class Discussion
   /**
    * @ORM\Column(type="text")
    * @Groups("discussion:read")
-   * @Groups("user:read")
    */
   private $preview;
 
   /**
    * @ORM\Column(type="datetime")
    * @Groups("discussion:read")
-   * @Groups("user:read")
    */
   private $createdAt;
 
   /**
    * @ORM\Column(type="datetime", nullable=true)
    * @Groups("discussion:read")
-   * @Groups("user:read")
    */
   private $updatedAt;
 
   /**
    * @ORM\OneToMany(targetEntity=Message::class, mappedBy="discussion", cascade={"persist"}), orphanRemoval=true)
    * @Groups("discussion:read")
-   * @Groups("user:read")
    */
   private $messages;
 
   /**
    * @ORM\Column(type="boolean", nullable=true)
    * @Groups("discussion:read")
-   * @Groups("user:read")
    */
   private $unseen;
 
   /**
    * @ORM\Column(type="boolean", nullable=true)
    * @Groups("discussion:read")
-   * @Groups("user:read")
    */
   private $unseenVendor;
 
   /**
    * @ORM\ManyToOne(targetEntity=User::class, inversedBy="discussions")
    * @Groups("discussion:read")
-   * @Groups("user:read")
    */
   private $user;
 
   /**
    * @ORM\ManyToOne(targetEntity=User::class, inversedBy="discussions")
    * @Groups("discussion:read")
-   * @Groups("user:read")
    */
   private $vendor;
 
   /**
    * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="discussions")
    * @Groups("discussion:read")
-   * @Groups("user:read")
    */
   private $purchase;
 

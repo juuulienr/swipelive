@@ -23,6 +23,7 @@ class Upload
      * @Groups("clip:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $id;
 
@@ -35,6 +36,7 @@ class Upload
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $filename;
 
@@ -47,6 +49,7 @@ class Upload
      * @Groups("category:read")
      * @Groups("live:read")
      * @Groups("order:read")
+     * @Groups("favoris:read")
      */
     private $position;
 

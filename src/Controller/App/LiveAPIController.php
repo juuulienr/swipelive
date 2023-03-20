@@ -141,6 +141,9 @@ class LiveAPIController extends Controller {
           } else {
             return $this->json(false, 404);
           }
+        } else {
+          $live->setCreatedAt(new \DateTime('now', timezone_open('UTC')));
+          $manager->flush();
         }
 
         $channel = "channel" . $live->getId();

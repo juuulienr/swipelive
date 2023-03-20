@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\App;
+namespace App\Controller\Webhook;
 
 use App\Entity\Clip;
 use App\Entity\Live;

@@ -30,7 +30,7 @@ class ProductRepository extends ServiceEntityRepository
       }
 
       return $query->getQuery()
-      ->setMaxResults(20)
+      ->setMaxResults(18)
       ->getResult();
     }
 

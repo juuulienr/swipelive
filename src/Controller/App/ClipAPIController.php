@@ -34,9 +34,9 @@ class ClipAPIController extends Controller {
   /**
    * Récupérer tous les clips
    *
-   * @Route("/user/api/clips/all", name="user_api_clips_all", methods={"GET"})
+   * @Route("/user/api/clips", name="user_api_clips", methods={"GET"})
    */
-  public function allClips(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
+  public function clips(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
     $clips = $clipRepo->findByVendor($this->getUser()->getVendor());
 
     return $this->json($clips, 200, [], [
@@ -84,7 +84,7 @@ class ClipAPIController extends Controller {
   /**
    * Mettre à jour les likes
    *
-   * @Route("/user/api/clip/{id}/update/likes", name="user_api_clip_update_likes", methods={"PUT"})
+   * @Route("/user/api/clips/{id}/update/likes", name="user_api_clips_update_likes", methods={"PUT"})
    */
   public function updateLikes(Clip $clip, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     $clip->setTotalLikes($clip->getTotalLikes() + 1);
