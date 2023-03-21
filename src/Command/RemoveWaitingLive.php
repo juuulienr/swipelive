@@ -26,7 +26,7 @@ class RemoveWaitingLive extends ContainerAwareCommand
   {
     $this
     ->setName('remove:lives')
-    ->setDescription('Supprimer les lives en attente ou terminés qui ont pas de clips')
+    ->setDescription('Delete live without clip')
     ;
   }
 

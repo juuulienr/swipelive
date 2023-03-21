@@ -24,7 +24,7 @@ class CreateClipsFromLive extends ContainerAwareCommand {
   protected function configure() {
     $this
     ->setName('create:clips')
-    ->setDescription('Créer les clips depuis un live')
+    ->setDescription('Create clips from a live')
     ;
   }
 
@@ -34,7 +34,7 @@ class CreateClipsFromLive extends ContainerAwareCommand {
 
     if ($clips) {
       foreach ($clips as $clip) {
-        // creation du clip sur bambuser
+        // create clip
         if ($clip->getCreatedAt()->modify('+2 minutes') < $now && $clip->getStatus() != "available") {
           $data = [
             "source" => [
