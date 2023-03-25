@@ -38,13 +38,6 @@ class WebhookController extends Controller {
    */
   public function bambuser(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager, LiveProductsRepository $liveProductRepo) {
     $result = json_decode($request->getContent(), true);
-    
-    // try {
-    //   $this->functionFailsForSure();
-    // } catch (\Throwable $exception) {
-     // \Sentry\captureMessage("Bambuser error");
-    //   \Sentry\captureException($exception);
-    // }
 
     // broadcast
     if ($result["collection"] == "broadcast") {
@@ -157,71 +150,90 @@ class WebhookController extends Controller {
 
 
 
-
   /**
-   * Sendcloud Weebhook
+   * Webhooks Upelgo
    *
-   * @Route("/api/sendcloud/webhooks", name="api_sendcloud_webhooks")", methods={"POST"})
+   * @Route("/api/upelgo/webhooks", name="api_upelgo_webhooks", methods={"POST"})
    */
-  public function sendcloud(Request $request, ObjectManager $manager, OrderRepository $orderRepo, OrderStatusRepository $statusRepo) {
+  public function upelgo(Request $request, ObjectManager $manager, OrderRepository $orderRepo, OrderStatusRepository $statusRepo) {
     $result = json_decode($request->getContent(), true);
-
-    // update parcel status
-    if ($result["action"] == "parcel_status_changed") {
-      $parcelId = $result["parcel"]["id"];
-      $order = $orderRepo->findOneByParcelId($parcelId);
-
-      if ($order) {
-        if ($order->getTrackingNumber()) {
-          $url = "https://panel.sendcloud.sc/api/v2/tracking" . '?' . $order->getTrackingNumber();
-          $curl = curl_init();
-
-          curl_setopt_array($curl, [
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => [
-              "Authorization: Basic MzgyNjY4NmYyZGJjNDE4MzgwODk4Y2MyNTRmYzBkMjg6MDk2ZTQ0Y2I5YjI2NDMxYjkwY2M1YjVkZWZjOWU5MTU=",
-              "Content-Type: application/json"
-            ],
-          ]);
-
-          $response = curl_exec($curl);
-          $result = json_decode($response);
-          curl_close($curl);
-
-          if ($result && array_key_exists("expected_delivery_date", $result)) {
-            $order->setExpectedDelivery(new \Datetime($result->expected_delivery_date));
-            $manager->flush();
-
-            foreach ($result->statuses as $status) {
-              $orderStatus = $statusRepo->findOneByStatusId($status->parcel_status_history_id);
-
-              if (!$orderStatus) {
-                $orderStatus = new OrderStatus();
-                $orderStatus->setUpdateAt(new \Datetime($status->carrier_update_timestamp));
-                $orderStatus->setMessage($status->carrier_message);
-                $orderStatus->setStatus($status->parent_status);
-                $orderStatus->setCode($status->carrier_code);
-                $orderStatus->setStatusId($status->parcel_status_history_id);
-                $orderStatus->setShipping($order);
-                $order->setShippingStatus($status->parent_status);
-                $order->setUpdatedAt(new \Datetime($status->carrier_update_timestamp));
-
-                $manager->persist($orderStatus);
-                $manager->flush();
-              }
-            }
-          }
-        }
-      }
+    
+    try {
+      $this->functionFailsForSure();
+    } catch (\Throwable $exception) {
+      \Sentry\captureException($exception);
     }
+
     return $this->json(true, 200);
   }
+
+
+
+
+  // /**
+  //  * Sendcloud Weebhook
+  //  *
+  //  * @Route("/api/sendcloud/webhooks", name="api_sendcloud_webhooks")", methods={"POST"})
+  //  */
+  // public function sendcloud(Request $request, ObjectManager $manager, OrderRepository $orderRepo, OrderStatusRepository $statusRepo) {
+  //   $result = json_decode($request->getContent(), true);
+
+  //   // update parcel status
+  //   if ($result["action"] == "parcel_status_changed") {
+  //     $parcelId = $result["parcel"]["id"];
+  //     $order = $orderRepo->findOneByParcelId($parcelId);
+
+  //     if ($order) {
+  //       if ($order->getTrackingNumber()) {
+  //         $url = "https://panel.sendcloud.sc/api/v2/tracking" . '?' . $order->getTrackingNumber();
+  //         $curl = curl_init();
+
+  //         curl_setopt_array($curl, [
+  //           CURLOPT_URL => $url,
+  //           CURLOPT_RETURNTRANSFER => true,
+  //           CURLOPT_ENCODING => "",
+  //           CURLOPT_MAXREDIRS => 10,
+  //           CURLOPT_TIMEOUT => 30,
+  //           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  //           CURLOPT_CUSTOMREQUEST => "GET",
+  //           CURLOPT_HTTPHEADER => [
+  //             "Authorization: Basic MzgyNjY4NmYyZGJjNDE4MzgwODk4Y2MyNTRmYzBkMjg6MDk2ZTQ0Y2I5YjI2NDMxYjkwY2M1YjVkZWZjOWU5MTU=",
+  //             "Content-Type: application/json"
+  //           ],
+  //         ]);
+
+  //         $response = curl_exec($curl);
+  //         $result = json_decode($response);
+  //         curl_close($curl);
+
+  //         if ($result && array_key_exists("expected_delivery_date", $result)) {
+  //           $order->setExpectedDelivery(new \Datetime($result->expected_delivery_date));
+  //           $manager->flush();
+
+  //           foreach ($result->statuses as $status) {
+  //             $orderStatus = $statusRepo->findOneByStatusId($status->parcel_status_history_id);
+
+  //             if (!$orderStatus) {
+  //               $orderStatus = new OrderStatus();
+  //               $orderStatus->setUpdateAt(new \Datetime($status->carrier_update_timestamp));
+  //               $orderStatus->setMessage($status->carrier_message);
+  //               $orderStatus->setStatus($status->parent_status);
+  //               $orderStatus->setCode($status->carrier_code);
+  //               $orderStatus->setStatusId($status->parcel_status_history_id);
+  //               $orderStatus->setShipping($order);
+  //               $order->setShippingStatus($status->parent_status);
+  //               $order->setUpdatedAt(new \Datetime($status->carrier_update_timestamp));
+
+  //               $manager->persist($orderStatus);
+  //               $manager->flush();
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return $this->json(true, 200);
+  // }
 }
 
 
