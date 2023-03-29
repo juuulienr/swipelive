@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Webhook;
+namespace App\Controller\Admin;
 
 use App\Entity\Clip;
 use App\Entity\Live;
@@ -158,10 +158,12 @@ class WebhookController extends Controller {
   public function upelgo(Request $request, ObjectManager $manager, OrderRepository $orderRepo, OrderStatusRepository $statusRepo) {
     $result = json_decode($request->getContent(), true);
     
-    try {
-      $this->functionFailsForSure();
-    } catch (\Throwable $exception) {
-      \Sentry\captureException($exception);
+    if ($result["action"] != "multirate") {
+      try {
+        $this->functionFailsForSure();
+      } catch (\Throwable $exception) {
+        \Sentry\captureException($exception);
+      }
     }
 
     return $this->json(true, 200);
