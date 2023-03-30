@@ -41,76 +41,78 @@ class ShippingAPIController extends Controller {
   /**
    * @Route("/api/shipping/price", name="user_api_shipping_price")
    */
-  public function shippingPrice(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo) {
-    // if ($json = $request->getContent()) {
-	    // $param = json_decode($json, true);
+  public function shippingPrice(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo) {
+    if ($json = $request->getContent()) {
+	    $param = json_decode($json, true);
 
-	    // if ($param) {
-	    	// $lineItems = $param["lineItems"];
-	    	// $to_country = $param["countryShort"];
-        // $totalWeight = 0;
+	    if ($param) {
+	    	$lineItems = $param["lineItems"];
+	    	$to_country = $param["countryShort"];
+        $nbOrders = 1000 + sizeof($orderRepo->findAll());
+        $now = new \DateTime('now', timezone_open('UTC'));
+        $totalWeight = 0;
 
-	      // if (!$lineItems) {
-	      //   return $this->json("Un produit est obligatoire !", 404); 
-	      // }
+	      if (!$lineItems) {
+	        return $this->json("Un produit est obligatoire !", 404); 
+	      }
 
-        // foreach ($lineItems as $lineItem) {
-        //   if ($lineItem["variant"]) {
-        //     $weightUnit = $lineItem["variant"]["weightUnit"];
-        //     $weight = $lineItem["variant"]["weight"];
-        //   } else {
-        //     $weightUnit = $lineItem["product"]["weightUnit"];
-        //     $weight = $lineItem["product"]["weight"];
-        //   }
-        //   $quantity = $lineItem["quantity"];
+        foreach ($lineItems as $lineItem) {
+          if ($lineItem["variant"]) {
+            $weightUnit = $lineItem["variant"]["weightUnit"];
+            $weight = $lineItem["variant"]["weight"];
+          } else {
+            $weightUnit = $lineItem["product"]["weightUnit"];
+            $weight = $lineItem["product"]["weight"];
+          }
+          $quantity = $lineItem["quantity"];
 
-        //   if ($weightUnit == "kg") {
-        //     $totalWeight += round($weight * 1000 * $quantity);
-        //   } else {
-        //     $totalWeight += round($weight * $quantity);
-        //   }
-        // }
+          if ($weightUnit == "kg") {
+            $totalWeight += round($weight * 1000 * $quantity);
+          } else {
+            $totalWeight += round($weight * $quantity);
+          }
+        }
+
+        dump(time());
 
 	      try {
-
           // récupérer les prix pour les livraisons
-          $data = [
-            "order_id" => "Test_order_1001", 
-            "locale" => "fr_FR", 
-            "shipment" => [
-              "id" => 0, 
-              "type" => 2, 
-              "stackable" => false, 
-              "shipment_date" => "2023-05-25", 
-              "delivery_type" => "HOME_DELIVERY", 
-              "insurance" => true, 
-              "insurance_type" => "UPELA", 
-              "insurance_price" => 100 
-            ], 
-            "ship_from" => [
-              "pro" => true, 
-              "postcode" => "75001", 
-              "city" => "Paris", 
-              "country_code" => "FR" 
-            ], 
-            "ship_to" => [
-              "pro" => true, 
-              "postcode" => "01700", 
-              "city" => "Miribel", 
-              "country_code" => "FR" 
-            ], 
-            "parcels" => [
-              [
-                "number" => 1, 
-                "weight" => 0.3, 
-                "volumetric_weight" => 0.3, 
-                "x" => 20, 
-                "y" => 20, 
-                "z" => 20 
-              ] 
-            ] 
-          ]; 
-
+          // $data = [
+          //   "order_id" => "Order_" . $nbOrders . "_" . time(), 
+          //   "locale" => "fr_FR", 
+          //   "shipment" => [
+          //     "id" => 0, 
+          //     "type" => 2, 
+          //     "stackable" => false, 
+          //     "shipment_date" => $now->format('Y') . "-" . $now->format('m') . "-" . $now->format('d'), 
+          //     "delivery_type" => "HOME_DELIVERY", 
+          //     "insurance" => true, 
+          //     "insurance_type" => "UPELA", 
+          //     "insurance_price" => 100 
+          //   ], 
+          //   "ship_from" => [
+          //     "pro" => true, 
+          //     "postcode" => "75001", 
+          //     "city" => "Paris", 
+          //     "country_code" => "FR" 
+          //   ], 
+          //   "ship_to" => [
+          //     "pro" => true, 
+          //     "postcode" => "01700", 
+          //     "city" => "Miribel", 
+          //     "country_code" => "FR" 
+          //   ], 
+          //   "parcels" => [
+          //     [
+          //       "number" => 1, 
+          //       "weight" => 0.3, 
+          //       "volumetric_weight" => 0.3, 
+          //       "x" => 20, 
+          //       "y" => 20, 
+          //       "z" => 20 
+          //     ] 
+          //   ] 
+          // ]; 
 
 
           $ch = curl_init();
@@ -121,109 +123,74 @@ class ShippingAPIController extends Controller {
           curl_setopt($ch, CURLOPT_URL, "https://www.upelgo.com/api/carrier/multi-rate");
 
           $result = curl_exec($ch);
-          dump($result);
           $result = json_decode($result);
-          dump($result);
           curl_close($ch);
 
-          dump($result->offers);
-          // dump($result->success);
-          // dump($result->errors);
+          dump($result);
 
-
-	      	if ($result->offers && $result->success == true) {
+	      	if ($result->success == true) {
 	      		foreach ($result->offers as $offer) {
-                dump($offer);
-                // dump($offer->shipment_id);
-                // dump($offer->carrier_id);
-                // dump($offer->order_id);
-                // dump($offer->carrier_name);
-                // dump($offer->carrier_logo);
-                // dump($offer->user_id);
-                // dump($offer->service_id);
-                // dump($offer->service_name);
-                // dump($offer->is_express);
-                // dump($offer->allow_pickup);
-                // dump($offer->allow_dropoff);
-                // dump($offer->delivery_to_collection_point);
-                // dump($offer->service_code);
-                // dump($offer->carrier_price_te);
-                // dump($offer->currency);
-                // dump($offer->shipment_date);
-                // dump($offer->shipment_time);
-                // dump($offer->delivery_date);
-                // dump($offer->delivery_time);
-                // dump($offer->transit_time);
-                // dump($offer->rating);
-                // dump($offer->advice);
-                // dump($offer->validity_date);
-                // dump($offer->price_te);
-                // dump($offer->extra_cost);
-                // dump($offer->process_time);
+              dump($offer);
+              // dump($offer->shipment_id);
+              // dump($offer->carrier_id);
+              // dump($offer->order_id);
+              // dump($offer->carrier_name);
+              // dump($offer->carrier_logo);
+              // dump($offer->user_id);
+              // dump($offer->service_id);
+              // dump($offer->service_name);
+              // dump($offer->is_express);
+              // dump($offer->allow_pickup);
+              // dump($offer->allow_dropoff);
+              // dump($offer->delivery_to_collection_point);
+              // dump($offer->service_code);
+              // dump($offer->carrier_price_te);
+              // dump($offer->currency);
+              // dump($offer->shipment_date);
+              // dump($offer->shipment_time);
+              // dump($offer->delivery_date);
+              // dump($offer->delivery_time);
+              // dump($offer->transit_time);
+              // dump($offer->rating);
+              // dump($offer->advice);
+              // dump($offer->validity_date);
+              // dump($offer->price_te);
+              // dump($offer->extra_cost);
+              // dump($offer->process_time);
+
+              // if ($value->code == 'colissimo:europe-home' || $value->code == 'mondial_relay:home_international' || $value->code == 'mondial_relay:service_point,international' || $value->code == 'chronopost:shop2shop' || ($value->code == 'colissimo:home/fr' && !str_contains($method->name, 'Colissimo Home Signature')) || $value->code == 'mondial_relay:service_point' || $value->code == 'chronopost:service_point_abroad') {
+
+              //   $data = [ 
+              //     "id" => $method->id,
+              //     "carrier" => $value->carrier,
+              //     "name" => $value->name,
+              //     "code" => $value->code,
+              //     "price" => (string) round($result[0]->price * 1.2, 2),
+              //     "currency" => $result[0]->currency
+              //   ];
+
+              //   if ($value->code == 'colissimo:europe-home' || $value->code == 'colissimo:home/fr' || $value->code == 'mondial_relay:home_international') {
+              //     $array["domicile"][] = $data;
+              //   } else {
+              //     $array["service_point"][] = $data;
+              //   }
+              // }
+
+              // $price = array_column($array["service_point"], 'price');
+              // array_multisort($price, SORT_ASC, $array["service_point"]);
+
+              // $price = array_column($array["domicile"], 'price');
+              // array_multisort($price, SORT_ASC, $array["domicile"]);
+              // if (array_key_exists('domicile', $array) && sizeof($array["domicile"]) > 1) {
+              //   foreach ($array["domicile"] as $key => $value) {
+              //     if ($value["code"] != "mondial_relay:home_international") {
+              //       unset($array["domicile"][$key]);
+              //     }
+              //   }
+
+              // }
             }
           }
-
-
-	      	// 		foreach ($value->methods as $method) {
-	      	// 			if ($value->code == 'colissimo:europe-home' || $value->code == 'mondial_relay:home_international' || $value->code == 'mondial_relay:service_point,international' || $value->code == 'chronopost:shop2shop' || ($value->code == 'colissimo:home/fr' && !str_contains($method->name, 'Colissimo Home Signature')) || $value->code == 'mondial_relay:service_point' || $value->code == 'chronopost:service_point_abroad') {
-
-          //         $params = [
-          //           "from_country" => "FR",
-          //           "to_country" => $to_country,
-          //           "weight" => $totalWeight,
-          //           "weight_unit" => "gram",
-          //           "shipping_method_id" => $method->id 
-          //         ];
-          //         $url = "https://panel.sendcloud.sc/api/v2/shipping-price" . '?' . http_build_query($params);
-          //         $curl = curl_init();
-
-          //         curl_setopt_array($curl, [
-          //           CURLOPT_URL => $url,
-          //           CURLOPT_RETURNTRANSFER => true,
-          //           CURLOPT_ENCODING => "",
-          //           CURLOPT_MAXREDIRS => 10,
-          //           CURLOPT_TIMEOUT => 30,
-          //           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          //           CURLOPT_CUSTOMREQUEST => "GET",
-          //           CURLOPT_HTTPHEADER => [
-          //             "Authorization: Basic MzgyNjY4NmYyZGJjNDE4MzgwODk4Y2MyNTRmYzBkMjg6MDk2ZTQ0Y2I5YjI2NDMxYjkwY2M1YjVkZWZjOWU5MTU=",
-          //             "Content-Type: application/json"
-          //           ],
-          //         ]);
-
-          //         $response = curl_exec($curl);
-          //         $result = json_decode($response);
-          //         curl_close($curl);
-
-          //         $data = [ 
-          //           "id" => $method->id,
-          //           "carrier" => $value->carrier,
-          //           "name" => $value->name,
-          //           "code" => $value->code,
-          //           "price" => (string) round($result[0]->price * 1.2, 2),
-          //           "currency" => $result[0]->currency
-          //         ];
-
-	      	// 				if ($value->code == 'colissimo:europe-home' || $value->code == 'colissimo:home/fr' || $value->code == 'mondial_relay:home_international') {
-	      	// 					$array["domicile"][] = $data;
-	      	// 				} else {
-	      	// 					$array["service_point"][] = $data;
-	      	// 				}
-	      	// 			}
-	      	// 		}
-
-          // $price = array_column($array["service_point"], 'price');
-          // array_multisort($price, SORT_ASC, $array["service_point"]);
-
-          // $price = array_column($array["domicile"], 'price');
-          // array_multisort($price, SORT_ASC, $array["domicile"]);
-          // if (array_key_exists('domicile', $array) && sizeof($array["domicile"]) > 1) {
-          //   foreach ($array["domicile"] as $key => $value) {
-          //     if ($value["code"] != "mondial_relay:home_international") {
-          //       unset($array["domicile"][$key]);
-          //     }
-          //   }
-          // }
 
           die();
 
@@ -231,10 +198,10 @@ class ShippingAPIController extends Controller {
 	      } catch (Exception $e) {
 	      	return $this->json($e, 500);
 	      }
-			// }
-		// }
+			}
+		}
     
-    // return $this->json(false, 404);
+    return $this->json(false, 404);
   }
 
 
@@ -250,7 +217,6 @@ class ShippingAPIController extends Controller {
   	} else {
   		$companyName = "";
   	}
-
 
 
     try {
@@ -279,6 +245,7 @@ class ShippingAPIController extends Controller {
           "company" => "Upela" 
         ], 
         "ship_to" => [
+          "pro" => false,
           "address1" => "54 rue du coteau", 
           "lastname" => "Marc Reignier", 
           "email" => "marc.reignier@laposte.net", 
@@ -299,9 +266,6 @@ class ShippingAPIController extends Controller {
       $result = json_decode($result);
       dump($result);
       curl_close($ch);
-
-      // dump($result->success);
-      // dump($result->errors);
 
 
       if ($result->success == true) {
@@ -339,12 +303,9 @@ class ShippingAPIController extends Controller {
 
       $result = curl_exec($ch);
       $result = json_decode($result);
-      dump($result);
       curl_close($ch);
 
-      // dump($result->success);
-      // dump($result->errors);
-
+      dump($result);
 
       if ($result->success == true) {
         dump($result->delivered);
