@@ -77,15 +77,18 @@ class ShippingAPIController extends Controller {
             $totalWeight += round($weight / 1000 * $quantity, 2);
             // number_format($weight, 2, '.', '');
           } else {
-            $totalWeight += round($weight * $quantity);
+            $totalWeight += $weight * $quantity;
           }
+        }
+
+        if ($totalWeight < 0.1) {
+          $totalWeight = 0.1;
         }
 
 	      try {
           // récupérer les prix pour les livraisons
           $data = [
             "order_id" => "Order_" . $nbOrders . "_" . time(), 
-            "locale" => "fr_FR", 
             "shipment" => [
               "id" => 0, 
               "type" => 2,
@@ -129,25 +132,31 @@ class ShippingAPIController extends Controller {
           if ($result->success == true) {
             foreach ($result->offers as $value) {
               $data = [ 
-                "id" => $value->service_id,
-                "carrier" => $value->carrier_name,
-                "name" => $value->service_name,
-                "code" => $value->service_code,
-                "price" => (string) round($value->price_te * 1.2, 2),
-                "currency" => $value->currency
+                "carrier_id" => $value->carrier_id,
+                "carrier_name" => $value->carrier_name,
+                "service_id" => $value->service_id,
+                "service_name" => $value->service_name,
+                "service_code" => $value->service_code,
+                "currency" => $value->currency,
+                "price" => (string) round($value->price_te * 1.2, 2)
               ];
 
-              if (($value->service_id == '78cb1adc-1b18-40d7-85f0-28e2a4b1753d' && $value->service_name == 'Shop2Shop') || ($value->service_id == 'bd644fe6-a77a-4045-bf97-ee1049033f0e' && $value->service_name == 'Mondial Relay')) {
-                $array["service_point"][] = $data;
-              } else {
-                if ($value->service_id == '5d490080-3ccf-48b3-b16a-72d7dd268d51' && $value->service_name == 'UPS Standard®') {
-                  $array["domicile"][] = $data;
+              // pour la France, check pour les autres pays
+              if ($shippingAddress->getCountryCode() == "FR" && $vendor->getCountryCode() == "FR") {
+                if (($value->service_id == '78cb1adc-1b18-40d7-85f0-28e2a4b1753d' && $value->service_name == 'Shop2Shop') || ($value->service_id == 'bd644fe6-a77a-4045-bf97-ee1049033f0e' && $value->service_name == 'Mondial Relay')) {
+                  $array["service_point"][] = $data;
+                } else {
+                  if ($value->service_id == '5d490080-3ccf-48b3-b16a-72d7dd268d51' && $value->service_name == 'UPS Standard®') {
+                    $array["domicile"][] = $data;
+                  }
                 }
               }
             }
 
-            $price = array_column($array["service_point"], 'price');
-            array_multisort($price, SORT_ASC, $array["service_point"]);
+            if (array_key_exists('service_point', $array)) {
+              $price = array_column($array["service_point"], 'price');
+              array_multisort($price, SORT_ASC, $array["service_point"]);
+            }
           }
 
 	      	return $this->json($array, 200);
@@ -156,6 +165,96 @@ class ShippingAPIController extends Controller {
 	      }
 			}
 		}
+    
+    return $this->json(false, 404);
+  }
+
+
+  /**
+   * @Route("/user/api/dropoff-locations", name="user_api_dropoff_locations")
+   */
+  public function dropoffLocations(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, ShippingAddressRepository $shippingAddressRepo, VendorRepository $vendorRepo) {
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
+
+      if ($param) {
+        $servicePoints = $param["service_point"];
+        $shippingAddress = $shippingAddressRepo->findOneByUser($this->getUser());
+        $array = [];
+    
+        if (!$shippingAddress) {
+          return $this->json("Une adresse est obligatoire !", 404); 
+        }
+
+        foreach ($servicePoints as $point) {
+          try {
+            // récupérer les points relais
+            $url = "https://www.upelgo.com/api/carrier/" . $point["carrier_id"] . "/dropoff-locations";
+            $data = [
+              "address" => $shippingAddress->getAddress(), 
+              "postcode" => $shippingAddress->getZip(), 
+              "city" => $shippingAddress->getCity(), 
+              "country_code" => $shippingAddress->getCountryCode()
+            ]; 
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($ch, CURLOPT_URL, $url);
+
+            $result = curl_exec($ch);
+            $result = json_decode($result);
+            curl_close($ch);
+
+            if ($result->success == true) {
+              foreach ($result->locations as $value) {
+                $opening = [];
+                foreach ($value->hours as $hour) {
+                  $opening[] = [ 
+                    "day" => $hour->day, 
+                    "opening_hours" => $hour->opening_hours
+                  ];
+                }
+
+                if ($point["carrier_id"] == "b139ac1f-bbb9-4235-b87e-aedcb3c32132") {
+                  $distance = round($value->distance * 1000, 2);
+                } else {
+                  $distance = $value->distance;
+                }
+
+                $array[] = [
+                  "carrier_id" => $point["carrier_id"],
+                  "carrier_name" => $point["carrier_name"],
+                  "location_id" => $value->location_id,
+                  "name" => trim($value->name),
+                  "address1" => trim($value->address1),
+                  "address2" => trim($value->address2),
+                  "postcode" => $value->postcode,
+                  "city" => trim($value->city),
+                  "country_code" => $value->country_code,
+                  "latitude" => $value->latitude,
+                  "longitude" => $value->longitude,
+                  "distance" => $distance,
+                  "hours" => $opening,
+                  "dropoff_location_id" => $value->dropoff_location_id,
+                  "image_url" => $value->image_url,
+                  "number" => $value->number,
+                ];
+              }
+            }
+          } catch (Exception $e) {
+            return $this->json($e, 500);
+          }
+        }
+
+        $distance = array_column($array, 'distance');
+        array_multisort($distance, SORT_ASC, $array);
+
+        return $this->json($array, 200);
+      }
+    }
     
     return $this->json(false, 404);
   }
@@ -225,66 +324,22 @@ class ShippingAPIController extends Controller {
 
 
       if ($result->success == true) {
-        dump($result->parent_carrier);
-        dump($result->shipment_id);
-        dump($result->carrier_id);
-        dump($result->carrier_name);
-        dump($result->carrier_code);
-        dump($result->tracking_numbers);
-        dump($result->tracking_uri); // url pour tracker directement
-        // dump($result->waybills);
-        dump($result->waybills_uri);
-        dump($result->pickup_code);
-        dump($result->documents);
+        // dump($result->parent_carrier);
+        // dump($result->shipment_id);
+        // dump($result->carrier_id);
+        // dump($result->carrier_name);
+        // dump($result->carrier_code);
+        // dump($result->tracking_numbers);
+        // dump($result->tracking_uri); // url pour tracker directement
+        // // dump($result->waybills);
+        // dump($result->waybills_uri);
+        // dump($result->pickup_code);
+        // dump($result->documents);
       }
     } catch (\Exception $e) {
       return $this->json($e->getMessage(), 404);
     }
 
-
-    try {
-
-      // tracker un colis 
-      $data = [
-        "tracking_number" => "6A25869964850"
-      ]; 
-
-
-      $ch = curl_init();
-      curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-      curl_setopt($ch, CURLOPT_URL, "https://www.upelgo.com/api/carrier/32b1463a-a275-46d3-b9fd-ee17a1e8ab33/track");
-
-      $result = curl_exec($ch);
-      $result = json_decode($result);
-      curl_close($ch);
-
-      dump($result);
-
-      if ($result->success == true) {
-        dump($result->delivered);
-        dump($result->pickup_date);
-        dump($result->incident_date);
-        dump($result->delivery_date);
-        dump($result->tracking_number);
-        dump($result->service_name); 
-        dump($result->carrier_name);
-        dump($result->requested_shipment_date);
-        dump($result->requested_delivery_date);
-
-
-
-        if ($result->events) {
-          foreach ($result->events as $event) {
-            // $event->date
-            // $event->location
-            // $event->description
-            // $event->code
-          }
-        }
-      }
 
 
   	// try {
@@ -445,9 +500,64 @@ class ShippingAPIController extends Controller {
   		// } else {
       //   return $this->json($result->error->message, 404);
       // }
-  	} catch (\Exception $e) {
-  		return $this->json($e->getMessage(), 404);
-  	}
+
+      return true;
+  }
+
+
+  /**
+   * Suivre une commande
+   *
+   * @Route("/user/api/orders/track", name="user_api_shipping_address", methods={"POST"})
+   */
+  public function tracking(Order $order, Request $request, ObjectManager $manager) {
+    try {
+      // tracker un colis 
+      $data = [
+        "tracking_number" => "6A25869964850"
+      ]; 
+
+
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+      curl_setopt($ch, CURLOPT_URL, "https://www.upelgo.com/api/carrier/32b1463a-a275-46d3-b9fd-ee17a1e8ab33/track");
+
+      $result = curl_exec($ch);
+      $result = json_decode($result);
+      curl_close($ch);
+
+      dump($result);
+
+      if ($result->success == true) {
+        dump($result->delivered);
+        dump($result->pickup_date);
+        dump($result->incident_date);
+        dump($result->delivery_date);
+        dump($result->tracking_number);
+        dump($result->service_name); 
+        dump($result->carrier_name);
+        dump($result->requested_shipment_date);
+        dump($result->requested_delivery_date);
+
+
+
+        if ($result->events) {
+          foreach ($result->events as $event) {
+            // $event->date
+            // $event->location
+            // $event->description
+            // $event->code
+          }
+        }
+      }
+    } catch (\Exception $e) {
+      return $this->json($e->getMessage(), 404);
+    }
+
+    return $this->json(true, 200);
   }
 
 
