@@ -286,7 +286,7 @@ class ShippingAPIController extends Controller {
         "shipment" => [
           "id" => 0, 
           "type" => 2, 
-          "dropoff": false, // true if collection point
+          "dropoff" => false, // true if collection point
           "service_id" => "58da4d87-f7e1-4bb7-901e-ff6b52062b4c", 
           "delivery_type" => "DELIVERY_TO_COLLECTION_POINT",  //HOME_DELIVERY
           "label_format" => "PDF", 
