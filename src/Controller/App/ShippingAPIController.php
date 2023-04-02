@@ -52,6 +52,7 @@ class ShippingAPIController extends Controller {
         $shippingAddress = $shippingAddressRepo->findOneByUser($this->getUser());
 	    	$lineItems = $param["lineItems"];
         $nbOrders = 1000 + sizeof($orderRepo->findAll());
+        $orderId = "Order_" . time();
         $totalWeight = 0;
 
 	      if (!$lineItems) {
@@ -88,7 +89,7 @@ class ShippingAPIController extends Controller {
 	      try {
           // récupérer les prix pour les livraisons
           $data = [
-            "order_id" => "Order_" . $nbOrders . "_" . time(), 
+            "order_id" => $orderId, 
             "shipment" => [
               "id" => 0, 
               "type" => 2,
@@ -132,6 +133,7 @@ class ShippingAPIController extends Controller {
           if ($result->success == true) {
             foreach ($result->offers as $value) {
               $data = [ 
+                "order_id" => $orderId,
                 "carrier_id" => $value->carrier_id,
                 "carrier_name" => $value->carrier_name,
                 "service_id" => $value->service_id,
@@ -150,6 +152,8 @@ class ShippingAPIController extends Controller {
                     $array["domicile"][] = $data;
                   }
                 }
+              } else {
+                return $this->json("Livraison indisponible dans ce pays", 404);
               }
             }
 
@@ -157,16 +161,16 @@ class ShippingAPIController extends Controller {
               $price = array_column($array["service_point"], 'price');
               array_multisort($price, SORT_ASC, $array["service_point"]);
             }
-          }
 
-	      	return $this->json($array, 200);
+            return $this->json($array, 200);
+          }
 	      } catch (Exception $e) {
 	      	return $this->json($e, 500);
 	      }
 			}
 		}
     
-    return $this->json(false, 404);
+    return $this->json("Un erreur est survenue", 404);
   }
 
 
@@ -513,17 +517,17 @@ class ShippingAPIController extends Controller {
   public function tracking(Order $order, Request $request, ObjectManager $manager) {
     try {
       // tracker un colis 
+      $url = "https://www.upelgo.com/api/carrier/32b1463a-a275-46d3-b9fd-ee17a1e8ab33/track";
       $data = [
         "tracking_number" => "6A25869964850"
       ]; 
-
 
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
       curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-      curl_setopt($ch, CURLOPT_URL, "https://www.upelgo.com/api/carrier/32b1463a-a275-46d3-b9fd-ee17a1e8ab33/track");
+      curl_setopt($ch, CURLOPT_URL, $url);
 
       $result = curl_exec($ch);
       $result = json_decode($result);
