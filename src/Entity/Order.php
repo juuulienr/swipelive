@@ -19,7 +19,6 @@ class Order
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups("order:read")
-     * @Groups("user:read")
      * @Groups("discussion:read")
      */
     private $id;
@@ -32,7 +31,6 @@ class Order
     /**
      * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="sales")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups("user:read")
      * @Groups("order:read")
      */
     private $vendor;
@@ -40,42 +38,36 @@ class Order
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $status;
 
     /**
      * @ORM\Column(type="datetime")
      * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
      * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $subTotal;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
      * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $total;
 
     /**
      * @ORM\OneToMany(targetEntity=LineItem::class, mappedBy="orderId")
      * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $lineItems;
 
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
      * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $fees;
 
@@ -87,64 +79,31 @@ class Order
     /**
      * @ORM\Column(type="datetime", nullable=true)
      * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $updatedAt;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="purchases")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups("user:read")
      * @Groups("order:read")
      */
     private $buyer;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups("order:read")
-     * @Groups("user:read")
-     */
-    private $shippingName;
-
-    /**
-     * @ORM\Column(type="integer")
-     * @Groups("order:read")
-     * @Groups("user:read")
-     */
-    private $shippingMethodId;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups("order:read")
-     * @Groups("user:read")
-     */
-    private $shippingCarrier;
-
-    /**
      * @ORM\Column(type="decimal", precision=8, scale=2)
      * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $shippingPrice;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      * @Groups("order:read")
-     * @Groups("user:read")
-     */
-    private $servicePointId;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $number;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $trackingNumber;
 
@@ -156,28 +115,18 @@ class Order
     /**
      * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
      * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $weight;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $pdf;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
-     * @Groups("order:read")
-     * @Groups("user:read")
-     */
-    private $parcelId;
-
-    /**
      * @ORM\Column(type="datetime", nullable=true)
      * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $expectedDelivery;
 
@@ -186,28 +135,18 @@ class Order
      * @Groups("order:read")
      * @ORM\OrderBy({"updateAt" = "ASC"})
      * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $orderStatuses;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("order:read")
-     * @Groups("user:read")
-     */
-    private $trackingUrl;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $shippingStatus;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("order:read")
-     * @Groups("user:read")
      */
     private $paymentStatus;
 
@@ -215,6 +154,66 @@ class Order
      * @ORM\OneToMany(targetEntity=Discussion::class, mappedBy="purchase")
      */
     private $discussions;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("order:read")
+     */
+    private $identifier;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("order:read")
+     */
+    private $shippingCarrierId;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("order:read")
+     */
+    private $shippingCarrierName;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("order:read")
+     */
+    private $shippingServiceId;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("order:read")
+     */
+    private $shippingServiceName;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Groups("order:read")
+     */
+    private $shippingServiceCode;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("order:read")
+     */
+    private $dropoffLocationId;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("order:read")
+     */
+    private $dropoffCountryCode;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("order:read")
+     */
+    private $dropoffPostcode;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("order:read")
+     */
+    private $dropoffName;
 
 
     public function __construct()
@@ -380,42 +379,6 @@ class Order
         return $this;
     }
 
-    public function getShippingName(): ?string
-    {
-        return $this->shippingName;
-    }
-
-    public function setShippingName(string $shippingName): self
-    {
-        $this->shippingName = $shippingName;
-
-        return $this;
-    }
-
-    public function getShippingMethodId(): ?int
-    {
-        return $this->shippingMethodId;
-    }
-
-    public function setShippingMethodId(int $shippingMethodId): self
-    {
-        $this->shippingMethodId = $shippingMethodId;
-
-        return $this;
-    }
-
-    public function getShippingCarrier(): ?string
-    {
-        return $this->shippingCarrier;
-    }
-
-    public function setShippingCarrier(string $shippingCarrier): self
-    {
-        $this->shippingCarrier = $shippingCarrier;
-
-        return $this;
-    }
-
     public function getShippingPrice(): ?string
     {
         return $this->shippingPrice;
@@ -424,18 +387,6 @@ class Order
     public function setShippingPrice(string $shippingPrice): self
     {
         $this->shippingPrice = $shippingPrice;
-
-        return $this;
-    }
-
-    public function getServicePointId(): ?int
-    {
-        return $this->servicePointId;
-    }
-
-    public function setServicePointId(?int $servicePointId): self
-    {
-        $this->servicePointId = $servicePointId;
 
         return $this;
     }
@@ -500,18 +451,6 @@ class Order
         return $this;
     }
 
-    public function getParcelId(): ?int
-    {
-        return $this->parcelId;
-    }
-
-    public function setParcelId(?int $parcelId): self
-    {
-        $this->parcelId = $parcelId;
-
-        return $this;
-    }
-
     public function getExpectedDelivery(): ?\DateTimeInterface
     {
         return $this->expectedDelivery;
@@ -553,19 +492,7 @@ class Order
 
         return $this;
     }
-
-    public function getTrackingUrl(): ?string
-    {
-        return $this->trackingUrl;
-    }
-
-    public function setTrackingUrl(?string $trackingUrl): self
-    {
-        $this->trackingUrl = $trackingUrl;
-
-        return $this;
-    }
-
+    
     public function getShippingStatus(): ?string
     {
         return $this->shippingStatus;
@@ -616,6 +543,126 @@ class Order
                 $discussion->setPurchase(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getIdentifier(): ?string
+    {
+        return $this->identifier;
+    }
+
+    public function setIdentifier(string $identifier): self
+    {
+        $this->identifier = $identifier;
+
+        return $this;
+    }
+
+    public function getShippingCarrierId(): ?string
+    {
+        return $this->shippingCarrierId;
+    }
+
+    public function setShippingCarrierId(string $shippingCarrierId): self
+    {
+        $this->shippingCarrierId = $shippingCarrierId;
+
+        return $this;
+    }
+
+    public function getShippingCarrierName(): ?string
+    {
+        return $this->shippingCarrierName;
+    }
+
+    public function setShippingCarrierName(string $shippingCarrierName): self
+    {
+        $this->shippingCarrierName = $shippingCarrierName;
+
+        return $this;
+    }
+
+    public function getShippingServiceId(): ?string
+    {
+        return $this->shippingServiceId;
+    }
+
+    public function setShippingServiceId(string $shippingServiceId): self
+    {
+        $this->shippingServiceId = $shippingServiceId;
+
+        return $this;
+    }
+
+    public function getShippingServiceName(): ?string
+    {
+        return $this->shippingServiceName;
+    }
+
+    public function setShippingServiceName(string $shippingServiceName): self
+    {
+        $this->shippingServiceName = $shippingServiceName;
+
+        return $this;
+    }
+
+    public function getShippingServiceCode(): ?string
+    {
+        return $this->shippingServiceCode;
+    }
+
+    public function setShippingServiceCode(string $shippingServiceCode): self
+    {
+        $this->shippingServiceCode = $shippingServiceCode;
+
+        return $this;
+    }
+
+    public function getDropoffLocationId(): ?string
+    {
+        return $this->dropoffLocationId;
+    }
+
+    public function setDropoffLocationId(?string $dropoffLocationId): self
+    {
+        $this->dropoffLocationId = $dropoffLocationId;
+
+        return $this;
+    }
+
+    public function getDropoffCountryCode(): ?string
+    {
+        return $this->dropoffCountryCode;
+    }
+
+    public function setDropoffCountryCode(?string $dropoffCountryCode): self
+    {
+        $this->dropoffCountryCode = $dropoffCountryCode;
+
+        return $this;
+    }
+
+    public function getDropoffPostcode(): ?string
+    {
+        return $this->dropoffPostcode;
+    }
+
+    public function setDropoffPostcode(?string $dropoffPostcode): self
+    {
+        $this->dropoffPostcode = $dropoffPostcode;
+
+        return $this;
+    }
+
+    public function getDropoffName(): ?string
+    {
+        return $this->dropoffName;
+    }
+
+    public function setDropoffName(?string $dropoffName): self
+    {
+        $this->dropoffName = $dropoffName;
 
         return $this;
     }

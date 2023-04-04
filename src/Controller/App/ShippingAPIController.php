@@ -50,9 +50,8 @@ class ShippingAPIController extends Controller {
 
 	    if ($param) {
         $shippingAddress = $shippingAddressRepo->findOneByUser($this->getUser());
-	    	$lineItems = $param["lineItems"];
-        $nbOrders = 1000 + sizeof($orderRepo->findAll());
-        $orderId = "Order_" . time();
+        $lineItems = $param["lineItems"];
+        $identifier = "Order_" . time();
         $totalWeight = 0;
 
 	      if (!$lineItems) {
@@ -76,7 +75,6 @@ class ShippingAPIController extends Controller {
 
           if ($weightUnit == "g") {
             $totalWeight += round($weight / 1000 * $quantity, 2);
-            // number_format($weight, 2, '.', '');
           } else {
             $totalWeight += $weight * $quantity;
           }
@@ -89,33 +87,29 @@ class ShippingAPIController extends Controller {
 	      try {
           // récupérer les prix pour les livraisons
           $data = [
-            "order_id" => $orderId, 
+            "order_id" => $identifier, 
             "shipment" => [
               "id" => 0, 
               "type" => 2,
             ], 
             "ship_from" => [
-              "pro" => true,
               "postcode" => $vendor->getZip(), 
               "city" => $vendor->getCity(), 
               "country_code" => $vendor->getCountryCode()
             ], 
             "ship_to" => [
-              "pro" => false, 
               "postcode" => $shippingAddress->getZip(), 
               "city" => $shippingAddress->getCity(), 
               "country_code" => $shippingAddress->getCountryCode()
             ], 
-            "parcels" => [
-              [
-                "number" => 1,
-                "weight" => $totalWeight, 
-                "volumetric_weight" => $totalWeight, 
-                "x" => 10, 
-                "y" => 10, 
-                "z" => 10 
-              ] 
-            ] 
+            "parcels" => [[
+              "number" => 1,
+              "weight" => $totalWeight, 
+              "volumetric_weight" => $totalWeight, 
+              "x" => 10, 
+              "y" => 10, 
+              "z" => 10 
+            ]] 
           ]; 
 
 
@@ -132,21 +126,24 @@ class ShippingAPIController extends Controller {
 
           if ($result->success == true) {
             foreach ($result->offers as $value) {
-              $data = [ 
-                "order_id" => $orderId,
+              $data = [
+                "identifier" => $identifier,
                 "carrier_id" => $value->carrier_id,
                 "carrier_name" => $value->carrier_name,
+                "carrier_logo" => $value->carrier_logo,
                 "service_id" => $value->service_id,
                 "service_name" => $value->service_name,
                 "service_code" => $value->service_code,
                 "currency" => $value->currency,
-                "price" => (string) round($value->price_te * 1.2, 2)
+                "price" => (string) $value->price_te
               ];
 
               // pour la France, check pour les autres pays
               if ($shippingAddress->getCountryCode() == "FR" && $vendor->getCountryCode() == "FR") {
                 if (($value->service_id == '78cb1adc-1b18-40d7-85f0-28e2a4b1753d' && $value->service_name == 'Shop2Shop') || ($value->service_id == 'bd644fe6-a77a-4045-bf97-ee1049033f0e' && $value->service_name == 'Mondial Relay')) {
-                  $array["service_point"][] = $data;
+                  if ($value->delivery_to_collection_point == true) {
+                    $array["service_point"][] = $data;
+                  }
                 } else {
                   if ($value->service_id == '5d490080-3ccf-48b3-b16a-72d7dd268d51' && $value->service_name == 'UPS Standard®') {
                     $array["domicile"][] = $data;
@@ -271,24 +268,16 @@ class ShippingAPIController extends Controller {
   	$shippingAddress = $order->getShippingAddress();
   	$vendor = $order->getVendor();
 
-  	if ($vendor->getBusinessType() == "company") {
-  		$companyName = $vendor->getCompany();
-  	} else {
-  		$companyName = "";
-  	}
-
-
     try {
-
       // créer l'étiquette 
       $data = [
-        "order_id" => "Test_order_id2", 
+        "order_id" => $order->getIdentifier(), 
         "shipment" => [
           "id" => 0, 
           "type" => 2, 
-          "dropoff" => false, // true if collection point
-          "service_id" => "58da4d87-f7e1-4bb7-901e-ff6b52062b4c", 
-          "delivery_type" => "DELIVERY_TO_COLLECTION_POINT",  //HOME_DELIVERY
+          "dropoff" => $order->getDropoffName() ? true : false,
+          "service_id" => $order->getShippingServiceId(), 
+          "delivery_type" => $order->getDropoffName() ? "DELIVERY_TO_COLLECTION_POINT" : "HOME_DELIVERY",
           "label_format" => "PDF", 
           // "insurance" => true, 
           // "insurance_type" => "UPELA", 
@@ -299,24 +288,26 @@ class ShippingAPIController extends Controller {
           "lastname" => $vendor->getUser()->getFullName(), 
           "email" => $vendor->getUser()->getEmail(), 
           "phone" => $vendor->getUser()->getPhone(), 
-          "company" => $vendor->getCompany()
+          "company" => $vendor->getBusinessType() === "company" ? $vendor->getCompany() : $vendor->getUser()->getFullName(),
+          "pro" => $vendor->getBusinessType() === "company" ? true : false
         ], 
         "ship_to" => [
-          "pro" => false,
-          "address1" => $shippingAddress->getAddress(), 
-          "lastname" => $order->getBuyer()->getFullName(), 
-          "email" => $order->getBuyer()->getEmail(), 
+          "address1" => $shippingAddress->getHouseNumber() . " " . $shippingAddress->getAddress(), // rajouter house_number
+          "lastname" => $shippingAddress->getName(), 
+          "company" => $shippingAddress->getName(),
           "phone" => $shippingAddress->getPhone(), 
-          "company" => "Swipe Live" 
+          "email" => $order->getBuyer()->getEmail()
         ],
-        // "dropoff_to" => [
-        //   "country_code" => "FR",
-        //   "postcode" => "69140",
-        //   "lastname" => "ESPACE DIGITAL",
-        //   "dropoff_location_id" => "006274"
-        // ]
       ]; 
 
+      if ($order->getDropoffName()) {
+        $data["dropoff_to"] = [
+          "country_code" => $order->getDropoffCountryCode(),
+          "postcode" => $order->getDropoffPostcode(),
+          "lastname" => $order->getDropoffName(),
+          "dropoff_location_id" => $order->getDropoffLocationId()
+        ];
+      }
 
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
@@ -329,96 +320,42 @@ class ShippingAPIController extends Controller {
       $result = json_decode($result);
       curl_close($ch);
 
-      dump($result);
+      if ($result->success) {
+        $filename = md5(time().uniqid()); 
+        $fullname = $filename. ".pdf"; 
+        $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
+        file_put_contents($filepath, base64_decode($result->waybills[0]));
 
-      if ($result->success == true) {
-       // $id = $result->parcel->id;
-       // $tracking_number = $result->parcel->tracking_number;
-       // $tracking_url = $result->parcel->tracking_url;
+        try {
+          (new UploadApi())->upload($filepath, [
+            'public_id' => $filename,
+            'use_filename' => TRUE,
+          ]);
 
-       // $order->setTrackingUrl($tracking_url);
-       // $order->setTrackingNumber($tracking_number);
-       // $order->setParcelId($id);
-       // $order->setPdf($filename);
-       // $manager->flush();
+          unlink($filepath);
+        } catch (\Exception $e) {
+          return $this->json($e->getMessage(), 404);
+        }
 
-        // dump($result->parent_carrier);
-        // dump($result->shipment_id);
-        // dump($result->carrier_id);
-        // dump($result->carrier_name);
-        // dump($result->carrier_code);
-        // dump($result->tracking_numbers);
-        // dump($result->tracking_uri); // url pour tracker directement
-        // // dump($result->waybills);
-        // dump($result->waybills_uri);
-        // dump($result->pickup_code);
-        // dump($result->documents);
+        $order->setTrackingNumber($result->tracking_numbers[0]);
+        $order->setPdf($filename);
+        $manager->flush();
+
+        // $result->shipment_id;
+        // $result->pickup_code;
+        // $result->documents;
 
         return $this->json($order, 200, [], [
           'groups' => 'order:read', 
         ]);
+      } else {
+        return $this->json($result->error, 404);
       }
     } catch (\Exception $e) {
       return $this->json($e->getMessage(), 404);
     }
 
     return $this->json(false, 404);
-  }
-
-
-  /**
-   * Suivre une commande
-   *
-   * @Route("/user/api/orders/track", name="user_api_shipping_address", methods={"POST"})
-   */
-  public function tracking(Order $order, Request $request, ObjectManager $manager) {
-    try {
-      // tracker un colis 
-      $url = "https://www.upelgo.com/api/carrier/32b1463a-a275-46d3-b9fd-ee17a1e8ab33/track";
-      $data = [
-        "tracking_number" => "6A25869964850"
-      ]; 
-
-      $ch = curl_init();
-      curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-      curl_setopt($ch, CURLOPT_URL, $url);
-
-      $result = curl_exec($ch);
-      $result = json_decode($result);
-      curl_close($ch);
-
-      dump($result);
-
-      if ($result->success == true) {
-        dump($result->delivered);
-        dump($result->pickup_date);
-        dump($result->incident_date);
-        dump($result->delivery_date);
-        dump($result->tracking_number);
-        dump($result->service_name); 
-        dump($result->carrier_name);
-        dump($result->requested_shipment_date);
-        dump($result->requested_delivery_date);
-
-
-
-        if ($result->events) {
-          foreach ($result->events as $event) {
-            // $event->date
-            // $event->location
-            // $event->description
-            // $event->code
-          }
-        }
-      }
-    } catch (\Exception $e) {
-      return $this->json($e->getMessage(), 404);
-    }
-
-    return $this->json(true, 200);
   }
 
 

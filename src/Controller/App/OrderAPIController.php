@@ -71,14 +71,20 @@ class OrderAPIController extends Controller {
 	    	$customer = $this->getUser();
         $nbOrders = sizeof($orderRepo->findAll());
         $lineItems = $param["lineItems"];
-	      $shippingPrice = $param["shippingPrice"];
-	      $shippingName = $param["shippingName"];
-	      $shippingMethodId = $param["shippingMethodId"];
-	      $shippingCarrier = $param["shippingCarrier"];
-	      $servicePointId = $param["servicePointId"];
+	      $identifier = $param["identifier"];
+        $shippingPrice = $param["shippingPrice"];
+        $shippingCarrierId = $param["shippingCarrierId"];
+        $shippingCarrierName = $param["shippingCarrierName"];
+	      $shippingServiceId = $param["shippingServiceId"];
+	      $shippingServiceName = $param["shippingServiceName"];
+	      $shippingServiceCode = $param["shippingServiceCode"];
+        $dropoffLocationId = $param["dropoffLocationId"];
+        $dropoffCountryCode = $param["dropoffCountryCode"];
+        $dropoffPostcode = $param["dropoffPostcode"];
+        $dropoffName = $param["dropoffName"];
+        $soldOut = false;
         $totalWeight = 0;
         $subTotal = 0;
-        $soldOut = false;
 
 	      $order = new Order();
 	      $order->setBuyer($customer);
@@ -162,12 +168,18 @@ class OrderAPIController extends Controller {
 
   	      $order->setWeight($totalWeight);
   	      $order->setSubTotal($subTotal);
-  	      $order->setShippingPrice($shippingPrice);
-  	      $order->setShippingName($shippingName);
-  	      $order->setShippingMethodId($shippingMethodId);
-  	      $order->setShippingCarrier($shippingCarrier);
-  	      $order->setServicePointId($servicePointId);
-  	      $order->setTotal($total);
+  	      $order->setIdentifier($identifier);
+          $order->setShippingPrice($shippingPrice);
+          $order->setShippingCarrierId($shippingCarrierId);
+          $order->setShippingCarrierName($shippingCarrierName);
+          $order->setShippingServiceId($shippingServiceId);
+          $order->setShippingServiceName($shippingServiceName);
+          $order->setShippingServiceCode($shippingServiceCode);
+          $order->setDropoffLocationId($dropoffLocationId);
+          $order->setDropoffCountryCode($dropoffCountryCode);
+          $order->setDropoffPostcode($dropoffPostcode);
+  	      $order->setDropoffName($dropoffName);
+          $order->setTotal($total);
   	      $order->setFees($fees);
   	      $order->setProfit($profit);
   	      $order->setShippingStatus("ready-to-send");
@@ -192,58 +204,90 @@ class OrderAPIController extends Controller {
 
 
   /**
+   * Suivre une commande
+   *
+   * @Route("/user/api/orders/{id}/track", name="user_api_shipping_address", methods={"POST"})
+   */
+  public function tracking(Order $order, Request $request, ObjectManager $manager) {
+    try {
+      // tracker un colis 
+      $url = "https://www.upelgo.com/api/carrier/" . $order->getShippingCarrierId() . "/track";
+      $data = [
+        "tracking_number" => $order->getTrackingNumber()
+      ]; 
+
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+      curl_setopt($ch, CURLOPT_URL, $url);
+
+      $result = curl_exec($ch);
+      $result = json_decode($result);
+      curl_close($ch);
+
+      if ($result->success == true) {
+        // dump($result->delivered);
+        // dump($result->incident_date);
+        // dump($result->delivery_date);
+
+
+        // update orderStatus
+        if ($result->events) {
+          foreach ($result->events as $event) {
+            // $event->date
+            // $event->date_unformatted
+            // $event->location
+            foreach ($event->location as $location) {
+              // $location->postcode
+              // $location->city
+              // $location->location
+            }
+            // $event->description
+            // $event->code
+
+          // $orderStatus = $statusRepo->findOneByStatusId($status->parcel_status_history_id);
+
+          // if (!$orderStatus) {
+          //   $orderStatus = new OrderStatus();
+          //   $orderStatus->setUpdateAt(new \Datetime($status->carrier_update_timestamp));
+          //   $orderStatus->setMessage($status->carrier_message);
+          //   $orderStatus->setStatus($status->parent_status);
+          //   $orderStatus->setCode($status->carrier_code);
+          //   $orderStatus->setStatusId($status->parcel_status_history_id);
+          //   $orderStatus->setShipping($order);
+          //   $order->setShippingStatus($status->parent_status);
+          //   $order->setUpdatedAt(new \Datetime($status->carrier_update_timestamp));
+            
+          //   $manager->persist($orderStatus);
+          //   $manager->flush();
+          // }
+
+          }
+        }
+
+        $manager->flush();
+
+        return $this->json($order, 200, [], [
+          'groups' => 'order:read', 
+        ]);
+      }
+    } catch (\Exception $e) {
+      return $this->json($e->getMessage(), 404);
+    }
+
+    return $this->json(true, 200);
+  }
+
+
+  /**
    * Récupérer une commande
    *
    * @Route("/user/api/orders/{id}", name="user_api_order", methods={"GET"})
    */
   public function order(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo) {
-    if ($order->getTrackingNumber()) {
-      $url = "https://panel.sendcloud.sc/api/v2/tracking/" . $order->getTrackingNumber();
-      $curl = curl_init();
-
-      curl_setopt_array($curl, [
-        CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => "",
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "GET",
-        CURLOPT_HTTPHEADER => [
-          "Authorization: Basic MzgyNjY4NmYyZGJjNDE4MzgwODk4Y2MyNTRmYzBkMjg6MDk2ZTQ0Y2I5YjI2NDMxYjkwY2M1YjVkZWZjOWU5MTU=",
-          "Content-Type: application/json"
-        ],
-      ]);
-
-      $response = curl_exec($curl);
-      $result = json_decode($response);
-      curl_close($curl);
-
-      if ($result && array_key_exists("expected_delivery_date", $result)) {
-        $order->setExpectedDelivery(new \Datetime($result->expected_delivery_date));
-        $manager->flush();
-
-        foreach ($result->statuses as $status) {
-          $orderStatus = $statusRepo->findOneByStatusId($status->parcel_status_history_id);
-
-          if (!$orderStatus) {
-            $orderStatus = new OrderStatus();
-            $orderStatus->setUpdateAt(new \Datetime($status->carrier_update_timestamp));
-            $orderStatus->setMessage($status->carrier_message);
-            $orderStatus->setStatus($status->parent_status);
-            $orderStatus->setCode($status->carrier_code);
-            $orderStatus->setStatusId($status->parcel_status_history_id);
-            $orderStatus->setShipping($order);
-            $order->setShippingStatus($status->parent_status);
-            $order->setUpdatedAt(new \Datetime($status->carrier_update_timestamp));
-            
-            $manager->persist($orderStatus);
-            $manager->flush();
-          }
-        }
-      }
-    }
-
+   
     return $this->json($order, 200, [], [
       'groups' => 'order:read', 
     ]);
@@ -273,11 +317,38 @@ class OrderAPIController extends Controller {
    * @Route("/user/api/orders/{id}/cancel", name="user_api_order_cancel", methods={"GET"})
    */
   public function cancel(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo) {
-    $order->setStatus('cancel');
-    $manager->flush();
+    try {
+      $data = [
+        "order_id" => $order->getIdentifier(), 
+        "shipment" => [
+          "service_code" => $order->getShippingServiceCode(), 
+          "pickup_code" => "", 
+        ]
+      ]; 
 
-    return $this->json($order, 200, [], [
-      'groups' => 'order:read', 
-    ]);
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+      curl_setopt($ch, CURLOPT_URL, "https://www.upelgo.com/api/carrier/cancel");
+
+      $result = curl_exec($ch);
+      $result = json_decode($result);
+      curl_close($ch);
+
+      if ($result->success) {
+        $order->setStatus('cancel');
+        $manager->flush();
+
+        return $this->json($order, 200, [], [
+          'groups' => 'order:read', 
+        ]);
+      }
+    } catch (\Exception $e) {
+      return $this->json($e->getMessage(), 404);
+    }
+
+    return $this->json(true, 200);
   }
 }
