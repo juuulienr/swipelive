@@ -78,6 +78,7 @@ class OrderAPIController extends Controller {
 	      $shippingServiceId = $param["shippingServiceId"];
 	      $shippingServiceName = $param["shippingServiceName"];
 	      $shippingServiceCode = $param["shippingServiceCode"];
+        $expectedDelivery = $param["expectedDelivery"];
         $dropoffLocationId = $param["dropoffLocationId"];
         $dropoffCountryCode = $param["dropoffCountryCode"];
         $dropoffPostcode = $param["dropoffPostcode"];
@@ -175,6 +176,7 @@ class OrderAPIController extends Controller {
           $order->setShippingServiceId($shippingServiceId);
           $order->setShippingServiceName($shippingServiceName);
           $order->setShippingServiceCode($shippingServiceCode);
+          $order->setExpectedDelivery(new \Datetime($expectedDelivery));
           $order->setDropoffLocationId($dropoffLocationId);
           $order->setDropoffCountryCode($dropoffCountryCode);
           $order->setDropoffPostcode($dropoffPostcode);
@@ -204,90 +206,11 @@ class OrderAPIController extends Controller {
 
 
   /**
-   * Suivre une commande
-   *
-   * @Route("/user/api/orders/{id}/track", name="user_api_shipping_address", methods={"POST"})
-   */
-  public function tracking(Order $order, Request $request, ObjectManager $manager) {
-    try {
-      // tracker un colis 
-      $url = "https://www.upelgo.com/api/carrier/" . $order->getShippingCarrierId() . "/track";
-      $data = [
-        "tracking_number" => $order->getTrackingNumber()
-      ]; 
-
-      $ch = curl_init();
-      curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-      curl_setopt($ch, CURLOPT_URL, $url);
-
-      $result = curl_exec($ch);
-      $result = json_decode($result);
-      curl_close($ch);
-
-      if ($result->success == true) {
-        // dump($result->delivered);
-        // dump($result->incident_date);
-        // dump($result->delivery_date);
-
-
-        // update orderStatus
-        if ($result->events) {
-          foreach ($result->events as $event) {
-            // $event->date
-            // $event->date_unformatted
-            // $event->location
-            foreach ($event->location as $location) {
-              // $location->postcode
-              // $location->city
-              // $location->location
-            }
-            // $event->description
-            // $event->code
-
-          // $orderStatus = $statusRepo->findOneByStatusId($status->parcel_status_history_id);
-
-          // if (!$orderStatus) {
-          //   $orderStatus = new OrderStatus();
-          //   $orderStatus->setUpdateAt(new \Datetime($status->carrier_update_timestamp));
-          //   $orderStatus->setMessage($status->carrier_message);
-          //   $orderStatus->setStatus($status->parent_status);
-          //   $orderStatus->setCode($status->carrier_code);
-          //   $orderStatus->setStatusId($status->parcel_status_history_id);
-          //   $orderStatus->setShipping($order);
-          //   $order->setShippingStatus($status->parent_status);
-          //   $order->setUpdatedAt(new \Datetime($status->carrier_update_timestamp));
-            
-          //   $manager->persist($orderStatus);
-          //   $manager->flush();
-          // }
-
-          }
-        }
-
-        $manager->flush();
-
-        return $this->json($order, 200, [], [
-          'groups' => 'order:read', 
-        ]);
-      }
-    } catch (\Exception $e) {
-      return $this->json($e->getMessage(), 404);
-    }
-
-    return $this->json(true, 200);
-  }
-
-
-  /**
    * Récupérer une commande
    *
    * @Route("/user/api/orders/{id}", name="user_api_order", methods={"GET"})
    */
   public function order(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo) {
-   
     return $this->json($order, 200, [], [
       'groups' => 'order:read', 
     ]);

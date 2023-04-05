@@ -42,6 +42,8 @@ class ShippingAPIController extends Controller {
 
 
   /**
+   * Récupérer les prix pour les livraisons
+   *
    * @Route("/user/api/shipping/price", name="user_api_shipping_price")
    */
   public function shippingPrice(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, ShippingAddressRepository $shippingAddressRepo, VendorRepository $vendorRepo) {
@@ -85,7 +87,6 @@ class ShippingAPIController extends Controller {
         }
 
 	      try {
-          // récupérer les prix pour les livraisons
           $data = [
             "order_id" => $identifier, 
             "shipment" => [
@@ -134,6 +135,7 @@ class ShippingAPIController extends Controller {
                 "service_id" => $value->service_id,
                 "service_name" => $value->service_name,
                 "service_code" => $value->service_code,
+                "expectedDelivery" => $value->delivery_date,
                 "currency" => $value->currency,
                 "price" => (string) $value->price_te
               ];
@@ -172,6 +174,8 @@ class ShippingAPIController extends Controller {
 
 
   /**
+   * Récupérer les points relais
+   *
    * @Route("/user/api/dropoff-locations", name="user_api_dropoff_locations")
    */
   public function dropoffLocations(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, ShippingAddressRepository $shippingAddressRepo, VendorRepository $vendorRepo) {
@@ -189,7 +193,6 @@ class ShippingAPIController extends Controller {
 
         foreach ($servicePoints as $point) {
           try {
-            // récupérer les points relais
             $url = "https://www.upelgo.com/api/carrier/" . $point["carrier_id"] . "/dropoff-locations";
             $data = [
               "address" => $shippingAddress->getAddress(), 
@@ -262,6 +265,8 @@ class ShippingAPIController extends Controller {
 
 
   /**
+   * Créer l'étiquette pour envoyer un colis
+   *
    * @Route("/user/api/shipping/create/{id}", name="user_api_create")
    */
   public function shipping(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo) {
@@ -269,7 +274,6 @@ class ShippingAPIController extends Controller {
   	$vendor = $order->getVendor();
 
     try {
-      // créer l'étiquette 
       $data = [
         "order_id" => $order->getIdentifier(), 
         "shipment" => [
@@ -292,7 +296,7 @@ class ShippingAPIController extends Controller {
           "pro" => $vendor->getBusinessType() === "company" ? true : false
         ], 
         "ship_to" => [
-          "address1" => $shippingAddress->getHouseNumber() . " " . $shippingAddress->getAddress(), // rajouter house_number
+          "address1" => $shippingAddress->getHouseNumber() . " " . $shippingAddress->getAddress(),
           "lastname" => $shippingAddress->getName(), 
           "company" => $shippingAddress->getName(),
           "phone" => $shippingAddress->getPhone(), 
@@ -340,16 +344,80 @@ class ShippingAPIController extends Controller {
         $order->setTrackingNumber($result->tracking_numbers[0]);
         $order->setPdf($filename);
         $manager->flush();
+      } else {
+        return $this->json($result->error, 404);
+      }
 
-        // $result->shipment_id;
-        // $result->pickup_code;
-        // $result->documents;
 
+      try {
+        $url = "https://www.upelgo.com/api/carrier/" . $order->getShippingCarrierId() . "/track";
+        $data = [
+          "tracking_number" => $order->getTrackingNumber()
+        ]; 
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        $result = curl_exec($ch);
+        $result = json_decode($result);
+        curl_close($ch);
+
+        if ($result->success) {
+          $order->setDelivered($result->delivered);
+
+          if ($result->incident_date != "") {
+            $order->setIncidentDate(new \Datetime($result->incident_date));
+          }
+
+          if ($result->delivery_date != "") {
+            $order->setDeliveryDate(new \Datetime($result->delivery_date));
+          }
+
+          // update orderStatus
+          if ($result->events) {
+            foreach ($result->events as $event) {
+              $orderStatus = $statusRepo->findOneByShipping($order);
+
+              if (!$orderStatus) {
+                $orderStatus = new OrderStatus();
+                $orderStatus->setDate(new \Datetime($event->date_unformatted));
+                $orderStatus->setDescription($event->description);
+                $orderStatus->setCode($event->code);
+                $orderStatus->setShipping($order);
+
+                foreach ($event->location as $location) {
+                  $orderStatus->setPostcode($location->postcode);
+                  $orderStatus->setCity($location->city);
+                  $orderStatus->setLocation($location->location);
+                }
+
+                $order->setShippingStatus("open");
+                $order->setUpdatedAt(new \Datetime($event->date_unformatted));
+                
+                $manager->persist($orderStatus);
+                $manager->flush();
+              }
+            }
+          }
+
+          $manager->flush();
+
+          return $this->json($order, 200, [], [
+            'groups' => 'order:read', 
+          ]);
+        } else {
+          return $this->json($order, 200, [], [
+            'groups' => 'order:read', 
+          ]);
+        }
+      } catch (\Exception $e) {
         return $this->json($order, 200, [], [
           'groups' => 'order:read', 
         ]);
-      } else {
-        return $this->json($result->error, 404);
       }
     } catch (\Exception $e) {
       return $this->json($e->getMessage(), 404);

@@ -132,8 +132,7 @@ class Order
 
     /**
      * @ORM\OneToMany(targetEntity=OrderStatus::class, mappedBy="shipping")
-     * @Groups("order:read")
-     * @ORM\OrderBy({"updateAt" = "ASC"})
+     * @ORM\OrderBy({"date" = "ASC"})
      * @Groups("order:read")
      */
     private $orderStatuses;
@@ -214,6 +213,24 @@ class Order
      * @Groups("order:read")
      */
     private $dropoffName;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups("order:read")
+     */
+    private $delivered;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups("order:read")
+     */
+    private $incidentDate;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups("order:read")
+     */
+    private $deliveryDate;
 
 
     public function __construct()
@@ -492,18 +509,6 @@ class Order
 
         return $this;
     }
-    
-    public function getShippingStatus(): ?string
-    {
-        return $this->shippingStatus;
-    }
-
-    public function setShippingStatus(?string $shippingStatus): self
-    {
-        $this->shippingStatus = $shippingStatus;
-
-        return $this;
-    }
 
     public function getPaymentStatus(): ?string
     {
@@ -555,6 +560,18 @@ class Order
     public function setIdentifier(string $identifier): self
     {
         $this->identifier = $identifier;
+
+        return $this;
+    }
+
+    public function getShippingStatus(): ?string
+    {
+        return $this->shippingStatus;
+    }
+
+    public function setShippingStatus(string $shippingStatus): self
+    {
+        $this->shippingStatus = $shippingStatus;
 
         return $this;
     }
@@ -663,6 +680,42 @@ class Order
     public function setDropoffName(?string $dropoffName): self
     {
         $this->dropoffName = $dropoffName;
+
+        return $this;
+    }
+
+    public function getDelivered(): ?bool
+    {
+        return $this->delivered;
+    }
+
+    public function setDelivered(bool $delivered): self
+    {
+        $this->delivered = $delivered;
+
+        return $this;
+    }
+
+    public function getIncidentDate(): ?\DateTimeInterface
+    {
+        return $this->incidentDate;
+    }
+
+    public function setIncidentDate(\DateTimeInterface $incidentDate): self
+    {
+        $this->incidentDate = $incidentDate;
+
+        return $this;
+    }
+
+    public function getDeliveryDate(): ?\DateTimeInterface
+    {
+        return $this->deliveryDate;
+    }
+
+    public function setDeliveryDate(\DateTimeInterface $deliveryDate): self
+    {
+        $this->deliveryDate = $deliveryDate;
 
         return $this;
     }
