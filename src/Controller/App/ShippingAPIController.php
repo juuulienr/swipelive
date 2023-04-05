@@ -343,6 +343,7 @@ class ShippingAPIController extends Controller {
 
         $order->setTrackingNumber($result->tracking_numbers[0]);
         $order->setPdf($filename);
+        $order->setShippingStatus("open");
         $manager->flush();
       } else {
         return $this->json($result->error, 404);
@@ -382,20 +383,21 @@ class ShippingAPIController extends Controller {
             foreach ($result->events as $event) {
               $orderStatus = $statusRepo->findOneByShipping($order);
 
-              if (!$orderStatus) {
+              if (!$orderStatus && $event->date) {
                 $orderStatus = new OrderStatus();
                 $orderStatus->setDate(new \Datetime($event->date_unformatted));
                 $orderStatus->setDescription($event->description);
                 $orderStatus->setCode($event->code);
                 $orderStatus->setShipping($order);
 
-                foreach ($event->location as $location) {
-                  $orderStatus->setPostcode($location->postcode);
-                  $orderStatus->setCity($location->city);
-                  $orderStatus->setLocation($location->location);
+                if ($event->location) {
+                  foreach ($event->location as $location) {
+                    $orderStatus->setPostcode($location->postcode);
+                    $orderStatus->setCity($location->city);
+                    $orderStatus->setLocation($location->location);
+                  }
                 }
 
-                $order->setShippingStatus("open");
                 $order->setUpdatedAt(new \Datetime($event->date_unformatted));
                 
                 $manager->persist($orderStatus);
