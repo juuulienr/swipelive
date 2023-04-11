@@ -61,7 +61,7 @@ class OrderAPIController extends Controller {
 
   
   /**
-   * @Route("/user/api/orders/payment/success", name="user_api_orders_success")
+   * @Route("/user/api/orders/payment/success", name="user_api_orders_success", methods={"POST"})
    */
   public function success(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo) {
     if ($json = $request->getContent()) {
@@ -201,6 +201,66 @@ class OrderAPIController extends Controller {
       }
     }
 
+    return $this->json(false, 404);
+  }
+
+  
+  /**
+   * @Route("/user/api/payment/intent", name="user_api_payment_intent", methods={"GET"})
+   */
+  public function intent(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+    \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
+
+    // $customer = \Stripe\Customer::create();
+
+    // $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+
+    // $customer = $stripe->customers->create([
+    //   'email' => $buyer->getEmail(),
+    //   'name' => ucwords($buyer->getFullName()),
+    // ]);
+
+    $intent = \Stripe\PaymentIntent::create([
+      'amount' => 10000,
+      'customer' => "cus_LdHzF3Snr0mzf1",
+      'description' => "Test",
+      'currency' => 'eur',
+      'automatic_payment_methods' => [
+         'enabled' => 'true',
+       ],
+       'payment_method_options' => [
+         'card' => [
+          'setup_future_usage' => 'off_session',
+          ],
+        ],
+        'application_fee_amount' => 1000,
+        'transfer_data' => [
+         'destination' => "acct_1LttLoFZcx4zHjJa",
+       ],
+     ]);
+
+    if ($intent) {
+      return $this->json([ "clientSecret" => $intent->client_secret ], 200);
+    }
+    return $this->json(false, 404);
+  }
+
+
+  
+  /**
+   * @Route("/user/api/payment/intent/update", name="user_api_payment_intent_update", methods={"GET"})
+   */
+  public function update(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+    \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
+
+    $intent = $stripe->paymentIntents->update(
+      '{{PAYMENT_INTENT_ID}}',
+      ['amount' => 1499]
+    );
+
+    if ($intent) {
+      return $this->json([ 'status' => $intent->status ], 200);
+    }
     return $this->json(false, 404);
   }
 

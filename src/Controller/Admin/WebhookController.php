@@ -149,6 +149,122 @@ class WebhookController extends Controller {
   }
 
 
+  
+  /**
+   * Webhooks Stripe
+   *
+   * @Route("/api/stripe/webhooks", name="api_stripe_webhooks", methods={"POST"})
+   */
+  public function stripe(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+    $result = json_decode($request->getContent(), true);
+
+    // payment_intent
+    if ($result["object"] == "event" && $result["data"]["object"]["object"] == "payment_intent") {
+      $order = $orderRepo->findOneByPaymentId($result["data"]["object"]["id"]);
+
+      if ($order) {
+        switch ($result["type"]) {
+          case 'payment_intent.canceled':
+            $order->setStatus("canceled");
+            break;
+
+          case 'payment_intent.created':
+            $order->setStatus("created");
+            break;
+
+          case 'payment_intent.payment_failed':
+            $order->setStatus("payment_failed");
+            break;
+
+          case 'payment_intent.processing':
+            $order->setStatus("processing");
+            break;
+
+          case 'payment_intent.requires_action':
+            $order->setStatus("requires_action");
+            break;
+
+          case 'payment_intent.succeeded':
+            $order->setStatus("succeeded");
+            $user->setPending($order->getTotal() - $order->getFees());
+
+            foreach ($order->getLineItems() as $lineItem) {
+              if ($lineItem->getVariant()) {
+                $variant = $lineItem->getVariant();
+                $variant->setQuantity($variant->getQuantity() - $lineItem->getQuantity());
+              } else {
+                $product = $lineItem->getProduct();
+                $product->setQuantity($product->getQuantity() - $lineItem->getQuantity());
+              }
+            }
+            break;
+
+          default:
+            // $this->get('bugsnag')->notifyException(new Exception($result["type"]));
+            break;
+        }
+
+        $order->setEventId($result["id"]);
+        $order->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
+        $manager->flush();
+      }
+    }
+
+    // balance available
+    if ($result["object"] == "event" && $result["data"]["object"]["object"] == "balance") {
+      if ($result["type"] == "balance.available") {
+        $pending = $result["data"]["object"]["pending"]["amount"];
+        $available = $result["data"]["object"]["available"]["amount"];
+        $connect_reserved = $result["data"]["object"]["connect_reserved"]["amount"];
+        $livemode = $result["data"]["object"]["livemode"];
+      }
+    }
+
+    return $this->json(true, 200);
+  }
+
+
+  /**
+   * Webhooks Stripe Connect
+   *
+   * @Route("/api/stripe/webhooks/connect", name="api_stripe_webhooks_connect", methods={"POST"})
+   */
+  public function stripeConnect(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+    $result = json_decode($request->getContent(), true);
+
+    // account
+    if ($result["object"] == "event") {
+      switch ($result["type"]) {
+        case 'account.updated':
+          // $account = $result["data"]["object"];
+          break;
+
+        case 'account.external_account.updated':
+          // $externalAccount = $result["data"]["object"];
+          break;
+
+        case 'balance.available':
+          // $balance = $result["data"]["object"];
+          break;
+
+        case 'payout.failed':
+          // $payout = $result["data"]["object"];
+          break;
+
+        case 'person.updated':
+          // $person = $result["data"]["object"];
+          break;
+          
+        default:
+          $this->get('bugsnag')->notifyException(new Exception($result["type"]));
+          break;
+      }
+    }
+
+    return $this->json(true, 200);
+  }
+
+
 
 
   /**
@@ -169,41 +285,10 @@ class WebhookController extends Controller {
     
     if ($result["action"] == "track") {
       try {
-        $this->functionFailsForSure();
+        $this->functionFailsForSure2();
       } catch (\Throwable $exception) {
         \Sentry\captureException($exception);
       }
-
-      // enregistrer status de la commande + envoyer notif push
-      // $order = $orderRepo->findOneByParcelId($parcelId);
-      // if ($order) {
-      //   if ($order->getTrackingNumber()) {
-      //     if ($result && array_key_exists("expected_delivery_date", $result)) {
-      //       $order->setExpectedDelivery(new \Datetime($result->expected_delivery_date));
-      //       $manager->flush();
-
-      //       foreach ($result->statuses as $status) {
-      //         $orderStatus = $statusRepo->findOneByStatusId($status->parcel_status_history_id);
-
-      //         if (!$orderStatus) {
-      //           $orderStatus = new OrderStatus();
-      //           $orderStatus->setUpdateAt(new \Datetime($status->carrier_update_timestamp));
-      //           $orderStatus->setMessage($status->carrier_message);
-      //           $orderStatus->setStatus($status->parent_status);
-      //           $orderStatus->setCode($status->carrier_code);
-      //           $orderStatus->setStatusId($status->parcel_status_history_id);
-      //           $orderStatus->setShipping($order);
-      //           $order->setShippingStatus($status->parent_status);
-      //           $order->setUpdatedAt(new \Datetime($status->carrier_update_timestamp));
-
-      //           $manager->persist($orderStatus);
-      //           $manager->flush();
-      //         }
-      //       }
-      //     }
-      //   }
-      // }
-
     }
 
     return $this->json(true, 200);
