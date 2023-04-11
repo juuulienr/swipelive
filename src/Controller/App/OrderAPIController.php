@@ -220,24 +220,45 @@ class OrderAPIController extends Controller {
     //   'name' => ucwords($buyer->getFullName()),
     // ]);
 
-    $intent = \Stripe\PaymentIntent::create([
-      'amount' => 10000,
-      'customer' => "cus_LdHzF3Snr0mzf1",
-      'description' => "Test",
-      'currency' => 'eur',
-      'automatic_payment_methods' => [
-         'enabled' => 'true',
-       ],
-       'payment_method_options' => [
-         'card' => [
-          'setup_future_usage' => 'off_session',
+    if ($this->getParameter('environment') == "dev") {
+      $intent = \Stripe\PaymentIntent::create([
+        'amount' => 1000,
+        'customer' => "cus_LdHzF3Snr0mzf1",
+        'description' => "Test",
+        'currency' => 'eur',
+        'automatic_payment_methods' => [
+           'enabled' => 'true',
+         ],
+         'payment_method_options' => [
+           'card' => [
+            'setup_future_usage' => 'off_session',
+            ],
           ],
+          'application_fee_amount' => 500,
+          'transfer_data' => [
+           'destination' => "acct_1LttLoFZcx4zHjJa",
+         ],
+       ]);
+    } else {
+      $intent = \Stripe\PaymentIntent::create([
+        'amount' => 1000,
+        'customer' => "cus_L7tKdWqKtHTMS6",
+        'description' => "Test",
+        'currency' => 'eur',
+        'automatic_payment_methods' => [
+           'enabled' => 'true',
+         ],
+         'payment_method_options' => [
+           'card' => [
+            'setup_future_usage' => 'off_session',
+            ],
+          ],
+          'application_fee_amount' => 500,
+          'transfer_data' => [
+           'destination' => "acct_1KTnvo2YJzONPbEb",
         ],
-        'application_fee_amount' => 1000,
-        'transfer_data' => [
-         'destination' => "acct_1LttLoFZcx4zHjJa",
-       ],
-     ]);
+      ]);
+    }
 
     if ($intent) {
       return $this->json([ "clientSecret" => $intent->client_secret ], 200);
