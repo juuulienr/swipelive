@@ -205,64 +205,126 @@ class OrderAPIController extends Controller {
   }
 
   
+  // /**
+  //  * @Route("/user/api/payment/intent", name="user_api_payment_intent", methods={"GET"})
+  //  */
+  // public function intent(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+  //   \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
+
+  //   // $customer = \Stripe\Customer::create();
+
+  //   // $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+
+  //   // $customer = $stripe->customers->create([
+  //   //   'email' => $buyer->getEmail(),
+  //   //   'name' => ucwords($buyer->getFullName()),
+  //   // ]);
+
+  //   if ($this->getParameter('environment') == "dev") {
+  //     $intent = \Stripe\PaymentIntent::create([
+  //       'amount' => 1000,
+  //       'customer' => "cus_LdHzF3Snr0mzf1",
+  //       'description' => "Test",
+  //       'currency' => 'eur',
+  //       'automatic_payment_methods' => [
+  //          'enabled' => 'true',
+  //        ],
+  //        'payment_method_options' => [
+  //          'card' => [
+  //           'setup_future_usage' => 'off_session',
+  //           ],
+  //         ],
+  //         'application_fee_amount' => 500,
+  //         'transfer_data' => [
+  //          'destination' => "acct_1LttLoFZcx4zHjJa",
+  //        ],
+  //      ]);
+  //   } else {
+  //     $intent = \Stripe\PaymentIntent::create([
+  //       'amount' => 1000,
+  //       'customer' => "cus_L7tKdWqKtHTMS6",
+  //       'description' => "Test",
+  //       'currency' => 'eur',
+  //       'automatic_payment_methods' => [
+  //          'enabled' => 'true',
+  //        ],
+  //        'payment_method_options' => [
+  //          'card' => [
+  //           'setup_future_usage' => 'off_session',
+  //           ],
+  //         ],
+  //         'application_fee_amount' => 500,
+  //         'transfer_data' => [
+  //          'destination' => "acct_1KTnvo2YJzONPbEb",
+  //       ],
+  //     ]);
+  //   }
+
+  //   if ($intent) {
+  //     return $this->json([ "clientSecret" => $intent->client_secret ], 200);
+  //   }
+  //   return $this->json(false, 404);
+  // }
+
+
+  
   /**
    * @Route("/user/api/payment/intent", name="user_api_payment_intent", methods={"GET"})
    */
   public function intent(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
-    \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
+   \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
 
-    // $customer = \Stripe\Customer::create();
 
-    // $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+     // if ($this->getParameter('environment') == "dev") {
+       $customer = "cus_LdHzF3Snr0mzf1";
+       $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2022-11-15' ]);
 
-    // $customer = $stripe->customers->create([
-    //   'email' => $buyer->getEmail(),
-    //   'name' => ucwords($buyer->getFullName()),
-    // ]);
+       $fees = 200;
+       $stripeAcc = "acct_1LttLoFZcx4zHjJa";
 
-    if ($this->getParameter('environment') == "dev") {
-      $intent = \Stripe\PaymentIntent::create([
+       $intent = \Stripe\PaymentIntent::create([
         'amount' => 1000,
-        'customer' => "cus_LdHzF3Snr0mzf1",
-        'description' => "Test",
+        'customer' => $customer,
+        'description' => "Produit Test",
         'currency' => 'eur',
         'automatic_payment_methods' => [
-           'enabled' => 'true',
+         'enabled' => 'true',
          ],
          'payment_method_options' => [
            'card' => [
             'setup_future_usage' => 'off_session',
-            ],
           ],
-          'application_fee_amount' => 500,
+          ],
+          'application_fee_amount' => $fees,
           'transfer_data' => [
-           'destination' => "acct_1LttLoFZcx4zHjJa",
+           'destination' => $stripeAcc,
          ],
        ]);
-    } else {
-      $intent = \Stripe\PaymentIntent::create([
-        'amount' => 1000,
-        'customer' => "cus_L7tKdWqKtHTMS6",
-        'description' => "Test",
-        'currency' => 'eur',
-        'automatic_payment_methods' => [
-           'enabled' => 'true',
-         ],
-         'payment_method_options' => [
-           'card' => [
-            'setup_future_usage' => 'off_session',
-            ],
-          ],
-          'application_fee_amount' => 500,
-          'transfer_data' => [
-           'destination' => "acct_1KTnvo2YJzONPbEb",
-        ],
-      ]);
-    }
+     // }
 
-    if ($intent) {
-      return $this->json([ "clientSecret" => $intent->client_secret ], 200);
-    }
+       // $profit = $fees - (25 + str_replace(',', '', $total) * 1.4);
+
+       // $order->setPaymentId($intent->id);
+       // $order->setSubTotal($total);
+       // $order->setTotal($total);
+       // $order->setFees($fees / 100);
+       // $order->setProfit($profit / 100);
+       // $order->setStatus("created");
+       // $manager->flush();
+
+       $array = [
+        "publishableKey"=> $this->getParameter('stripe_pk'),
+        "companyName"=> "Swipe Live",
+        "paymentIntent"=> $intent->client_secret,
+        "ephemeralKey" => $ephemeralKey->secret,
+        "customerId"=> $customer,
+        "appleMerchantId"=> "merchant.com.swipelive.app",
+        "appleMerchantCountryCode"=> "FR",
+        "mobilePayEnabled"=> true
+      ];
+
+      return $this->json($array, 200);
+
     return $this->json(false, 404);
   }
 
