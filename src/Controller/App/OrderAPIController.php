@@ -205,41 +205,38 @@ class OrderAPIController extends Controller {
   }
 
   
-  // /**
-  //  * @Route("/user/api/payment/intent", name="user_api_payment_intent", methods={"GET"})
-  //  */
-  // public function intent(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
-  //   \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
+  /**
+   * @Route("/user/api/payment/intent", name="user_api_payment_intent", methods={"GET"})
+   */
+  public function intent(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+   \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
 
-  //   // $customer = \Stripe\Customer::create();
 
-  //   // $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+     // if ($this->getParameter('environment') == "dev") {
+       $customer = "cus_LdHzF3Snr0mzf1";
+       $stripeAcc = "acct_1LttLoFZcx4zHjJa";
+       $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
+       $fees = 200;
 
-  //   // $customer = $stripe->customers->create([
-  //   //   'email' => $buyer->getEmail(),
-  //   //   'name' => ucwords($buyer->getFullName()),
-  //   // ]);
-
-  //   if ($this->getParameter('environment') == "dev") {
-  //     $intent = \Stripe\PaymentIntent::create([
-  //       'amount' => 1000,
-  //       'customer' => "cus_LdHzF3Snr0mzf1",
-  //       'description' => "Test",
-  //       'currency' => 'eur',
-  //       'automatic_payment_methods' => [
-  //          'enabled' => 'true',
-  //        ],
-  //        'payment_method_options' => [
-  //          'card' => [
-  //           'setup_future_usage' => 'off_session',
-  //           ],
-  //         ],
-  //         'application_fee_amount' => 500,
-  //         'transfer_data' => [
-  //          'destination' => "acct_1LttLoFZcx4zHjJa",
-  //        ],
-  //      ]);
-  //   } else {
+       $intent = \Stripe\PaymentIntent::create([
+        'amount' => 1000,
+        'customer' => $customer,
+        'description' => "Produit Test",
+        'currency' => 'eur',
+        'automatic_payment_methods' => [
+         'enabled' => 'true',
+         ],
+         'payment_method_options' => [
+           'card' => [
+            'setup_future_usage' => 'off_session',
+          ],
+          ],
+          'application_fee_amount' => $fees,
+          'transfer_data' => [
+           'destination' => $stripeAcc,
+         ],
+       ]);
+        //   } else {
   //     $intent = \Stripe\PaymentIntent::create([
   //       'amount' => 1000,
   //       'customer' => "cus_L7tKdWqKtHTMS6",
@@ -260,46 +257,6 @@ class OrderAPIController extends Controller {
   //     ]);
   //   }
 
-  //   if ($intent) {
-  //     return $this->json([ "clientSecret" => $intent->client_secret ], 200);
-  //   }
-  //   return $this->json(false, 404);
-  // }
-
-
-  
-  /**
-   * @Route("/user/api/payment/intent", name="user_api_payment_intent", methods={"GET"})
-   */
-  public function intent(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
-   \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
-
-
-     // if ($this->getParameter('environment') == "dev") {
-       $customer = "cus_LdHzF3Snr0mzf1";
-       $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2022-11-15' ]);
-
-       $fees = 200;
-       $stripeAcc = "acct_1LttLoFZcx4zHjJa";
-
-       $intent = \Stripe\PaymentIntent::create([
-        'amount' => 1000,
-        'customer' => $customer,
-        'description' => "Produit Test",
-        'currency' => 'eur',
-        'automatic_payment_methods' => [
-         'enabled' => 'true',
-         ],
-         'payment_method_options' => [
-           'card' => [
-            'setup_future_usage' => 'off_session',
-          ],
-          ],
-          'application_fee_amount' => $fees,
-          'transfer_data' => [
-           'destination' => $stripeAcc,
-         ],
-       ]);
      // }
 
        // $profit = $fees - (25 + str_replace(',', '', $total) * 1.4);
@@ -325,25 +282,6 @@ class OrderAPIController extends Controller {
 
       return $this->json($array, 200);
 
-    return $this->json(false, 404);
-  }
-
-
-  
-  /**
-   * @Route("/user/api/payment/intent/update", name="user_api_payment_intent_update", methods={"GET"})
-   */
-  public function update(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
-    \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
-
-    $intent = $stripe->paymentIntents->update(
-      '{{PAYMENT_INTENT_ID}}',
-      ['amount' => 1499]
-    );
-
-    if ($intent) {
-      return $this->json([ 'status' => $intent->status ], 200);
-    }
     return $this->json(false, 404);
   }
 
