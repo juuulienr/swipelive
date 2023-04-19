@@ -206,36 +206,34 @@ class OrderAPIController extends Controller {
 
   
   /**
-   * @Route("/user/api/payment/intent", name="user_api_payment_intent", methods={"GET"})
+   * @Route("/user/api/payment", name="user_api_payment", methods={"GET"})
    */
-  public function intent(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+  public function payment(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
    \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
 
+   $customer = "cus_LdHzF3Snr0mzf1";
+   $stripeAcc = "acct_1LttLoFZcx4zHjJa";
+   $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
+   $fees = 200;
 
-     // if ($this->getParameter('environment') == "dev") {
-       $customer = "cus_LdHzF3Snr0mzf1";
-       $stripeAcc = "acct_1LttLoFZcx4zHjJa";
-       $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
-       $fees = 200;
-
-       $intent = \Stripe\PaymentIntent::create([
-        'amount' => 1000,
-        'customer' => $customer,
-        'description' => "Produit Test",
-        'currency' => 'eur',
-        'automatic_payment_methods' => [
-         'enabled' => 'true',
-         ],
-         'payment_method_options' => [
-           'card' => [
-            'setup_future_usage' => 'off_session',
-          ],
-          ],
-          'application_fee_amount' => $fees,
-          'transfer_data' => [
-           'destination' => $stripeAcc,
-         ],
-       ]);
+   $intent = \Stripe\PaymentIntent::create([
+    'amount' => 1000,
+    'customer' => $customer,
+    'description' => "Produit Test",
+    'currency' => 'eur',
+    'automatic_payment_methods' => [
+     'enabled' => 'true',
+     ],
+     'payment_method_options' => [
+       'card' => [
+        'setup_future_usage' => 'on_session',
+      ],
+      ],
+      'application_fee_amount' => $fees,
+      'transfer_data' => [
+       'destination' => $stripeAcc,
+     ],
+   ]);
         //   } else {
   //     $intent = \Stripe\PaymentIntent::create([
   //       'amount' => 1000,

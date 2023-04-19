@@ -232,6 +232,11 @@ class Order
      */
     private $deliveryDate;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $eventId;
+
 
     public function __construct()
     {
@@ -716,6 +721,18 @@ class Order
     public function setDeliveryDate(\DateTimeInterface $deliveryDate): self
     {
         $this->deliveryDate = $deliveryDate;
+
+        return $this;
+    }
+
+    public function getEventId(): ?string
+    {
+        return $this->eventId;
+    }
+
+    public function setEventId(?string $eventId): self
+    {
+        $this->eventId = $eventId;
 
         return $this;
     }

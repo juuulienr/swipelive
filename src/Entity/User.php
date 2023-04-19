@@ -187,6 +187,11 @@ class User implements UserInterface
      */
     private $favoris;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $stripeCustomer;
+
     
 
     public function __construct()
@@ -635,6 +640,18 @@ class User implements UserInterface
                 $favori->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStripeCustomer(): ?string
+    {
+        return $this->stripeCustomer;
+    }
+
+    public function setStripeCustomer(?string $stripeCustomer): self
+    {
+        $this->stripeCustomer = $stripeCustomer;
 
         return $this;
     }

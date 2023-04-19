@@ -190,6 +190,16 @@ class Vendor
      */
     private $promotions;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $stripeAcc;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $personId;
+
     
     public function __construct()
     {
@@ -612,6 +622,30 @@ class Vendor
                 $promotion->setVendor(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStripeAcc(): ?string
+    {
+        return $this->stripeAcc;
+    }
+
+    public function setStripeAcc(?string $stripeAcc): self
+    {
+        $this->stripeAcc = $stripeAcc;
+
+        return $this;
+    }
+
+    public function getPersonId(): ?string
+    {
+        return $this->personId;
+    }
+
+    public function setPersonId(?string $personId): self
+    {
+        $this->personId = $personId;
 
         return $this;
     }

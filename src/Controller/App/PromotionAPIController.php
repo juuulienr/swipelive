@@ -54,8 +54,12 @@ class PromotionAPIController extends Controller {
   public function active(Product $product, Request $request, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer)
   {
     $promotion = $promotionRepo->findOneBy([ "vendor" => $product->getVendor(), "isActive" => true ]);
-    
-    return $this->json($promotion, 200, [], ['groups' => 'promotion:read'], 200);
+
+    if ($promotion) {
+      return $this->json($promotion, 200, [], ['groups' => 'promotion:read'], 200);
+    } else {
+      return $this->json("Aucune promotion disponible", 404);
+    }
   }
 
 
