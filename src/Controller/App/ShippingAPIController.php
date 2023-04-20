@@ -52,6 +52,7 @@ class ShippingAPIController extends Controller {
 
 	    if ($param) {
         $shippingAddress = $shippingAddressRepo->findOneByUser($this->getUser());
+        $now = new \DateTime('now', timezone_open('UTC'));
         $lineItems = $param["lineItems"];
         $identifier = "Order_" . time();
         $totalWeight = 0;
@@ -92,6 +93,7 @@ class ShippingAPIController extends Controller {
             "shipment" => [
               "id" => 0, 
               "type" => 2,
+              "shipment_date" => $now->format('YYYY-mm-dd')
             ], 
             "ship_from" => [
               "postcode" => $vendor->getZip(), 
@@ -147,7 +149,7 @@ class ShippingAPIController extends Controller {
                     $array["service_point"][] = $data;
                   }
                 } else {
-                  if ($value->service_id == '5d490080-3ccf-48b3-b16a-72d7dd268d51' && $value->service_name == 'UPS Standard®') {
+                  if ($value->service_id == '58da4d87-f7e1-4bb7-901e-ff6b52062b4c' && $value->service_name == 'Colissimo sans signature') {
                     $array["domicile"][] = $data;
                   }
                 }
