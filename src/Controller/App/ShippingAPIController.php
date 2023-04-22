@@ -93,7 +93,7 @@ class ShippingAPIController extends Controller {
             "shipment" => [
               "id" => 0, 
               "type" => 2,
-              "shipment_date" => $now->format('YYYY-mm-dd')
+              "shipment_date" => $now->format('Y-m-d')
             ], 
             "ship_from" => [
               "postcode" => $vendor->getZip(), 
@@ -114,7 +114,6 @@ class ShippingAPIController extends Controller {
               "z" => 10 
             ]] 
           ]; 
-
 
           $ch = curl_init();
           curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
