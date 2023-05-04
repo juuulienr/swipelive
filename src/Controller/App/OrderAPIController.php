@@ -63,7 +63,7 @@ class OrderAPIController extends Controller {
   /**
    * @Route("/user/api/orders/payment", name="user_api_orders_payment", methods={"POST"})
    */
-  public function payment(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo) {
+  public function payment(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
 	    $param = json_decode($json, true);
 
@@ -114,7 +114,6 @@ class OrderAPIController extends Controller {
                     $lineTotal = $variant->getPrice() * $quantity;
                     $subTotal += $lineTotal;
 
-                    $variant->setQuantity($variant->getQuantity() - $quantity);
                     $lineItem->setVariant($variant);
                   } else {
                     $soldOut = true; 
@@ -126,8 +125,6 @@ class OrderAPIController extends Controller {
                   $price = $product->getPrice();
                   $lineTotal = $product->getPrice() * $quantity;
                   $subTotal += $lineTotal;
-               
-                  $product->setQuantity($product->getQuantity() - $quantity);
                 } else {
                   $soldOut = true; 
                 }
@@ -183,7 +180,6 @@ class OrderAPIController extends Controller {
           $order->setTotal($total);
   	      $order->setFees($fees);
   	      $order->setShippingStatus("ready-to-send");
-          $order->setPaymentStatus("requires_payment_method");
           $order->setStatus("created");
   	      $manager->flush();
 
@@ -194,7 +190,7 @@ class OrderAPIController extends Controller {
           $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
 
           $intent = \Stripe\PaymentIntent::create([
-            'amount' => $total * 100,
+            'amount' => round($total * 100),
             'customer' => $customer,
             'currency' => 'eur',
             'automatic_payment_methods' => [
@@ -205,28 +201,32 @@ class OrderAPIController extends Controller {
                 'setup_future_usage' => 'off_session',
               ],
             ],
-            'application_fee_amount' => $fees * 100,
+            'application_fee_amount' => round($fees * 100),
             'transfer_data' => [
               'destination' => $stripeAcc,
             ],
           ]);
 
-          $paymentConfig = [
-            "publishableKey"=> $this->getParameter('stripe_pk'),
-            "companyName"=> "Swipe Live",
-            "paymentIntent"=> $intent->client_secret,
-            "ephemeralKey" => $ephemeralKey->secret,
-            "customerId"=> $customer,
-            "appleMerchantId"=> "merchant.com.swipelive.app",
-            "appleMerchantCountryCode"=> "FR",
-            "mobilePayEnabled"=> true
-          ];
-
           $order->setNumber(1000 + $nbOrders);
           $order->setPaymentId($intent->id);
           $manager->flush();
 
-          return $this->json($paymentConfig, 200);
+
+          $array = [
+            "order" => $serializer->serialize($order, "json", [ 'groups' => 'order:read']),
+            "paymentConfig" => [
+              "publishableKey"=> $this->getParameter('stripe_pk'),
+              "companyName"=> "Swipe Live",
+              "paymentIntent"=> $intent->client_secret,
+              "ephemeralKey" => $ephemeralKey->secret,
+              "customerId"=> $customer,
+              "appleMerchantId"=> "merchant.com.swipelive.app",
+              "appleMerchantCountryCode"=> "FR",
+              "mobilePayEnabled"=> true
+            ]
+          ];
+
+          return $this->json($array, 200);
   		  } else {
           return $this->json("Le panier est obligatoire", 404); 
         }
@@ -236,60 +236,6 @@ class OrderAPIController extends Controller {
     return $this->json(false, 404);
   }
 
-  
-  /**
-   * @Route("/user/api/payment", name="user_api_payment", methods={"GET"})
-   */
-  public function payment(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
-   \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
-
-   $customer = "cus_LdHzF3Snr0mzf1";
-   $stripeAcc = "acct_1LttLoFZcx4zHjJa";
-   $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
-   $fees = 100;
-
-   $intent = \Stripe\PaymentIntent::create([
-      'amount' => 400,
-      'customer' => $customer,
-      'description' => "Produit Test",
-      'currency' => 'eur',
-      'automatic_payment_methods' => [
-       'enabled' => 'true',
-     ],
-     'payment_method_options' => [
-       'card' => [
-        'setup_future_usage' => 'off_session',
-      ],
-    ],
-    'application_fee_amount' => $fees,
-    'transfer_data' => [
-     'destination' => $stripeAcc,
-   ],
-  ]);
-
-
-       // $order->setPaymentId($intent->id);
-       // $order->setSubTotal($total);
-       // $order->setTotal($total);
-       // $order->setFees($fees / 100);
-       // $order->setStatus("created");
-       // $manager->flush();
-
-       $array = [
-        "publishableKey"=> $this->getParameter('stripe_pk'),
-        "companyName"=> "Swipe Live",
-        "paymentIntent"=> $intent->client_secret,
-        "ephemeralKey" => $ephemeralKey->secret,
-        "customerId"=> $customer,
-        "appleMerchantId"=> "merchant.com.swipelive.app",
-        "appleMerchantCountryCode"=> "FR",
-        "mobilePayEnabled"=> true
-      ];
-
-      return $this->json($array, 200);
-
-    // return $this->json(false, 404);
-  }
 
 
   /**

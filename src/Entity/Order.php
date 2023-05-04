@@ -72,11 +72,6 @@ class Order
     private $fees;
 
     /**
-     * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
-     */
-    private $profit;
-
-    /**
      * @ORM\Column(type="datetime", nullable=true)
      * @Groups("order:read")
      */
@@ -142,12 +137,6 @@ class Order
      * @Groups("order:read")
      */
     private $shippingStatus;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("order:read")
-     */
-    private $paymentStatus;
 
     /**
      * @ORM\OneToMany(targetEntity=Discussion::class, mappedBy="purchase")
@@ -377,18 +366,6 @@ class Order
         return $this;
     }
 
-    public function getProfit(): ?string
-    {
-        return $this->profit;
-    }
-
-    public function setProfit(string $profit): self
-    {
-        $this->profit = $profit;
-
-        return $this;
-    }
-
     public function getUpdatedAt(): ?\DateTimeInterface
     {
         return $this->updatedAt;
@@ -511,18 +488,6 @@ class Order
                 $orderStatus->setShipping(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getPaymentStatus(): ?string
-    {
-        return $this->paymentStatus;
-    }
-
-    public function setPaymentStatus(?string $paymentStatus): self
-    {
-        $this->paymentStatus = $paymentStatus;
 
         return $this;
     }
