@@ -34,7 +34,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 class OrderAPIController extends Controller {
 
   /**
-   * Récupérer les commandes
+   * Récupérer les ventes
    *
    * @Route("/user/api/orders", name="user_api_orders", methods={"GET"})
    */
@@ -61,9 +61,9 @@ class OrderAPIController extends Controller {
 
   
   /**
-   * @Route("/user/api/orders/payment/success", name="user_api_orders_success", methods={"POST"})
+   * @Route("/user/api/orders/payment", name="user_api_orders_payment", methods={"POST"})
    */
-  public function success(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo) {
+  public function payment(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo) {
     if ($json = $request->getContent()) {
 	    $param = json_decode($json, true);
 
@@ -159,8 +159,7 @@ class OrderAPIController extends Controller {
             return $this->json("Le produit est en rupture de stock", 404); 
           }
           
-  	      $fees = $subTotal * 0.09; // commission
-  	      $profit = $subTotal * 0.06; // commission - frais paiement (3%)
+  	      $fees = $subTotal * 0.08; // commission
   	      $total = $subTotal + $shippingPrice;
 
   	      if (sizeof($customer->getShippingAddresses()->toArray())) {
@@ -183,18 +182,51 @@ class OrderAPIController extends Controller {
   	      $order->setDropoffName($dropoffName);
           $order->setTotal($total);
   	      $order->setFees($fees);
-  	      $order->setProfit($profit);
   	      $order->setShippingStatus("ready-to-send");
-          $order->setPaymentStatus("paid");
-          $order->setStatus("open");
+          $order->setPaymentStatus("requires_payment_method");
+          $order->setStatus("created");
   	      $manager->flush();
 
-  	      $order->setNumber(1000 + $nbOrders);
-  	      $manager->flush();
 
-          return $this->json($order, 200, [], [
-            'groups' => 'order:read', 
+          $customer = "cus_LdHzF3Snr0mzf1";
+          $stripeAcc = "acct_1LttLoFZcx4zHjJa";
+          \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
+          $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
+
+          $intent = \Stripe\PaymentIntent::create([
+            'amount' => $total * 100,
+            'customer' => $customer,
+            'currency' => 'eur',
+            'automatic_payment_methods' => [
+              'enabled' => 'true',
+            ],
+            'payment_method_options' => [
+              'card' => [
+                'setup_future_usage' => 'off_session',
+              ],
+            ],
+            'application_fee_amount' => $fees * 100,
+            'transfer_data' => [
+              'destination' => $stripeAcc,
+            ],
           ]);
+
+          $paymentConfig = [
+            "publishableKey"=> $this->getParameter('stripe_pk'),
+            "companyName"=> "Swipe Live",
+            "paymentIntent"=> $intent->client_secret,
+            "ephemeralKey" => $ephemeralKey->secret,
+            "customerId"=> $customer,
+            "appleMerchantId"=> "merchant.com.swipelive.app",
+            "appleMerchantCountryCode"=> "FR",
+            "mobilePayEnabled"=> true
+          ];
+
+          $order->setNumber(1000 + $nbOrders);
+          $order->setPaymentId($intent->id);
+          $manager->flush();
+
+          return $this->json($paymentConfig, 200);
   		  } else {
           return $this->json("Le panier est obligatoire", 404); 
         }
@@ -214,56 +246,32 @@ class OrderAPIController extends Controller {
    $customer = "cus_LdHzF3Snr0mzf1";
    $stripeAcc = "acct_1LttLoFZcx4zHjJa";
    $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
-   $fees = 200;
+   $fees = 100;
 
    $intent = \Stripe\PaymentIntent::create([
-    'amount' => 1000,
-    'customer' => $customer,
-    'description' => "Produit Test",
-    'currency' => 'eur',
-    'automatic_payment_methods' => [
-     'enabled' => 'true',
+      'amount' => 400,
+      'customer' => $customer,
+      'description' => "Produit Test",
+      'currency' => 'eur',
+      'automatic_payment_methods' => [
+       'enabled' => 'true',
      ],
      'payment_method_options' => [
        'card' => [
-        'setup_future_usage' => 'on_session',
+        'setup_future_usage' => 'off_session',
       ],
-      ],
-      'application_fee_amount' => $fees,
-      'transfer_data' => [
-       'destination' => $stripeAcc,
-     ],
-   ]);
-        //   } else {
-  //     $intent = \Stripe\PaymentIntent::create([
-  //       'amount' => 1000,
-  //       'customer' => "cus_L7tKdWqKtHTMS6",
-  //       'description' => "Test",
-  //       'currency' => 'eur',
-  //       'automatic_payment_methods' => [
-  //          'enabled' => 'true',
-  //        ],
-  //        'payment_method_options' => [
-  //          'card' => [
-  //           'setup_future_usage' => 'off_session',
-  //           ],
-  //         ],
-  //         'application_fee_amount' => 500,
-  //         'transfer_data' => [
-  //          'destination' => "acct_1KTnvo2YJzONPbEb",
-  //       ],
-  //     ]);
-  //   }
+    ],
+    'application_fee_amount' => $fees,
+    'transfer_data' => [
+     'destination' => $stripeAcc,
+   ],
+  ]);
 
-     // }
-
-       // $profit = $fees - (25 + str_replace(',', '', $total) * 1.4);
 
        // $order->setPaymentId($intent->id);
        // $order->setSubTotal($total);
        // $order->setTotal($total);
        // $order->setFees($fees / 100);
-       // $order->setProfit($profit / 100);
        // $order->setStatus("created");
        // $manager->flush();
 
@@ -280,7 +288,7 @@ class OrderAPIController extends Controller {
 
       return $this->json($array, 200);
 
-    return $this->json(false, 404);
+    // return $this->json(false, 404);
   }
 
 

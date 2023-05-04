@@ -213,9 +213,9 @@ class WebhookController extends Controller {
     // balance available
     if ($result["object"] == "event" && $result["data"]["object"]["object"] == "balance") {
       if ($result["type"] == "balance.available") {
-        $pending = $result["data"]["object"]["pending"]["amount"];
-        $available = $result["data"]["object"]["available"]["amount"];
-        $connect_reserved = $result["data"]["object"]["connect_reserved"]["amount"];
+        $pending = $result["data"]["object"]["pending"][0]["amount"];
+        $available = $result["data"]["object"]["available"][0]["amount"];
+        $connect_reserved = $result["data"]["object"]["connect_reserved"][0]["amount"];
         $livemode = $result["data"]["object"]["livemode"];
       }
     }

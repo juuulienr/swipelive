@@ -313,6 +313,63 @@ class AccountAPIController extends Controller {
         }
       }
 
+      // if ($param['businessType'] == "company" | $param['businessType'] == "individual") {
+      //   try {
+      //     $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+      //     $response = $stripe->accounts->create([
+      //       'country' => 'FR',
+      //       'type' => 'custom',
+      //       'capabilities' => [
+      //         'transfers' => ['requested' => true],
+      //       ],
+      //       'business_profile' => [
+      //         'product_description' => $param['summary'],
+      //       ],
+      //       'account_token' => $param['tokenAccount'],
+      //       'settings' => [
+      //         'payouts' => [
+      //           'schedule' => [
+      //             'interval' => 'manual'
+      //           ]
+      //         ]
+      //       ]
+      //     ]);
+
+      //     $vendor = new Vendor();
+      //     $vendor->setStripeAcc($response->id);
+      //     $vendor->setBusinessName($param['businessName']);
+      //     $vendor->setBusinessType($param['businessType']);
+      //     $vendor->setSummary($param['summary']);
+      //     $vendor->setDob(new \DateTime($param['dob']));
+      //     $vendor->setAddress($param['address']);
+      //     $vendor->setCity($param['city']);
+      //     $vendor->setZip($param['zip']);
+
+      //     $user->setType("vendor");
+      //     $user->setVendor($vendor);
+
+      //     $manager->persist($vendor);
+      //     $manager->flush();
+
+      //     if ($param['businessType'] == "company") {
+      //       try {
+      //         \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
+
+      //         $person = \Stripe\Account::createPerson($response->id, [
+      //           'person_token' => $param['tokenPerson'],
+      //         ]);
+
+      //         $vendor->setCompany($param['company']);
+      //         $vendor->setSiren($param['siren']);
+      //         $vendor->setPersonId($person->id);
+      //         $manager->flush();
+
+      //       } catch (Exception $e) {
+      //         return $this->json($e->getMessage(), 404);
+      //       }
+      //     }
+
+
       return $this->json($user, 200, [], [
         'groups' => 'user:read', 
         'circular_reference_limit' => 1, 

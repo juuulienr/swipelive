@@ -160,6 +160,12 @@ class ShippingAPIController extends Controller {
             if (array_key_exists('service_point', $array)) {
               $price = array_column($array["service_point"], 'price');
               array_multisort($price, SORT_ASC, $array["service_point"]);
+            } else {
+              $array["service_point"] = [];
+            }
+
+            if (!array_key_exists('domicile', $array)) {
+              $array["domicile"] = [];
             }
 
             return $this->json($array, 200);
@@ -284,9 +290,6 @@ class ShippingAPIController extends Controller {
           "service_id" => $order->getShippingServiceId(), 
           "delivery_type" => $order->getDropoffName() ? "DELIVERY_TO_COLLECTION_POINT" : "HOME_DELIVERY",
           "label_format" => "PDF", 
-          // "insurance" => true, 
-          // "insurance_type" => "UPELA", 
-          // "insurance_price" => 100 
         ], 
         "ship_from" => [
           "address1" => $vendor->getAddress(), 
