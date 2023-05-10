@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\PromotionRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -60,7 +62,7 @@ class Promotion
 
     /**
      * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="promotions")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $vendor;
 
@@ -69,11 +71,17 @@ class Promotion
      */
     private $createdAt;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Order::class, mappedBy="promotion")
+     */
+    private $orders;
+
 
     public function __construct()
     {
       $this->isActive = true;
       $this->createdAt = new \DateTime('now', timezone_open('UTC'));
+      $this->orders = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -149,6 +157,36 @@ class Promotion
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Order[]
+     */
+    public function getOrders(): Collection
+    {
+        return $this->orders;
+    }
+
+    public function addOrder(Order $order): self
+    {
+        if (!$this->orders->contains($order)) {
+            $this->orders[] = $order;
+            $order->setPromotion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrder(Order $order): self
+    {
+        if ($this->orders->removeElement($order)) {
+            // set the owning side to null (unless already changed)
+            if ($order->getPromotion() === $this) {
+                $order->setPromotion(null);
+            }
+        }
 
         return $this;
     }

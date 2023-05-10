@@ -226,6 +226,17 @@ class Order
      */
     private $eventId;
 
+    /**
+     * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+     * @Groups("order:read")
+     */
+    private $promotionAmount;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Promotion::class, inversedBy="orders")
+     */
+    private $promotion;
+
 
     public function __construct()
     {
@@ -698,6 +709,30 @@ class Order
     public function setEventId(?string $eventId): self
     {
         $this->eventId = $eventId;
+
+        return $this;
+    }
+
+    public function getPromotionAmount(): ?string
+    {
+        return $this->promotionAmount;
+    }
+
+    public function setPromotionAmount(?string $promotionAmount): self
+    {
+        $this->promotionAmount = $promotionAmount;
+
+        return $this;
+    }
+
+    public function getPromotion(): ?Promotion
+    {
+        return $this->promotion;
+    }
+
+    public function setPromotion(?Promotion $promotion): self
+    {
+        $this->promotion = $promotion;
 
         return $this;
     }

@@ -71,6 +71,14 @@ class PromotionAPIController extends Controller {
   public function deletePromotion(Promotion $promotion, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer)
   {
     if ($promotion) {
+      // $orders = $orderRepo->findByPromotion($promotion);
+
+      // if ($orders) {
+      //   foreach ($orders as $order) {
+      //     $order->setPromotion(null);
+      //   }
+      // }
+
       $manager->remove($promotion);
       $manager->flush();
     }

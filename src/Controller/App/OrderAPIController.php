@@ -17,6 +17,7 @@ use App\Repository\OrderRepository;
 use App\Repository\ClipRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
+use App\Repository\PromotionRepository;
 use App\Repository\LiveRepository;
 use App\Repository\VariantRepository;
 use App\Repository\LiveProductsRepository;
@@ -63,7 +64,7 @@ class OrderAPIController extends Controller {
   /**
    * @Route("/user/api/orders/payment", name="user_api_orders_payment", methods={"POST"})
    */
-  public function payment(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, SerializerInterface $serializer) {
+  public function payment(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, PromotionRepository $promotionRepo, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
 	    $param = json_decode($json, true);
 
@@ -72,6 +73,8 @@ class OrderAPIController extends Controller {
         $nbOrders = sizeof($orderRepo->findAll());
         $lineItems = $param["lineItems"];
 	      $identifier = $param["identifier"];
+        $promotionId = $param["promotionId"];
+        $promotionAmount = $param["promotionAmount"];
         $shippingPrice = $param["shippingPrice"];
         $shippingCarrierId = $param["shippingCarrierId"];
         $shippingCarrierName = $param["shippingCarrierName"];
@@ -155,16 +158,26 @@ class OrderAPIController extends Controller {
           if ($soldOut && sizeof($lineItems) == 1) {
             return $this->json("Le produit est en rupture de stock", 404); 
           }
-          
-  	      $fees = $subTotal * 0.08; // commission
-  	      $total = $subTotal + $shippingPrice;
+
+          if ($promotionId && $promotionAmount) {
+            $promotion = $promotionRepo->findOneById($promotionId);
+
+            if ($promotion) {
+              $order->setPromotionAmount($promotionAmount);
+              $order->setPromotion($promotion);
+            }
+          } else {
+            $promotionAmount = 0;
+          }
 
   	      if (sizeof($customer->getShippingAddresses()->toArray())) {
   		      $order->setShippingAddress($customer->getShippingAddresses()->toArray()[0]);
   	      }
 
+          $fees = ($subTotal - $promotionAmount) * 0.08; // commission
+          $total = $subTotal - $promotionAmount + $shippingPrice;
+
   	      $order->setWeight($totalWeight);
-  	      $order->setSubTotal($subTotal);
   	      $order->setIdentifier($identifier);
           $order->setShippingPrice($shippingPrice);
           $order->setShippingCarrierId($shippingCarrierId);
@@ -177,6 +190,7 @@ class OrderAPIController extends Controller {
           $order->setDropoffCountryCode($dropoffCountryCode);
           $order->setDropoffPostcode($dropoffPostcode);
   	      $order->setDropoffName($dropoffName);
+          $order->setSubTotal($subTotal);
           $order->setTotal($total);
   	      $order->setFees($fees);
   	      $order->setShippingStatus("ready-to-send");
