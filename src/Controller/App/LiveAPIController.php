@@ -705,13 +705,19 @@ class LiveAPIController extends Controller {
         $nbProducts = $nbProducts + $lineItem->getQuantity();
       }
 
+      if ($order->getPromotionAmount()) {
+        $amount = $order->getSubtotal() - $order->getPromotionAmount();
+      } else {
+        $amount = $order->getSubtotal();
+      }
+
       $data = [
         "order" => [
           "available" => $available,
           "number" => $order->getNumber(),
           "createdAt" => $order->getCreatedAt(),
           "nbProducts" => $nbProducts,
-          "amount" => $order->getSubtotal(),
+          "amount" => $amount,
           "upload" => $upload,
           "buyer" => [
             "vendor" => $vendor,

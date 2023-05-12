@@ -307,14 +307,14 @@ class OrderAPIController extends Controller {
       $result = json_decode($result);
       curl_close($ch);
 
-      if ($result->success) {
-        $order->setStatus('cancel');
-        $manager->flush();
+      $order->setStatus('cancelled');
+      $order->setShippingStatus('cancelled');
+      $manager->flush();
 
-        return $this->json($order, 200, [], [
-          'groups' => 'order:read', 
-        ]);
-      }
+      return $this->json($order, 200, [], [
+        'groups' => 'order:read', 
+      ]);
+      
     } catch (\Exception $e) {
       return $this->json($e->getMessage(), 404);
     }
