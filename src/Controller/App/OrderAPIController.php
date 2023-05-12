@@ -69,7 +69,7 @@ class OrderAPIController extends Controller {
 	    $param = json_decode($json, true);
 
 	    if ($param) {
-	    	$customer = $this->getUser();
+	    	$buyer = $this->getUser();
         $nbOrders = sizeof($orderRepo->findAll());
         $lineItems = $param["lineItems"];
 	      $identifier = $param["identifier"];
@@ -91,7 +91,7 @@ class OrderAPIController extends Controller {
         $subTotal = 0;
 
 	      $order = new Order();
-	      $order->setBuyer($customer);
+	      $order->setBuyer($buyer);
 	      $manager->persist($order);
 	      
         if ($lineItems) {
@@ -147,7 +147,8 @@ class OrderAPIController extends Controller {
                   $lineItem->setOrderId($order);
                   $manager->persist($lineItem);
                   
-                  $order->setVendor($product->getVendor());
+                  $vendor = $product->getVendor();
+                  $order->setVendor($vendor);
                 }
               }
             } else {
@@ -170,8 +171,8 @@ class OrderAPIController extends Controller {
             $promotionAmount = 0;
           }
 
-  	      if (sizeof($customer->getShippingAddresses()->toArray())) {
-  		      $order->setShippingAddress($customer->getShippingAddresses()->toArray()[0]);
+  	      if (sizeof($buyer->getShippingAddresses()->toArray())) {
+  		      $order->setShippingAddress($buyer->getShippingAddresses()->toArray()[0]);
   	      }
 
           $fees = ($subTotal - $promotionAmount) * 0.08; // commission
@@ -198,14 +199,25 @@ class OrderAPIController extends Controller {
   	      $manager->flush();
 
 
-          $customer = "cus_LdHzF3Snr0mzf1";
+          if (!$buyer->getStripeCustomer()) {
+            $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+            $stripeCustomer = $stripe->customers->create([
+              'email' => $buyer->getEmail(),
+              'name' => ucwords($buyer->getFullName()),
+            ]);
+
+            $buyer->setStripeCustomer($stripeCustomer->id);
+            $manager->flush();
+          }
+
+
           $stripeAcc = "acct_1LttLoFZcx4zHjJa";
           \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
-          $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $customer ], [ 'stripe_version' => '2020-08-27' ]);
+          $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $buyer->getStripeCustomer() ], [ 'stripe_version' => '2020-08-27' ]);
 
           $intent = \Stripe\PaymentIntent::create([
             'amount' => round($total * 100),
-            'customer' => $customer,
+            'customer' => $buyer->getStripeCustomer(),
             'currency' => 'eur',
             'automatic_payment_methods' => [
               'enabled' => 'true',
@@ -217,7 +229,7 @@ class OrderAPIController extends Controller {
             ],
             'application_fee_amount' => round($fees * 100),
             'transfer_data' => [
-              'destination' => $stripeAcc,
+              'destination' => $vendor->getStripeAcc(),
             ],
           ]);
 
@@ -233,7 +245,7 @@ class OrderAPIController extends Controller {
               "companyName"=> "Swipe Live",
               "paymentIntent"=> $intent->client_secret,
               "ephemeralKey" => $ephemeralKey->secret,
-              "customerId"=> $customer,
+              "customerId"=> $buyer->getStripeCustomer(),
               "appleMerchantId"=> "merchant.com.swipelive.app",
               "appleMerchantCountryCode"=> "FR",
               "mobilePayEnabled"=> true
