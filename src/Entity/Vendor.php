@@ -127,12 +127,6 @@ class Vendor
      * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
      * @Groups("user:read")
      */
-    private $total;
-
-    /**
-     * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
-     * @Groups("user:read")
-     */
     private $pending;
 
     /**
@@ -210,7 +204,6 @@ class Vendor
         $this->withdraws = new ArrayCollection();
         $this->bankAccounts = new ArrayCollection();
         $this->promotions = new ArrayCollection();
-        $this->total = "0.00";
         $this->pending = "0.00";
         $this->available = "0.00";
         $this->verified = false;
@@ -438,18 +431,6 @@ class Vendor
     public function setBusinessName(?string $businessName): self
     {
         $this->businessName = $businessName;
-
-        return $this;
-    }
-
-    public function getTotal(): ?string
-    {
-        return $this->total;
-    }
-
-    public function setTotal(?string $total): self
-    {
-        $this->total = $total;
 
         return $this;
     }

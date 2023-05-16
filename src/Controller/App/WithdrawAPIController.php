@@ -42,12 +42,12 @@ class WithdrawAPIController extends Controller {
 
   		if ($param) {
   			$vendor = $this->getUser()->getVendor();
-  			$oldBank = $bankRepo->findOneByVendor($vendor);
+  			$oldBanks = $bankRepo->findByVendor($vendor);
 
 				$bank = new BankAccount();
 				$bank->setLast4($param["last4"]);
 				$bank->setCountryCode($param["countryCode"]);
-				$bank->setCurrency("EUR");
+				$bank->setCurrency("eur");
 				$bank->setNumber($param["number"]);
         $bank->setHolderName($param["holderName"]);
         $bank->setBusinessName($param["businessName"]);
@@ -56,17 +56,22 @@ class WithdrawAPIController extends Controller {
 				$manager->persist($bank);
 				$manager->flush();
 
-        $iban = $bank->getCountryCode() . $bank->getNumber();
+        if ($oldBanks) {
+          foreach ($oldBanks as $oldBank) {
+            $manager->remove($oldBank);
+            $manager->flush();
+          }
+        }
 
         try {
-
+          $iban = $bank->getCountryCode() . $bank->getNumber();
           $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
           $stripeBank = $stripe->accounts->createExternalAccount($vendor->getStripeAcc(), [
             'external_account' => [
               'object' => 'bank_account',
-              'country' => $bank->getCountryCode(),
-              'currency' => 'eur',
               'default_for_currency' => true,
+              'country' => $bank->getCountryCode(),
+              'currency' => $bank->getCurrency(),
               'account_holder_name' => $vendor->getBusinessType() === "individual" ? $bank->getHolderName() : $bank->getBusinessName(),
               'account_holder_type' => $vendor->getBusinessType(),
               'account_number' => $iban,
@@ -78,12 +83,6 @@ class WithdrawAPIController extends Controller {
         } catch (\Exception $e) {
           return $this->json($e->getMessage(), 404);
         }
-
-
-				if ($oldBank) {
-					$manager->remove($oldBank);
-					$manager->flush();
-				}
 
         return $this->json($this->getUser(), 200, [], [
           'groups' => 'user:read', 
@@ -124,14 +123,27 @@ class WithdrawAPIController extends Controller {
 
             $manager->persist($withdraw);
             $manager->flush();
-    
-            return $this->json($this->getUser(), 200, [], [
-              'groups' => 'user:read', 
-              'circular_reference_limit' => 1, 
-              'circular_reference_handler' => function ($object) {
-                return $object->getId();
-              } 
-            ]);
+
+            try {
+              $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+              $payout = $stripe->payouts->create(
+                ['amount' => 1000, 'currency' => $bank->getCurrency() ],
+                ['stripe_account' => $vendor->getStripeAcc() ]
+              );
+
+              $withdraw->setPayoutId($payout->id);
+              $manager->flush();
+
+              return $this->json($this->getUser(), 200, [], [
+                'groups' => 'user:read', 
+                'circular_reference_limit' => 1, 
+                'circular_reference_handler' => function ($object) {
+                  return $object->getId();
+                } 
+              ]);
+            } catch (\Exception $e) {
+              return $this->json($e->getMessage(), 404);
+            }
           } else {
             return $this->json("Le montant demandé est supérieur à l'argent disponible", 404);
           }
