@@ -49,14 +49,36 @@ class WithdrawAPIController extends Controller {
 				$bank->setCountryCode($param["countryCode"]);
 				$bank->setCurrency("EUR");
 				$bank->setNumber($param["number"]);
-        $bank->setFirstname($param["firstname"]);
-        $bank->setLastname($param["lastname"]);
+        $bank->setHolderName($param["holderName"]);
         $bank->setBusinessName($param["businessName"]);
 				$bank->setVendor($vendor);
-        // $bank->setBankId($result->id);
 				
 				$manager->persist($bank);
 				$manager->flush();
+
+        $iban = $bank->getCountryCode() . $bank->getNumber();
+
+        try {
+
+          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+          $stripeBank = $stripe->accounts->createExternalAccount($vendor->getStripeAcc(), [
+            'external_account' => [
+              'object' => 'bank_account',
+              'country' => $bank->getCountryCode(),
+              'currency' => 'eur',
+              'default_for_currency' => true,
+              'account_holder_name' => $vendor->getBusinessType() === "individual" ? $bank->getHolderName() : $bank->getBusinessName(),
+              'account_holder_type' => $vendor->getBusinessType(),
+              'account_number' => $iban,
+            ],
+          ]);
+
+          $bank->setBankId($stripeBank->id);
+          $manager->flush();
+        } catch (\Exception $e) {
+          return $this->json($e->getMessage(), 404);
+        }
+
 
 				if ($oldBank) {
 					$manager->remove($oldBank);

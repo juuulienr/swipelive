@@ -49,23 +49,21 @@ class BankAccount
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $firstname;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $lastname;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("user:read")
      */
     private $businessName;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("user:read")
      */
     private $countryCode;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups("user:read")
+     */
+    private $holderName;
 
     public function getId(): ?int
     {
@@ -132,30 +130,6 @@ class BankAccount
         return $this;
     }
 
-    public function getFirstname(): ?string
-    {
-        return $this->firstname;
-    }
-
-    public function setFirstname(?string $firstname): self
-    {
-        $this->firstname = $firstname;
-
-        return $this;
-    }
-
-    public function getLastname(): ?string
-    {
-        return $this->lastname;
-    }
-
-    public function setLastname(?string $lastname): self
-    {
-        $this->lastname = $lastname;
-
-        return $this;
-    }
-
     public function getBusinessName(): ?string
     {
         return $this->businessName;
@@ -176,6 +150,18 @@ class BankAccount
     public function setCountryCode(string $countryCode): self
     {
         $this->countryCode = $countryCode;
+
+        return $this;
+    }
+
+    public function getHolderName(): ?string
+    {
+        return $this->holderName;
+    }
+
+    public function setHolderName(?string $holderName): self
+    {
+        $this->holderName = $holderName;
 
         return $this;
     }
