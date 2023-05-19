@@ -201,7 +201,6 @@ class WebhookController extends Controller {
             break;
 
           default:
-            // $this->get('bugsnag')->notifyException(new Exception($result["type"]));
             break;
         }
 
@@ -219,6 +218,12 @@ class WebhookController extends Controller {
         $connect_reserved = $result["data"]["object"]["connect_reserved"][0]["amount"];
         $livemode = $result["data"]["object"]["livemode"];
       }
+    }
+
+    try {
+      $this->functionFailsForSure();
+    } catch (\Throwable $exception) {
+      \Sentry\captureException($exception);
     }
 
     return $this->json(true, 200);
@@ -257,9 +262,14 @@ class WebhookController extends Controller {
           break;
           
         default:
-          $this->get('bugsnag')->notifyException(new Exception($result["type"]));
           break;
       }
+    }
+
+    try {
+      $this->functionFailsForSure();
+    } catch (\Throwable $exception) {
+      \Sentry\captureException($exception);
     }
 
     return $this->json(true, 200);
@@ -276,21 +286,85 @@ class WebhookController extends Controller {
   public function upelgo(Request $request, ObjectManager $manager, OrderRepository $orderRepo, OrderStatusRepository $statusRepo) {
     $result = json_decode($request->getContent(), true);
     
-    if ($result["action"] == "delivery") {
-      try {
-        $this->functionFailsForSure();
-      } catch (\Throwable $exception) {
-        \Sentry\captureException($exception);
+    if ($result["action"]) {
+      switch ($result["action"]) {
+        case 'ship':
+          break;
+
+        case 'delivery':
+          break;
+
+        case 'pickup':
+          break;
+
+        case 'track':
+
+          // if ($result->success) {
+          //   $order->setDelivered($result->delivered);
+
+          //   if ($result->incident_date != "") {
+          //     $order->setIncidentDate(new \Datetime($result->incident_date));
+          //   }
+
+          //   if ($result->delivery_date != "") {
+          //     $order->setDeliveryDate(new \Datetime($result->delivery_date));
+          //   }
+
+          //   // update orderStatus
+          //   if ($result->events) {
+          //     foreach ($result->events as $event) {
+          //       $orderStatus = $statusRepo->findOneByShipping($order);
+
+          //       if (!$orderStatus && $event->date) {
+          //         $orderStatus = new OrderStatus();
+          //         $orderStatus->setDate(new \Datetime($event->date_unformatted));
+          //         $orderStatus->setDescription($event->description);
+          //         $orderStatus->setCode($event->code);
+          //         $orderStatus->setShipping($order);
+
+          //         if ($event->location) {
+          //           foreach ($event->location as $location) {
+          //             $orderStatus->setPostcode($location->postcode);
+          //             $orderStatus->setCity($location->city);
+          //             $orderStatus->setLocation($location->location);
+          //           }
+          //         }
+
+          //         $order->setUpdatedAt(new \Datetime($event->date_unformatted));
+                  
+          //         $manager->persist($orderStatus);
+          //         $manager->flush();
+          //       }
+          //     }
+          //   }
+
+          //   $manager->flush();
+          // }
+
+        
+          break;
+
+        case 'multirate':
+          break;
+
+        case 'rate':
+          break;
+
+        case 'cancel':
+          break;
+          
+        default:
+          break;
       }
     }
-    
-    if ($result["action"] == "track") {
-      try {
-        $this->functionFailsForSure2();
-      } catch (\Throwable $exception) {
-        \Sentry\captureException($exception);
-      }
+
+
+    try {
+      $this->functionFailsForSure();
+    } catch (\Throwable $exception) {
+      \Sentry\captureException($exception);
     }
+
 
     return $this->json(true, 200);
   }
