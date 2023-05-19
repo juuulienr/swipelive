@@ -117,7 +117,7 @@ class WithdrawAPIController extends Controller {
             // check amount payout
             $withdraw = new Withdraw();
             $withdraw->setAmount($withdrawAmount);
-            $withdraw->setStatus("completed");
+            $withdraw->setStatus("created");
             $withdraw->setLast4($bank->getLast4());
             $withdraw->setVendor($vendor);
 
@@ -127,11 +127,12 @@ class WithdrawAPIController extends Controller {
             try {
               $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
               $payout = $stripe->payouts->create(
-                ['amount' => 1000, 'currency' => $bank->getCurrency() ],
+                ['amount' => $withdrawAmount * 100, 'currency' => $bank->getCurrency(), 'source_type' => 'bank_account' ],
                 ['stripe_account' => $vendor->getStripeAcc() ]
               );
 
               $withdraw->setPayoutId($payout->id);
+              $withdraw->setStatus("succeeded");
               $manager->flush();
 
               return $this->json($this->getUser(), 200, [], [
