@@ -214,6 +214,7 @@ class OrderAPIController extends Controller {
           $stripeAcc = "acct_1LttLoFZcx4zHjJa";
           \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
           $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $buyer->getStripeCustomer() ], [ 'stripe_version' => '2020-08-27' ]);
+          $applicationAmount = round($fees * 100) + round($shippingPrice * 100);
 
           $intent = \Stripe\PaymentIntent::create([
             'amount' => round($total * 100),
@@ -227,7 +228,7 @@ class OrderAPIController extends Controller {
                 'setup_future_usage' => 'off_session',
               ],
             ],
-            'application_fee_amount' => round($fees * 100),
+            'application_fee_amount' => $applicationAmount,
             'transfer_data' => [
               'destination' => $vendor->getStripeAcc(),
             ],
