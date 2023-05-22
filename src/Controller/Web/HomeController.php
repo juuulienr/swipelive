@@ -21,7 +21,7 @@ class HomeController extends Controller {
   public function landing(){
     try {
     // Some potentially crashy code
-      $this->createError();
+      $this->createError2();
     } catch (Exception $exception) {
       $this->bugsnag->notifyException($exception, function ($report) {
         $report->setSeverity('info');
