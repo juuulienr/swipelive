@@ -19,22 +19,6 @@ class HomeController extends Controller {
    * @Route("/", name="landing")
    */
   public function landing(){
-    try {
-    // Some potentially crashy code
-      $this->createError2();
-    } catch (Exception $exception) {
-      $this->get('bugsnag')->notifyException($exception, function ($report) {
-        $report->setSeverity('info');
-        $report->setMetaData([
-          'account' => array(
-            'paying' => true,
-            'name' => 'Acme Co'
-          )
-        ]);
-      });
-    }
-
-
     return $this->render('web/landing.html.twig');
   }
 
@@ -42,16 +26,6 @@ class HomeController extends Controller {
    * @Route("/mentions-legales", name="legal")
    */
   public function legal(){
-    $this->get('bugsnag')->notifyError('ErrorType', 'Something bad happened', function ($report) {
-      $report->setSeverity('info');
-      $report->setMetaData([
-        'account' => array(
-          'paying' => true,
-          'name' => 'Acme Co'
-        )
-      ]);
-    });
-
     return $this->render('web/legal.html.twig');
   }
 
