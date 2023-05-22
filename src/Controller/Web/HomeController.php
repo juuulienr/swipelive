@@ -23,7 +23,7 @@ class HomeController extends Controller {
     // Some potentially crashy code
       $this->createError2();
     } catch (Exception $exception) {
-      $this->bugsnag->notifyException($exception, function ($report) {
+      $this->get('bugsnag')->notifyException($exception, function ($report) {
         $report->setSeverity('info');
         $report->setMetaData([
           'account' => array(
@@ -42,7 +42,7 @@ class HomeController extends Controller {
    * @Route("/mentions-legales", name="legal")
    */
   public function legal(){
-    $this->bugsnag->notifyError('ErrorType', 'Something bad happened', function ($report) {
+    $this->get('bugsnag')->notifyError('ErrorType', 'Something bad happened', function ($report) {
       $report->setSeverity('info');
       $report->setMetaData([
         'account' => array(
