@@ -157,6 +157,7 @@ class WebhookController extends Controller {
    */
   public function stripe(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
+    $this->get('bugsnag')->notifyException(new Exception($result));
 
     // payment_intent
     if ($result["object"] == "event" && $result["data"]["object"]["object"] == "payment_intent") {
@@ -220,12 +221,6 @@ class WebhookController extends Controller {
       }
     }
 
-    try {
-      $this->functionFailsForSure();
-    } catch (\Throwable $exception) {
-      \Sentry\captureException($exception);
-    }
-
     return $this->json(true, 200);
   }
 
@@ -237,6 +232,7 @@ class WebhookController extends Controller {
    */
   public function stripeConnect(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
+    $this->get('bugsnag')->notifyException(new Exception($result));
 
     // account
     if ($result["object"] == "event") {
@@ -266,12 +262,6 @@ class WebhookController extends Controller {
       }
     }
 
-    try {
-      $this->functionFailsForSure();
-    } catch (\Throwable $exception) {
-      \Sentry\captureException($exception);
-    }
-
     return $this->json(true, 200);
   }
 
@@ -285,6 +275,7 @@ class WebhookController extends Controller {
    */
   public function upelgo(Request $request, ObjectManager $manager, OrderRepository $orderRepo, OrderStatusRepository $statusRepo) {
     $result = json_decode($request->getContent(), true);
+    $this->get('bugsnag')->notifyException(new Exception($result));
     
     if ($result["action"]) {
       switch ($result["action"]) {
@@ -357,14 +348,6 @@ class WebhookController extends Controller {
           break;
       }
     }
-
-
-    try {
-      $this->functionFailsForSure();
-    } catch (\Throwable $exception) {
-      \Sentry\captureException($exception);
-    }
-
 
     return $this->json(true, 200);
   }
