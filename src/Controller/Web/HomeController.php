@@ -42,20 +42,15 @@ class HomeController extends Controller {
    * @Route("/mentions-legales", name="legal")
    */
   public function legal(){
-    try {
-    // Some potentially crashy code
-      $this->createError();
-    } catch (Exception $exception) {
-      $this->bugsnag->notifyError('ErrorType', 'Something bad happened', function ($report) {
-        $report->setSeverity('info');
-        $report->setMetaData([
-          'account' => array(
-            'paying' => true,
-            'name' => 'Acme Co'
-          )
-        ]);
-      });
-    }
+    $this->bugsnag->notifyError('ErrorType', 'Something bad happened', function ($report) {
+      $report->setSeverity('info');
+      $report->setMetaData([
+        'account' => array(
+          'paying' => true,
+          'name' => 'Acme Co'
+        )
+      ]);
+    });
 
     return $this->render('web/legal.html.twig');
   }
