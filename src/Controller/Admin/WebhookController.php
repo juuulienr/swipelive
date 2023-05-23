@@ -38,6 +38,7 @@ class WebhookController extends Controller {
    */
   public function bambuser(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager) {
     $result = json_decode($request->getContent(), true);
+    $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Bambuser');
 
     // broadcast
     if ($result["collection"] == "broadcast") {
@@ -157,7 +158,13 @@ class WebhookController extends Controller {
    */
   public function stripe(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyException(new Exception($result));
+    $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Stripe');
+
+    // try {
+    // // Some potentially crashy code
+    // } catch (Exception $exception) {
+    //   $this->get('bugsnag')->notifyException($exception);
+    // }
 
     // payment_intent
     if ($result["object"] == "event" && $result["data"]["object"]["object"] == "payment_intent") {
@@ -166,7 +173,7 @@ class WebhookController extends Controller {
       if ($order) {
         switch ($result["type"]) {
           case 'payment_intent.canceled':
-            $order->setStatus("canceled");
+            $order->setStatus("cancelled");
             break;
 
           case 'payment_intent.created':
@@ -174,7 +181,7 @@ class WebhookController extends Controller {
             break;
 
           case 'payment_intent.payment_failed':
-            $order->setStatus("payment_failed");
+            $order->setStatus("failed");
             break;
 
           case 'payment_intent.processing':
@@ -232,7 +239,7 @@ class WebhookController extends Controller {
    */
   public function stripeConnect(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyException(new Exception($result));
+    $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Stripe Connect');
 
     // account
     if ($result["object"] == "event") {
@@ -275,7 +282,7 @@ class WebhookController extends Controller {
    */
   public function upelgo(Request $request, ObjectManager $manager, OrderRepository $orderRepo, OrderStatusRepository $statusRepo) {
     $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyException(new Exception($result));
+    $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Upelgo');
     
     if ($result["action"]) {
       switch ($result["action"]) {
@@ -285,11 +292,7 @@ class WebhookController extends Controller {
         case 'delivery':
           break;
 
-        case 'pickup':
-          break;
-
         case 'track':
-
           // if ($result->success) {
           //   $order->setDelivered($result->delivered);
 
@@ -331,14 +334,10 @@ class WebhookController extends Controller {
 
           //   $manager->flush();
           // }
-
         
           break;
 
         case 'multirate':
-          break;
-
-        case 'rate':
           break;
 
         case 'cancel':
