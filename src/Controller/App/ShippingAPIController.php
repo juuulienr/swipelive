@@ -402,8 +402,7 @@ class ShippingAPIController extends Controller {
                   }
                 }
 
-                $order->setUpdatedAt(new \Datetime($event->date_unformatted));
-                
+                $order->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
                 $manager->persist($orderStatus);
                 $manager->flush();
               }

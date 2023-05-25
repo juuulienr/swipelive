@@ -112,18 +112,6 @@ class WithdrawAPIController extends Controller {
 
         if ($bank) {
           if ($vendor->getAvailable() >= $withdrawAmount) {
-            $vendor->setAvailable($vendor->getAvailable() - $withdrawAmount);
-
-            // check amount payout
-            $withdraw = new Withdraw();
-            $withdraw->setAmount($withdrawAmount);
-            $withdraw->setStatus("created");
-            $withdraw->setLast4($bank->getLast4());
-            $withdraw->setVendor($vendor);
-
-            $manager->persist($withdraw);
-            $manager->flush();
-
             try {
               $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
               $payout = $stripe->payouts->create(
@@ -131,8 +119,17 @@ class WithdrawAPIController extends Controller {
                 ['stripe_account' => $vendor->getStripeAcc() ]
               );
 
-              $withdraw->setPayoutId($payout->id);
+              $vendor->setAvailable($vendor->getAvailable() - $withdrawAmount);
+
+              // check amount payout
+              $withdraw = new Withdraw();
+              $withdraw->setAmount($withdrawAmount);
               $withdraw->setStatus("succeeded");
+              $withdraw->setLast4($bank->getLast4());
+              $withdraw->setPayoutId($payout->id);
+              $withdraw->setVendor($vendor);
+
+              $manager->persist($withdraw);
               $manager->flush();
 
               return $this->json($this->getUser(), 200, [], [
