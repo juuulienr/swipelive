@@ -336,8 +336,6 @@ class OrderAPIController extends Controller {
         'payment_intent' => $order->getPaymentId(),
       ]);
 
-
-
       return $this->json($order, 200, [], [
         'groups' => 'order:read', 
       ]);

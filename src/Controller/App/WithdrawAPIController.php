@@ -115,7 +115,7 @@ class WithdrawAPIController extends Controller {
             try {
               $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
               $payout = $stripe->payouts->create(
-                ['amount' => $withdrawAmount * 100, 'currency' => $bank->getCurrency(), 'source_type' => 'bank_account' ],
+                ['amount' => $withdrawAmount * 100, 'currency' => $bank->getCurrency() ],
                 ['stripe_account' => $vendor->getStripeAcc() ]
               );
 
