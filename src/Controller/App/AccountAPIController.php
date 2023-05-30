@@ -95,7 +95,6 @@ class AccountAPIController extends Controller {
       }
     }
 
-
     return $this->json("Une erreur est survenue", 404);
   }
 
@@ -245,13 +244,23 @@ class AccountAPIController extends Controller {
   */
   public function editProfile(Request $request, ObjectManager $manager, UserRepository $userRepo, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
-      $serializer->deserialize($json, User::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $this->getUser()]);
+      $param = json_decode($json, true);
+      $user = $this->getUser();
+      $vendor = $user->getVendor();
+
+      $serializer->deserialize($json, User::class, "json", [ AbstractNormalizer::OBJECT_TO_POPULATE => $user ]);
       $manager->flush();
 
-      $param = json_decode($json, true);
+      try {
+        $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+        $stripe->accounts->update($vendor->getStripeAcc(), [
+          'business_profile' => [
+            'name' => $param['businessName'],
+            'product_description' => $param['summary'],
+          ],
+          'email' => $user->getEmail()
+        ]);
 
-      if ($param['businessType']) {
-        $vendor = $this->getUser()->getVendor();
         $vendor->setBusinessName($param['businessName']);
         $vendor->setSummary($param['summary']);
         $vendor->setAddress($param['address']);
@@ -259,18 +268,18 @@ class AccountAPIController extends Controller {
         $vendor->setZip($param['zip']);
         $vendor->setCountry($param['country']);
         $vendor->setCountryCode($param['countryCode']);
-        $vendor->setCompany($param['company']);
-        $vendor->setSiren($param['siren']);
         $manager->flush();
-      }
 
-	    return $this->json($this->getUser(), 200, [], [
-	    	'groups' => 'user:read', 
-	    	'circular_reference_limit' => 1, 
-	    	'circular_reference_handler' => function ($object) {
-	    		return $object->getId();
-	    	} 
-	    ]);
+        return $this->json($this->getUser(), 200, [], [
+          'groups' => 'user:read', 
+          'circular_reference_limit' => 1, 
+          'circular_reference_handler' => function ($object) {
+            return $object->getId();
+          } 
+        ]);
+      } catch (Exception $e) {
+        return $this->json($e->getMessage(), 404);
+      }
     }
 
     return $this->json("Une erreur est survenue", 404);
