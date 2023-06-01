@@ -148,7 +148,7 @@ class ShippingAPIController extends Controller {
                     $array["service_point"][] = $data;
                   }
                 } else {
-                  if ($value->service_id == '58da4d87-f7e1-4bb7-901e-ff6b52062b4c' && $value->service_name == 'Colissimo sans signature') {
+                  if ($value->service_id == '40bb5845-6a62-4198-8297-153a9bfc95fb' && $value->service_name == 'Colissimo sans signature') {
                     $array["domicile"][] = $data;
                   }
                 }

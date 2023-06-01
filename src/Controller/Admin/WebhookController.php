@@ -160,12 +160,6 @@ class WebhookController extends Controller {
     $result = json_decode($request->getContent(), true);
     $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Stripe');
 
-    // try {
-    // // Some potentially crashy code
-    // } catch (Exception $exception) {
-    //   $this->get('bugsnag')->notifyException($exception);
-    // }
-
     // payment_intent
     if ($result["object"] == "event" && $result["data"]["object"]["object"] == "payment_intent") {
       $order = $orderRepo->findOneByPaymentId($result["data"]["object"]["id"]);

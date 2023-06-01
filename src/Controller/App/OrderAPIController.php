@@ -225,11 +225,6 @@ class OrderAPIController extends Controller {
               'automatic_payment_methods' => [
                 'enabled' => 'true',
               ],
-              'payment_method_options' => [
-                'card' => [
-                  'setup_future_usage' => 'off_session',
-                ],
-              ],
               'application_fee_amount' => $applicationAmount,
               'transfer_data' => [
                 'destination' => $vendor->getStripeAcc(),

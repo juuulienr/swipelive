@@ -151,4 +151,80 @@ class WithdrawAPIController extends Controller {
 
     return $this->json(false, 404);
   }
+
+
+  /**
+   * @Route("/user/api/verification/document/front", name="user_api_verification_front")
+   */
+  public function verifFront(Request $request, ObjectManager $manager) {
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
+
+      if ($param) {
+        try {
+          $vendor = $this->getUser()->getVendor();
+          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+          $stripe->accounts->updatePerson($vendor->getStripeAcc(), $vendor->getPersonId(), [ 'person_token' => $param['person_token'] ]);
+
+          return $this->json(true, 200);
+        } catch (\Exception $e) {
+          return $this->json($e->getMessage(), 404);
+        }
+      }
+    }
+
+    return $this->json("Le document est introuvable !", 404);
+  }
+
+
+  /**
+   * @Route("/user/api/verification/document/back", name="user_api_verification_back")
+   */
+  public function verifBack(Request $request, ObjectManager $manager) {
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
+
+      if ($param) {
+        try {
+          $vendor = $this->getUser()->getVendor();
+          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+          $update = $stripe->accounts->updatePerson($vendor->getStripeAcc(), $vendor->getPersonId(), [ 'person_token' => $param['person_token'] ]);
+
+          return $this->json(true, 200);
+        } catch (\Exception $e) {
+          return $this->json($e->getMessage(), 404);
+        }
+      }
+    }
+
+    return $this->json("Le document est introuvable !", 404);
+  }
+
+
+  /**
+   * @Route("/user/api/verification/company/document", name="user_api_verification_company_document")
+   */
+  public function verifCompany(Request $request, ObjectManager $manager){
+    if ($request->files->get('document')) {
+      $file = $request->files->get('document');
+
+      if (!$file) {
+        return $this->json("Le document est introuvable !", 404);
+      }
+
+      // $filename = md5(time().uniqid()). "." . $file->guessExtension(); 
+      // $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
+      // file_put_contents($filepath, file_get_contents($file));
+
+      // $upload = new Upload();
+      // $upload->setFilename($filename);
+
+      // $manager->persist($upload);
+      // $manager->flush();
+
+      return $this->json($upload, 200);
+    }
+
+    return $this->json("Le document est introuvable !", 404);
+  }
 }
