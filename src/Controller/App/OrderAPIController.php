@@ -195,6 +195,7 @@ class OrderAPIController extends Controller {
   	      $order->setFees($fees);
   	      $order->setShippingStatus("ready-to-send");
           $order->setStatus("created");
+          $manager->flush();
 
 
           if (!$buyer->getStripeCustomer()) {
@@ -206,7 +207,6 @@ class OrderAPIController extends Controller {
               ]);
 
               $buyer->setStripeCustomer($stripeCustomer->id);
-              $manager->flush();
             } catch (Exception $e) {
               return $this->json($e, 500);
             }

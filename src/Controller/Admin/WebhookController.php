@@ -166,26 +166,6 @@ class WebhookController extends Controller {
 
       if ($order) {
         switch ($result["type"]) {
-          case 'payment_intent.canceled':
-            $order->setStatus("cancelled");
-            break;
-
-          case 'payment_intent.created':
-            $order->setStatus("created");
-            break;
-
-          case 'payment_intent.payment_failed':
-            $order->setStatus("failed");
-            break;
-
-          case 'payment_intent.processing':
-            $order->setStatus("processing");
-            break;
-
-          case 'payment_intent.requires_action':
-            $order->setStatus("requires_action");
-            break;
-
           case 'payment_intent.succeeded':
             $order->setStatus("succeeded");
             $vendor = $order->getVendor();
@@ -201,15 +181,16 @@ class WebhookController extends Controller {
                 $product->setQuantity($product->getQuantity() - $lineItem->getQuantity());
               }
             }
+
+            $order->setEventId($result["id"]);
+            $order->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
+            $manager->flush();
+            
             break;
 
           default:
             break;
         }
-
-        $order->setEventId($result["id"]);
-        $order->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
-        $manager->flush();
       }
     }
 
@@ -243,20 +224,16 @@ class WebhookController extends Controller {
           // $account = $result["data"]["object"];
           break;
 
-        case 'account.external_account.updated':
-          // $externalAccount = $result["data"]["object"];
-          break;
-
-        case 'balance.available':
-          // $balance = $result["data"]["object"];
+        case 'person.updated':
+          // $person = $result["data"]["object"];
           break;
 
         case 'payout.failed':
           // $payout = $result["data"]["object"];
           break;
 
-        case 'person.updated':
-          // $person = $result["data"]["object"];
+        case 'balance.available':
+          // $balance = $result["data"]["object"];
           break;
           
         default:
