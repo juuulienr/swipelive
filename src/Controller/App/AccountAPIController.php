@@ -171,37 +171,32 @@ class AccountAPIController extends Controller {
         $email = $param['email'];
         $password = $param['password'];
 
-        $filename = md5(uniqid());
-        $fullname = $filename . ".jpg"; 
-        $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
-        file_put_contents($filepath, file_get_contents($picture));
-
-        try {
-          $result = (new UploadApi())->upload($filepath, [
-            'public_id' => $filename,
-            'use_filename' => TRUE,
-            "height" => 256, 
-            "width" => 256, 
-            "crop" => "thumb"
-          ]);
-
-          unlink($filepath);
-        } catch (\Exception $e) {
-          return $this->json($e->getMessage(), 404);
-        }
-
         $userExist = $userRepo->findOneByEmail($email);
         $user = $userRepo->findOneByFacebookId($facebookId);
 
         if ($userExist) {
-          if ($userExist->getPicture()) {
-            $oldFilename = explode(".", $userExist->getPicture());
-            $result = (new AdminApi())->deleteAssets($oldFilename[0], []);
+          if (!$userExist->getPicture()) {
+            $filename = md5(uniqid());
+            $fullname = $filename . ".jpg"; 
+            $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
+            file_put_contents($filepath, file_get_contents($picture));
+
+            try {
+              $result = (new UploadApi())->upload($filepath, [
+                'public_id' => $filename,
+                'use_filename' => TRUE,
+                "height" => 256, 
+                "width" => 256, 
+                "crop" => "thumb"
+              ]);
+
+              unlink($filepath);
+              $userExist->setPicture($filename);
+            } catch (\Exception $e) {
+              return $this->json($e->getMessage(), 404);
+            }
           }
 
-          $hash = $encoder->encodePassword($userExist, $password);
-          $userExist->setHash($hash);
-          $userExist->setPicture($filename);
           $userExist->setFacebookId($facebookId);
           $manager->flush();
 
@@ -209,6 +204,26 @@ class AccountAPIController extends Controller {
         } else if (!$user) {
           $user = $serializer->deserialize($json, User::class, "json");
           $hash = $encoder->encodePassword($user, $password);
+          $filename = md5(uniqid());
+          $fullname = $filename . ".jpg"; 
+          $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
+          file_put_contents($filepath, file_get_contents($picture));
+
+          try {
+            $result = (new UploadApi())->upload($filepath, [
+              'public_id' => $filename,
+              'use_filename' => TRUE,
+              "height" => 256, 
+              "width" => 256, 
+              "crop" => "thumb"
+            ]);
+
+            unlink($filepath);
+            $userExist->setPicture($filename);
+          } catch (\Exception $e) {
+            return $this->json($e->getMessage(), 404);
+          }
+            
           $user->setHash($hash);
           $user->setPicture($filename);
 
