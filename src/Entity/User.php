@@ -192,6 +192,16 @@ class User implements UserInterface
      */
     private $stripeCustomer;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $appleId;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $googleId;
+
     
 
     public function __construct()
@@ -652,6 +662,30 @@ class User implements UserInterface
     public function setStripeCustomer(?string $stripeCustomer): self
     {
         $this->stripeCustomer = $stripeCustomer;
+
+        return $this;
+    }
+
+    public function getAppleId(): ?string
+    {
+        return $this->appleId;
+    }
+
+    public function setAppleId(?string $appleId): self
+    {
+        $this->appleId = $appleId;
+
+        return $this;
+    }
+
+    public function getGoogleId(): ?string
+    {
+        return $this->googleId;
+    }
+
+    public function setGoogleId(?string $googleId): self
+    {
+        $this->googleId = $googleId;
 
         return $this;
     }

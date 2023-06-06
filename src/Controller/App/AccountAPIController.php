@@ -157,6 +157,49 @@ class AccountAPIController extends Controller {
 
 
   /**
+   * Accès avec Apple
+   *
+  * @Route("/api/authentication/apple", name="api_apple_authentification")
+  */
+  public function appleAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
+
+      if ($param) {
+        $appleId = $param['appleId'];
+        $password = $param['password'];
+        $email = $param['email'];
+
+        $userExist = $userRepo->findOneByEmail($email);
+        $user = $userRepo->findOneByAppleId($appleId);
+
+        if ($userExist) {
+          $hash = $encoder->encodePassword($userExist, $password);
+          $userExist->setHash($hash);
+          $userExist->setAppleId($appleId);
+          $manager->flush();
+
+          return $this->json(false, 200);
+        } else if (!$user) {
+          $user = $serializer->deserialize($json, User::class, "json");
+          $hash = $encoder->encodePassword($user, $password);
+          $user->setHash($hash);
+
+          $manager->persist($user);
+          $manager->flush();
+
+          return $this->json(true, 200);
+        } else {
+          return $this->json(true, 200);
+        }
+      }
+    }
+
+    return $this->json("Une erreur est survenue", 404);
+  }
+
+
+  /**
    * Accès avec Facebook
    *
   * @Route("/api/authentication/facebook", name="api_facebook_authentification")
@@ -197,6 +240,8 @@ class AccountAPIController extends Controller {
             }
           }
 
+          $hash = $encoder->encodePassword($userExist, $password);
+          $userExist->setHash($hash);
           $userExist->setFacebookId($facebookId);
           $manager->flush();
 
