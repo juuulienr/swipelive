@@ -202,7 +202,6 @@ class User implements UserInterface
      */
     private $googleId;
 
-    
 
     public function __construct()
     {

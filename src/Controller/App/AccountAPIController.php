@@ -200,6 +200,93 @@ class AccountAPIController extends Controller {
 
 
   /**
+   * Accès avec Google
+   *
+  * @Route("/api/authentication/google", name="api_google_authentification")
+  */
+  public function googleAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
+    if ($json = $request->getContent()) {
+      $param = json_decode($json, true);
+
+      if ($param) {
+        $googleId = $param['googleId'];
+        $picture = $param['picture'];
+        $email = $param['email'];
+        $password = $param['password'];
+
+        $userExist = $userRepo->findOneByEmail($email);
+        $user = $userRepo->findOneByGoogleId($googleId);
+
+        if ($userExist) {
+          if (!$userExist->getPicture()) {
+            $filename = md5(uniqid());
+            $fullname = $filename . ".jpg"; 
+            $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
+            file_put_contents($filepath, file_get_contents($picture));
+
+            try {
+              $result = (new UploadApi())->upload($filepath, [
+                'public_id' => $filename,
+                'use_filename' => TRUE,
+                "height" => 256, 
+                "width" => 256, 
+                "crop" => "thumb"
+              ]);
+
+              unlink($filepath);
+              $userExist->setPicture($filename);
+            } catch (\Exception $e) {
+              return $this->json($e->getMessage(), 404);
+            }
+          }
+
+          $hash = $encoder->encodePassword($userExist, $password);
+          $userExist->setHash($hash);
+          $userExist->setGoogleId($googleId);
+          $manager->flush();
+
+          return $this->json(false, 200);
+        } else if (!$user) {
+          $user = $serializer->deserialize($json, User::class, "json");
+          $hash = $encoder->encodePassword($user, $password);
+          $filename = md5(uniqid());
+          $fullname = $filename . ".jpg"; 
+          $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
+          file_put_contents($filepath, file_get_contents($picture));
+
+          try {
+            $result = (new UploadApi())->upload($filepath, [
+              'public_id' => $filename,
+              'use_filename' => TRUE,
+              "height" => 256, 
+              "width" => 256, 
+              "crop" => "thumb"
+            ]);
+
+            unlink($filepath);
+            $userExist->setPicture($filename);
+          } catch (\Exception $e) {
+            return $this->json($e->getMessage(), 404);
+          }
+            
+          $user->setHash($hash);
+          $user->setPicture($filename);
+
+          $manager->persist($user);
+          $manager->flush();
+
+          return $this->json(true, 200);
+        } else {
+          return $this->json(true, 200);
+        }
+      }
+    }
+
+    return $this->json("Une erreur est survenue", 404);
+  }
+
+
+  /**
    * Accès avec Facebook
    *
   * @Route("/api/authentication/facebook", name="api_facebook_authentification")
