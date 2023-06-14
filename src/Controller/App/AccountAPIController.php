@@ -159,7 +159,7 @@ class AccountAPIController extends Controller {
   /**
    * Accès avec Apple
    *
-  * @Route("/api/authentication/apple", name="api_apple_authentification")
+  * @Route("/api/authentication/apple", name="api_authentification_apple")
   */
   public function appleAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
@@ -183,8 +183,8 @@ class AccountAPIController extends Controller {
         } else if (!$user) {
           $user = $serializer->deserialize($json, User::class, "json");
           $hash = $encoder->encodePassword($user, $password);
+          
           $user->setHash($hash);
-
           $manager->persist($user);
           $manager->flush();
 
@@ -202,7 +202,7 @@ class AccountAPIController extends Controller {
   /**
    * Accès avec Google
    *
-  * @Route("/api/authentication/google", name="api_google_authentification")
+  * @Route("/api/authentication/google", name="api_authentification_google")
   */
   public function googleAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
@@ -264,14 +264,12 @@ class AccountAPIController extends Controller {
             ]);
 
             unlink($filepath);
-            $userExist->setPicture($filename);
+            $user->setPicture($filename);
           } catch (\Exception $e) {
             return $this->json($e->getMessage(), 404);
           }
             
           $user->setHash($hash);
-          $user->setPicture($filename);
-
           $manager->persist($user);
           $manager->flush();
 
@@ -289,7 +287,7 @@ class AccountAPIController extends Controller {
   /**
    * Accès avec Facebook
    *
-  * @Route("/api/authentication/facebook", name="api_facebook_authentification")
+  * @Route("/api/authentication/facebook", name="api_authentification_facebook")
   */
   public function facebookAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
@@ -490,7 +488,6 @@ class AccountAPIController extends Controller {
           if ($param['businessType'] == "company") {
             try {
               \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
-
               $person = \Stripe\Account::createPerson($response->id, [
                 'person_token' => $param['tokenPerson'],
               ]);
@@ -543,7 +540,6 @@ class AccountAPIController extends Controller {
     } else {
       return $this->json("L'image est introuvable !", 404);
     }
-
 
     $filename = md5(time().uniqid()); 
     $fullname = $filename . "." . $extension; 
