@@ -183,14 +183,15 @@ class AccountAPIController extends Controller {
         } else if (!$user) {
           $user = $serializer->deserialize($json, User::class, "json");
           $hash = $encoder->encodePassword($user, $password);
-          
+
+          $user->setAppleId($appleId);
           $user->setHash($hash);
           $manager->persist($user);
           $manager->flush();
 
           return $this->json(true, 200);
         } else {
-          return $this->json(true, 200);
+          return $this->json(false, 200);
         }
       }
     }
@@ -249,6 +250,9 @@ class AccountAPIController extends Controller {
         } else if (!$user) {
           $user = $serializer->deserialize($json, User::class, "json");
           $hash = $encoder->encodePassword($user, $password);
+          $user->setHash($hash);
+          $user->setGoogleId($googleId);
+
           $filename = md5(uniqid());
           $fullname = $filename . ".jpg"; 
           $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
@@ -269,13 +273,12 @@ class AccountAPIController extends Controller {
             return $this->json($e->getMessage(), 404);
           }
             
-          $user->setHash($hash);
           $manager->persist($user);
           $manager->flush();
 
           return $this->json(true, 200);
         } else {
-          return $this->json(true, 200);
+          return $this->json(false, 200);
         }
       }
     }
@@ -362,7 +365,7 @@ class AccountAPIController extends Controller {
 
           return $this->json(true, 200);
         } else {
-          return $this->json(true, 200);
+          return $this->json(false, 200);
         }
       }
     }
