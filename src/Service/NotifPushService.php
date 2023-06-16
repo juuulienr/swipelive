@@ -2,19 +2,17 @@
 
 namespace App\Service;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use sngrl\PhpFirebaseCloudMessaging\Client;
-use sngrl\PhpFirebaseCloudMessaging\Message;
 use sngrl\PhpFirebaseCloudMessaging\Recipient\Device;
 use sngrl\PhpFirebaseCloudMessaging\Recipient\Topic;
 use sngrl\PhpFirebaseCloudMessaging\Notification;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-
+use sngrl\PhpFirebaseCloudMessaging\Message;
+use sngrl\PhpFirebaseCloudMessaging\Client;
+use Doctrine\Common\Persistence\ObjectManager;
 
 
 class NotifPushService {
-
   private $manager;
   private $params;
 
@@ -23,73 +21,27 @@ class NotifPushService {
     $this->params = $params;
   }
 
-  public function send($title, $body, $type, $device = null) {
-    // if ($type == "presta") {
-    //   $server_key = 'AAAAd11X9bc:APA91bHZjyGXAbeWAHQFIXXtuD6Pk9J-Wh4JpyQ5yGGxcjtPF5J-SjnUaBxGuuIqZpAi86ZcB9alF4ov4DtoV_qdCRupZdC7ddbXOe_OeGaolbZGIFQRGh54_UKZr4TYcssCKpDZaLN1';
-    // } else {
-    //   $server_key = 'AAAAYwvTJo0:APA91bHjq2DdbKev4ks_xPZQGnJACLM8hUoSsxElB72mn-NdbtH2FLjZ0Jqd8NoPMcXnQlGakPoyVAg8e-1EPfxqt-53WC0FUXZkFXhbT8GjFXI8SGLQV7Tyq2qB6vPLVZ2i7mQJFb4s';
-    // }
-
+  public function send($title, $body, $token) {
     $client = new Client();
-    $client->setApiKey($server_key);
+    $client->setApiKey('AAAA6Ak76C0:APA91bH9aWTsN6yRcF7-gV7O-siNKXb1NK08EVZK_ePYeh60TvMtuJS7yr8lAZ3RLqrBY4QhgpEqS7OJivxKrRQ3cUGUtc7edxTtG5IpJPdl8ofVwN7kOl7mv__ytPZ3NBVyAI2R00UW');
     $client->injectGuzzleHttpClient(new \GuzzleHttp\Client());
 
+    $notif = new Notification();
+    $notif->setTitle($title);
+    $notif->setBody($body);
+    $notif->setSound(true);
+    $notif->setBadge(1);
+
     $message = new Message();
-    $notifPush = new Notification();
-    $notifPush->setTitle($title);
-    $notifPush->setBody($body);
-    $notifPush->setBadge(1);
-    $notifPush->setSound(true);
     $message->setPriority('high');
-
-    if ($device) {
-      $message->addRecipient(new Device($device));
-    } else {
-      $topic = "" . $type . "app";
-      $message->addRecipient(new Topic($topic));
-    }
-
-    $message->setNotification($notifPush)
-    ->setData(['key' => 'value']);
+    $message->addRecipient(new Device($token));
+    $message->setNotification($notif);
+    $message->setData(['key' => 'value']);
 
     $response = $client->send($message);
     $status = $response->getStatusCode();
     $content = $response->getBody()->getContents();
 
     return $status;
-  }
-
-
-  public function addTopicSubscription($topic, $device) {
-
-    if ($device) {
-      $client = new Client();
-      $client->setApiKey($this->server_key);
-      $client->injectGuzzleHttpClient(new \GuzzleHttp\Client());
-
-      $response = $client->addTopicSubscription($topic, $device);
-      $status = $response->getStatusCode();
-
-      return $status;
-    }
-
-    return true;
-  }
-
-
-  public function removeTopicSubscription($topic, $device) {
-
-    if ($device) {
-      $client = new Client();
-      $client->setApiKey($this->server_key);
-      $client->injectGuzzleHttpClient(new \GuzzleHttp\Client());
-
-      $response = $client->removeTopicSubscription($topic, $device);
-      $status = $response->getStatusCode();
-
-      return $status;
-    }
-
-    return true;
   }
 }

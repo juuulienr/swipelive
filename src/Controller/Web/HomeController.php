@@ -11,9 +11,17 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use App\Service\NotifPushService;
 
 
 class HomeController extends Controller {
+
+  private $notifPushService;
+
+  public function __construct(NotifPushService $notifPushService) {
+      $this->notifPushService = $notifPushService;
+  }
+
 
   /**
    * @Route("/", name="landing")

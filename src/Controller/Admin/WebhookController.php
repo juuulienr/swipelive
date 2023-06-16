@@ -27,9 +27,17 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use App\Service\NotifPushService;
 
 
 class WebhookController extends Controller {
+
+  private $notifPushService;
+
+  public function __construct(NotifPushService $notifPushService) {
+      $this->notifPushService = $notifPushService;
+  }
+
 
   /**
    * Webhooks Bambuser
@@ -185,7 +193,14 @@ class WebhookController extends Controller {
             $order->setEventId($result["id"]);
             $order->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
             $manager->flush();
-            
+
+            // check if user is live
+            try {
+              $this->notifPushService->send("SWIPE LIVE", "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", $vendor->getPushToken());
+            } catch (\Exception $error) {
+              $this->get('bugsnag')->notifyError('ErrorType', $error);
+            }
+
             break;
 
           default:
