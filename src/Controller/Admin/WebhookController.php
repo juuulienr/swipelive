@@ -164,7 +164,7 @@ class WebhookController extends Controller {
    *
    * @Route("/api/stripe/webhooks", name="api_stripe_webhooks", methods={"POST"})
    */
-  public function stripe(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+  public function stripe(Request $request, ObjectManager $manager, OrderRepository $orderRepo, LiveRepository $liveRepo) {
     $result = json_decode($request->getContent(), true);
     $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Stripe');
 
@@ -194,11 +194,15 @@ class WebhookController extends Controller {
             $order->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
             $manager->flush();
 
-            // check if user is live
-            try {
-              $this->notifPushService->send("SWIPE LIVE", "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", $vendor->getPushToken());
-            } catch (\Exception $error) {
-              $this->get('bugsnag')->notifyError('ErrorType', $error);
+
+            $live = $liveRepo->vendorIsLive($vendor);
+
+            if (!$live) {
+              try {
+                $this->notifPushService->send("SWIPE LIVE", "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", $vendor->getUser()->getPushToken());
+              } catch (\Exception $error) {
+                $this->get('bugsnag')->notifyError('ErrorType', $error);
+              }
             }
 
             break;
@@ -246,10 +250,6 @@ class WebhookController extends Controller {
         case 'payout.failed':
           // $payout = $result["data"]["object"];
           break;
-
-        case 'balance.available':
-          // $balance = $result["data"]["object"];
-          break;
           
         default:
           break;
@@ -280,6 +280,16 @@ class WebhookController extends Controller {
           break;
 
         case 'track':
+          // Livraison Expédition : Bonne nouvelle ! (Shop name) a envoyé ton colis.
+          // Livraison En transit : Ton colis vient d’être pris en charge par le transporteur.
+          // Livraison Disponible en Point Relai : Ton colis est disponible au point relai : ( Nom du PR).
+          // Livraison Terminée : Colis livré ! Tu a 48h pour vérifier ta commande et cliquez sur «tout est correct» pour la clôturer.
+          // Litiges : blocage des fond + Ouverture du chat directement ( amiable ) + problème résolu ? Oui Non
+          // Si oui : clôturer le chat + déblocage des fonds soit pour le client soit pour le vendeur.
+          // Si non : transfert du litige vers nous
+          // Exemple de litige : Colis non reçu, colis non conforme, Contrefaçon….
+                
+
           // if ($result->success) {
           //   $order->setDelivered($result->delivered);
 
@@ -321,7 +331,6 @@ class WebhookController extends Controller {
 
           //   $manager->flush();
           // }
-        
           break;
 
         case 'multirate':

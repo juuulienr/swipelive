@@ -114,7 +114,7 @@ class LiveAPIController extends Controller {
    *
    * @Route("/user/api/live/update/{id}", name="user_api_live_update", methods={"PUT"})
    */
-  public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, UserRepository $userRepo) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
       $broadcastId = $param["broadcastId"];
@@ -157,13 +157,14 @@ class LiveAPIController extends Controller {
         $channel = "channel" . $live->getId();
         $event = "event" . $live->getId();
         $user = $this->getUser();
+        $businessName = $user->getVendor()->getBusinessName();
 
         $data = [
           "comment" => [
             "content" => "Début du live", 
             "user" => [
               "vendor" => [
-                "businessName" => $user->getVendor()->getBusinessName(),
+                "businessName" => $businessName,
               ],
               "firstname" => $user->getFirstname(),
               "lastname" => $user->getLastname(),
@@ -178,6 +179,19 @@ class LiveAPIController extends Controller {
         $live->setChannel($channel);
         $live->setEvent($event);
         $manager->flush();
+
+
+        $followers = $userRepo->findUserFollowers($user);
+
+        if ($followers) {
+          foreach ($followers as $follower) {
+            try {
+              $this->notifPushService->send("SWIPE LIVE", "🔴 " . $businessName . " est actuellement en direct", $follower->getPushToken());
+            } catch (\Exception $error) {
+              $this->get('bugsnag')->notifyError('ErrorType', $error);
+            }
+          }
+        }
 
         return $this->json($live, 200, [], [
           'groups' => 'live:read', 

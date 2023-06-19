@@ -176,6 +176,9 @@ class DiscussionAPIController extends Controller {
       $pusher->trigger("discussion_channel", "new_message", $data);
       $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
 
+
+      // notif push
+
       return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',
         'circular_reference_limit' => 1,

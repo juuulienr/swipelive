@@ -37,6 +37,22 @@ class LiveRepository extends ServiceEntityRepository
     }
 
 
+    public function vendorIsLive($vendor){
+      $query = $this->createQueryBuilder('l')
+      ->join('l.vendor', 'v')
+      ->andWhere('l.resourceUri IS NOT NULL')
+      ->andWhere('l.status = 1');
+
+      if ($vendor) {
+        $query->andWhere('v.id == :vendor')
+        ->setParameter('vendor', $vendor);
+      }
+
+      return $query->getQuery()
+      ->getResult();
+    }
+
+
     // public function findByLiveAndVendor($vendor){
     //     return $this->createQueryBuilder('l')
     //                 ->join('l.vendor', 'v')
