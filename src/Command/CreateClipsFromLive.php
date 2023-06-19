@@ -12,11 +12,11 @@ use App\Repository\ClipRepository;
 use App\Repository\Clip;
 
 class CreateClipsFromLive extends ContainerAwareCommand {
-  private $repo;
+  private $clipRepo;
 
-  public function __construct(ClipRepository $repo, ObjectManager $manager) {
+  public function __construct(ClipRepository $clipRepo, ObjectManager $manager) {
     $this->manager = $manager;
-    $this->repo = $repo;
+    $this->clipRepo = $clipRepo;
 
     parent::__construct();
   }
@@ -29,7 +29,7 @@ class CreateClipsFromLive extends ContainerAwareCommand {
   }
 
   protected function execute(InputInterface $input, OutputInterface $output) {
-    $clips = $this->repo->findAll();
+    $clips = $this->clipRepo->findAll();
     $now = new \DateTime('now', timezone_open('UTC'));
 
     if ($clips) {

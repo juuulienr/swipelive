@@ -326,7 +326,7 @@ class OrderAPIController extends Controller {
       $manager->flush();
 
 
-      // rembourser client
+      // refund customer
       $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
       $stripe->refunds->create([
         'payment_intent' => $order->getPaymentId(),

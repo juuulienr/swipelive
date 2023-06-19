@@ -197,7 +197,7 @@ class WebhookController extends Controller {
 
             $live = $liveRepo->vendorIsLive($vendor);
 
-            if (!$live) {
+            if (!$live && $vendor->getUser()->getPushToken()) {
               try {
                 $this->notifPushService->send("SWIPE LIVE", "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", $vendor->getUser()->getPushToken());
               } catch (\Exception $error) {

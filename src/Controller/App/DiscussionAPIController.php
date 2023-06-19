@@ -155,8 +155,12 @@ class DiscussionAPIController extends Controller {
 
       if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
         $discussion->setUnseenVendor(true);
+        $name = $discussion->getVendor()->getBusinessName();
+        $receiver = $discussion->getVendor()->getUser();
       } else {
         $discussion->setUnseen(true);
+        $name = $discussion->getUser()->getFullName();
+        $receiver = $discussion->getUser();
       }
 
       $manager->persist($message);
@@ -176,8 +180,13 @@ class DiscussionAPIController extends Controller {
       $pusher->trigger("discussion_channel", "new_message", $data);
       $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
 
-
-      // notif push
+      if ($receiver->getPushToken()) {
+        try {
+          $this->notifPushService->send("SWIPE LIVE", "Tu as un nouveau message de " . $name, $receiver->getPushToken());
+        } catch (\Exception $error) {
+          $this->get('bugsnag')->notifyError('ErrorType', $error);
+        }
+      }
 
       return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',
@@ -307,8 +316,12 @@ class DiscussionAPIController extends Controller {
 
       if ($discussion->getUser()->getId() == $user->getId()) {
         $discussion->setUnseenVendor(true);
+        $name = $discussion->getVendor()->getBusinessName();
+        $receiver = $discussion->getVendor()->getUser();
       } else {
         $discussion->setUnseen(true);
+        $name = $user->getFullName();
+        $receiver = $user;
       }
 
       $manager->flush();
@@ -327,6 +340,14 @@ class DiscussionAPIController extends Controller {
       $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger("discussion_channel", "new_message", $data);
       $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
+
+      if ($receiver->getPushToken()) {
+        try {
+          $this->notifPushService->send("SWIPE LIVE", "Tu as un nouveau message de " . $name, $receiver->getPushToken());
+        } catch (\Exception $error) {
+          $this->get('bugsnag')->notifyError('ErrorType', $error);
+        }
+      }
 
       return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',

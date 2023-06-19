@@ -12,12 +12,12 @@ use App\Repository\LiveRepository;
 
 class RemoveWaitingLive extends ContainerAwareCommand
 {
-  private $repo;
+  private $liveRepo;
 
-  public function __construct(LiveRepository $repo, ObjectManager $manager)
+  public function __construct(LiveRepository $liveRepo, ObjectManager $manager)
   {
     $this->manager = $manager;
-    $this->repo = $repo;
+    $this->liveRepo = $liveRepo;
 
     parent::__construct();
   }
@@ -32,7 +32,7 @@ class RemoveWaitingLive extends ContainerAwareCommand
 
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $lives = $this->repo->findAll();
+    $lives = $this->liveRepo->findAll();
     $now = new \DateTime('now', timezone_open('UTC'));
     $now->modify('-1 day');
 

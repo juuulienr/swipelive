@@ -185,10 +185,12 @@ class LiveAPIController extends Controller {
 
         if ($followers) {
           foreach ($followers as $follower) {
-            try {
-              $this->notifPushService->send("SWIPE LIVE", "🔴 " . $businessName . " est actuellement en direct", $follower->getPushToken());
-            } catch (\Exception $error) {
-              $this->get('bugsnag')->notifyError('ErrorType', $error);
+            if ($follower->getPushToken()) {
+              try {
+                $this->notifPushService->send("SWIPE LIVE", "🔴 " . $businessName . " est actuellement en direct", $follower->getPushToken());
+              } catch (\Exception $error) {
+                $this->get('bugsnag')->notifyError('ErrorType', $error);
+              }
             }
           }
         }
