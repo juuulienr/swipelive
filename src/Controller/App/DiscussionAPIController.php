@@ -155,8 +155,8 @@ class DiscussionAPIController extends Controller {
 
       if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
         $discussion->setUnseenVendor(true);
-        $name = $discussion->getVendor()->getBusinessName();
-        $receiver = $discussion->getVendor()->getUser();
+        $name = $discussion->getVendor()->getVendor()->getBusinessName();
+        $receiver = $discussion->getVendor();
       } else {
         $discussion->setUnseen(true);
         $name = $discussion->getUser()->getFullName();
@@ -316,8 +316,8 @@ class DiscussionAPIController extends Controller {
 
       if ($discussion->getUser()->getId() == $user->getId()) {
         $discussion->setUnseenVendor(true);
-        $name = $discussion->getVendor()->getBusinessName();
-        $receiver = $discussion->getVendor()->getUser();
+        $name = $discussion->getVendor()->getVendor()->getBusinessName();
+        $receiver = $discussion->getVendor();
       } else {
         $discussion->setUnseen(true);
         $name = $user->getFullName();
