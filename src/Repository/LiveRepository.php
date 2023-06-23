@@ -44,7 +44,7 @@ class LiveRepository extends ServiceEntityRepository
       ->andWhere('l.status = 1');
 
       if ($vendor) {
-        $query->andWhere('v.id == :vendor')
+        $query->andWhere('v.id = :vendor')
         ->setParameter('vendor', $vendor);
       }
 
