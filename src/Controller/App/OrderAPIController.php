@@ -30,9 +30,18 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use App\Service\NotifPushService;
+
 
 
 class OrderAPIController extends Controller {
+
+  private $notifPushService;
+
+  public function __construct(NotifPushService $notifPushService) {
+      $this->notifPushService = $notifPushService;
+  }
+
 
   /**
    * Récupérer les ventes
@@ -289,6 +298,19 @@ class OrderAPIController extends Controller {
     // payer le vendeur
     // pending -> available
 
+    // Litiges : blocage des fond + Ouverture du chat directement ( amiable ) + problème résolu ? Oui Non
+    // Si oui : clôturer le chat + déblocage des fonds soit pour le client soit pour le vendeur.
+    // Si non : transfert du litige vers nous
+    // Exemple de litige : Colis non reçu, colis non conforme, Contrefaçon….
+    
+    // if ($order->getBuyer->getPushToken()) {
+    //   try {
+    //     $this->notifPushService->send("SWIPE LIVE", "La commande a été annulée ", $order->getBuyer->getPushToken());
+    //   } catch (\Exception $error) {
+    //     $this->get('bugsnag')->notifyError('ErrorType', $error);
+    //   }
+    // }
+
     return $this->json($order, 200, [], [
       'groups' => 'order:read', 
     ]);
@@ -331,6 +353,15 @@ class OrderAPIController extends Controller {
       $stripe->refunds->create([
         'payment_intent' => $order->getPaymentId(),
       ]);
+
+      // send notif push to buyer/vendor
+      // if ($order->getBuyer->getPushToken()) {
+      //   try {
+      //     $this->notifPushService->send("SWIPE LIVE", "La commande a été annulée ", $order->getBuyer->getPushToken());
+      //   } catch (\Exception $error) {
+      //     $this->get('bugsnag')->notifyError('ErrorType', $error);
+      //   }
+      // }
 
       return $this->json($order, 200, [], [
         'groups' => 'order:read', 

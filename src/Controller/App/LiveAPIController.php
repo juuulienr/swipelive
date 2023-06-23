@@ -15,6 +15,7 @@ use App\Entity\Upload;
 use App\Repository\LiveProductsRepository;
 use App\Repository\FollowRepository;
 use App\Repository\VendorRepository;
+use App\Repository\UserRepository;
 use App\Repository\ClipRepository;
 use App\Repository\ProductRepository;
 use App\Repository\CommentRepository;
