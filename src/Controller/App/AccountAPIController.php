@@ -189,6 +189,27 @@ class AccountAPIController extends Controller {
           $manager->persist($user);
           $manager->flush();
 
+          $security = new SecurityUser();
+          $security->setUser($user);
+          $security->setWifiIPAddress($param['wifiIPAddress']);
+          $security->setCarrierIPAddress($param['carrierIPAddress']);
+          $security->setConnection($param['connection']);
+          $security->setTimezone($param['timezone']);
+          $security->setLocale($param['locale']);
+
+          if ($param['device'] && $param['device'] != null) {
+            $security->setModel($param['device']['model']);
+            $security->setPlatform($param['device']['platform']);
+            $security->setUuid($param['device']['uuid']);
+            $security->setVersion($param['device']['version']);
+            $security->setManufacturer($param['device']['manufacturer']);
+            $security->setIsVirtual($param['device']['isVirtual']);
+            $security->setSerial($param['device']['serial']);
+          }
+
+          $manager->persist($security);
+          $manager->flush();
+
           return $this->json(true, 200);
         } else {
           return $this->json(false, 200);
@@ -276,6 +297,27 @@ class AccountAPIController extends Controller {
           $manager->persist($user);
           $manager->flush();
 
+          $security = new SecurityUser();
+          $security->setUser($user);
+          $security->setWifiIPAddress($param['wifiIPAddress']);
+          $security->setCarrierIPAddress($param['carrierIPAddress']);
+          $security->setConnection($param['connection']);
+          $security->setTimezone($param['timezone']);
+          $security->setLocale($param['locale']);
+
+          if ($param['device'] && $param['device'] != null) {
+            $security->setModel($param['device']['model']);
+            $security->setPlatform($param['device']['platform']);
+            $security->setUuid($param['device']['uuid']);
+            $security->setVersion($param['device']['version']);
+            $security->setManufacturer($param['device']['manufacturer']);
+            $security->setIsVirtual($param['device']['isVirtual']);
+            $security->setSerial($param['device']['serial']);
+          }
+
+          $manager->persist($security);
+          $manager->flush();
+
           return $this->json(true, 200);
         } else {
           return $this->json(false, 200);
@@ -361,6 +403,27 @@ class AccountAPIController extends Controller {
           $user->setPicture($filename);
 
           $manager->persist($user);
+          $manager->flush();
+
+          $security = new SecurityUser();
+          $security->setUser($user);
+          $security->setWifiIPAddress($param['wifiIPAddress']);
+          $security->setCarrierIPAddress($param['carrierIPAddress']);
+          $security->setConnection($param['connection']);
+          $security->setTimezone($param['timezone']);
+          $security->setLocale($param['locale']);
+
+          if ($param['device'] && $param['device'] != null) {
+            $security->setModel($param['device']['model']);
+            $security->setPlatform($param['device']['platform']);
+            $security->setUuid($param['device']['uuid']);
+            $security->setVersion($param['device']['version']);
+            $security->setManufacturer($param['device']['manufacturer']);
+            $security->setIsVirtual($param['device']['isVirtual']);
+            $security->setSerial($param['device']['serial']);
+          }
+
+          $manager->persist($security);
           $manager->flush();
 
           return $this->json(true, 200);
