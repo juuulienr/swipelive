@@ -70,90 +70,90 @@ class LineItem
 
     public function getId(): ?int
     {
-        return $this->id;
+      return $this->id;
     }
 
     public function getTitle(): ?string
     {
-        return $this->title;
+      return $this->title;
     }
 
     public function setTitle(string $title): self
     {
-        $this->title = $title;
+      $this->title = $title;
 
-        return $this;
+      return $this;
     }
 
     public function getProduct(): ?Product
     {
-        return $this->product;
+      return $this->product;
     }
 
     public function setProduct(?Product $product): self
     {
-        $this->product = $product;
+      $this->product = $product;
 
-        return $this;
+      return $this;
     }
 
     public function getVariant(): ?Variant
     {
-        return $this->variant;
+      return $this->variant;
     }
 
     public function setVariant(?Variant $variant): self
     {
-        $this->variant = $variant;
+      $this->variant = $variant;
 
-        return $this;
+      return $this;
     }
 
     public function getQuantity(): ?int
     {
-        return $this->quantity;
+      return $this->quantity;
     }
 
     public function setQuantity(int $quantity): self
     {
-        $this->quantity = $quantity;
+      $this->quantity = $quantity;
 
-        return $this;
+      return $this;
     }
 
     public function getPrice(): ?string
     {
-        return $this->price;
+      return $this->price;
     }
 
     public function setPrice(string $price): self
     {
-        $this->price = $price;
+      $this->price = $price;
 
-        return $this;
+      return $this;
     }
 
     public function getTotal(): ?string
     {
-        return $this->total;
+      return $this->total;
     }
 
     public function setTotal(string $total): self
     {
-        $this->total = $total;
+      $this->total = $total;
 
-        return $this;
+      return $this;
     }
 
     public function getOrderId(): ?Order
     {
-        return $this->orderId;
+      return $this->orderId;
     }
 
     public function setOrderId(?Order $orderId): self
     {
-        $this->orderId = $orderId;
+      $this->orderId = $orderId;
 
-        return $this;
+      return $this;
     }
-}
+  }

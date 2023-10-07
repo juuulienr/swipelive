@@ -46,7 +46,7 @@ class WebhookController extends Controller {
    */
   public function bambuser(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager) {
     $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Bambuser');
+    // $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Bambuser');
 
     // broadcast
     if ($result["collection"] == "broadcast") {
@@ -166,7 +166,7 @@ class WebhookController extends Controller {
    */
   public function stripe(Request $request, ObjectManager $manager, OrderRepository $orderRepo, LiveRepository $liveRepo) {
     $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Stripe');
+    // $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Stripe');
 
     // payment_intent
     if ($result["object"] == "event" && $result["data"]["object"]["object"] == "payment_intent") {
@@ -201,7 +201,7 @@ class WebhookController extends Controller {
               try {
                 $this->notifPushService->send("SWIPE LIVE", "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", $vendor->getUser()->getPushToken());
               } catch (\Exception $error) {
-                $this->get('bugsnag')->notifyError('ErrorType', $error);
+                // $this->get('bugsnag')->notifyError('ErrorType', $error);
               }
             }
 
@@ -234,7 +234,7 @@ class WebhookController extends Controller {
    */
   public function stripeConnect(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Stripe Connect');
+    // $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Stripe Connect');
 
     // account
     if ($result["object"] == "event") {
@@ -269,7 +269,7 @@ class WebhookController extends Controller {
    */
   public function upelgo(Request $request, ObjectManager $manager, OrderRepository $orderRepo, OrderStatusRepository $statusRepo) {
     $result = json_decode($request->getContent(), true);
-    $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Upelgo');
+    // $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Upelgo');
     
     if ($result["action"]) {
       switch ($result["action"]) {
