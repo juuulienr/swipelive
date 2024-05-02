@@ -322,9 +322,6 @@
     "sngrl/php-firebase-cloud-messaging": {
         "version": "dev-master"
     },
-    "swiftmailer/swiftmailer": {
-        "version": "v6.1.2"
-    },
     "symfony/apache-pack": {
         "version": "1.0",
         "recipe": {
@@ -567,15 +564,6 @@
     },
     "symfony/stopwatch": {
         "version": "v4.1.1"
-    },
-    "symfony/swiftmailer-bundle": {
-        "version": "2.5",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "2.5",
-            "ref": "3db029c03e452b4a23f7fc45cec7c922c2247eb8"
-        }
     },
     "symfony/translation": {
         "version": "3.3",
