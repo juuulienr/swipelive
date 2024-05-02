@@ -16,6 +16,10 @@ ENV LOG_CHANNEL stderr
 # Installer les dépendances avec Composer
 RUN composer install --no-dev --optimize-autoloader
 
+# Copier la configuration Nginx
+COPY nginx.conf /etc/nginx/sites-available/default
+
+
 # Configuration de l'image
 ENV WEBROOT /var/www/html/public 
 ENV PHP_ERRORS_STDERR 1
