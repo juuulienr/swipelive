@@ -35,6 +35,7 @@ services:
         tags:
           - { name: serializer.normalizer }services:
 
+    Doctrine\Persistence\ObjectManager: '@doctrine.orm.default_entity_manager'
 
     App\Service\NotifPushService:
         arguments: []

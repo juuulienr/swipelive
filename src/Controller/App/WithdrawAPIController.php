@@ -20,10 +20,10 @@ use App\Repository\BankAccountRepository;
 use App\Repository\LiveRepository;
 use App\Repository\VariantRepository;
 use App\Repository\LiveProductsRepository;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -31,7 +31,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 
 
-class WithdrawAPIController extends Controller {
+class WithdrawAPIController extends AbstractController {
 
   /**
    * @Route("/user/api/bank/add", name="user_api_bank_add")

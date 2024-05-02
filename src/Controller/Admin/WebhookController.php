@@ -18,10 +18,10 @@ use App\Repository\ProductRepository;
 use App\Repository\LiveRepository;
 use App\Repository\OrderStatusRepository;
 use App\Repository\LiveProductsRepository;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,7 +30,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use App\Service\NotifPushService;
 
 
-class WebhookController extends Controller {
+class WebhookController extends AbstractController {
 
   private $notifPushService;
 

@@ -17,10 +17,10 @@ use App\Repository\ProductRepository;
 use App\Repository\LiveRepository;
 use App\Repository\UserRepository;
 use App\Repository\LiveProductsRepository;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -31,7 +31,7 @@ use Cloudinary\Api\Admin\AdminApi;
 use Cloudinary\Cloudinary;
 
 
-class APIController extends Controller {
+class APIController extends AbstractController {
 
   /**
    * Afficher le feed
