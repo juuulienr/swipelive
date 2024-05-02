@@ -2,7 +2,16 @@
 FROM richarvey/nginx-php-fpm:3.1.6
 
 # Copier les fichiers de l'application dans le conteneur
-COPY . .
+COPY . /var/www/html
+
+# Se déplacer dans le répertoire de l'application
+WORKDIR /var/www/html
+
+# Installer Composer dans le conteneur
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Installer les dépendances avec Composer
+RUN composer install --no-dev --optimize-autoloader
 
 # Configuration de l'image
 ENV WEBROOT /var/www/html/public   # Symfony utilise également ce répertoire pour le contenu web accessible
