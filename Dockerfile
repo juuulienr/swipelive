@@ -14,15 +14,15 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
 # Configuration de Symfony
-ENV APP_ENV prod  # Production environment pour Symfony
-ENV APP_DEBUG false  # Désactiver le mode debug en production
-ENV LOG_CHANNEL stderr  # Configurer Symfony pour enregistrer les erreurs via stderr
+ENV APP_ENV prod 
+ENV APP_DEBUG false 
+ENV LOG_CHANNEL stderr
 
 # Installer les dépendances avec Composer
 RUN composer install --no-dev --optimize-autoloader
 
 # Configuration de l'image
-ENV WEBROOT /var/www/html/public   # Symfony utilise également ce répertoire pour le contenu web accessible
+ENV WEBROOT /var/www/html/public 
 ENV PHP_ERRORS_STDERR 1
 ENV RUN_SCRIPTS 1
 ENV REAL_IP_HEADER 1
