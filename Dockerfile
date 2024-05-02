@@ -17,8 +17,7 @@ ENV LOG_CHANNEL stderr
 RUN composer install --no-dev --optimize-autoloader
 
 # Copier la configuration Nginx
-COPY nginx.conf /etc/nginx/sites-available/default
-
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Configuration de l'image
 ENV WEBROOT /var/www/html/public 
