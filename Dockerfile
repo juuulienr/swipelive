@@ -8,6 +8,11 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Permettre à Composer de s'exécuter avec des privilèges root
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
+# Configuration de Symfony
+ENV APP_ENV prod 
+ENV APP_DEBUG false 
+ENV LOG_CHANNEL stderr
+
 # Installer les dépendances avec Composer
 RUN composer install --no-dev --optimize-autoloader
 
