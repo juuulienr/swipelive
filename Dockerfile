@@ -10,6 +10,9 @@ WORKDIR /var/www/html
 # Installer Composer dans le conteneur
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Permettre à Composer de s'exécuter avec des privilèges root
+ENV COMPOSER_ALLOW_SUPERUSER 1
+
 # Installer les dépendances avec Composer
 RUN composer install --no-dev --optimize-autoloader
 
@@ -23,9 +26,6 @@ ENV REAL_IP_HEADER 1
 ENV APP_ENV prod  # Production environment pour Symfony
 ENV APP_DEBUG false  # Désactiver le mode debug en production
 ENV LOG_CHANNEL stderr  # Configurer Symfony pour enregistrer les erreurs via stderr
-
-# Permettre à Composer de s'exécuter avec des privilèges root
-ENV COMPOSER_ALLOW_SUPERUSER 1
 
 # Commande pour démarrer les services Nginx et PHP-FPM
 CMD ["/start.sh"]
