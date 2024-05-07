@@ -49,7 +49,7 @@ class PromotionAPIController extends AbstractController {
   /**
    * Récupérer la promotion active
    *
-   * @Route("/user/api/promotions/{id}/active", name="user_api_promotions_active", methods={"GET"})
+   * @Route("/user/api/promotions/active/{id}", name="user_api_promotions_active", methods={"GET"})
    */
   public function active(Product $product, Request $request, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer)
   {
