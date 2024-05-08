@@ -25,6 +25,15 @@ services:
     # App\Controller\Admin\:
         # resource: '../src/Controller/Admin'
         # tags: ['controller.service_arguments']
+    App\Controller\Admin\:
+        resource: '../src/Controller/Admin'
+        tags: ['controller.service_arguments']
+    App\Controller\App\:
+        resource: '../src/Controller/App'
+        tags: ['controller.service_arguments']
+    App\Controller\Web\:
+        resource: '../src/Controller/Web'
+        tags: ['controller.service_arguments']
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
