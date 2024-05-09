@@ -272,8 +272,8 @@ class APIController extends AbstractController {
 
     $filename = md5(time().uniqid()); 
     $fullname = $filename . "." . $extension; 
-    $file->move($this->getParameter('uploads_directory'), $fullName);
-    $file = $this->getParameter('uploads_directory') . '/' . $fullName;
+    $file->move($this->getParameter('uploads_directory'), $fullname);
+    $file = $this->getParameter('uploads_directory') . '/' . $fullname;
 
     try {
       Configuration::instance($this->getParameter('cloudinary'));

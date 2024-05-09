@@ -232,8 +232,8 @@ class ProductAPIController extends AbstractController {
 
       foreach ($product->getUploads()->toArray() as $upload) {
         try {
-          $fileName = explode(".", $upload->getFilename());
-          $result = (new AdminApi())->deleteAssets($fileName[0], []);
+          $filename = explode(".", $upload->getFilename());
+          $result = (new AdminApi())->deleteAssets($filename[0], []);
         } catch (\Exception $e) {
           return $this->json($e->getMessage(), 404);
         }
@@ -314,8 +314,8 @@ class ProductAPIController extends AbstractController {
 
     $filename = md5(time().uniqid()); 
     $fullname = $filename . "." . $extension; 
-    $file->move($this->getParameter('uploads_directory'), $fullName);
-    $file = $this->getParameter('uploads_directory') . '/' . $fullName;
+    $file->move($this->getParameter('uploads_directory'), $fullname);
+    $file = $this->getParameter('uploads_directory') . '/' . $fullname;
 
     try {
       Configuration::instance($this->getParameter('cloudinary'));

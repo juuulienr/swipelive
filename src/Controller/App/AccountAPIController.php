@@ -83,8 +83,8 @@ class AccountAPIController extends AbstractController {
           $manager->persist($security);
           $manager->flush();
 
-			    return $this->json($user, 200, [], [
-			    	'groups' => 'user:read', 
+          return $this->json($user, 200, [], [
+            'groups' => 'user:read', 
 			    	'circular_reference_limit' => 1, 
 			    	'circular_reference_handler' => function ($object) {
 			    		return $object->getId();
@@ -244,8 +244,8 @@ class AccountAPIController extends AbstractController {
           if (!$userExist->getPicture()) {
             $filename = md5(uniqid());
             $fullname = $filename . ".jpg"; 
-            $file->move($this->getParameter('uploads_directory'), $fullName);
-            $file = $this->getParameter('uploads_directory') . '/' . $fullName;
+            $file->move($this->getParameter('uploads_directory'), $fullname);
+            $file = $this->getParameter('uploads_directory') . '/' . $fullname;
 
             try {
               Configuration::instance($this->getParameter('cloudinary'));
@@ -277,8 +277,8 @@ class AccountAPIController extends AbstractController {
 
           $filename = md5(uniqid());
           $fullname = $filename . ".jpg"; 
-          $file->move($this->getParameter('uploads_directory'), $fullName);
-          $file = $this->getParameter('uploads_directory') . '/' . $fullName;
+          $file->move($this->getParameter('uploads_directory'), $fullname);
+          $file = $this->getParameter('uploads_directory') . '/' . $fullname;
 
           try {
             Configuration::instance($this->getParameter('cloudinary'));
@@ -352,8 +352,8 @@ class AccountAPIController extends AbstractController {
           if (!$userExist->getPicture()) {
             $filename = md5(uniqid());
             $fullname = $filename . ".jpg"; 
-            $file->move($this->getParameter('uploads_directory'), $fullName);
-            $file = $this->getParameter('uploads_directory') . '/' . $fullName;
+            $file->move($this->getParameter('uploads_directory'), $fullname);
+            $file = $this->getParameter('uploads_directory') . '/' . $fullname;
 
             try {
               Configuration::instance($this->getParameter('cloudinary'));
@@ -382,8 +382,8 @@ class AccountAPIController extends AbstractController {
           $hash = $encoder->encodePassword($user, $password);
           $filename = md5(uniqid());
           $fullname = $filename . ".jpg"; 
-          $file->move($this->getParameter('uploads_directory'), $fullName);
-          $file = $this->getParameter('uploads_directory') . '/' . $fullName;
+          $file->move($this->getParameter('uploads_directory'), $fullname);
+          $file = $this->getParameter('uploads_directory') . '/' . $fullname;
 
           try {
             Configuration::instance($this->getParameter('cloudinary'));
@@ -607,15 +607,15 @@ class AccountAPIController extends AbstractController {
       return $this->json("L'image est introuvable !", 404);
     }
 
-    $fileName = md5(uniqid());
-    $fullName = $fileName.'.'.$file->guessExtension();
-    $file->move($this->getParameter('uploads_directory'), $fullName);
-    $file = $this->getParameter('uploads_directory') . '/' . $fullName;
+    $filename = md5(uniqid());
+    $fullname = $filename.'.'.$file->guessExtension();
+    $file->move($this->getParameter('uploads_directory'), $fullname);
+    $file = $this->getParameter('uploads_directory') . '/' . $fullname;
 
     try {
       Configuration::instance($this->getParameter('cloudinary'));
       $result = (new UploadApi())->upload($file, [
-        'public_id' => $fileName,
+        'public_id' => $filename,
         'use_filename' => TRUE,
         "height" => 256, 
         "width" => 256, 
