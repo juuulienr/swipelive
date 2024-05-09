@@ -26,6 +26,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
 use Cloudinary\Cloudinary;
@@ -275,6 +276,7 @@ class APIController extends AbstractController {
     file_put_contents($filepath, $content);
 
     try {
+      Configuration::instance($this->getParameter('cloudinary'));
       $result = (new UploadApi())->upload($filepath, [
         'public_id' => $filename,
         'use_filename' => TRUE,

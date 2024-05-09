@@ -284,6 +284,7 @@ class DiscussionAPIController extends AbstractController {
     file_put_contents($filepath, $content);
 
     try {
+      Configuration::instance($this->getParameter('cloudinary'));
       $result = (new UploadApi())->upload($filepath, [
         'public_id' => $filename,
         'use_filename' => TRUE,

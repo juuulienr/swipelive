@@ -33,6 +33,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
 use Cloudinary\Cloudinary;
@@ -335,6 +336,7 @@ class ShippingAPIController extends AbstractController {
         file_put_contents($filepath, base64_decode($result->waybills[0]));
 
         try {
+          Configuration::instance($this->getParameter('cloudinary'));
           (new UploadApi())->upload($filepath, [
             'public_id' => $filename,
             'use_filename' => TRUE,

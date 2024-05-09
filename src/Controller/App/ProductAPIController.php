@@ -30,6 +30,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
 use Cloudinary\Cloudinary;
@@ -317,6 +318,7 @@ class ProductAPIController extends AbstractController {
     file_put_contents($filepath, $content);
 
     try {
+      Configuration::instance($this->getParameter('cloudinary'));
       $result = (new UploadApi())->upload($filepath, [
         'public_id' => $filename,
         'use_filename' => TRUE,

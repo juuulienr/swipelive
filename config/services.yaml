@@ -1,6 +1,7 @@
 parameters:
     locale: 'fr'
     uploads_directory: '%kernel.project_dir%/public/uploads'
+    cloudinary: '%env(CLOUDINARY_URL)%'
     environment: '%env(APP_ENV)%'
     stripe_pk: '%env(STRIPE_PK)%'
     stripe_sk: '%env(STRIPE_SK)%'
