@@ -257,7 +257,7 @@ class AccountAPIController extends AbstractController {
                 "crop" => "thumb"
               ]);
 
-              $userExist->setPicture($filename);
+              $userExist->setPicture($fullname);
             } catch (\Exception $e) {
               return $this->json($e->getMessage(), 404);
             }
@@ -290,7 +290,7 @@ class AccountAPIController extends AbstractController {
               "crop" => "thumb"
             ]);
 
-            $user->setPicture($filename);
+            $user->setPicture($fullname);
           } catch (\Exception $e) {
             return $this->json($e->getMessage(), 404);
           }
@@ -365,7 +365,7 @@ class AccountAPIController extends AbstractController {
                 "crop" => "thumb"
               ]);
 
-              $userExist->setPicture($filename);
+              $userExist->setPicture($fullname);
             } catch (\Exception $e) {
               return $this->json($e->getMessage(), 404);
             }
@@ -395,13 +395,12 @@ class AccountAPIController extends AbstractController {
               "crop" => "thumb"
             ]);
 
-            $userExist->setPicture($filename);
+            $user->setPicture($fullname);
           } catch (\Exception $e) {
             return $this->json($e->getMessage(), 404);
           }
             
           $user->setHash($hash);
-          $user->setPicture($filename);
 
           $manager->persist($user);
           $manager->flush();
@@ -616,14 +615,12 @@ class AccountAPIController extends AbstractController {
     try {
       Configuration::instance($this->getParameter('cloudinary'));
       $result = (new UploadApi())->upload($file, [
-        'public_id' => $filename,
+        'public_id' => $fileName,
         'use_filename' => TRUE,
         "height" => 256, 
         "width" => 256, 
         "crop" => "thumb"
       ]);
-
-      unlink($filepath);
     } catch (\Exception $e) {
       return $this->json($e->getMessage(), 404);
     }

@@ -6,6 +6,7 @@
 
 ###> symfony/webpack-encore-pack ###
 /node_modules/
+/public/uploads/
 npm-debug.log
 yarn-error.log
 
