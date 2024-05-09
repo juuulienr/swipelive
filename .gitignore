@@ -6,7 +6,6 @@
 
 ###> symfony/webpack-encore-pack ###
 /node_modules/
-/public/uploads/
 npm-debug.log
 yarn-error.log
 
@@ -21,11 +20,6 @@ yarn-error.log
 /node_modules/
 npm-debug.log
 yarn-error.log
-
-###> config\packages\bugsnag.yaml ###
-/config/packages/bugsnag.yaml
-###> lexik/jwt-authentication-bundle ###
-###< lexik/jwt-authentication-bundle ###
 
 ###> phpunit/phpunit ###
 /phpunit.xml
