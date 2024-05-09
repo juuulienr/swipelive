@@ -314,20 +314,18 @@ class ProductAPIController extends AbstractController {
 
     $filename = md5(time().uniqid()); 
     $fullname = $filename . "." . $extension; 
-    $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
-    file_put_contents($filepath, $content);
+    $file->move($this->getParameter('uploads_directory'), $fullName);
+    $file = $this->getParameter('uploads_directory') . '/' . $fullName;
 
     try {
       Configuration::instance($this->getParameter('cloudinary'));
-      $result = (new UploadApi())->upload($filepath, [
+      $result = (new UploadApi())->upload($file, [
         'public_id' => $filename,
         'use_filename' => TRUE,
         "height" => 750, 
         "width" => 750, 
         "crop" => "thumb"
       ]);
-
-      unlink($filepath);
     } catch (\Exception $e) {
       return $this->json($e->getMessage(), 404);
     }
