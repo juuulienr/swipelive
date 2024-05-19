@@ -26,6 +26,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\HttpFoundation\Response;
+use BoogieFromZk\AgoraToken\RtcTokenBuilder2;
 use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
@@ -33,6 +35,27 @@ use Cloudinary\Cloudinary;
 
 
 class APIController extends AbstractController {
+
+
+  /**
+   * @Route("/agora/token", name="generate_agora_token")
+   */
+  public function generateToken() {
+    $appID = $this->getParameter('agora_app_id');
+    $appCertificate = $this->getParameter('agora_app_certificate');
+    $expiresInSeconds = 86400;
+    $channelName = "test";
+    $uid = 0;
+    $role = RtcTokenBuilder2::ROLE_PUBLISHER;
+    $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $channelName, $uid, $role, $expiresInSeconds);
+
+    if ($token) {
+      return $this->json([ "token" => $token ], 200);
+    }
+
+    return $this->json(false, 404);
+  }
+
 
   /**
    * Afficher le feed
