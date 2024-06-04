@@ -302,11 +302,9 @@ class ProductAPIController extends AbstractController {
 
     if ($file && array_key_exists("picture", $file)) {
       $file = $file["picture"];
-      $content = $file;
       $extension = 'jpg';
     } else if ($request->files->get('picture')) {
       $file = $request->files->get('picture');
-      $content = file_get_contents($file);
       $extension = $file->guessExtension();
     } else {
       return $this->json("L'image est introuvable !", 404);

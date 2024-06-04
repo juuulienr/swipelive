@@ -597,21 +597,19 @@ class AccountAPIController extends AbstractController {
 
     if ($file && array_key_exists("picture", $file)) {
       $file = $file["picture"];
-      $content = $file;
       $extension = 'jpg';
     } else if ($request->files->get('picture')) {
       $file = $request->files->get('picture');
-      $content = file_get_contents($file);
       $extension = $file->guessExtension();
     } else {
       return $this->json("L'image est introuvable !", 404);
     }
 
-    $filename = md5(uniqid());
-    $fullname = $filename.'.'.$file->guessExtension();
-    $file->move($this->getParameter('uploads_directory'), $fullname);
-    $file = $this->getParameter('uploads_directory') . '/' . $fullname;
-
+    $fileName = md5(uniqid());
+    $fullName = $fileName.'.'.$extension;
+    $file->move($this->getParameter('uploads_directory'), $fullName);
+    $file = $this->getParameter('uploads_directory') . '/' . $fullName;
+        
     try {
       Configuration::instance($this->getParameter('cloudinary'));
       $result = (new UploadApi())->upload($file, [
