@@ -38,13 +38,13 @@ class APIController extends AbstractController {
 
 
   /**
-   * @Route("/agora/token", name="generate_agora_token")
+   * @Route("/agora/token/{id}", name="generate_agora_token")
    */
-  public function generateToken() {
+  public function generateToken(Live $live) {
     $appID = $this->getParameter('agora_app_id');
     $appCertificate = $this->getParameter('agora_app_certificate');
     $expiresInSeconds = 86400;
-    $channelName = "test";
+    $channelName = "Live" . $live->getId();
     $uid = 0;
     $role = RtcTokenBuilder2::ROLE_PUBLISHER;
     $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $channelName, $uid, $role, $expiresInSeconds);
