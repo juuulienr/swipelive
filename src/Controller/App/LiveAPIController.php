@@ -436,6 +436,7 @@ class LiveAPIController extends AbstractController {
     //       }
     //     }
     //   }
+    // }
 
       // stop stream sur facebook
       if ($fbStreamId) {
@@ -454,7 +455,6 @@ class LiveAPIController extends AbstractController {
           return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
         }
       }
-    }
 
     return $this->json($this->getUser(), 200, [], [
       'groups' => 'user:read', 
