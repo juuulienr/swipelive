@@ -40,126 +40,6 @@ class WebhookController extends AbstractController {
 
 
   /**
-   * Webhooks Bambuser
-   *
-   * @Route("/api/bambuser/webhooks", name="api_bambuser_webhooks", methods={"POST"})
-   */
-  public function bambuser(Request $request, ClipRepository $clipRepo, LiveRepository $liveRepo, ObjectManager $manager) {
-    $result = json_decode($request->getContent(), true);
-    // $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Bambuser');
-
-    // broadcast
-    if ($result["collection"] == "broadcast") {
-
-      // broadcast add
-      if ($result["action"] == "add") {
-        $broadcastId = $result["payload"]["id"];
-        $clip = $clipRepo->findOneByBroadcastId($broadcastId);
-
-        if ($clip) {
-          $clip->setResourceUri($result["payload"]["resourceUri"]);
-          $clip->setEventId($result["eventId"]);
-          $clip->setTotalLikes($clip->getLive()->getTotalLikes());
-
-          if (array_key_exists("preview", $result["payload"])) {
-            $clip->setPreview($result["payload"]["preview"]);
-          } else {
-            $clip->setPreview($clip->getLive()->getPreview());
-          }
-
-          $manager->flush();
-        }
-      }
-
-      // broadcast update
-      if ($result["action"] == "update") {
-        $broadcastId = $result["payload"]["id"];
-        $live = $liveRepo->findOneByBroadcastId($broadcastId);
-
-        if ($live) {
-          $live->setEventId($result["eventId"]);
-
-          if ($result["payload"]["type"] == "archived") {
-            $live->setStatus(2);
-          }
-
-          $manager->flush();
-        }
-
-        $clip = $clipRepo->findOneByBroadcastId($broadcastId);
-
-        if ($clip) {
-          $clip->setEventId($result["eventId"]);
-          $clip->setTotalLikes($clip->getLive()->getTotalLikes());
-
-          if (array_key_exists("preview", $result["payload"])) {
-            $clip->setPreview($result["payload"]["preview"]);
-          }
-
-          $manager->flush();
-        }
-      }
-
-      // broadcast extract
-      if ($result["action"] == "extract") {
-        $broadcastId = $result["payload"]["id"];
-        $clip = $clipRepo->findOneByBroadcastId($broadcastId);
-
-        if ($clip) {
-          $clip->setEventId($result["eventId"]);
-          $clip->setTotalLikes($clip->getLive()->getTotalLikes());
-          $manager->flush();
-        }
-      }
-
-      // broadcast remove
-      if ($result["action"] == "remove") {
-        $broadcastId = $result["payload"]["id"];
-        $clip = $clipRepo->findOneByBroadcastId($broadcastId);
-
-        if ($clip) {
-          $comments = $clip->getComments();
-
-          if ($comments) {
-            foreach ($comments as $comment) {
-              $manager->remove($comment);
-            }
-          }
-
-          $manager->remove($clip);
-          $manager->flush();
-        }
-
-        $live = $liveRepo->findOneByBroadcastId($broadcastId);
-
-        if ($live) {
-          $liveProducts = $live->getLiveProducts();
-          $comments = $live->getComments();
-
-          if ($liveProducts) {
-            foreach ($liveProducts as $liveProduct) {
-              $manager->remove($liveProduct);
-            }
-          }
-
-          if ($comments) {
-            foreach ($comments as $comment) {
-              $manager->remove($comment);
-            }
-          }
-
-          $manager->remove($live);
-          $manager->flush();
-        }
-      }
-    }
-
-    return $this->json(true, 200);
-  }
-
-
-  
-  /**
    * Webhooks Stripe
    *
    * @Route("/api/stripe/webhooks", name="api_stripe_webhooks", methods={"POST"})
@@ -201,7 +81,7 @@ class WebhookController extends AbstractController {
               try {
                 $this->notifPushService->send("SWIPE LIVE", "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", $vendor->getUser()->getPushToken());
               } catch (\Exception $error) {
-                // $this->get('bugsnag')->notifyError('ErrorType', $error);
+                $this->get('bugsnag')->notifyError('ErrorType', $error);
               }
             }
 

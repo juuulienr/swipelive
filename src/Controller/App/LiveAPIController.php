@@ -219,7 +219,6 @@ class LiveAPIController extends AbstractController {
   public function updateStream(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
-      $broadcastId = $param["broadcastId"];
       $fbIdentifier = $param["fbIdentifier"];
       $showGroupsPage = $param["showGroupsPage"];
       $fbPageIdentifier = $param["fbPageIdentifier"];
@@ -229,132 +228,74 @@ class LiveAPIController extends AbstractController {
       $groups = $param["groups"];
 
 
-      // stream sur facebook
-      if ($broadcastId) {
+      // create fb stream
+      $fb = new \Facebook\Facebook([
+        'app_id' => '936988141017522',
+        'app_secret' => '025a5522cd75e464437fb048ee3cfe23',
+        'default_graph_version' => 'v2.10',
+      ]);
 
-        // create fb stream
-        $fb = new \Facebook\Facebook([
-          'app_id' => '936988141017522',
-          'app_secret' => '025a5522cd75e464437fb048ee3cfe23',
-          'default_graph_version' => 'v2.10',
-        ]);
-
-        $data = [
-          'title' => 'Live sur Swipe Live',
-          'description' => 'Live sur Swipe Live',
-          'status' => 'LIVE_NOW',
-          // 'privacy' => [
-            // 'value' => "EVERYONE"
-          // ]
-        ];
+      $data = [
+        'title' => 'Live sur Swipe Live',
+        'description' => 'Live sur Swipe Live',
+        'status' => 'LIVE_NOW',
+        // 'privacy' => [
+          // 'value' => "EVERYONE"
+        // ]
+      ];
 
 
-        try {
-          if ($fbTokenPage && $fbPageIdentifier) {
-            $url = $fbPageIdentifier . "/live_videos?fields=id,permalink_url,secure_stream_url";
-            $response = $fb->post($url, $data, $fbTokenPage);
-          } else {
-            $url = $fbIdentifier . "/live_videos?fields=id,permalink_url,secure_stream_url";
-            $response = $fb->post($url, $data, $fbToken);
-          }
-        } catch(\Facebook\Exceptions\FacebookResponseException $e) {
-          return $this->json("Graph returned an error: " . $e->getMessage(), 404);
-        } catch(\Facebook\Exceptions\FacebookSDKException $e) {
-          return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
+      try {
+        if ($fbTokenPage && $fbPageIdentifier) {
+          $url = $fbPageIdentifier . "/live_videos?fields=id,permalink_url,secure_stream_url";
+          $response = $fb->post($url, $data, $fbTokenPage);
+        } else {
+          $url = $fbIdentifier . "/live_videos?fields=id,permalink_url,secure_stream_url";
+          $response = $fb->post($url, $data, $fbToken);
         }
+      } catch(\Facebook\Exceptions\FacebookResponseException $e) {
+        return $this->json("Graph returned an error: " . $e->getMessage(), 404);
+      } catch(\Facebook\Exceptions\FacebookSDKException $e) {
+        return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
+      }
 
-        $result = $response->getGraphNode();
+      $result = $response->getGraphNode();
 
-        if ($result) {
-          $fbStreamId = $result["id"];
-          $fbStreamUrl = $result["secure_stream_url"];
-          $fbPermalinkUrl = $result["permalink_url"];
-          $postUrl = 'https://www.facebook.com' . $fbPermalinkUrl;
+      if ($result) {
+        $fbStreamId = $result["id"];
+        $fbStreamUrl = $result["secure_stream_url"];
+        $fbPermalinkUrl = $result["permalink_url"];
+        $postUrl = 'https://www.facebook.com' . $fbPermalinkUrl;
 
-          if ($groups && sizeof($groups) > 0) {
-            foreach ($groups as $group) {
-              if ($group["name"] == "Test Live") {
-                $url = '/' . $group['id'] . '/feed';
+        if ($groups && sizeof($groups) > 0) {
+          foreach ($groups as $group) {
+            if ($group["name"] == "Test Live") {
+              $url = '/' . $group['id'] . '/feed';
 
-                try {
-                  $response = $fb->post($url, [ 'link' => $postUrl, "message" => "Partage du live" ], $fbToken);
-                } catch (Facebook\Exceptions\FacebookResponseException $e) {
-                  return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
-                } catch (Facebook\Exceptions\FacebookSDKException $e) {
-                  return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
-                }
+              try {
+                $response = $fb->post($url, [ 'link' => $postUrl, "message" => "Partage du live" ], $fbToken);
+              } catch (Facebook\Exceptions\FacebookResponseException $e) {
+                return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
+              } catch (Facebook\Exceptions\FacebookSDKException $e) {
+                return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
               }
             }
           }
-
-
-          // create pipeline
-          $ch = curl_init();
-          curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
-          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-          curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-          curl_setopt($ch, CURLOPT_URL, "https://api.bambuser.com/pipelines");
-
-          $result = curl_exec($ch);
-          $result = json_decode($result);
-          curl_close($ch);
-
-          if ($result && $result->id) {
-            // update pipeline
-            $pipelineId = $result->id;
-            $url = "https://api.bambuser.com/pipelines/" . $pipelineId;
-            $data = [ 
-              "broadcastId" => $broadcastId, 
-              "closeOnEnd" => true 
-            ];
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-            curl_setopt($ch, CURLOPT_URL, $url);
-
-            $result = curl_exec($ch);
-            $result = json_decode($result);
-            curl_close($ch);
-
-
-            // new RMTP
-            $url = "https://api.bambuser.com/pipelines/" . $pipelineId . "/outputs";
-            $data = [ 
-              "destination" => $fbStreamUrl, 
-              "rtmpStreamId" => "",
-              "resolution" => "720x1280",
-              "framerate" => 30,
-            ];
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-            curl_setopt($ch, CURLOPT_URL, $url);
-
-            $result = curl_exec($ch);
-            $result = json_decode($result);
-            curl_close($ch);
-          }
-
-          $live->setFbStreamId($fbStreamId);
-          $live->setFbStreamUrl($fbStreamUrl);
-          $live->setPostUrl($postUrl);
-          $manager->flush();
-
-          return $this->json([ "fbStreamId" => $fbStreamId ], 200, [], [
-            'groups' => 'live:read',
-            'circular_reference_limit' => 1,
-            'circular_reference_handler' => function ($object) {
-              return $object->getId();
-            } 
-          ]);
         }
       }
+
+      $live->setFbStreamId($fbStreamId);
+      $live->setFbStreamUrl($fbStreamUrl);
+      $live->setPostUrl($postUrl);
+      $manager->flush();
+
+      return $this->json([ "fbStreamId" => $fbStreamId ], 200, [], [
+        'groups' => 'live:read',
+        'circular_reference_limit' => 1,
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ]);
     }
     
     return $this->json(false, 404);
@@ -444,58 +385,57 @@ class LiveAPIController extends AbstractController {
     $fbToken = $param["fbToken"];
 
 
-    if ($live->getBroadcastId()) {
-      // créer le dernier clip
-      $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
+    // if ($live->getBroadcastId()) {
+    //   // créer le dernier clip
+    //   $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
 
-      if ($liveProduct) {
-        if ($live->getDisplay() == 1) {
-          $start = 5;
-        } else {
-          $start = $live->getDuration() + 1;
-        }
+    //   if ($liveProduct) {
+    //     if ($live->getDisplay() == 1) {
+    //       $start = 5;
+    //     } else {
+    //       $start = $live->getDuration() + 1;
+    //     }
 
-        $url = "https://api.bambuser.com/broadcasts/" . $live->getBroadcastId();
-        $ch = curl_init();
+    //     $url = "https://api.bambuser.com/broadcasts/" . $live->getBroadcastId();
+    //     $ch = curl_init();
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-        curl_setopt($ch, CURLOPT_URL, $url);
+    //     curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
+    //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    //     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+    //     curl_setopt($ch, CURLOPT_URL, $url);
 
-        $result = curl_exec($ch);
-        $result = json_decode($result);
-        curl_close($ch);
+    //     $result = curl_exec($ch);
+    //     $result = json_decode($result);
+    //     curl_close($ch);
 
-        if ($result && $result->id) {
-          $end = $result->length - 5;
-          $duration = $end - $start;
+    //     if ($result && $result->id) {
+    //       $end = $result->length - 5;
+    //       $duration = $end - $start;
 
-          if ($duration > 15) {
-            $clip = new Clip();
-            $clip->setVendor($this->getUser()->getVendor());
-            $clip->setLive($live);
-            $clip->setProduct($liveProduct->getProduct());
-            $clip->setPreview($live->getPreview());
-            $clip->setStart($start);
-            $clip->setEnd($end);
-            $clip->setDuration($duration);
+    //       if ($duration > 15) {
+    //         $clip = new Clip();
+    //         $clip->setVendor($this->getUser()->getVendor());
+    //         $clip->setLive($live);
+    //         $clip->setProduct($liveProduct->getProduct());
+    //         $clip->setPreview($live->getPreview());
+    //         $clip->setStart($start);
+    //         $clip->setEnd($end);
+    //         $clip->setDuration($duration);
 
-            $manager->persist($clip);
-            $manager->flush();
+    //         $manager->persist($clip);
+    //         $manager->flush();
 
-            $live->setDuration($end);
-            $comments = $commentRepo->findByLiveAndClipNull($live);
+    //         $live->setDuration($end);
+    //         $comments = $commentRepo->findByLiveAndClipNull($live);
 
-            foreach ($comments as $comment) {
-              $comment->setClip($clip);
-            }
+    //         foreach ($comments as $comment) {
+    //           $comment->setClip($clip);
+    //         }
 
-            $manager->flush();
-          }
-        }
-      }
-
+    //         $manager->flush();
+    //       }
+    //     }
+    //   }
 
       // stop stream sur facebook
       if ($fbStreamId) {

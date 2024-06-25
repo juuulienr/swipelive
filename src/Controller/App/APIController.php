@@ -45,7 +45,7 @@ class APIController extends AbstractController {
     $appCertificate = $this->getParameter('agora_app_certificate');
     $expiresInSeconds = 86400;
     $channelName = "Live" . $live->getId();
-    $uid = 0;
+    $uid = (int) $live->getVendor()->getId();
     $role = RtcTokenBuilder2::ROLE_PUBLISHER;
     $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $channelName, $uid, $role, $expiresInSeconds);
 

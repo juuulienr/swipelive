@@ -140,21 +140,6 @@ class ProductAPIController extends AbstractController {
             $manager->flush();
           }
 
-
-          if ($env == "prod") {
-            $url = "https://api.bambuser.com/broadcasts/" . $clip->getBroadcastId();
-            $ch = curl_init();
-
-            curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
-            curl_setopt($ch, CURLOPT_URL, $url);
-
-            $result = curl_exec($ch);
-            $result = json_decode($result);
-            curl_close($ch);
-          }
-
           $manager->remove($clip);
           $manager->flush();
 
@@ -174,20 +159,6 @@ class ProductAPIController extends AbstractController {
                 $manager->remove($comment);
               }
               $manager->flush();
-            }
-
-            if ($env == "prod") {
-              $url = "https://api.bambuser.com/broadcasts/" . $live->getBroadcastId();
-              $ch = curl_init();
-
-              curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
-              curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-              curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
-              curl_setopt($ch, CURLOPT_URL, $url);
-
-              $result = curl_exec($ch);
-              $result = json_decode($result);
-              curl_close($ch);
             }
 
             $manager->remove($live);
