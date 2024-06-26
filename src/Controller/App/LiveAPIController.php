@@ -118,92 +118,61 @@ class LiveAPIController extends AbstractController {
   public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, UserRepository $userRepo) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
-      $broadcastId = $param["broadcastId"];
 
-      if ($broadcastId && !$live->getBroadcastId() && $live->getStatus() != 2) {
-        if ($broadcastId != "test") {
-          // create broadcast
-          $url = "https://api.bambuser.com/broadcasts/" . $broadcastId;
-          $ch = curl_init();
+      $live->setCreatedAt(new \DateTime('now', timezone_open('UTC')));
+      $live->setBroadcastId("test");
+      $live->setResourceUri("test");
+      $live->setPreview("test");
+      $live->setStatus(1);
+      $manager->flush();
+   
+      $channel = "channel" . $live->getId();
+      $event = "event" . $live->getId();
+      $user = $this->getUser();
+      $businessName = $user->getVendor()->getBusinessName();
 
-          curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
-          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-          curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-          curl_setopt($ch, CURLOPT_URL, $url);
-
-          $result = curl_exec($ch);
-          $result = json_decode($result);
-          curl_close($ch);
-
-
-          if ($result && $result->id) {
-            $unix = $result->created;
-            $gmdate = gmdate("d-m-Y H:i:s", $unix);
-            $createdAt = new \DateTime($gmdate, timezone_open('UTC'));
-
-            $live->setBroadcastId($broadcastId);
-            $live->setResourceUri($result->resourceUri);
-            $live->setPreview($result->preview);
-            $live->setCreatedAt($createdAt);
-            $live->setStatus(1);
-            $manager->flush();
-          } else {
-            return $this->json(false, 404);
-          }
-        } else {
-          $live->setCreatedAt(new \DateTime('now', timezone_open('UTC')));
-          $manager->flush();
-        }
-
-        $channel = "channel" . $live->getId();
-        $event = "event" . $live->getId();
-        $user = $this->getUser();
-        $businessName = $user->getVendor()->getBusinessName();
-
-        $data = [
-          "comment" => [
-            "content" => "Début du live", 
-            "user" => [
-              "vendor" => [
-                "businessName" => $businessName,
-              ],
-              "firstname" => $user->getFirstname(),
-              "lastname" => $user->getLastname(),
-              "picture" => $user->getPicture()
-            ]
+      $data = [
+        "comment" => [
+          "content" => "Début du live", 
+          "user" => [
+            "vendor" => [
+              "businessName" => $businessName,
+            ],
+            "firstname" => $user->getFirstname(),
+            "lastname" => $user->getLastname(),
+            "picture" => $user->getPicture()
           ]
-        ];
+        ]
+      ];
 
-        $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
-        $pusher->trigger($channel, $event, $data);
+      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher->trigger($channel, $event, $data);
 
-        $live->setChannel($channel);
-        $live->setEvent($event);
-        $manager->flush();
+      $live->setChannel($channel);
+      $live->setEvent($event);
+      $manager->flush();
 
+      $followers = $userRepo->findUserFollowers($user);
 
-        $followers = $userRepo->findUserFollowers($user);
-
-        if ($followers) {
-          foreach ($followers as $follower) {
-            if ($follower->getPushToken()) {
-              try {
-                $this->notifPushService->send("SWIPE LIVE", "🔴 " . $businessName . " est actuellement en direct", $follower->getPushToken());
-              } catch (\Exception $error) {
-                $this->get('bugsnag')->notifyError('ErrorType', $error);
-              }
+      if ($followers) {
+        foreach ($followers as $follower) {
+          if ($follower->getPushToken()) {
+            try {
+              $this->notifPushService->send("SWIPE LIVE", "🔴 " . $businessName . " est actuellement en direct", $follower->getPushToken());
+            } catch (\Exception $error) {
+              $this->get('bugsnag')->notifyError('ErrorType', $error);
             }
           }
         }
-
-        return $this->json($live, 200, [], [
-          'groups' => 'live:read', 
-          'circular_reference_limit' => 1, 
-          'circular_reference_handler' => function ($object) {
-            return $object->getId();
-          } 
-        ]);
       }
+
+      return $this->json($live, 200, [], [
+        'groups' => 'live:read', 
+        'circular_reference_limit' => 1, 
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ]);
     }
     
     return $this->json(false, 404);

@@ -23,7 +23,6 @@ class LiveRepository extends ServiceEntityRepository
     public function findByLive($vendor){
       $query = $this->createQueryBuilder('l')
       ->join('l.vendor', 'v')
-      ->andWhere('l.resourceUri IS NOT NULL')
       ->andWhere('l.status = 1');
 
       if ($vendor) {
@@ -40,7 +39,6 @@ class LiveRepository extends ServiceEntityRepository
     public function vendorIsLive($vendor){
       $query = $this->createQueryBuilder('l')
       ->join('l.vendor', 'v')
-      ->andWhere('l.resourceUri IS NOT NULL')
       ->andWhere('l.status = 1');
 
       if ($vendor) {
