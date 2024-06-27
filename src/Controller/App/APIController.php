@@ -58,6 +58,25 @@ class APIController extends AbstractController {
 
 
   /**
+   * @Route("/agora/token/audience/{id}", name="generate_agora_token_audience")
+   */
+  public function generateAudienceToken(Live $live) {
+    $appID = $this->getParameter('agora_app_id');
+    $appCertificate = $this->getParameter('agora_app_certificate');
+    $expiresInSeconds = 86400;
+    $channelName = "Live" . $live->getId();
+    $role = RtcTokenBuilder2::ROLE_SUBSCRIBER;
+    $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $channelName, null, $role, $expiresInSeconds);
+
+    if ($token) {
+      return $this->json([ "token" => $token ], 200);
+    }
+
+    return $this->json(false, 404);
+  }
+
+
+  /**
    * Afficher le feed
    *
    * @Route("/user/api/feed", name="api_feed", methods={"GET"})
