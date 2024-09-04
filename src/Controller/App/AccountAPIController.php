@@ -461,9 +461,9 @@ class AccountAPIController extends AbstractController {
 
       $serializer->deserialize($json, User::class, "json", [ AbstractNormalizer::OBJECT_TO_POPULATE => $user ]);
       $manager->flush();
-
-      try {
-        if ($vendor->getStripeAcc()) {
+        
+      if ($vendor->getStripeAcc()) {
+        try {
           $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
           $stripe->accounts->update($vendor->getStripeAcc(), [
             'business_profile' => [
@@ -472,26 +472,26 @@ class AccountAPIController extends AbstractController {
             ],
             'email' => $user->getEmail()
           ]);
+
+          $vendor->setBusinessName($param['businessName']);
+          $vendor->setSummary($param['summary']);
+          $vendor->setAddress($param['address']);
+          $vendor->setCity($param['city']);
+          $vendor->setZip($param['zip']);
+          $vendor->setCountry($param['country']);
+          $vendor->setCountryCode($param['countryCode']);
+          $manager->flush();
+
+          return $this->json($this->getUser(), 200, [], [
+            'groups' => 'user:read', 
+            'circular_reference_limit' => 1, 
+            'circular_reference_handler' => function ($object) {
+              return $object->getId();
+            } 
+          ]);
+        } catch (Exception $e) {
+          return $this->json($e->getMessage(), 404);
         }
-
-        $vendor->setBusinessName($param['businessName']);
-        $vendor->setSummary($param['summary']);
-        $vendor->setAddress($param['address']);
-        $vendor->setCity($param['city']);
-        $vendor->setZip($param['zip']);
-        $vendor->setCountry($param['country']);
-        $vendor->setCountryCode($param['countryCode']);
-        $manager->flush();
-
-        return $this->json($this->getUser(), 200, [], [
-          'groups' => 'user:read', 
-          'circular_reference_limit' => 1, 
-          'circular_reference_handler' => function ($object) {
-            return $object->getId();
-          } 
-        ]);
-      } catch (Exception $e) {
-        return $this->json($e->getMessage(), 404);
       }
     }
 
