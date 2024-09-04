@@ -462,7 +462,7 @@ class AccountAPIController extends AbstractController {
       $serializer->deserialize($json, User::class, "json", [ AbstractNormalizer::OBJECT_TO_POPULATE => $user ]);
       $manager->flush();
         
-      if ($vendor->getStripeAcc()) {
+      if ($user->getVendor() && $vendor->getStripeAcc()) {
         try {
           $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
           $stripe->accounts->update($vendor->getStripeAcc(), [
@@ -481,18 +481,18 @@ class AccountAPIController extends AbstractController {
           $vendor->setCountry($param['country']);
           $vendor->setCountryCode($param['countryCode']);
           $manager->flush();
-
-          return $this->json($this->getUser(), 200, [], [
-            'groups' => 'user:read', 
-            'circular_reference_limit' => 1, 
-            'circular_reference_handler' => function ($object) {
-              return $object->getId();
-            } 
-          ]);
         } catch (Exception $e) {
           return $this->json($e->getMessage(), 404);
         }
       }
+
+      return $this->json($this->getUser(), 200, [], [
+        'groups' => 'user:read', 
+        'circular_reference_limit' => 1, 
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ]);
     }
 
     return $this->json("Une erreur est survenue", 404);
