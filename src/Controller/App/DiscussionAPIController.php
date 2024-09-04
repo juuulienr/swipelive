@@ -14,6 +14,7 @@ use App\Entity\Message;
 use App\Entity\Order;
 use App\Entity\LiveProducts;
 use App\Entity\Upload;
+use App\Service\NotifPushService;
 use App\Repository\LiveProductsRepository;
 use App\Repository\FollowRepository;
 use App\Repository\VendorRepository;
@@ -29,10 +30,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
 use Cloudinary\Cloudinary;
@@ -40,6 +42,13 @@ use Cloudinary\Cloudinary;
 
 
 class DiscussionAPIController extends AbstractController {
+
+  private $notifPushService;
+
+  public function __construct(NotifPushService $notifPushService) {
+      $this->notifPushService = $notifPushService;
+  }
+
 
 
   /**

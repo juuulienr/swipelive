@@ -463,14 +463,16 @@ class AccountAPIController extends AbstractController {
       $manager->flush();
 
       try {
-        $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
-        $stripe->accounts->update($vendor->getStripeAcc(), [
-          'business_profile' => [
-            'name' => $param['businessName'],
-            'product_description' => $param['summary'],
-          ],
-          'email' => $user->getEmail()
-        ]);
+        if ($vendor->getStripeAcc()) {
+          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+          $stripe->accounts->update($vendor->getStripeAcc(), [
+            'business_profile' => [
+              'name' => $param['businessName'],
+              'product_description' => $param['summary'],
+            ],
+            'email' => $user->getEmail()
+          ]);
+        }
 
         $vendor->setBusinessName($param['businessName']);
         $vendor->setSummary($param['summary']);
