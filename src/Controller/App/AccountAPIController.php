@@ -595,7 +595,7 @@ class AccountAPIController extends AbstractController {
   public function picture(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     $file = json_decode($request->getContent(), true);
     $user = $this->getUser();
-    $oldFilename = $user->getPicture();
+    $oldfilename = $user->getPicture();
 
     if ($file && array_key_exists("picture", $file)) {
       $file = $file["picture"];
@@ -607,10 +607,10 @@ class AccountAPIController extends AbstractController {
       return $this->json("L'image est introuvable !", 404);
     }
 
-    $fileName = md5(uniqid());
-    $fullName = $fileName.'.'.$extension;
-    $file->move($this->getParameter('uploads_directory'), $fullName);
-    $file = $this->getParameter('uploads_directory') . '/' . $fullName;
+    $filename = md5(uniqid());
+    $fullname = $filename.'.'.$extension;
+    $file->move($this->getParameter('uploads_directory'), $fullname);
+    $file = $this->getParameter('uploads_directory') . '/' . $fullname;
         
     try {
       Configuration::instance($this->getParameter('cloudinary'));
@@ -625,9 +625,9 @@ class AccountAPIController extends AbstractController {
       return $this->json($e->getMessage(), 404);
     }
 
-    if ($oldFilename) {
-      $oldFilename = explode(".", $oldFilename);
-      $result = (new AdminApi())->deleteAssets($oldFilename[0], []);
+    if ($oldfilename) {
+      $oldfilename = explode(".", $oldfilename);
+      $result = (new AdminApi())->deleteAssets($oldfilename[0], []);
     }
 
     $user->setPicture($fullname);
