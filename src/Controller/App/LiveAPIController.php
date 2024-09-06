@@ -175,10 +175,10 @@ class LiveAPIController extends AbstractController {
       try {
         // Appel à l'API `acquire` pour obtenir un `resourceId`
         $acquireUrl = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $this->getParameter('agora_app_id'));
-        $this->bugsnag->notifyException($this->getParameter('agora_app_id'));
-        $this->bugsnag->notifyException($this->getParameter('agora_app_certificate'));
-        $this->bugsnag->notifyException($live->getVendor()->getId());
-        $this->bugsnag->notifyException($channel);
+        $this->bugsnag->leaveBreadcrumb($this->getParameter('agora_app_id'));
+        $this->bugsnag->leaveBreadcrumb($this->getParameter('agora_app_certificate'));
+        $this->bugsnag->leaveBreadcrumb($live->getVendor()->getId());
+        $this->bugsnag->leaveBreadcrumb($channel);
 
         // Appel à l'API `acquire`
         $acquireResponse = $this->httpClient->request('POST', $acquireUrl, [
@@ -236,7 +236,7 @@ class LiveAPIController extends AbstractController {
 
         // Récupérer la réponse de l'API `start`
         $startData = $startResponse->toArray();
-        $this->bugsnag->notifyException($startData);
+        $this->bugsnag->leaveBreadcrumb($startData);
 
         // Retourner une réponse JSON contenant les informations de démarrage
         return new JsonResponse([
