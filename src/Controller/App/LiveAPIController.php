@@ -166,6 +166,80 @@ class LiveAPIController extends AbstractController {
         }
       }
 
+
+      try {
+        // Appel à l'API `acquire` pour obtenir un `resourceId`
+        $acquireUrl = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $this->getParameter('agora_app_id'));
+        $acquireBody = [
+          'cname' => $channel,
+          'uid' => $live->getVendor()->getId(),
+          'clientRequest' => []
+        ];
+
+        // Appel à l'API `acquire`
+        $acquireResponse = $this->httpClient->request('POST', $acquireUrl, [
+          'json' => $acquireBody,
+          'auth_basic' => [$this->getParameter('agora_app_id'), $this->getParameter('agora_app_certificate')],
+        ]);
+
+        // Récupérer la réponse et le `resourceId`
+        $acquireData = $acquireResponse->toArray();
+        $resourceId = $acquireData['resourceId'];
+
+        // Une fois `resourceId` obtenu, appeler l'API `start`
+        $startUrl = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/mode/mix/start', $this->getParameter('agora_app_id'), $resourceId);
+
+        $startBody = [
+          'cname' => $channel,
+          'uid' => $live->getVendor()->getId(),
+          'clientRequest' => [
+            'recordingConfig' => [
+              'maxIdleTime' => 30,
+              'streamTypes' => 2,
+              'channelType' => 1,
+              'videoStreamType' => 0,
+              'transcodingConfig' => [
+                'width' => 1280,
+                'height' => 720,
+                'fps' => 30,
+                'bitrate' => 800
+              ]
+            ],
+            'storageConfig' => [
+              'vendor' => 2,  // 2 pour AWS S3
+              'region' => 0,
+              'bucket' => 'swipe-live-app-storage',
+              'accessKey' => 'AKIAYXWBN6DLIY2K6V4X',
+              'secretKey' => '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'
+            ]
+          ]
+        ];
+
+        // Appel à l'API `start` pour démarrer l'enregistrement
+        $startResponse = $this->httpClient->request('POST', $startUrl, [
+          'json' => $startBody,
+          'auth_basic' => [$this->getParameter('agora_app_id'), $this->getParameter('agora_app_certificate')],
+        ]);
+
+        // Récupérer la réponse de l'API `start`
+        $startData = $startResponse->toArray();
+        $this->get('bugsnag')->notifyError('ErrorType', $startData);
+
+        // Retourner une réponse JSON contenant les informations de démarrage
+        return new JsonResponse([
+          'success' => true,
+          'message' => 'Recording started successfully',
+          'startData' => $startData
+        ], JsonResponse::HTTP_OK);
+      } catch (\Exception $e) {
+        // Gestion des erreurs
+        return new JsonResponse([
+          'error' => 'Failed to start recording',
+          'message' => $e->getMessage()
+        ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+      }
+
+
       return $this->json($live, 200, [], [
         'groups' => 'live:read', 
         'circular_reference_limit' => 1, 
