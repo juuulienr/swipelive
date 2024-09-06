@@ -32,15 +32,18 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Service\NotifPushService;
 
 
 class LiveAPIController extends AbstractController {
 
   private $notifPushService;
+  private $httpClient;
 
-  public function __construct(NotifPushService $notifPushService) {
-      $this->notifPushService = $notifPushService;
+  public function __construct(NotifPushService $notifPushService, HttpClientInterface $httpClient) {
+    $this->httpClient = $httpClient;
+    $this->notifPushService = $notifPushService;
   }
 
 
