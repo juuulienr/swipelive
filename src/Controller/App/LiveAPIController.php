@@ -180,6 +180,11 @@ class LiveAPIController extends AbstractController {
 
         // Appel à l'API `acquire`
         $acquireResponse = $this->httpClient->request('POST', $acquireUrl, [
+          'headers' => [
+            'Content-Type' => 'application/json',
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'POST, OPTIONS',
+          ],
           'auth_basic' => [$this->getParameter('agora_app_id'), $this->getParameter('agora_app_certificate')],
           'json' => [
             'cname' => $channel,
