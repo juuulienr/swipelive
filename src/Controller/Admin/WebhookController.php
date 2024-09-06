@@ -81,7 +81,7 @@ class WebhookController extends AbstractController {
               try {
                 $this->notifPushService->send("SWIPE LIVE", "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", $vendor->getUser()->getPushToken());
               } catch (\Exception $error) {
-                $this->get('bugsnag')->notifyError('ErrorType', $error);
+                // $this->get('bugsnag')->notifyError('ErrorType', $error);
               }
             }
 

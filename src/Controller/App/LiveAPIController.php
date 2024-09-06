@@ -40,10 +40,12 @@ class LiveAPIController extends AbstractController {
 
   private $notifPushService;
   private $httpClient;
+  private $bugsnag;
 
-  public function __construct(NotifPushService $notifPushService, HttpClientInterface $httpClient) {
+  public function __construct(NotifPushService $notifPushService, HttpClientInterface $httpClient, \Bugsnag\Client $bugsnag) {
     $this->httpClient = $httpClient;
     $this->notifPushService = $notifPushService;
+    $this->bugsnag = $bugsnag;
   }
 
 
@@ -163,7 +165,7 @@ class LiveAPIController extends AbstractController {
             try {
               $this->notifPushService->send("SWIPE LIVE", "🔴 " . $businessName . " est actuellement en direct", $follower->getPushToken());
             } catch (\Exception $error) {
-              $this->get('bugsnag')->notifyError('ErrorType', $error);
+              $this->bugsnag->notifyException($error);
             }
           }
         }
@@ -173,10 +175,10 @@ class LiveAPIController extends AbstractController {
       try {
         // Appel à l'API `acquire` pour obtenir un `resourceId`
         $acquireUrl = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $this->getParameter('agora_app_id'));
-        $this->get('bugsnag')->notifyError('ErrorType', $this->getParameter('agora_app_id'));
-        $this->get('bugsnag')->notifyError('ErrorType', $this->getParameter('agora_app_certificate'));
-        $this->get('bugsnag')->notifyError('ErrorType', $live->getVendor()->getId());
-        $this->get('bugsnag')->notifyError('ErrorType', $channel);
+        $this->bugsnag->notifyException($this->getParameter('agora_app_id'));
+        $this->bugsnag->notifyException($this->getParameter('agora_app_certificate'));
+        $this->bugsnag->notifyException($live->getVendor()->getId());
+        $this->bugsnag->notifyException($channel);
 
         // Appel à l'API `acquire`
         $acquireResponse = $this->httpClient->request('POST', $acquireUrl, [
@@ -234,7 +236,7 @@ class LiveAPIController extends AbstractController {
 
         // Récupérer la réponse de l'API `start`
         $startData = $startResponse->toArray();
-        $this->get('bugsnag')->notifyError('ErrorType', $startData);
+        $this->bugsnag->notifyException($startData);
 
         // Retourner une réponse JSON contenant les informations de démarrage
         return new JsonResponse([
