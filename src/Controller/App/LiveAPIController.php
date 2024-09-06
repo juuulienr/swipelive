@@ -176,9 +176,6 @@ class LiveAPIController extends AbstractController {
         // Appel à l'API `acquire` pour obtenir un `resourceId`
         $acquireUrl = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $this->getParameter('agora_app_id'));
         $this->bugsnag->leaveBreadcrumb($this->getParameter('agora_app_id'));
-        $this->bugsnag->leaveBreadcrumb($this->getParameter('agora_app_certificate'));
-        $this->bugsnag->leaveBreadcrumb($live->getVendor()->getId());
-        $this->bugsnag->leaveBreadcrumb($channel);
 
         // Appel à l'API `acquire`
         $acquireResponse = $this->httpClient->request('POST', $acquireUrl, [
@@ -187,10 +184,10 @@ class LiveAPIController extends AbstractController {
             'Access-Control-Allow-Origin' => '*',
             'Access-Control-Allow-Methods' => 'POST, OPTIONS',
           ],
-          'auth_basic' => [$this->getParameter('agora_app_id'), $this->getParameter('agora_app_certificate')],
+          'auth_basic' => ["b6d203c81e5b46809b6e308802f8cae4", "a1b6267b9afc43948c1c609cedf9d617"],
           'json' => [
             'cname' => $channel,
-            'uid' => 123456789,
+            'uid' => "123456789",
             'clientRequest' => []
           ],
         ]);
@@ -231,7 +228,7 @@ class LiveAPIController extends AbstractController {
         // Appel à l'API `start` pour démarrer l'enregistrement
         $startResponse = $this->httpClient->request('POST', $startUrl, [
           'json' => $startBody,
-          'auth_basic' => [$this->getParameter('agora_app_id'), $this->getParameter('agora_app_certificate')],
+          'auth_basic' => ["b6d203c81e5b46809b6e308802f8cae4", "a1b6267b9afc43948c1c609cedf9d617"],
         ]);
 
         // Récupérer la réponse de l'API `start`
