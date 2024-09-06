@@ -173,16 +173,19 @@ class LiveAPIController extends AbstractController {
       try {
         // Appel à l'API `acquire` pour obtenir un `resourceId`
         $acquireUrl = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $this->getParameter('agora_app_id'));
-        $acquireBody = [
-          'cname' => $channel,
-          'uid' => $live->getVendor()->getId(),
-          'clientRequest' => []
-        ];
+        $this->get('bugsnag')->notifyError('ErrorType', $this->getParameter('agora_app_id'));
+        $this->get('bugsnag')->notifyError('ErrorType', $this->getParameter('agora_app_certificate'));
+        $this->get('bugsnag')->notifyError('ErrorType', $live->getVendor()->getId());
+        $this->get('bugsnag')->notifyError('ErrorType', $channel);
 
         // Appel à l'API `acquire`
         $acquireResponse = $this->httpClient->request('POST', $acquireUrl, [
-          'json' => $acquireBody,
           'auth_basic' => [$this->getParameter('agora_app_id'), $this->getParameter('agora_app_certificate')],
+          'json' => [
+            'cname' => $channel,
+            'uid' => $live->getVendor()->getId(),
+            'clientRequest' => []
+          ],
         ]);
 
         // Récupérer la réponse et le `resourceId`
