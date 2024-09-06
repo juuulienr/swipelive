@@ -18,8 +18,8 @@ class Order
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups("order:read")
      * @Groups("discussion:read")
+     * @Groups("order:read")
      */
     private $id;
 

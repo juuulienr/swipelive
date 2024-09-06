@@ -241,6 +241,10 @@ class OrderAPIController extends AbstractController {
               ],
             ]);
 
+            $order->setPaymentId($intent->id);
+            $manager->persist($order);
+            $manager->flush();
+
             $array = [
               "order" => $serializer->serialize($order, "json", [ 'groups' => 'order:read']),
               "paymentConfig" => [
@@ -254,10 +258,6 @@ class OrderAPIController extends AbstractController {
                 "mobilePayEnabled"=> true
               ]
             ];
-
-            $order->setPaymentId($intent->id);
-            $manager->persist($order);
-            $manager->flush();
 
             return $this->json($array, 200);
           } catch (Exception $e) {
