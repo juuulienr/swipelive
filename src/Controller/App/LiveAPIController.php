@@ -246,12 +246,12 @@ class LiveAPIController extends AbstractController {
         ], JsonResponse::HTTP_OK);
       } catch (\Exception $e) {
         // Gestion des erreurs
+        $this->bugsnag->notifyException($e);
         return new JsonResponse([
           'error' => 'Failed to start recording',
           'message' => $e->getMessage()
         ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
       }
-
 
       return $this->json($live, 200, [], [
         'groups' => 'live:read', 
