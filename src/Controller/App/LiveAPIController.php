@@ -190,7 +190,7 @@ class LiveAPIController extends AbstractController {
           'auth_basic' => [$this->getParameter('agora_app_id'), $this->getParameter('agora_app_certificate')],
           'json' => [
             'cname' => $channel,
-            'uid' => $live->getVendor()->getId(),
+            'uid' => 123456789,
             'clientRequest' => []
           ],
         ]);
