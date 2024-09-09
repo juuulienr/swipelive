@@ -172,83 +172,83 @@ class LiveAPIController extends AbstractController {
       }
 
 
-      try {
-        // Appel à l'API `acquire` pour obtenir un `resourceId`
-        $acquireUrl = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $this->getParameter('agora_app_id'));
-        $this->bugsnag->leaveBreadcrumb($this->getParameter('agora_app_id'));
+      // try {
+      //   // Appel à l'API `acquire` pour obtenir un `resourceId`
+      //   $acquireUrl = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $this->getParameter('agora_app_id'));
+      //   $this->bugsnag->leaveBreadcrumb($this->getParameter('agora_app_id'));
 
-        // Appel à l'API `acquire`
-        $acquireResponse = $this->httpClient->request('POST', $acquireUrl, [
-          'headers' => [
-            'Content-Type' => 'application/json',
-            'Access-Control-Allow-Origin' => '*',
-            'Access-Control-Allow-Methods' => 'POST, OPTIONS',
-          ],
-          'auth_basic' => ["b6d203c81e5b46809b6e308802f8cae4", "a1b6267b9afc43948c1c609cedf9d617"],
-          'json' => [
-            'cname' => $channel,
-            'uid' => "123456789",
-            'clientRequest' => []
-          ],
-        ]);
+      //   // Appel à l'API `acquire`
+      //   $acquireResponse = $this->httpClient->request('POST', $acquireUrl, [
+      //     'headers' => [
+      //       'Content-Type' => 'application/json',
+      //       'Access-Control-Allow-Origin' => '*',
+      //       'Access-Control-Allow-Methods' => 'POST, OPTIONS',
+      //     ],
+      //     'auth_basic' => ["b6d203c81e5b46809b6e308802f8cae4", "a1b6267b9afc43948c1c609cedf9d617"],
+      //     'json' => [
+      //       'cname' => $channel,
+      //       'uid' => "123456789",
+      //       'clientRequest' => []
+      //     ],
+      //   ]);
 
-        // Récupérer la réponse et le `resourceId`
-        $acquireData = $acquireResponse->toArray();
-        $resourceId = $acquireData['resourceId'];
+      //   // Récupérer la réponse et le `resourceId`
+      //   $acquireData = $acquireResponse->toArray();
+      //   $resourceId = $acquireData['resourceId'];
 
-        // Une fois `resourceId` obtenu, appeler l'API `start`
-        $startUrl = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/mode/mix/start', $this->getParameter('agora_app_id'), $resourceId);
+      //   // Une fois `resourceId` obtenu, appeler l'API `start`
+      //   $startUrl = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/mode/mix/start', $this->getParameter('agora_app_id'), $resourceId);
 
-        $startBody = [
-          'cname' => $channel,
-          'uid' => $live->getVendor()->getId(),
-          'clientRequest' => [
-            'recordingConfig' => [
-              'maxIdleTime' => 30,
-              'streamTypes' => 2,
-              'channelType' => 1,
-              'videoStreamType' => 0,
-              'transcodingConfig' => [
-                'width' => 1280,
-                'height' => 720,
-                'fps' => 30,
-                'bitrate' => 800
-              ]
-            ],
-            'storageConfig' => [
-              'vendor' => 2,  // 2 pour AWS S3
-              'region' => 0,
-              'bucket' => 'swipe-live-app-storage',
-              'accessKey' => 'AKIAYXWBN6DLIY2K6V4X',
-              'secretKey' => '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'
-            ]
-          ]
-        ];
+      //   $startBody = [
+      //     'cname' => $channel,
+      //     'uid' => $live->getVendor()->getId(),
+      //     'clientRequest' => [
+      //       'recordingConfig' => [
+      //         'maxIdleTime' => 30,
+      //         'streamTypes' => 2,
+      //         'channelType' => 1,
+      //         'videoStreamType' => 0,
+      //         'transcodingConfig' => [
+      //           'width' => 1280,
+      //           'height' => 720,
+      //           'fps' => 30,
+      //           'bitrate' => 800
+      //         ]
+      //       ],
+      //       'storageConfig' => [
+      //         'vendor' => 2,  // 2 pour AWS S3
+      //         'region' => 0,
+      //         'bucket' => 'swipe-live-app-storage',
+      //         'accessKey' => 'AKIAYXWBN6DLIY2K6V4X',
+      //         'secretKey' => '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'
+      //       ]
+      //     ]
+      //   ];
 
-        // Appel à l'API `start` pour démarrer l'enregistrement
-        $startResponse = $this->httpClient->request('POST', $startUrl, [
-          'json' => $startBody,
-          'auth_basic' => ["b6d203c81e5b46809b6e308802f8cae4", "a1b6267b9afc43948c1c609cedf9d617"],
-        ]);
+      //   // Appel à l'API `start` pour démarrer l'enregistrement
+      //   $startResponse = $this->httpClient->request('POST', $startUrl, [
+      //     'json' => $startBody,
+      //     'auth_basic' => ["b6d203c81e5b46809b6e308802f8cae4", "a1b6267b9afc43948c1c609cedf9d617"],
+      //   ]);
 
-        // Récupérer la réponse de l'API `start`
-        $startData = $startResponse->toArray();
-        $this->bugsnag->leaveBreadcrumb($startData);
+      //   // Récupérer la réponse de l'API `start`
+      //   $startData = $startResponse->toArray();
+      //   $this->bugsnag->leaveBreadcrumb($startData);
 
-        // Retourner une réponse JSON contenant les informations de démarrage
-        return new JsonResponse([
-          'success' => true,
-          'message' => 'Recording started successfully',
-          'startData' => $startData
-        ], JsonResponse::HTTP_OK);
-      } catch (\Exception $e) {
-        // Gestion des erreurs
-        $this->bugsnag->notifyException($e);
-        return new JsonResponse([
-          'error' => 'Failed to start recording',
-          'message' => $e->getMessage()
-        ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
-      }
+      //   // Retourner une réponse JSON contenant les informations de démarrage
+      //   return new JsonResponse([
+      //     'success' => true,
+      //     'message' => 'Recording started successfully',
+      //     'startData' => $startData
+      //   ], JsonResponse::HTTP_OK);
+      // } catch (\Exception $e) {
+      //   // Gestion des erreurs
+      //   $this->bugsnag->notifyException($e);
+      //   return new JsonResponse([
+      //     'error' => 'Failed to start recording',
+      //     'message' => $e->getMessage()
+      //   ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+      // }
 
       return $this->json($live, 200, [], [
         'groups' => 'live:read', 
