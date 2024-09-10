@@ -51,14 +51,14 @@ class ReminderToSendParcel extends ContainerAwareCommand {
                 'payment_intent' => $order->getPaymentId(),
               ]);
             } catch (\Exception $error) {
-              $this->get('bugsnag')->notifyError('ErrorType', $error);
+              $this->bugsnag->notifyException($error);
             }
 
             if ($pushToken) {
               try {
                 $this->notifPushService->send("SWIPE LIVE", "Commande annulée, le client à été remboursé", $pushToken);
               } catch (\Exception $error) {
-                $this->get('bugsnag')->notifyError('ErrorType', $error);
+                $this->bugsnag->notifyException($error);
               }
             }
 
@@ -66,7 +66,7 @@ class ReminderToSendParcel extends ContainerAwareCommand {
               try {
                 $this->notifPushService->send("SWIPE LIVE", "Commande annulée, le vendeur n'a pas envoyé le colis. Vous allez être remboursé", $order->getBuyer()->getPushToken());
               } catch (\Exception $error) {
-                $this->get('bugsnag')->notifyError('ErrorType', $error);
+                $this->bugsnag->notifyException($error);
               }
             }
           } elseif ($order->getCreatedAt()->modify('+4 days') < $now) {
@@ -75,7 +75,7 @@ class ReminderToSendParcel extends ContainerAwareCommand {
               try {
                 $this->notifPushService->send("SWIPE LIVE", "Plus que 24h pour expédier ta commande ou elle sera annulé", $pushToken);
               } catch (\Exception $error) {
-                $this->get('bugsnag')->notifyError('ErrorType', $error);
+                $this->bugsnag->notifyException($error);
               }
             }
           } else if ($order->getCreatedAt()->modify('+2 days') < $now) {
@@ -84,7 +84,7 @@ class ReminderToSendParcel extends ContainerAwareCommand {
               try {
                 $this->notifPushService->send("SWIPE LIVE", "N’oublie pas d’imprimer le bon de livraison et d’expédier ta commande", $pushToken);
               } catch (\Exception $error) {
-                $this->get('bugsnag')->notifyError('ErrorType', $error);
+                $this->bugsnag->notifyException($error);
               }
             }
           }

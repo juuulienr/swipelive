@@ -307,7 +307,7 @@ class OrderAPIController extends AbstractController {
     //   try {
     //     $this->notifPushService->send("SWIPE LIVE", "La commande a été annulée ", $order->getBuyer->getPushToken());
     //   } catch (\Exception $error) {
-    //     $this->get('bugsnag')->notifyError('ErrorType', $error);
+    //     $this->bugsnag->notifyException($error);
     //   }
     // }
 
@@ -359,7 +359,7 @@ class OrderAPIController extends AbstractController {
       //   try {
       //     $this->notifPushService->send("SWIPE LIVE", "La commande a été annulée ", $order->getBuyer->getPushToken());
       //   } catch (\Exception $error) {
-      //     $this->get('bugsnag')->notifyError('ErrorType', $error);
+      //     $this->bugsnag->notifyException($error);
       //   }
       // }
 

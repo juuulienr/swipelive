@@ -116,7 +116,6 @@ class WebhookController extends AbstractController {
    */
   public function stripeConnect(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
-    // $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Stripe Connect');
 
     // account
     if ($result["object"] == "event") {
@@ -150,27 +149,7 @@ class WebhookController extends AbstractController {
    */
   public function agora(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
     $result = json_decode($request->getContent(), true);
-    $this->bugsnag->leaveBreadcrumb($startData);
-
-    // account
-    if ($result["object"] == "event") {
-      switch ($result["type"]) {
-        case 'account.updated':
-          // $account = $result["data"]["object"];
-          break;
-
-        case 'person.updated':
-          // $person = $result["data"]["object"];
-          break;
-
-        case 'payout.failed':
-          // $payout = $result["data"]["object"];
-          break;
-          
-        default:
-          break;
-      }
-    }
+    $this->bugsnag->leaveBreadcrumb("agora");
 
     return $this->json(true, 200);
   }

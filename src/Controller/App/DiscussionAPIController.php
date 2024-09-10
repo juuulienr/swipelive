@@ -193,7 +193,7 @@ class DiscussionAPIController extends AbstractController {
         try {
           $this->notifPushService->send("SWIPE LIVE", "Tu as un nouveau message de " . $name, $receiver->getPushToken());
         } catch (\Exception $error) {
-          $this->get('bugsnag')->notifyError('ErrorType', $error);
+          $this->bugsnag->notifyException($error);
         }
       }
 
@@ -353,7 +353,7 @@ class DiscussionAPIController extends AbstractController {
         try {
           $this->notifPushService->send("SWIPE LIVE", "Tu as un nouveau message de " . $name, $receiver->getPushToken());
         } catch (\Exception $error) {
-          $this->get('bugsnag')->notifyError('ErrorType', $error);
+          $this->bugsnag->notifyException($error);
         }
       }
 
