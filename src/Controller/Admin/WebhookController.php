@@ -33,10 +33,13 @@ use App\Service\NotifPushService;
 class WebhookController extends AbstractController {
 
   private $notifPushService;
+  private $bugsnag;
 
-  public function __construct(NotifPushService $notifPushService) {
-      $this->notifPushService = $notifPushService;
+  public function __construct(NotifPushService $notifPushService, \Bugsnag\Client $bugsnag) {
+    $this->notifPushService = $notifPushService;
+    $this->bugsnag = $bugsnag;
   }
+
 
 
   /**
@@ -46,7 +49,6 @@ class WebhookController extends AbstractController {
    */
   public function stripe(Request $request, ObjectManager $manager, OrderRepository $orderRepo, LiveRepository $liveRepo) {
     $result = json_decode($request->getContent(), true);
-    // $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Stripe');
 
     // payment_intent
     if ($result["object"] == "event" && $result["data"]["object"]["object"] == "payment_intent") {
@@ -81,7 +83,7 @@ class WebhookController extends AbstractController {
               try {
                 $this->notifPushService->send("SWIPE LIVE", "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", $vendor->getUser()->getPushToken());
               } catch (\Exception $error) {
-                // $this->get('bugsnag')->notifyError('ErrorType', $error);
+                $this->bugsnag->notifyException($error);
               }
             }
 
@@ -141,6 +143,40 @@ class WebhookController extends AbstractController {
 
 
 
+  /**
+   * Webhooks Agora
+   *
+   * @Route("/api/agora/webhooks", name="api_agora_webhooks", methods={"POST"})
+   */
+  public function agora(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+    $result = json_decode($request->getContent(), true);
+    $this->bugsnag->leaveBreadcrumb($startData);
+
+    // account
+    if ($result["object"] == "event") {
+      switch ($result["type"]) {
+        case 'account.updated':
+          // $account = $result["data"]["object"];
+          break;
+
+        case 'person.updated':
+          // $person = $result["data"]["object"];
+          break;
+
+        case 'payout.failed':
+          // $payout = $result["data"]["object"];
+          break;
+          
+        default:
+          break;
+      }
+    }
+
+    return $this->json(true, 200);
+  }
+
+
+
 
   /**
    * Webhooks Upelgo
@@ -149,7 +185,6 @@ class WebhookController extends AbstractController {
    */
   public function upelgo(Request $request, ObjectManager $manager, OrderRepository $orderRepo, OrderStatusRepository $statusRepo) {
     $result = json_decode($request->getContent(), true);
-    // $this->get('bugsnag')->notifyError('ErrorType', 'Webhooks Upelgo');
     
     if ($result["action"]) {
       switch ($result["action"]) {
