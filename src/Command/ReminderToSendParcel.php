@@ -2,94 +2,138 @@
 
 namespace App\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Doctrine\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Service\NotifPushService;
 use App\Repository\OrderRepository;
-use App\Repository\Clip;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-class ReminderToSendParcel extends ContainerAwareCommand {
+class ReminderToSendParcel extends Command
+{
+  protected static $defaultName = 'reminder:send:parcel';
   private $orderRepo;
+  private $entityManager;
+  private $notifPushService;
+  private $parameterBag;
+  private $logger;
+  private $bugsnag;
 
-  public function __construct(OrderRepository $orderRepo, ObjectManager $manager, NotifPushService $notifPushService) {
-    $this->manager = $manager;
-    $this->orderRepo = $orderRepo;
-    $this->notifPushService = $notifPushService;
-
+  public function __construct(
+    OrderRepository $orderRepo,
+    EntityManagerInterface $entityManager,
+    NotifPushService $notifPushService,
+    ParameterBagInterface $parameterBag,
+    LoggerInterface $logger,
+    \Bugsnag\Client $bugsnag
+  ) {
     parent::__construct();
+    $this->orderRepo = $orderRepo;
+    $this->entityManager = $entityManager;
+    $this->notifPushService = $notifPushService;
+    $this->parameterBag = $parameterBag;
+    $this->logger = $logger;
+    $this->bugsnag = $bugsnag;
   }
 
-  protected function configure() {
-    $this
-    ->setName('reminder:send:parcel')
-    ->setDescription('Reminder to print label and send parcel')
-    ;
+  protected function configure()
+  {
+    $this->setDescription('Reminder to print label and send parcel.');
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output) {
+  protected function execute(InputInterface $input, OutputInterface $output)
+  {
     $orders = $this->orderRepo->findAll();
-    $now = new \DateTime('now', timezone_open('UTC'));
+    $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
 
-    if ($orders) {
-      foreach ($orders as $order) {
-        if ($order->getShippingStatus() != "cancelled" && $order->getStatus() != "cancelled" && !$order->getTrackingNumber() && !$order->getPdf()) {
-          $pushToken = $order->getVendor()->getUser()->getPushToken();
-
-          if ($order->getCreatedAt()->modify('+7 days') < $now) {
-            // cancel order
-            $order->setStatus('cancelled');
-            $this->manager->flush();
-
-            // refund customer
-            try {
-              $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
-              $stripe->refunds->create([
-                'payment_intent' => $order->getPaymentId(),
-              ]);
-            } catch (\Exception $error) {
-              $this->bugsnag->notifyException($error);
-            }
-
-            if ($pushToken) {
-              try {
-                $this->notifPushService->send("SWIPE LIVE", "Commande annulée, le client à été remboursé", $pushToken);
-              } catch (\Exception $error) {
-                $this->bugsnag->notifyException($error);
-              }
-            }
-
-            if ($order->getBuyer()->getPushToken()) {
-              try {
-                $this->notifPushService->send("SWIPE LIVE", "Commande annulée, le vendeur n'a pas envoyé le colis. Vous allez être remboursé", $order->getBuyer()->getPushToken());
-              } catch (\Exception $error) {
-                $this->bugsnag->notifyException($error);
-              }
-            }
-          } elseif ($order->getCreatedAt()->modify('+4 days') < $now) {
-            // 2nd reminder
-            if ($pushToken) {
-              try {
-                $this->notifPushService->send("SWIPE LIVE", "Plus que 24h pour expédier ta commande ou elle sera annulé", $pushToken);
-              } catch (\Exception $error) {
-                $this->bugsnag->notifyException($error);
-              }
-            }
-          } else if ($order->getCreatedAt()->modify('+2 days') < $now) {
-            // 1st reminder
-            if ($pushToken) {
-              try {
-                $this->notifPushService->send("SWIPE LIVE", "N’oublie pas d’imprimer le bon de livraison et d’expédier ta commande", $pushToken);
-              } catch (\Exception $error) {
-                $this->bugsnag->notifyException($error);
-              }
-            }
-          }
+    foreach ($orders as $order) {
+      if ($this->shouldRemindOrCancel($order)) {
+        $createdAt = $order->getCreatedAt();
+        if ($createdAt->modify('+7 days') < $now) {
+          $this->cancelOrder($order);
+        } elseif ($createdAt->modify('+4 days') < $now) {
+          $this->sendSecondReminder($order);
+        } elseif ($createdAt->modify('+2 days') < $now) {
+          $this->sendFirstReminder($order);
         }
+      }
+    }
+
+    return Command::SUCCESS;
+  }
+
+  private function shouldRemindOrCancel($order): bool
+  {
+    return $order->getShippingStatus() !== 'cancelled' 
+    && $order->getStatus() !== 'cancelled'
+    && !$order->getTrackingNumber() 
+    && !$order->getPdf();
+  }
+
+  private function cancelOrder($order): void
+  {
+    $order->setStatus('cancelled');
+    $this->entityManager->flush();
+
+    $this->refundCustomer($order);
+    $this->sendPushNotification(
+      $order->getVendor()->getUser()->getPushToken(),
+      'Commande annulée, le client a été remboursé'
+    );
+
+    $this->sendPushNotification(
+      $order->getBuyer()->getPushToken(),
+      'Commande annulée, le vendeur n\'a pas envoyé le colis. Vous allez être remboursé'
+    );
+
+    $this->logger->info('Order cancelled and customer refunded for order ID: ' . $order->getId());
+  }
+
+  private function refundCustomer($order): void
+  {
+    try {
+        // Récupérer la clé secrète Stripe depuis les paramètres
+      $stripeSecretKey = $this->parameterBag->get('stripe_sk');
+      $stripe = new \Stripe\StripeClient($stripeSecretKey);
+      $stripe->refunds->create([
+        'payment_intent' => $order->getPaymentId(),
+      ]);
+    } catch (\Exception $error) {
+      $this->logger->error('Failed to refund order ID: ' . $order->getId(), ['exception' => $error]);
+      $this->bugsnag->notifyException($error);
+    }
+  }
+
+  private function sendFirstReminder($order): void
+  {
+    $this->sendPushNotification(
+      $order->getVendor()->getUser()->getPushToken(),
+      'N’oublie pas d’imprimer le bon de livraison et d’expédier ta commande'
+    );
+    $this->logger->info('First reminder sent for order ID: ' . $order->getId());
+  }
+
+  private function sendSecondReminder($order): void
+  {
+    $this->sendPushNotification(
+      $order->getVendor()->getUser()->getPushToken(),
+      'Plus que 24h pour expédier ta commande ou elle sera annulée'
+    );
+    $this->logger->info('Second reminder sent for order ID: ' . $order->getId());
+  }
+
+  private function sendPushNotification(?string $pushToken, string $message): void
+  {
+    if ($pushToken) {
+      try {
+        $this->notifPushService->send('SWIPE LIVE', $message, $pushToken);
+      } catch (\Exception $error) {
+        $this->logger->error('Failed to send push notification', ['exception' => $error]);
+        $this->bugsnag->notifyException($error);
       }
     }
   }
 }
+

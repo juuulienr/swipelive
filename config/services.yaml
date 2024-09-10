@@ -7,6 +7,12 @@ parameters:
     stripe_sk: '%env(STRIPE_SK)%'
     agora_app_id: '%env(AGORA_APP_ID)%'
     agora_app_certificate: '%env(AGORA_APP_CERTIFICATE)%'
+    facebook_app_id: '%env(FACEBOOK_APP_ID)%'
+    facebook_app_secret: '%env(FACEBOOK_APP_SECRET)%'
+    pusher_app_id: '%env(PUSHER_APP_ID)%'
+    pusher_key: '%env(PUSHER_KEY)%'
+    pusher_secret: '%env(PUSHER_SECRET)%'
+
 
 
 services:
@@ -52,4 +58,7 @@ services:
         arguments: []
         
     Bugsnag\Client: '@bugsnag'
+    # App\Command\RemoveWaitingLive:
+    # tags: ['console.command']
+
 

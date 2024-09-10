@@ -150,7 +150,7 @@ class LiveAPIController extends AbstractController {
         ]
       ];
 
-      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger($channel, $event, $data);
 
       $live->setChannel($channel);
@@ -172,29 +172,36 @@ class LiveAPIController extends AbstractController {
       }
 
 
-      // try {
-      //   // Appel à l'API `acquire` pour obtenir un `resourceId`
-      //   $acquireUrl = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $this->getParameter('agora_app_id'));
-      //   $this->bugsnag->leaveBreadcrumb($this->getParameter('agora_app_id'));
 
-      //   // Appel à l'API `acquire`
-      //   $acquireResponse = $this->httpClient->request('POST', $acquireUrl, [
-      //     'headers' => [
-      //       'Content-Type' => 'application/json',
-      //       'Access-Control-Allow-Origin' => '*',
-      //       'Access-Control-Allow-Methods' => 'POST, OPTIONS',
-      //     ],
-      //     'auth_basic' => ["b6d203c81e5b46809b6e308802f8cae4", "a1b6267b9afc43948c1c609cedf9d617"],
-      //     'json' => [
-      //       'cname' => $channel,
-      //       'uid' => "123456789",
-      //       'clientRequest' => []
-      //     ],
-      //   ]);
+      try {
+        // Appel à l'API `acquire` pour obtenir un `resourceId`
+        $url = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $this->getParameter('agora_app_id'));
+        $response = $this->httpClient->request('POST', $url, [
+          'headers' => [
+            'Content-Type' => 'application/json',
+          ],
+          'auth_basic' => [$this->getParameter('agora_app_id'), $this->getParameter('agora_app_certificate')],
+          'json' => [
+            'cname' => "Live{$live->getId()}",
+            'uid' => "123456789",
+            'clientRequest' => []
+          ]
+        ]);
 
-      //   // Récupérer la réponse et le `resourceId`
-      //   $acquireData = $acquireResponse->toArray();
-      //   $resourceId = $acquireData['resourceId'];
+        // Récupérer la réponse et le `resourceId`
+        $acquireData = $response->toArray();
+        $resourceId = $acquireData['resourceId'];
+
+        $this->bugsnag->leaveBreadcrumb($resourceId);
+
+
+      } catch (\Exception $e) {
+        // Gestion des erreurs
+        $this->bugsnag->notifyException($e);
+        return $this->json($e->getMessage(), 500);
+      }
+
+
 
       //   // Une fois `resourceId` obtenu, appeler l'API `start`
       //   $startUrl = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/mode/mix/start', $this->getParameter('agora_app_id'), $resourceId);
@@ -283,8 +290,8 @@ class LiveAPIController extends AbstractController {
 
       // create fb stream
       $fb = new \Facebook\Facebook([
-        'app_id' => '936988141017522',
-        'app_secret' => '025a5522cd75e464437fb048ee3cfe23',
+        'app_id' => $this->getParameter('facebook_app_id'),
+        'app_secret' => $this->getParameter('facebook_app_secret'),
         'default_graph_version' => 'v2.10',
       ]);
 
@@ -369,7 +376,7 @@ class LiveAPIController extends AbstractController {
       $live->setDisplay($display);
       $manager->flush();
 
-      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger($live->getChannel(), $live->getEvent(), [ "display" => $display ]);
 
       // créer le clip pour le produit précédent
@@ -495,8 +502,8 @@ class LiveAPIController extends AbstractController {
       if ($fbStreamId) {
         $url = "/" . $fbStreamId . "/?end_live_video=true";
         $fb = new \Facebook\Facebook([
-          'app_id' => '936988141017522',
-          'app_secret' => '025a5522cd75e464437fb048ee3cfe23',
+          'app_id' => $this->getParameter('facebook_app_id'),
+          'app_secret' => $this->getParameter('facebook_app_secret'),
           'default_graph_version' => 'v2.10',
         ]);
 
@@ -558,7 +565,7 @@ class LiveAPIController extends AbstractController {
         ]
       ];
       
-      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
 			return $this->json($live, 200, [], [
@@ -578,7 +585,7 @@ class LiveAPIController extends AbstractController {
    * @Route("/user/api/live/{id}/update/viewers", name="user_api_live_update_viewers", methods={"PUT"})
    */
   public function updateViewers(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
     $info = $pusher->getChannelInfo($live->getChannel(), ['info' => 'subscription_count']);
     $count = $info->subscription_count;
     $user = $this->getUser();
@@ -634,7 +641,7 @@ class LiveAPIController extends AbstractController {
    * @Route("/user/api/live/{id}/update/likes", name="user_api_live_update_likes", methods={"PUT"})
    */
   public function updateLikes(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
     $live->setTotalLikes($live->getTotalLikes() + 1);
     $manager->flush();
 
@@ -660,7 +667,7 @@ class LiveAPIController extends AbstractController {
    * @Route("/user/api/live/{id}/update/banned/{userId}", name="user_api_live_update_banned", methods={"GET"})
    */
   public function bannedViewer(Live $live, $userId, Request $request, ObjectManager $manager, FollowRepository $followRepo, SerializerInterface $serializer) {
-    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
     $follow = $followRepo->findOneBy(['following' => $live->getVendor()->getUser(), 'follower' => $userId ]);
 
     if ($follow) {
@@ -709,7 +716,7 @@ class LiveAPIController extends AbstractController {
     }
 
     if ($order) {
-      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
 
       if ($order->getBuyer()->getVendor()) {
         $vendor = [ "businessName" => $order->getBuyer()->getVendor()->getBusinessName() ];

@@ -185,7 +185,7 @@ class DiscussionAPIController extends AbstractController {
         ],
       ];
 
-      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger("discussion_channel", "new_message", $data);
       $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
 
@@ -224,7 +224,7 @@ class DiscussionAPIController extends AbstractController {
       ],
     ];
 
-    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
     $pusher->trigger("discussion_channel", "new_message", $data);
     $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
 
@@ -252,7 +252,7 @@ class DiscussionAPIController extends AbstractController {
       ],
     ];
 
-    $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
     $pusher->trigger("discussion_channel", "new_message", $data);
     $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
 
@@ -345,7 +345,7 @@ class DiscussionAPIController extends AbstractController {
         ],
       ];
 
-      $pusher = new \Pusher\Pusher('55da4c74c2db8041edd6', 'd61dc5df277d1943a6fa', '1274340', [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger("discussion_channel", "new_message", $data);
       $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
 
