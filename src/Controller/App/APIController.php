@@ -73,6 +73,24 @@ class APIController extends AbstractController {
     }
   }
 
+  /**
+   * @Route("/agora/token/record/{id}", name="generate_agora_token_record")
+   */
+  public function generateRecordToken(Live $live) {
+    $appID = $this->getParameter('agora_app_id');
+    $appCertificate = $this->getParameter('agora_app_certificate');
+    $expiresInSeconds = 86400; // Expire dans 24 heures
+    $channelName = "Live" . $live->getId();
+    $role = RtcTokenBuilder2::ROLE_SUBSCRIBER;
+
+    try {
+      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $channelName, 123456789, $role, $expiresInSeconds);
+      return $this->json([ "token" => $token ], 200);
+    } catch (\Exception $e) {
+      return $this->json('Failed to generate token', 500);
+    }
+  }
+
 
   /**
    * Afficher le feed
