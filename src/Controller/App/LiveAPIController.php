@@ -182,7 +182,7 @@ class LiveAPIController extends AbstractController {
           'headers' => [
             'Content-Type' => 'application/json',
           ],
-          'auth_basic' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
+          'auth_basic' => ["b6d203c81e5b46809b6e308802f8cae4", "a1b6267b9afc43948c1c609cedf9d617"],
           'json' => [
             'cname' => $cname,
             'uid' => "123456789", // Vérifiez que le UID est approprié
