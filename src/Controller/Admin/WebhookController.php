@@ -57,40 +57,40 @@ class WebhookController extends AbstractController {
       if ($order) {
         switch ($result["type"]) {
           case 'payment_intent.succeeded':
-            $order->setStatus("succeeded");
-            $vendor = $order->getVendor();
-            $pending = $order->getTotal() - $order->getFees() - $order->getShippingPrice();
-            $vendor->setPending($pending);
+          $order->setStatus("succeeded");
+          $vendor = $order->getVendor();
+          $pending = $order->getTotal() - $order->getFees() - $order->getShippingPrice();
+          $vendor->setPending($pending);
 
-            foreach ($order->getLineItems() as $lineItem) {
-              if ($lineItem->getVariant()) {
-                $variant = $lineItem->getVariant();
-                $variant->setQuantity($variant->getQuantity() - $lineItem->getQuantity());
-              } else {
-                $product = $lineItem->getProduct();
-                $product->setQuantity($product->getQuantity() - $lineItem->getQuantity());
-              }
+          foreach ($order->getLineItems() as $lineItem) {
+            if ($lineItem->getVariant()) {
+              $variant = $lineItem->getVariant();
+              $variant->setQuantity($variant->getQuantity() - $lineItem->getQuantity());
+            } else {
+              $product = $lineItem->getProduct();
+              $product->setQuantity($product->getQuantity() - $lineItem->getQuantity());
             }
+          }
 
-            $order->setEventId($result["id"]);
-            $order->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
-            $manager->flush();
+          $order->setEventId($result["id"]);
+          $order->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
+          $manager->flush();
 
 
-            $live = $liveRepo->vendorIsLive($vendor);
+          $live = $liveRepo->vendorIsLive($vendor);
 
-            if (!$live && $vendor->getUser()->getPushToken()) {
-              try {
-                $this->notifPushService->send("SWIPE LIVE", "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", $vendor->getUser()->getPushToken());
-              } catch (\Exception $error) {
-                $this->bugsnag->notifyException($error);
-              }
+          if (!$live && $vendor->getUser()->getPushToken()) {
+            try {
+              $this->notifPushService->send("SWIPE LIVE", "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", $vendor->getUser()->getPushToken());
+            } catch (\Exception $error) {
+              $this->bugsnag->notifyException($error);
             }
+          }
 
-            break;
+          break;
 
           default:
-            break;
+          break;
         }
       }
     }
@@ -122,18 +122,18 @@ class WebhookController extends AbstractController {
       switch ($result["type"]) {
         case 'account.updated':
           // $account = $result["data"]["object"];
-          break;
+        break;
 
         case 'person.updated':
           // $person = $result["data"]["object"];
-          break;
+        break;
 
         case 'payout.failed':
           // $payout = $result["data"]["object"];
-          break;
-          
+        break;
+        
         default:
-          break;
+        break;
       }
     }
 
@@ -141,20 +141,40 @@ class WebhookController extends AbstractController {
   }
 
 
-
   /**
    * Webhooks Agora
    *
    * @Route("/api/agora/webhooks", name="api_agora_webhooks", methods={"POST"})
    */
-  public function agora(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
-    $result = json_decode($request->getContent(), true);
-    $this->bugsnag->leaveBreadcrumb("agora");
+  public function agora(Request $request, ObjectManager $manager, OrderRepository $orderRepo)
+  {
+    try {
+      $result = json_decode($request->getContent(), true);
+      
+      $this->bugsnag->leaveBreadcrumb("Agora Webhook", "request", [
+        'headers' => $request->headers->all(), 
+        'body' => $result
+      ]);
 
-    return $this->json(true, 200);
+      if (isset($result['eventType'])) {
+        $this->bugsnag->leaveBreadcrumb("Agora Event", "info", [
+          'eventType' => $result['eventType'],
+          'eventData' => $result 
+        ]);
+      } else {
+        $this->bugsnag->notifyException(new \Exception("Invalid Agora Webhook: eventType missing"));
+      }
+
+      return $this->json(true, 200);
+    } catch (\Exception $e) {
+      $this->bugsnag->notifyException($e);
+
+      return $this->json([
+        'status' => 'error',
+        'message' => 'Webhook processing failed: ' . $e->getMessage()
+      ], 500);
+    }
   }
-
-
 
 
   /**
@@ -168,10 +188,10 @@ class WebhookController extends AbstractController {
     if ($result["action"]) {
       switch ($result["action"]) {
         case 'ship':
-          break;
+        break;
 
         case 'delivery':
-          break;
+        break;
 
         case 'track':
           // Livraison Expédition : Bonne nouvelle ! (Shop name) a envoyé ton colis.
@@ -182,7 +202,7 @@ class WebhookController extends AbstractController {
           // Si oui : clôturer le chat + déblocage des fonds soit pour le client soit pour le vendeur.
           // Si non : transfert du litige vers nous
           // Exemple de litige : Colis non reçu, colis non conforme, Contrefaçon….
-                
+        
 
           // if ($result->success) {
           //   $order->setDelivered($result->delivered);
@@ -216,7 +236,7 @@ class WebhookController extends AbstractController {
           //         }
 
           //         $order->setUpdatedAt(new \Datetime($event->date_unformatted));
-                  
+        
           //         $manager->persist($orderStatus);
           //         $manager->flush();
           //       }
@@ -225,16 +245,16 @@ class WebhookController extends AbstractController {
 
           //   $manager->flush();
           // }
-          break;
+        break;
 
         case 'multirate':
-          break;
+        break;
 
         case 'cancel':
-          break;
-          
+        break;
+        
         default:
-          break;
+        break;
       }
     }
 
