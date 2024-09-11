@@ -172,28 +172,37 @@ class LiveAPIController extends AbstractController {
       }
 
 
-
       try {
         // Appel à l'API `acquire` pour obtenir un `resourceId`
         $url = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $this->getParameter('agora_app_id'));
+        $cname = "Live" . $live->getId();
+        $this->bugsnag->leaveBreadcrumb($cname);
+
         $response = $this->httpClient->request('POST', $url, [
           'headers' => [
             'Content-Type' => 'application/json',
           ],
           'auth_basic' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
           'json' => [
-            'cname' => "Live{$live->getId()}",
-            'uid' => "123456789",
+            'cname' => $cname,
+            'uid' => "123456789", // Vérifiez que le UID est approprié
             'clientRequest' => []
           ]
         ]);
 
+        // Vérification du statut de la requête
+        if ($response->getStatusCode() !== 200) {
+          throw new \Exception('Erreur lors de l\'appel à l\'API Agora: ' . $response->getContent());
+        }
+
         // Récupérer la réponse et le `resourceId`
         $acquireData = $response->toArray();
+        if (!isset($acquireData['resourceId'])) {
+          throw new \Exception('Le resourceId n\'a pas été retourné par l\'API.');
+        }
         $resourceId = $acquireData['resourceId'];
 
         $this->bugsnag->leaveBreadcrumb($resourceId);
-
 
       } catch (\Exception $e) {
         // Gestion des erreurs
