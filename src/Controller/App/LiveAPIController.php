@@ -35,9 +35,8 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use App\Service\NotifPushService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response;
-
 
 class LiveAPIController extends AbstractController {
 
@@ -205,7 +204,7 @@ class LiveAPIController extends AbstractController {
           // Vérification que `resourceId` est bien présent dans la réponse
           if (isset($responseData['resourceId'])) {
             $this->bugsnag->leaveBreadcrumb($responseData['resourceId']);
-            
+
               // Retourner `resourceId` dans une réponse JSON
             return new JsonResponse([
               'status' => 'success',
