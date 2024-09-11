@@ -175,7 +175,8 @@ class LiveAPIController extends AbstractController {
       try {
         $client = new Client();
         $cname = "Live" . $live->getId();
-
+        $url = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $this->getParameter('agora_app_id'));
+        
         $headers = [
           'Content-Type' => 'application/json'
         ];
@@ -186,18 +187,11 @@ class LiveAPIController extends AbstractController {
           'clientRequest' => new \stdClass()
         ]);
 
-        $this->bugsnag->leaveBreadcrumb($body);
-
-
-        // $request = new GuzzleRequest('POST', 'https://api.agora.io/v1/apps/0c6b099813dc4470a5b91979edb55af0/cloud_recording/acquire', $headers, $body);
-        // $res = $client->sendAsync($request)->wait();
-
         $res = $client->request('POST', 'https://api.agora.io/v1/apps/0c6b099813dc4470a5b91979edb55af0/cloud_recording/acquire', [
             'headers' => $headers,
-            'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],  // Authentification basique
+            'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
             'body' => $body
         ]);
-
 
         if ($res->getStatusCode() === 200) {
             // Décodage de la réponse JSON
