@@ -177,8 +177,7 @@ class LiveAPIController extends AbstractController {
         $cname = "Live" . $live->getId();
 
         $headers = [
-          'Content-Type' => 'application/json',
-          'Authorization' => 'Basic YjZkMjAzYzgxZTViNDY4MDliNmUzMDg4MDJmOGNhZTQ6YTFiNjI2N2I5YWZjNDM5NDhjMWM2MDljZWRmOWQ2MTc='
+          'Content-Type' => 'application/json'
         ];
 
         $body = json_encode([
@@ -188,10 +187,17 @@ class LiveAPIController extends AbstractController {
         ]);
 
         $this->bugsnag->leaveBreadcrumb($body);
-        
 
-        $request = new GuzzleRequest('POST', 'https://api.agora.io/v1/apps/0c6b099813dc4470a5b91979edb55af0/cloud_recording/acquire', $headers, $body);
-        $res = $client->sendAsync($request)->wait();
+
+        // $request = new GuzzleRequest('POST', 'https://api.agora.io/v1/apps/0c6b099813dc4470a5b91979edb55af0/cloud_recording/acquire', $headers, $body);
+        // $res = $client->sendAsync($request)->wait();
+
+        $res = $client->request('POST', 'https://api.agora.io/v1/apps/0c6b099813dc4470a5b91979edb55af0/cloud_recording/acquire', [
+            'headers' => $headers,
+            'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],  // Authentification basique
+            'body' => $body
+        ]);
+
 
         if ($res->getStatusCode() === 200) {
             // Décodage de la réponse JSON
