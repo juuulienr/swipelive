@@ -183,9 +183,9 @@ class LiveAPIController extends AbstractController {
         ];
 
         $body = json_encode([
-          'cname' => $cname, // Nom de canal dynamique
-          'uid' => '123456789', // Vérifiez que l'UID est correct
-          'clientRequest' => []
+          'cname' => $cname,
+          'uid' => '123456789', 
+          'clientRequest' => new \stdClass()
         ]);
 
         $this->bugsnag->leaveBreadcrumb($body);
