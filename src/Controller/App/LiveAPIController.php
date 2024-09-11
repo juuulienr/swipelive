@@ -180,7 +180,7 @@ class LiveAPIController extends AbstractController {
           'headers' => [
             'Content-Type' => 'application/json',
           ],
-          'auth_basic' => [$this->getParameter('agora_app_id'), $this->getParameter('agora_app_certificate')],
+          'auth_basic' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
           'json' => [
             'cname' => "Live{$live->getId()}",
             'uid' => "123456789",
@@ -235,7 +235,7 @@ class LiveAPIController extends AbstractController {
       //   // Appel à l'API `start` pour démarrer l'enregistrement
       //   $startResponse = $this->httpClient->request('POST', $startUrl, [
       //     'json' => $startBody,
-      //     'auth_basic' => ["b6d203c81e5b46809b6e308802f8cae4", "a1b6267b9afc43948c1c609cedf9d617"],
+          // 'auth_basic' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
       //   ]);
 
       //   // Récupérer la réponse de l'API `start`
