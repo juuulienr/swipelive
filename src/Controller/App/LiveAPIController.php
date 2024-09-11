@@ -32,8 +32,11 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Service\NotifPushService;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 
 
 class LiveAPIController extends AbstractController {
@@ -173,44 +176,77 @@ class LiveAPIController extends AbstractController {
 
 
       try {
-        // Appel à l'API `acquire` pour obtenir un `resourceId`
         $url = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $this->getParameter('agora_app_id'));
         $cname = "Live" . $live->getId();
-        $json = [
-            'cname' => $cname,
-            'uid' => "123456789",
-            'clientRequest' => []
-          ];
-        $this->bugsnag->leaveBreadcrumb($cname);
+        $client = new Client();
 
-        $response = $this->httpClient->request('POST', $url, [
-          'headers' => [
-            'Content-Type' => 'application/json',
-          ],
-          'auth_basic' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
-          'json' => $json
+        $headers = [
+          'Content-Type' => 'application/json',
+        ];
+
+        $body = json_encode([
+          'cname' => $cname,
+          'uid' => '123456789',
+          'clientRequest' => []
         ]);
 
-        // Vérification du statut de la requête
-        if ($response->getStatusCode() !== 200) {
-          throw new \Exception('Erreur lors de l\'appel à l\'API Agora: ' . $response->getContent());
+        $response = $client->post($url, [
+          'headers' => $headers,
+          'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
+          'body' => $body
+        ]);
+
+
+        // Vérification de la réponse
+        if ($response->getStatusCode() === 200) {
+          // Décodage de la réponse JSON
+          $responseData = json_decode($response->getBody(), true);
+
+          // Vérification que `resourceId` est bien présent dans la réponse
+          if (isset($responseData['resourceId'])) {
+            $this->bugsnag->leaveBreadcrumb($responseData['resourceId']);
+            
+              // Retourner `resourceId` dans une réponse JSON
+            return new JsonResponse([
+              'status' => 'success',
+              'resourceId' => $responseData['resourceId']
+            ], 200);
+          } else {
+              // Retourner une erreur si `resourceId` est manquant
+            return new JsonResponse([
+              'status' => 'error',
+              'message' => 'resourceId manquant dans la réponse de l\'API.'
+            ], 400);
+          }
+        } else {
+          // Si le code de statut n'est pas 200, renvoyer une erreur
+          return new JsonResponse([
+            'status' => 'error',
+            'message' => 'Erreur API Agora: ' . $response->getBody()
+          ], $response->getStatusCode());
         }
-
-        // Récupérer la réponse et le `resourceId`
-        $acquireData = $response->toArray();
-        if (!isset($acquireData['resourceId'])) {
-          throw new \Exception('Le resourceId n\'a pas été retourné par l\'API.');
+      } catch (RequestException $e) {
+        // Gestion des erreurs HTTP avec Guzzle
+        if ($e->hasResponse()) {
+          // Retourner un message d'erreur avec le code HTTP
+          return new JsonResponse([
+            'status' => 'error',
+            'message' => 'Erreur: ' . $e->getResponse()->getStatusCode() . ' - ' . $e->getResponse()->getBody()
+          ], $e->getResponse()->getStatusCode());
+        } else {
+          // Erreur réseau ou autre problème
+          return new JsonResponse([
+            'status' => 'error',
+            'message' => 'Erreur de requête : ' . $e->getMessage()
+          ], 500);
         }
-        $resourceId = $acquireData['resourceId'];
-
-        $this->bugsnag->leaveBreadcrumb($resourceId);
-
       } catch (\Exception $e) {
-        // Gestion des erreurs
-        $this->bugsnag->notifyException($e);
-        return $this->json($e->getMessage(), 500);
+        // Gestion d'autres exceptions
+        return new JsonResponse([
+          'status' => 'error',
+          'message' => 'Exception générale: ' . $e->getMessage()
+        ], 500);
       }
-
 
 
       //   // Une fois `resourceId` obtenu, appeler l'API `start`
