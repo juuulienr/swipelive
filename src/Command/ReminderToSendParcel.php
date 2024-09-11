@@ -94,7 +94,7 @@ class ReminderToSendParcel extends Command
   private function refundCustomer($order): void
   {
     try {
-        // Récupérer la clé secrète Stripe depuis les paramètres
+      // Récupérer la clé secrète Stripe depuis les paramètres
       $stripeSecretKey = $this->parameterBag->get('stripe_sk');
       $stripe = new \Stripe\StripeClient($stripeSecretKey);
       $stripe->refunds->create([
