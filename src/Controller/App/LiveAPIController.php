@@ -173,77 +173,142 @@ class LiveAPIController extends AbstractController {
 
 
       try {
-        $url = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $this->getParameter('agora_app_id'));
-        $cname = "Live" . $live->getId();
         $client = new Client();
+        $cname = "Live" . $live->getId();
+
 
         $headers = [
           'Content-Type' => 'application/json',
+          'Authorization' => 'Basic YjZkMjAzYzgxZTViNDY4MDliNmUzMDg4MDJmOGNhZTQ6YTFiNjI2N2I5YWZjNDM5NDhjMWM2MDljZWRmOWQ2MTc='
         ];
 
         $body = json_encode([
-          'cname' => $cname,
-          'uid' => '123456789',
+          'cname' => $cname, // Nom de canal dynamique
+          'uid' => '123456789', // Vérifiez que l'UID est correct
           'clientRequest' => []
         ]);
 
-        $response = $client->post($url, [
-          'headers' => $headers,
-          'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
-          'body' => $body
-        ]);
+        $request = new Request('POST', 'https://api.agora.io/v1/apps/0c6b099813dc4470a5b91979edb55af0/cloud_recording/acquire', $headers, $body);
+        $res = $client->sendAsync($request)->wait();
 
+        if ($res->getStatusCode() === 200) {
+            // Décodage de la réponse JSON
+            $responseData = json_decode($res->getBody(), true);
 
-        // Vérification de la réponse
-        if ($response->getStatusCode() === 200) {
-          // Décodage de la réponse JSON
-          $responseData = json_decode($response->getBody(), true);
-
-          // Vérification que `resourceId` est bien présent dans la réponse
-          if (isset($responseData['resourceId'])) {
-            $this->bugsnag->leaveBreadcrumb($responseData['resourceId']);
-
-              // Retourner `resourceId` dans une réponse JSON
-            return new JsonResponse([
-              'status' => 'success',
-              'resourceId' => $responseData['resourceId']
-            ], 200);
-          } else {
-              // Retourner une erreur si `resourceId` est manquant
-            return new JsonResponse([
-              'status' => 'error',
-              'message' => 'resourceId manquant dans la réponse de l\'API.'
-            ], 400);
-          }
+            // Vérification de la présence de resourceId
+            if (isset($responseData['resourceId'])) {
+                // Retourner le resourceId
+                return new JsonResponse([
+                    'status' => 'success',
+                    'resourceId' => $responseData['resourceId']
+                ], 200);
+            } else {
+                return new JsonResponse([
+                    'status' => 'error',
+                    'message' => 'resourceId manquant dans la réponse de l\'API.'
+                ], 400);
+            }
         } else {
-          // Si le code de statut n'est pas 200, renvoyer une erreur
-          return new JsonResponse([
-            'status' => 'error',
-            'message' => 'Erreur API Agora: ' . $response->getBody()
-          ], $response->getStatusCode());
+            // Si le code de statut n'est pas 200, renvoyer une erreur
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => 'Erreur API Agora: ' . $res->getBody()
+            ], $res->getStatusCode());
         }
-      } catch (RequestException $e) {
+    } catch (RequestException $e) {
         // Gestion des erreurs HTTP avec Guzzle
         if ($e->hasResponse()) {
-          // Retourner un message d'erreur avec le code HTTP
-          return new JsonResponse([
-            'status' => 'error',
-            'message' => 'Erreur: ' . $e->getResponse()->getStatusCode() . ' - ' . $e->getResponse()->getBody()
-          ], $e->getResponse()->getStatusCode());
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => 'Erreur: ' . $e->getResponse()->getStatusCode() . ' - ' . $e->getResponse()->getBody()
+            ], $e->getResponse()->getStatusCode());
         } else {
-          // Erreur réseau ou autre problème
-          return new JsonResponse([
-            'status' => 'error',
-            'message' => 'Erreur de requête : ' . $e->getMessage()
-          ], 500);
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => 'Erreur de requête : ' . $e->getMessage()
+            ], 500);
         }
-      } catch (\Exception $e) {
-        // Gestion d'autres exceptions
+    } catch (\Exception $e) {
         return new JsonResponse([
-          'status' => 'error',
-          'message' => 'Exception générale: ' . $e->getMessage()
+            'status' => 'error',
+            'message' => 'Exception générale: ' . $e->getMessage()
         ], 500);
-      }
+    }
+
+
+
+
+      //   $url = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $this->getParameter('agora_app_id'));
+      //   $cname = "Live" . $live->getId();
+      //   $client = new Client();
+
+      //   $headers = [
+      //     'Content-Type' => 'application/json',
+      //   ];
+
+      //   $body = json_encode([
+      //     'cname' => $cname,
+      //     'uid' => '123456789',
+      //     'clientRequest' => []
+      //   ]);
+
+      //   $response = $client->post($url, [
+      //     'headers' => $headers,
+      //     'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
+      //     'body' => $body
+      //   ]);
+
+
+      //   // Vérification de la réponse
+      //   if ($response->getStatusCode() === 200) {
+      //     // Décodage de la réponse JSON
+      //     $responseData = json_decode($response->getBody(), true);
+
+      //     // Vérification que `resourceId` est bien présent dans la réponse
+      //     if (isset($responseData['resourceId'])) {
+      //       $this->bugsnag->leaveBreadcrumb($responseData['resourceId']);
+
+      //         // Retourner `resourceId` dans une réponse JSON
+      //       return new JsonResponse([
+      //         'status' => 'success',
+      //         'resourceId' => $responseData['resourceId']
+      //       ], 200);
+      //     } else {
+      //         // Retourner une erreur si `resourceId` est manquant
+      //       return new JsonResponse([
+      //         'status' => 'error',
+      //         'message' => 'resourceId manquant dans la réponse de l\'API.'
+      //       ], 400);
+      //     }
+      //   } else {
+      //     // Si le code de statut n'est pas 200, renvoyer une erreur
+      //     return new JsonResponse([
+      //       'status' => 'error',
+      //       'message' => 'Erreur API Agora: ' . $response->getBody()
+      //     ], $response->getStatusCode());
+      //   }
+      // } catch (RequestException $e) {
+      //   // Gestion des erreurs HTTP avec Guzzle
+      //   if ($e->hasResponse()) {
+      //     // Retourner un message d'erreur avec le code HTTP
+      //     return new JsonResponse([
+      //       'status' => 'error',
+      //       'message' => 'Erreur: ' . $e->getResponse()->getStatusCode() . ' - ' . $e->getResponse()->getBody()
+      //     ], $e->getResponse()->getStatusCode());
+      //   } else {
+      //     // Erreur réseau ou autre problème
+      //     return new JsonResponse([
+      //       'status' => 'error',
+      //       'message' => 'Erreur de requête : ' . $e->getMessage()
+      //     ], 500);
+      //   }
+      // } catch (\Exception $e) {
+      //   // Gestion d'autres exceptions
+      //   return new JsonResponse([
+      //     'status' => 'error',
+      //     'message' => 'Exception générale: ' . $e->getMessage()
+      //   ], 500);
+      // }
 
 
       //   // Une fois `resourceId` obtenu, appeler l'API `start`
