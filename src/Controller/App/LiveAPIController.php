@@ -176,7 +176,6 @@ class LiveAPIController extends AbstractController {
         $client = new Client();
         $cname = "Live" . $live->getId();
 
-
         $headers = [
           'Content-Type' => 'application/json',
           'Authorization' => 'Basic YjZkMjAzYzgxZTViNDY4MDliNmUzMDg4MDJmOGNhZTQ6YTFiNjI2N2I5YWZjNDM5NDhjMWM2MDljZWRmOWQ2MTc='
