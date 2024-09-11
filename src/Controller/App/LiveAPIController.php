@@ -41,11 +41,9 @@ use GuzzleHttp\Psr7\Response;
 class LiveAPIController extends AbstractController {
 
   private $notifPushService;
-  private $httpClient;
   private $bugsnag;
 
-  public function __construct(NotifPushService $notifPushService, HttpClientInterface $httpClient, \Bugsnag\Client $bugsnag) {
-    $this->httpClient = $httpClient;
+  public function __construct(NotifPushService $notifPushService, \Bugsnag\Client $bugsnag) {
     $this->notifPushService = $notifPushService;
     $this->bugsnag = $bugsnag;
   }
