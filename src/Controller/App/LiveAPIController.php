@@ -188,7 +188,7 @@ class LiveAPIController extends AbstractController {
           'clientRequest' => []
         ]);
 
-        $request = new Request('POST', 'https://api.agora.io/v1/apps/0c6b099813dc4470a5b91979edb55af0/cloud_recording/acquire', $headers, $body);
+        $request = new GuzzleRequest('POST', 'https://api.agora.io/v1/apps/0c6b099813dc4470a5b91979edb55af0/cloud_recording/acquire', $headers, $body);
         $res = $client->sendAsync($request)->wait();
 
         if ($res->getStatusCode() === 200) {
