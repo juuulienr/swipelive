@@ -56,7 +56,7 @@ class Clip
      * @ORM\Column(type="text", nullable=true)
      * @Groups("clip:read")
      */
-    private $resourceUri;
+    private $resourceId;
 
     /**
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="clips")
@@ -181,14 +181,14 @@ class Clip
         return $this;
     }
 
-    public function getResourceUri(): ?string
+    public function getResourceId(): ?string
     {
-        return $this->resourceUri;
+        return $this->resourceId;
     }
 
-    public function setResourceUri(?string $resourceUri): self
+    public function setResourceId(?string $resourceId): self
     {
-        $this->resourceUri = $resourceUri;
+        $this->resourceId = $resourceId;
 
         return $this;
     }

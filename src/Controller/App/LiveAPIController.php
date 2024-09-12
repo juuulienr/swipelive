@@ -126,7 +126,6 @@ class LiveAPIController extends AbstractController {
 
       $live->setCreatedAt(new \DateTime('now', timezone_open('UTC')));
       $live->setBroadcastId("test");
-      $live->setResourceUri("test");
       $live->setPreview("test");
       $live->setStatus(1);
       $manager->flush();
@@ -174,7 +173,7 @@ class LiveAPIController extends AbstractController {
 
       try {
         $client = new Client();
-        $cname = "Live" . $live->getId();
+        $cname = $live->getCname();
         $appId = $this->getParameter('agora_app_id');
 
         // 1. Récupérer le token via votre propre route API
@@ -214,8 +213,10 @@ class LiveAPIController extends AbstractController {
           ], 400);
         }
 
-          // Récupérer le resourceId
+        // Récupérer le resourceId
         $resourceId = $acquireData['resourceId'];
+        $live->setResourceId($resourceId);
+        $manager->flush();
 
         // 3. Démarrer l'enregistrement en utilisant le tokenAgora
         $urlStart = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/mode/mix/start', $appId, $resourceId);
@@ -252,11 +253,18 @@ class LiveAPIController extends AbstractController {
         $responseStart = json_decode($resStart->getBody(), true);
 
         if (isset($responseStart['sid'])) {
-          return new JsonResponse([
-            'status' => 'success',
-            'sid' => $responseStart['sid'],
-            'resourceId' => $resourceId
-          ], 200);
+          $sid = $responseStart['sid'];
+
+          $live->setSid($resourceId);
+          $manager->flush();
+
+          return $this->json($live, 200, [], [
+            'groups' => 'live:read', 
+            'circular_reference_limit' => 1, 
+            'circular_reference_handler' => function ($object) {
+              return $object->getId();
+            } 
+          ]);
         }
 
         return new JsonResponse([
@@ -270,14 +278,6 @@ class LiveAPIController extends AbstractController {
           'message' => 'Exception: ' . $e->getMessage()
         ], 500);
       }
-
-      return $this->json($live, 200, [], [
-        'groups' => 'live:read', 
-        'circular_reference_limit' => 1, 
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
-      ]);
     }
     
     return $this->json(false, 404);
