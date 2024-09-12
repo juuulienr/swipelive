@@ -90,6 +90,12 @@ class Live
     private $sid;
 
     /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Groups("live:read")
+     */
+    private $cname;
+
+    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("live:read")
      */
@@ -470,4 +476,17 @@ class Live
 
         return $this;
     }
+
+    public function getCname(): ?string
+    {
+        return $this->cname;
+    }
+
+    public function setCname(?string $cname): self
+    {
+        $this->cname = $cname;
+
+        return $this;
+    }
+
 }

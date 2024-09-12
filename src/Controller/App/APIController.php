@@ -37,23 +37,27 @@ use Cloudinary\Cloudinary;
 class APIController extends AbstractController {
 
   /**
-   * @Route("/agora/token/{id}", name="generate_agora_token")
+   * @Route("/user/api/agora/token/{id}", name="generate_agora_token")
    */
-  public function generateToken(Live $live) {
+  public function generateToken(Live $live, ObjectManager $manager) {
     $appID = $this->getParameter('agora_app_id');
     $appCertificate = $this->getParameter('agora_app_certificate');
     $expiresInSeconds = 86400; // Expire dans 24 heures
-    $channelName = "Live" . $live->getId();
-    $uid = (int) $live->getVendor()->getId();
+    $cname = "Live" . $live->getId();
+    $uid = (int) $this->getUser()->getId();
     $role = RtcTokenBuilder2::ROLE_PUBLISHER;
 
+    $live->setCname($cname);
+    $manager->flush();
+
     try {
-      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $channelName, $uid, $role, $expiresInSeconds);
+      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $cname, $uid, $role, $expiresInSeconds);
       return $this->json([ "token" => $token ], 200);
     } catch (\Exception $e) {
       return $this->json('Failed to generate token', 500);
     }
   }
+
 
   /**
    * @Route("/agora/token/audience/{id}", name="generate_agora_token_audience")
@@ -62,16 +66,17 @@ class APIController extends AbstractController {
     $appID = $this->getParameter('agora_app_id');
     $appCertificate = $this->getParameter('agora_app_certificate');
     $expiresInSeconds = 86400; // Expire dans 24 heures
-    $channelName = "Live" . $live->getId();
     $role = RtcTokenBuilder2::ROLE_SUBSCRIBER;
+    $uid = (int) $this->getUser()->getId();
 
     try {
-      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $channelName, null, $role, $expiresInSeconds);
+      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $live->getCname(), $uid, $role, $expiresInSeconds);
       return $this->json([ "token" => $token ], 200);
     } catch (\Exception $e) {
       return $this->json('Failed to generate token', 500);
     }
   }
+
 
   /**
    * @Route("/agora/token/record/{id}", name="generate_agora_token_record")
@@ -80,11 +85,10 @@ class APIController extends AbstractController {
     $appID = $this->getParameter('agora_app_id');
     $appCertificate = $this->getParameter('agora_app_certificate');
     $expiresInSeconds = 86400; // Expire dans 24 heures
-    $channelName = "Live" . $live->getId();
     $role = RtcTokenBuilder2::ROLE_SUBSCRIBER;
 
     try {
-      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $channelName, 123456789, $role, $expiresInSeconds);
+      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $live->getCname(), 123456789, $role, $expiresInSeconds);
       return $this->json([ "token" => $token ], 200);
     } catch (\Exception $e) {
       return $this->json('Failed to generate token', 500);
