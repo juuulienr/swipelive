@@ -231,9 +231,6 @@ class LiveAPIController extends AbstractController {
               'channelType' => 0,
               'videoStreamType' => 0
             ],
-            'recordingFileConfig' => [
-              'avFileType' => ['hls', 'mp4']
-            ],
             'storageConfig' => [
               'vendor' => 1,
               'region' => 6,
@@ -255,7 +252,7 @@ class LiveAPIController extends AbstractController {
         if (isset($responseStart['sid'])) {
           $sid = $responseStart['sid'];
 
-          $live->setSid($resourceId);
+          $live->setSid($sid);
           $manager->flush();
 
           return $this->json($live, 200, [], [
