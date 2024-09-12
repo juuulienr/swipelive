@@ -167,9 +167,7 @@ class WebhookController extends AbstractController {
       ]);
 
               // Bug intentionnel : exception générée même si tout est correct
-        throw new \Exception("Simulated bug: this is a test exception for Bugsnag");
-
-
+      throw new \Exception("Simulated bug: this is a test exception for Bugsnag");
 
           // Analyser le contenu du webhook et logguer l'eventType
       if (isset($result['eventType'])) {
