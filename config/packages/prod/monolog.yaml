@@ -1,17 +1,20 @@
 monolog:
     handlers:
-        main:
-            type: fingers_crossed
-            action_level: error
-            handler: nested
-            excluded_404s:
-                # regex: exclude all 404 errors from the logs
-                - ^/
+        # Main handler for Logtail (you can adjust the level as needed)
+        logtail:
+            type: custom
+            id: Logtail\Monolog\LogtailHandler
+            token: '%env(LOGTAIL_TOKEN)%'
+            level: debug  # Capture tous les niveaux de logs à partir de 'debug'
+
+        # Logs also to stderr (for example, in Heroku or Docker)
         nested:
             type: stream
-            path: "%kernel.logs_dir%/%kernel.environment%.log"
-            level: debug
+            path: "php://stderr"
+            level: debug  # Capture tous les niveaux de logs
+
+        # Handler for the Symfony console
         console:
             type: console
             process_psr_3_messages: false
-            channels: ["!event", "!doctrine"]
+            channels: ["!event", "!doctrine"]  # Exclude event and doctrine logs

@@ -161,7 +161,7 @@ class WebhookController extends AbstractController {
       ]);
 
           // Enregistrer les informations dans les logs (vous pouvez changer la stratégie de log)
-      $this->get('logger')->info('Agora Webhook Received', [
+      $this->logger->info('Agora Webhook Received', [
         'headers' => $request->headers->all(),
         'body' => $result
       ]);
@@ -177,14 +177,14 @@ class WebhookController extends AbstractController {
         ]);
 
               // Enregistrer l'eventType dans les logs pour voir ce qui est reçu
-        $this->get('logger')->info('Agora Event Type', [
+        $this->logger->info('Agora Event Type', [
           'eventType' => $result['eventType'],
           'eventData' => $result
         ]);
       } else {
               // Si eventType est manquant, on l'enregistre dans les logs et on laisse un breadcrumb
         $this->bugsnag->leaveBreadcrumb("Missing eventType in Agora Webhook", "error");
-        $this->get('logger')->warning('Missing eventType in Agora Webhook', [
+        $this->logger->warning('Missing eventType in Agora Webhook', [
           'body' => $result
         ]);
       }
