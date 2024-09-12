@@ -149,24 +149,44 @@ class WebhookController extends AbstractController {
   public function agora(Request $request, ObjectManager $manager, OrderRepository $orderRepo)
   {
     try {
+          // Décoder le contenu JSON envoyé par Agora
       $result = json_decode($request->getContent(), true);
-      
-      $this->bugsnag->leaveBreadcrumb("Agora Webhook", "request", [
-        'headers' => $request->headers->all(), 
+
+          // Laisser un breadcrumb dans Bugsnag pour le suivi du webhook
+      $this->bugsnag->leaveBreadcrumb("Agora Webhook Received", "request", [
+        'headers' => $request->headers->all(),
         'body' => $result
       ]);
 
+          // Enregistrer les informations dans les logs (vous pouvez changer la stratégie de log)
+      $this->get('logger')->info('Agora Webhook Received', [
+        'headers' => $request->headers->all(),
+        'body' => $result
+      ]);
+
+          // Analyser le contenu du webhook et logguer l'eventType
       if (isset($result['eventType'])) {
-        $this->bugsnag->leaveBreadcrumb("Agora Event", "info", [
+        $this->bugsnag->leaveBreadcrumb("Agora Event Type Detected", "info", [
           'eventType' => $result['eventType'],
-          'eventData' => $result 
+          'eventData' => $result
+        ]);
+        
+              // Enregistrer l'eventType dans les logs pour voir ce qui est reçu
+        $this->get('logger')->info('Agora Event Type', [
+          'eventType' => $result['eventType'],
+          'eventData' => $result
         ]);
       } else {
-        $this->bugsnag->notifyException(new \Exception("Invalid Agora Webhook: eventType missing"));
+              // Si eventType est manquant, on l'enregistre dans les logs et on laisse un breadcrumb
+        $this->bugsnag->leaveBreadcrumb("Missing eventType in Agora Webhook", "error");
+        $this->get('logger')->warning('Missing eventType in Agora Webhook', [
+          'body' => $result
+        ]);
       }
 
       return $this->json(true, 200);
     } catch (\Exception $e) {
+          // Capturer les exceptions et notifier Bugsnag
       $this->bugsnag->notifyException($e);
 
       return $this->json([
@@ -175,6 +195,7 @@ class WebhookController extends AbstractController {
       ], 500);
     }
   }
+
 
 
   /**
