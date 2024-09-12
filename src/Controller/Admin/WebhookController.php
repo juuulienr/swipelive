@@ -166,6 +166,11 @@ class WebhookController extends AbstractController {
         'body' => $result
       ]);
 
+              // Bug intentionnel : exception générée même si tout est correct
+        throw new \Exception("Simulated bug: this is a test exception for Bugsnag");
+
+
+
           // Analyser le contenu du webhook et logguer l'eventType
       if (isset($result['eventType'])) {
         $this->bugsnag->leaveBreadcrumb("Agora Event Type Detected", "info", [
@@ -185,6 +190,7 @@ class WebhookController extends AbstractController {
           'body' => $result
         ]);
       }
+
 
       return $this->json(true, 200);
     } catch (\Exception $e) {
