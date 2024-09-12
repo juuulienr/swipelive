@@ -28,18 +28,20 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use App\Service\NotifPushService;
+use Psr\Log\LoggerInterface;
 
 
 class WebhookController extends AbstractController {
 
   private $notifPushService;
   private $bugsnag;
+  private $logger;
 
-  public function __construct(NotifPushService $notifPushService, \Bugsnag\Client $bugsnag) {
+  public function __construct(NotifPushService $notifPushService, \Bugsnag\Client $bugsnag, LoggerInterface $logger) {
     $this->notifPushService = $notifPushService;
     $this->bugsnag = $bugsnag;
+    $this->logger = $logger;
   }
-
 
 
   /**
@@ -170,7 +172,7 @@ class WebhookController extends AbstractController {
           'eventType' => $result['eventType'],
           'eventData' => $result
         ]);
-        
+
               // Enregistrer l'eventType dans les logs pour voir ce qui est reçu
         $this->get('logger')->info('Agora Event Type', [
           'eventType' => $result['eventType'],
