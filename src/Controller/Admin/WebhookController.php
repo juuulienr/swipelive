@@ -28,19 +28,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use App\Service\NotifPushService;
-use Psr\Log\LoggerInterface;
 
 
 class WebhookController extends AbstractController {
 
   private $notifPushService;
   private $bugsnag;
-  private $logger;
 
-  public function __construct(NotifPushService $notifPushService, \Bugsnag\Client $bugsnag, LoggerInterface $logger) {
+  public function __construct(NotifPushService $notifPushService, \Bugsnag\Client $bugsnag) {
     $this->notifPushService = $notifPushService;
     $this->bugsnag = $bugsnag;
-    $this->logger = $logger;
   }
 
 
@@ -160,33 +157,21 @@ class WebhookController extends AbstractController {
         'body' => $result
       ]);
 
-          // Enregistrer les informations dans les logs (vous pouvez changer la stratégie de log)
-      $this->logger->info('Agora Webhook Received', [
-        'headers' => $request->headers->all(),
-        'body' => $result
-      ]);
 
-              // Bug intentionnel : exception générée même si tout est correct
+      // Bug intentionnel : exception générée même si tout est correct
       throw new \Exception("Simulated bug: this is a test exception for Bugsnag");
 
           // Analyser le contenu du webhook et logguer l'eventType
       if (isset($result['eventType'])) {
-        $this->bugsnag->leaveBreadcrumb("Agora Event Type Detected", "info", [
-          'eventType' => $result['eventType'],
-          'eventData' => $result
-        ]);
+        // $this->bugsnag->leaveBreadcrumb("Agora Event Type Detected", "info", [
+        //   'eventType' => $result['eventType'],
+        //   'eventData' => $result
+        // ]);
 
-              // Enregistrer l'eventType dans les logs pour voir ce qui est reçu
-        $this->logger->info('Agora Event Type', [
-          'eventType' => $result['eventType'],
-          'eventData' => $result
-        ]);
+        //       // Enregistrer l'eventType dans les logs pour voir ce qui est reçu
       } else {
-              // Si eventType est manquant, on l'enregistre dans les logs et on laisse un breadcrumb
-        $this->bugsnag->leaveBreadcrumb("Missing eventType in Agora Webhook", "error");
-        $this->logger->warning('Missing eventType in Agora Webhook', [
-          'body' => $result
-        ]);
+        //       // Si eventType est manquant, on l'enregistre dans les logs et on laisse un breadcrumb
+        // $this->bugsnag->leaveBreadcrumb("Missing eventType in Agora Webhook", "error");
       }
 
 
