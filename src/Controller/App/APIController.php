@@ -60,40 +60,41 @@ class APIController extends AbstractController {
 
 
   /**
-   * @Route("/user/api/agora/token/{type}/{id}", name="generate_agora_token")
+   * @Route("/user/api/agora/token/audience/{id}", name="generate_agora_token_audience")
    */
-  public function generateAgoraToken(Live $live, string $type) {
+  public function generateAudienceToken(Live $live) {
     $appID = $this->getParameter('agora_app_id');
     $appCertificate = $this->getParameter('agora_app_certificate');
-    $role = RtcTokenBuilder2::ROLE_SUBSCRIBER;
     $expiresInSeconds = 86400; // Expire dans 24 heures
+    $role = RtcTokenBuilder2::ROLE_SUBSCRIBER;
+    $uid = (int) $this->getUser()->getId();
 
     try {
-      // Déterminer le type de token et le rôle
-      switch ($type) {
-        case 'audience':
-        $uid = (int) $this->getUser()->getId();  // UID basé sur l'utilisateur connecté
-        break;
-
-        case 'record':
-        $uid = 123456789;  // UID fixe pour l'enregistrement
-        break;
-
-        default:
-        return $this->json('Invalid type', 400);  // Gérer le cas d'un type invalide
-      }
-
-      // Générer le token Agora
       $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $live->getCname(), $uid, $role, $expiresInSeconds);
-
-      // Retourner le token généré
       return $this->json([ "token" => $token ], 200);
-
     } catch (\Exception $e) {
       return $this->json('Failed to generate token', 500);
     }
   }
-  
+
+
+  /**
+   * @Route("/agora/token/record/{id}", name="generate_agora_token_record")
+   */
+  public function generateRecordToken(Live $live) {
+    $appID = $this->getParameter('agora_app_id');
+    $appCertificate = $this->getParameter('agora_app_certificate');
+    $expiresInSeconds = 86400; // Expire dans 24 heures
+    $role = RtcTokenBuilder2::ROLE_SUBSCRIBER;
+
+    try {
+      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $live->getCname(), 123456789, $role, $expiresInSeconds);
+      return $this->json([ "token" => $token ], 200);
+    } catch (\Exception $e) {
+      return $this->json('Failed to generate token', 500);
+    }
+  }
+
 
   /**
    * Afficher le feed
