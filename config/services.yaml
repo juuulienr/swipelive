@@ -63,19 +63,8 @@ services:
     # App\Command\RemoveWaitingLive:
     # tags: ['console.command']
 
-
-    # Enregistreur Logtail pour Better Stack
-    App\Modules\Infrastructure\BetterStackHandler:
-        autoconfigure: true
+    Logtail\Monolog\LogtailHandler:
         arguments:
-            $sourceToken: '%env(BETTER_STACK_SOURCE_TOKEN)%'
-        tags:
-            - { name: monolog.handler }
-
-    # Processor optionnel pour formater les logs avec des contextes
-    Monolog\Processor\PsrLogMessageProcessor:
-        autoconfigure: true
-        tags:
-            - { name: monolog.processor }
+            $sourceToken: '%env(LOGTAIL_TOKEN)%'
 
 

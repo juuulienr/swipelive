@@ -1,11 +1,10 @@
 monolog:
     handlers:
-        # Main handler for Logtail (you can adjust the level as needed)
         logtail:
-            type: custom
+            type: service
             id: Logtail\Monolog\LogtailHandler
-            token: '%env(LOGTAIL_TOKEN)%'
-            level: debug  # Capture tous les niveaux de logs à partir de 'debug'
+            level: debug  # Capture tous les niveaux de logs
+
 
         # Logs also to stderr (for example, in Heroku or Docker)
         nested:
