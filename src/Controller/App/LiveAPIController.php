@@ -455,18 +455,13 @@ class LiveAPIController extends AbstractController {
     $fbStreamId = $param["fbStreamId"];
     $fbToken = $param["fbToken"];
 
-
-
     try {
       $client = new Client();
-      $cname = $live->getCname();
       $appId = $this->getParameter('agora_app_id');
-
-
       $urlStop = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/sid/%s/mode/mix/stop', $appId, $live->getResourceId(), $live->getSid());
       $headers = ['Content-Type' => 'application/json'];
       $bodyStop = json_encode([
-        'cname' => $cname,
+        'cname' => $live->getCname(),
         'uid' => '123456789',
         'clientRequest' => new \stdClass()
       ]);
@@ -480,7 +475,7 @@ class LiveAPIController extends AbstractController {
       $stopData = json_decode($resStop->getBody(), true);
 
       if (isset($stopData['serverResponse']['fileList'])) {
-        $fileList = $responseData['serverResponse']['fileList'];
+        $fileList = $stopData['serverResponse']['fileList'];
         $live->setFileList($fileList);
         $manager->flush();
       }
