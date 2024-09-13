@@ -237,7 +237,7 @@ class LiveAPIController extends AbstractController {
                 'fps' => 30,      
                 'gop' => 30, 
                 'videoCodecProfile' => 3 
-               ],
+               ]
             ],
             'storageConfig' => [
               'vendor' => 1,
