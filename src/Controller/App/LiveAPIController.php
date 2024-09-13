@@ -229,13 +229,7 @@ class LiveAPIController extends AbstractController {
               'maxIdleTime' => 120,
               'streamTypes' => 2,
               'channelType' => 0,
-              'videoStreamType' => 0,
-              'transcodingConfig' => [
-                'width' => 1920,
-                'height' => 1080,
-                'bitrate' => 6300,
-                'fps' => 30
-              ]
+              'videoStreamType' => 0
             ],
             'storageConfig' => [
               'vendor' => 1,
