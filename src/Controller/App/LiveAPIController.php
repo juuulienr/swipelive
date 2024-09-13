@@ -231,9 +231,9 @@ class LiveAPIController extends AbstractController {
               'channelType' => 0,
               'videoStreamType' => 0,
               'transcodingConfig' => [
-                'width' => 720,
-                'height' => 1080,
-                'bitrate' => 1710,
+                'width' => 1080,
+                'height' => 1920,
+                'bitrate' => 3150,
                 'fps' => 30
               ]
             ],
