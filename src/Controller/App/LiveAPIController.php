@@ -456,56 +456,70 @@ class LiveAPIController extends AbstractController {
     $fbToken = $param["fbToken"];
 
 
-    // try {
-    //   $client = new Client();
-    //   $appId = $this->getParameter('agora_app_id');
-    //   $customerId = $this->getParameter('agora_customer_id');
-    //   $customerSecret = $this->getParameter('agora_customer_secret');
 
-    //   // URL pour arrêter l'enregistrement
-    //   $urlStop = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/sid/%s/mode/mix/stop', $appId, $resourceId, $sid);
+    try {
+      $client = new Client();
+      $cname = $live->getCname();
+      $appId = $this->getParameter('agora_app_id');
 
-    //   // Headers
-    //   $headers = [
-    //     'Content-Type' => 'application/json',
-    //   ];
 
-    //   // Corps de la requête
-    //   $bodyStop = json_encode([
-    //     'cname' => "Live" . $live->getId(),
-    //     'uid' => '123456789',  // Remplacer par l'UID approprié
-    //     'clientRequest' => new \stdClass()  // Objet vide pour la requête
-    //   ]);
+      $urlStop = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/sid/%s/mode/mix/stop', $appId, $live->getResourceId(), $live->getSid());
+      $headers = ['Content-Type' => 'application/json'];
+      $bodyStop = json_encode([
+        'cname' => $cname,
+        'uid' => '123456789',
+        'clientRequest' => new \stdClass()
+      ]);
 
-    //   // Requête pour arrêter l'enregistrement
-    //   $resStop = $client->request('POST', $urlStop, [
-    //     'headers' => $headers,
-    //     'auth' => [$customerId, $customerSecret],  // Authentification basique
-    //     'body' => $bodyStop
-    //   ]);
+      $resStop = $client->request('POST', $urlStop, [
+        'headers' => $headers,
+        'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
+        'body' => $bodyStop
+      ]);
 
-    //   // Vérification du statut et décodage de la réponse
-    //   $responseStop = json_decode($resStop->getBody(), true);
+      $stopData = json_decode($resStop->getBody(), true);
 
-    //   if ($resStop->getStatusCode() === 200 && isset($responseStop['serverResponse'])) {
-    //     return new JsonResponse([
-    //       'status' => 'success',
-    //       'message' => 'L\'enregistrement a été arrêté avec succès.',
-    //       'data' => $responseStop['serverResponse']
-    //     ], 200);
-    //   }
+      if (isset($stopData['serverResponse']['fileList'])) {
+        $fileList = $responseData['serverResponse']['fileList'];
+        $live->setFileList($fileList);
+        $manager->flush();
+      }
 
-    //   return new JsonResponse([
-    //     'status' => 'error',
-    //     'message' => 'Impossible d\'arrêter l\'enregistrement.'
-    //   ], 400);
 
-    // } catch (\Exception $e) {
-    //   return new JsonResponse([
-    //     'status' => 'error',
-    //     'message' => 'Exception: ' . $e->getMessage()
-    //   ], 500);
-    // }
+      // stop stream sur facebook
+      if ($fbStreamId) {
+        $url = "/" . $fbStreamId . "/?end_live_video=true";
+        $fb = new \Facebook\Facebook([
+          'app_id' => $this->getParameter('facebook_app_id'),
+          'app_secret' => $this->getParameter('facebook_app_secret'),
+          'default_graph_version' => 'v2.10',
+        ]);
+
+        try {
+          $response = $fb->post($url, [], $fbToken);
+        } catch(\Facebook\Exceptions\FacebookResponseException $e) {
+          return $this->json("Graph returned an error: " . $e->getMessage(), 404);
+        } catch(\Facebook\Exceptions\FacebookSDKException $e) {
+          return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
+        }
+      }
+
+      return $this->json($this->getUser(), 200, [], [
+        'groups' => 'user:read', 
+        'circular_reference_limit' => 1, 
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ]);
+
+    } catch (\Exception $e) {
+      return new JsonResponse([
+        'status' => 'error',
+        'message' => 'Exception: ' . $e->getMessage()
+      ], 500);
+    }
+
+
 
     // if ($live->getBroadcastId()) {
     //   // créer le dernier clip
@@ -559,32 +573,6 @@ class LiveAPIController extends AbstractController {
     //     }
     //   }
     // }
-
-    // stop stream sur facebook
-    if ($fbStreamId) {
-      $url = "/" . $fbStreamId . "/?end_live_video=true";
-      $fb = new \Facebook\Facebook([
-        'app_id' => $this->getParameter('facebook_app_id'),
-        'app_secret' => $this->getParameter('facebook_app_secret'),
-        'default_graph_version' => 'v2.10',
-      ]);
-
-      try {
-        $response = $fb->post($url, [], $fbToken);
-      } catch(\Facebook\Exceptions\FacebookResponseException $e) {
-        return $this->json("Graph returned an error: " . $e->getMessage(), 404);
-      } catch(\Facebook\Exceptions\FacebookSDKException $e) {
-        return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
-      }
-    }
-
-    return $this->json($this->getUser(), 200, [], [
-      'groups' => 'user:read', 
-      'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
-    ]);
   }
 
 
