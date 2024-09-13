@@ -233,7 +233,7 @@ class LiveAPIController extends AbstractController {
               'transcodingConfig' => [
                 'width' => 720,
                 'height' => 1080,
-                'bitrate' => 6300,
+                'bitrate' => 3420,
                 'fps' => 30
               ]
             ],
