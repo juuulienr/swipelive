@@ -174,6 +174,7 @@ class LiveAPIController extends AbstractController {
       try {
         $client = new Client();
         $cname = $live->getCname();
+        $vname = "vendor_" . $live->getVendor()->getId();
         $appId = $this->getParameter('agora_app_id');
 
         // 1. Récupérer le token via votre propre route API
@@ -243,7 +244,7 @@ class LiveAPIController extends AbstractController {
               'bucket' => $this->getParameter('s3_bucket'),
               'accessKey' => $this->getParameter('s3_access_key'),
               'secretKey' => $this->getParameter('s3_secret_key'),
-              'fileNamePrefix' => [ $live->getVendor()->getPseudo(), $cname]
+              'fileNamePrefix' => [ $vname, $cname]
             ]
           ]
         ]);
