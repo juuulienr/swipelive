@@ -174,7 +174,7 @@ class LiveAPIController extends AbstractController {
       try {
         $client = new Client();
         $cname = $live->getCname();
-        $vname = "vendor" . $live->getVendor()->getId();
+        $vname = "vendor_" . $live->getVendor()->getId();
         $appId = $this->getParameter('agora_app_id');
 
         // 1. Récupérer le token via votre propre route API
