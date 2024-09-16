@@ -238,11 +238,11 @@ class LiveAPIController extends AbstractController {
               ]
             ],
             'storageConfig' => [
-              'vendor' => 1,
-              'region' => 6,
-              'bucket' => 'swipe-live-app-storage-eu-west-3',
-              'accessKey' => 'AKIAYXWBN6DLO7MI2H7Z',
-              'secretKey' => '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'
+              'vendor' => $this->getParameter('s3_vendor'),
+              'region' => $this->getParameter('s3_region'),
+              'bucket' => $this->getParameter('s3_bucket'),
+              'accessKey' => $this->getParameter('s3_access_key'),
+              'secretKey' => $this->getParameter('s3_secret_key')
             ]
           ]
         ]);
