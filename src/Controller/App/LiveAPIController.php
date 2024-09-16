@@ -235,7 +235,8 @@ class LiveAPIController extends AbstractController {
                 'height' => 1920,
                 'bitrate' => 3150,
                 'fps' => 30
-              ]
+              ],
+              'fileNamePrefix' => ['lives', $cname]
             ],
             'storageConfig' => [
               'vendor' => $this->getParameter('s3_vendor'),
