@@ -467,13 +467,13 @@ class AccountAPIController extends AbstractController {
           $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
           $stripe->accounts->update($vendor->getStripeAcc(), [
             'business_profile' => [
-              'name' => $param['businessName'],
+              'name' => $param['pseudo'],
               'product_description' => $param['summary'],
             ],
             'email' => $user->getEmail()
           ]);
 
-          $vendor->setBusinessName($param['businessName']);
+          $vendor->setPseudo($param['pseudo']);
           $vendor->setSummary($param['summary']);
           $vendor->setAddress($param['address']);
           $vendor->setCity($param['city']);
@@ -513,7 +513,7 @@ class AccountAPIController extends AbstractController {
 
       if ($param && !$user->getVendor()) {
         $vendor = new Vendor();
-        $vendor->setBusinessName($param['businessName']);
+        $vendor->setPseudo($param['pseudo']);
         $vendor->setBusinessType($param['businessType']);
         $vendor->setSummary($param['summary']);
         $vendor->setAddress($param['address']);

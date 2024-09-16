@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\VendorRepository")
  * @UniqueEntity(
- *  fields={"businessName"},
+ *  fields={"pseudo"},
  *  message="Le pseudo est indisponible"
  * )
  */
@@ -91,7 +91,7 @@ class Vendor
      * @Groups("discussion:read")
      * @Groups("user:follow")
      */
-    private $businessName;
+    private $pseudo;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -423,14 +423,14 @@ class Vendor
         return $this;
     }
 
-    public function getBusinessName(): ?string
+    public function getPseudo(): ?string
     {
-        return $this->businessName;
+        return $this->pseudo;
     }
 
-    public function setBusinessName(?string $businessName): self
+    public function setPseudo(?string $pseudo): self
     {
-        $this->businessName = $businessName;
+        $this->pseudo = $pseudo;
 
         return $this;
     }

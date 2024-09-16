@@ -64,7 +64,7 @@ class ClipAPIController extends AbstractController {
       $comment->setUser($user);
       $comment->setClip($clip);
 
-      if ($user->getVendor() && $user->getVendor()->getBusinessName() == $clip->getVendor()->getBusinessName()) {
+      if ($user->getVendor() && $user->getVendor()->getPseudo() == $clip->getVendor()->getPseudo()) {
         $comment->setIsVendor(true);
       }
       

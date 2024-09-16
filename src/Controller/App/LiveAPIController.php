@@ -133,14 +133,14 @@ class LiveAPIController extends AbstractController {
       $channel = "channel" . $live->getId();
       $event = "event" . $live->getId();
       $user = $this->getUser();
-      $businessName = $user->getVendor()->getBusinessName();
+      $pseudo = $user->getVendor()->getPseudo();
 
       $data = [
         "comment" => [
           "content" => "Début du live", 
           "user" => [
             "vendor" => [
-              "businessName" => $businessName,
+              "pseudo" => $pseudo,
             ],
             "firstname" => $user->getFirstname(),
             "lastname" => $user->getLastname(),
@@ -162,7 +162,7 @@ class LiveAPIController extends AbstractController {
         foreach ($followers as $follower) {
           if ($follower->getPushToken()) {
             try {
-              $this->notifPushService->send("SWIPE LIVE", "🔴 " . $businessName . " est actuellement en direct", $follower->getPushToken());
+              $this->notifPushService->send("SWIPE LIVE", "🔴 " . $pseudo . " est actuellement en direct", $follower->getPushToken());
             } catch (\Exception $error) {
               $this->bugsnag->notifyException($error);
             }
@@ -243,7 +243,7 @@ class LiveAPIController extends AbstractController {
               'bucket' => $this->getParameter('s3_bucket'),
               'accessKey' => $this->getParameter('s3_access_key'),
               'secretKey' => $this->getParameter('s3_secret_key'),
-              'fileNamePrefix' => ['lives', $cname]
+              'fileNamePrefix' => [ $live->getVendor()->getPseudo(), $cname]
             ]
           ]
         ]);
@@ -599,7 +599,7 @@ class LiveAPIController extends AbstractController {
 
       if ($user->getVendor()) {
         $vendor = [
-          "businessName" => $user->getVendor()->getBusinessName(),
+          "pseudo" => $user->getVendor()->getPseudo(),
         ];
       } else {
         $vendor = null;
@@ -645,7 +645,7 @@ class LiveAPIController extends AbstractController {
 
     if ($user->getVendor()) {
       $vendor = [
-        "businessName" => $user->getVendor()->getBusinessName(),
+        "pseudo" => $user->getVendor()->getPseudo(),
       ];
     } else {
       $vendor = null;
@@ -771,7 +771,7 @@ class LiveAPIController extends AbstractController {
       $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
 
       if ($order->getBuyer()->getVendor()) {
-        $vendor = [ "businessName" => $order->getBuyer()->getVendor()->getBusinessName() ];
+        $vendor = [ "pseudo" => $order->getBuyer()->getVendor()->getPseudo() ];
       }
 
       if (sizeof($order->getLineItems()->toArray()[0]->getProduct()->getUploads()) > 0) {

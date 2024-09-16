@@ -45,7 +45,7 @@ class UserRepository extends ServiceEntityRepository
     	->andWhere('u.type = :type');
 
       if ($search) {
-        $query->andWhere('u.firstname LIKE :search OR u.lastname LIKE :search OR v.businessName LIKE :search')
+        $query->andWhere('u.firstname LIKE :search OR u.lastname LIKE :search OR v.pseudo LIKE :search')
         ->setParameter('search', '%'.$search.'%');
       }
 
