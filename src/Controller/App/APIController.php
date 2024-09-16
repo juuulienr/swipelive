@@ -42,7 +42,7 @@ class APIController extends AbstractController {
   public function generateToken(Live $live, ObjectManager $manager) {
     $appID = $this->getParameter('agora_app_id');
     $appCertificate = $this->getParameter('agora_app_certificate');
-    $expiresInSeconds = 86400; // Expire dans 24 heures
+    $expiresInSeconds = 86400;
     $cname = "Live" . $live->getId();
     $uid = (int) $this->getUser()->getId();
     $role = RtcTokenBuilder2::ROLE_PUBLISHER;
@@ -65,12 +65,13 @@ class APIController extends AbstractController {
   public function generateAudienceToken(Live $live) {
     $appID = $this->getParameter('agora_app_id');
     $appCertificate = $this->getParameter('agora_app_certificate');
-    $expiresInSeconds = 86400; // Expire dans 24 heures
+    $expiresInSeconds = 86400; 
+    $cname = "Live" . $live->getId();
     $role = RtcTokenBuilder2::ROLE_SUBSCRIBER;
     $uid = (int) $this->getUser()->getId();
 
     try {
-      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $live->getCname(), $uid, $role, $expiresInSeconds);
+      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $cname, $uid, $role, $expiresInSeconds);
       return $this->json([ "token" => $token ], 200);
     } catch (\Exception $e) {
       return $this->json('Failed to generate token', 500);
