@@ -140,6 +140,7 @@ class WebhookController extends AbstractController {
   }
 
 
+
   /**
    * Webhooks Agora
    *
@@ -148,36 +149,27 @@ class WebhookController extends AbstractController {
   public function agora(Request $request, ObjectManager $manager, OrderRepository $orderRepo)
   {
     try {
-          // Décoder le contenu JSON envoyé par Agora
       $result = json_decode($request->getContent(), true);
 
-          // Laisser un breadcrumb dans Bugsnag pour le suivi du webhook
-      $this->bugsnag->leaveBreadcrumb("Agora Webhook Received", "request", [
-        'headers' => $request->headers->all(),
-        'body' => $result
-      ]);
+      if (isset($result['eventType'])) {
+        if ($result['eventType'] == 31) {
+          $fileList = $result['payload']['details']['fileList'] ?? [];
+          throw new \Exception('Analyser les fichiers');
 
+          if (count($fileList) > 0) {
+            foreach ($fileList as $file) {
+              $fileName = $file['fileName'];
+            }
 
-      // Bug intentionnel : exception générée même si tout est correct
-      // throw new \Exception("Simulated bug: this is a test exception for Bugsnag");
-
-          // Analyser le contenu du webhook et logguer l'eventType
-      // if (isset($result['eventType'])) {
-        // $this->bugsnag->leaveBreadcrumb("Agora Event Type Detected", "info", [
-        //   'eventType' => $result['eventType'],
-        //   'eventData' => $result
-        // ]);
-
-        //       // Enregistrer l'eventType dans les logs pour voir ce qui est reçu
-      // } else {
-        //       // Si eventType est manquant, on l'enregistre dans les logs et on laisse un breadcrumb
-        // $this->bugsnag->leaveBreadcrumb("Missing eventType in Agora Webhook", "error");
-      // }
-
-
-      return $this->json(true, 200);
+            return $this->json(true, 200);
+          } else {
+            throw new \Exception('Aucun fichier trouvé dans le fileList.');
+          }
+        }
+      } else {
+        throw new \Exception('Le champ eventType est manquant dans le JSON reçu.');
+      }
     } catch (\Exception $e) {
-          // Capturer les exceptions et notifier Bugsnag
       $this->bugsnag->notifyException($e);
 
       return $this->json([
@@ -186,6 +178,7 @@ class WebhookController extends AbstractController {
       ], 500);
     }
   }
+
 
 
 
