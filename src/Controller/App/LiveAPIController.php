@@ -244,6 +244,11 @@ class LiveAPIController extends AbstractController {
                 'jpg'
               ]
             ],
+            'recordingFileConfig' => [
+              'avFileType' => [
+                'hls'
+              ]
+            ],
             'storageConfig' => [
               'vendor' => $this->getParameter('s3_vendor'),
               'region' => $this->getParameter('s3_region'),
