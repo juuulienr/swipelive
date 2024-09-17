@@ -239,7 +239,7 @@ class LiveAPIController extends AbstractController {
               ]
             ],
             'snapshotConfig' => [
-              'captureInterval' => 5,
+              'captureInterval' => 0,
               'fileType' => [
                 'jpg'
               ]
