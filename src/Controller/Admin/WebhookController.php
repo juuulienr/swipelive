@@ -146,20 +146,30 @@ class WebhookController extends AbstractController {
    *
    * @Route("/api/agora/webhooks", name="api_agora_webhooks", methods={"POST"})
    */
-  public function agora(Request $request, ObjectManager $manager, OrderRepository $orderRepo)
+  public function agora(Request $request, ObjectManager $manager, LiveRepository $liveRepo)
   {
     try {
       $result = json_decode($request->getContent(), true);
 
       if (isset($result['eventType'])) {
-          throw new \Exception('Analyser les fichiers');
+        throw new \Exception('Analyser les fichiers');
         if ($result['eventType'] == 31) {
           $fileList = $result['payload']['details']['fileList'] ?? [];
+          $cname = $result['payload']['cname'];
+          $live = $liveRepo->findOneByCname($cname);
 
-          if (count($fileList) > 0) {
-            foreach ($fileList as $file) {
-              $fileName = $file['fileName'];
-            }
+          if ($live && !$live->getFileList() && $filelist) {
+            $live->setFileList($fileList);
+            $manager->flush();
+          }
+        } else if ($result['eventType'] == 45) {
+          $fileName = $result['payload']['details']['fileName'] ?? [];
+          $cname = $result['payload']['cname'];
+          $live = $liveRepo->findOneByCname($cname);
+
+          if ($live && $fileName) {
+            $live->setPreview($fileName);
+            $manager->flush();
           }
         }
       }
