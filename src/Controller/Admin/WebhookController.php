@@ -152,7 +152,7 @@ class WebhookController extends AbstractController {
       $result = json_decode($request->getContent(), true);
 
       if (isset($result['eventType'])) {
-        throw new \Exception('Analyser les fichiers');
+        // throw new \Exception('Analyser les fichiers');
         if ($result['eventType'] == 31) {
           $fileList = $result['payload']['details']['fileList'] ?? [];
           $cname = $result['payload']['cname'];
