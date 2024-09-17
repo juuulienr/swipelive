@@ -238,6 +238,12 @@ class LiveAPIController extends AbstractController {
                 'fps' => 30
               ]
             ],
+            'snapshotConfig' => [
+              'captureInterval' => 5,
+              'fileType' => [
+                'jpg'
+              ]
+            ],
             'storageConfig' => [
               'vendor' => $this->getParameter('s3_vendor'),
               'region' => $this->getParameter('s3_region'),
