@@ -160,14 +160,8 @@ class WebhookController extends AbstractController {
             foreach ($fileList as $file) {
               $fileName = $file['fileName'];
             }
-
-            return $this->json(true, 200);
-          } else {
-            throw new \Exception('Aucun fichier trouvé dans le fileList.');
           }
         }
-      } else {
-        throw new \Exception('Le champ eventType est manquant dans le JSON reçu.');
       }
     } catch (\Exception $e) {
       $this->bugsnag->notifyException($e);
@@ -177,6 +171,8 @@ class WebhookController extends AbstractController {
         'message' => 'Webhook processing failed: ' . $e->getMessage()
       ], 500);
     }
+
+    return $this->json(true, 200);
   }
 
 
