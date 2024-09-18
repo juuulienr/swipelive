@@ -318,11 +318,11 @@ class APIController extends AbstractController {
   public function categories(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
     $categories = $categoryRepo->findAll();
 
-   // try {
+   try {
       $this->notifPushService->send("SWIPE LIVE", "Tu as un nouveau message", "eltucWMI60iUmx34IIFz3X:APA91bHgfYJhHcBMvpe4dpjBDACnjufQVCijAyG3MqHxvCeqkU4rMCbdME11gru-TnwzRAvX7a-bfLIy1thUzPzlWb8OPuD1pHHhB0V57wuMOqjtnJZGL0EXmaIEMl4lUutYP9WpYXbU");
-    // } catch (\Exception $error) {
-      // $this->bugsnag->notifyException($error);
-    // }
+    } catch (\Exception $error) {
+      $this->bugsnag->notifyException($error);
+    }
 
     return $this->json($categories, 200, [], ['groups' => 'category:read']);
   }
