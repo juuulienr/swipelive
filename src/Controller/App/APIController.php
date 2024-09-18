@@ -31,10 +31,20 @@ use BoogieFromZk\AgoraToken\RtcTokenBuilder2;
 use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
+use App\Service\NotifPushService;
 use Cloudinary\Cloudinary;
 
 
 class APIController extends AbstractController {
+
+  private $notifPushService;
+  private $bugsnag;
+
+  public function __construct(NotifPushService $notifPushService, \Bugsnag\Client $bugsnag) {
+    $this->notifPushService = $notifPushService;
+    $this->bugsnag = $bugsnag;
+  }
+
 
   /**
    * @Route("/user/api/agora/token/{id}", name="generate_agora_token")
@@ -307,6 +317,12 @@ class APIController extends AbstractController {
    */
   public function categories(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
     $categories = $categoryRepo->findAll();
+
+   // try {
+      $this->notifPushService->send("SWIPE LIVE", "Tu as un nouveau message", "eltucWMI60iUmx34IIFz3X:APA91bHgfYJhHcBMvpe4dpjBDACnjufQVCijAyG3MqHxvCeqkU4rMCbdME11gru-TnwzRAvX7a-bfLIy1thUzPzlWb8OPuD1pHHhB0V57wuMOqjtnJZGL0EXmaIEMl4lUutYP9WpYXbU");
+    // } catch (\Exception $error) {
+      // $this->bugsnag->notifyException($error);
+    // }
 
     return $this->json($categories, 200, [], ['groups' => 'category:read']);
   }
