@@ -39,7 +39,6 @@ class FirebaseMessagingService
   {
     $data['route'] = "ListMessages";
 
-    // Créer le message CloudMessage à envoyer
     $message = CloudMessage::withTarget('token', $token)
     ->withNotification([
       'title' => $title,
@@ -47,24 +46,17 @@ class FirebaseMessagingService
     ])
     ->withData($data)
     ->withApnsConfig(
-      // ApnsConfig::fromArray([
-      //   'payload' => [
-      //     'aps' => [
-      //       'sound' => 'default'
-      //     ]
-      //   ]
-      // ])
-      ApnsConfig::fromArray([
-        'payload' => ['aps' => ['sound' => $this->params->get('notification_swipe')]]
-      ])
-    )
-    ->withAndroidConfig(
-      AndroidConfig::fromArray([
-        'notification' => [
-          'sound' => 'default'
-        ]
-      ])
+      ApnsConfig::new()
+      ->withSound($this->params->get('notification_swipe'))
+      ->withBadge(1)
     );
+    // ->withAndroidConfig(
+    //   AndroidConfig::fromArray([
+    //     'notification' => [
+    //       'sound' => 'default'
+    //     ]
+    //   ])
+    // );
 
     try {
       // Envoyer le message via Firebase Messaging
