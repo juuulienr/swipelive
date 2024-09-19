@@ -164,7 +164,7 @@ class DiscussionAPIController extends AbstractController {
 
       if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
         $discussion->setUnseenVendor(true);
-        $name = $discussion->getVendor()->getVendor()->getPseudo();
+        $name = $discussion->getVendor()->getPseudo();
         $receiver = $discussion->getVendor()->getUser();
       } else {
         $discussion->setUnseen(true);
@@ -328,7 +328,7 @@ class DiscussionAPIController extends AbstractController {
 
       if ($discussion->getUser()->getId() == $user->getId()) {
         $discussion->setUnseenVendor(true);
-        $name = $discussion->getVendor()->getVendor()->getPseudo();
+        $name = $discussion->getVendor()->getPseudo();
         $receiver = $discussion->getVendor()->getUser();
       } else {
         $discussion->setUnseen(true);
