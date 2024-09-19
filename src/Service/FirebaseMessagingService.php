@@ -38,10 +38,10 @@ class FirebaseMessagingService
   public function sendNotification(string $title, string $body, string $token, array $data = [], int $attempt = 1): ?string
   {
     if (isset($data['type']) && $data['type'] === 'vente') {
-      $apnsConfig = ApnsConfig::new()->withSound('notif_vente.wav')->withBadge(1);
+      $apnsConfig = ApnsConfig::new()->withSound('notif.wav')->withBadge(1);
       $androidConfig = AndroidConfig::fromArray([
         'notification' => [
-          'sound' => 'notif_vente'
+          'sound' => 'notif'
         ]
       ]);
     } else {
