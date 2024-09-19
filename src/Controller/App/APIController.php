@@ -323,25 +323,6 @@ class APIController extends AbstractController {
 
 
 
-
-  /**
-   * Test
-   *
-   * @Route("/api/test", name="api_test", methods={"GET"})
-   */
-  public function test(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
-
-   // try {
-    $test =  $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message", "dKohBffLnkWJjXhLGM8DM0:APA91bGHM7TV18DY3NNWVBOwUqbx8C4fdIk2waxn93a9RN465Db2Dmmvmcjt9eA5ZIhBHUhAX1D8yskc4GJpNP7li45TmNwvm7jVgZgx07gBvGBnxyXysMmQhpnR1MVu4C1EVPWrZkWP");
-
-      return $this->json($test, 200);
-    // } catch (\Exception $error) {
-      // $this->bugsnag->notifyException($error);
-    // }
-  }
-
-
-
   /**
    * Modifier image du profil
    *

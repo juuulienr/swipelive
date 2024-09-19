@@ -165,7 +165,7 @@ class DiscussionAPIController extends AbstractController {
       if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
         $discussion->setUnseenVendor(true);
         $name = $discussion->getVendor()->getVendor()->getPseudo();
-        $receiver = $discussion->getVendor();
+        $receiver = $discussion->getVendor()->getUser();
       } else {
         $discussion->setUnseen(true);
         $name = $discussion->getUser()->getFullName();
@@ -191,7 +191,11 @@ class DiscussionAPIController extends AbstractController {
 
       if ($receiver->getPushToken()) {
         try {
-          $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message de " . $name, $receiver->getPushToken());
+          $data = [
+            'route' => "ListDiscussions",
+          ];
+
+          $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message de " . $name, $receiver->getPushToken(), $data);
         } catch (\Exception $error) {
           $this->bugsnag->notifyException($error);
         }
@@ -325,7 +329,7 @@ class DiscussionAPIController extends AbstractController {
       if ($discussion->getUser()->getId() == $user->getId()) {
         $discussion->setUnseenVendor(true);
         $name = $discussion->getVendor()->getVendor()->getPseudo();
-        $receiver = $discussion->getVendor();
+        $receiver = $discussion->getVendor()->getUser();
       } else {
         $discussion->setUnseen(true);
         $name = $user->getFullName();
@@ -351,7 +355,11 @@ class DiscussionAPIController extends AbstractController {
 
       if ($receiver->getPushToken()) {
         try {
-          $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message de " . $name, $receiver->getPushToken());
+          $data = [
+            'route' => "ListDiscussions",
+          ];
+
+          $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message de " . $name, $receiver->getPushToken(), $data);
         } catch (\Exception $error) {
           $this->bugsnag->notifyException($error);
         }
