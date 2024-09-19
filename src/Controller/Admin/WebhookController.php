@@ -75,12 +75,21 @@ class WebhookController extends AbstractController {
           $order->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
           $manager->flush();
 
-
           $live = $liveRepo->vendorIsLive($vendor);
 
           if (!$live && $vendor->getUser()->getPushToken()) {
             try {
-              $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", $vendor->getUser()->getPushToken());
+              $data = [
+                'route' => "ListOrders",
+                'type' => 'vente'
+              ];
+
+              $this->firebaseMessagingService->sendNotification(
+                "SWIPE LIVE", 
+                "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", 
+                $vendor->getUser()->getPushToken(),
+                $data
+              );
             } catch (\Exception $error) {
               $this->bugsnag->notifyException($error);
             }

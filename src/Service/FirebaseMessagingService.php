@@ -35,40 +35,45 @@ class FirebaseMessagingService
    * @param array $data (optionnel) Des données supplémentaires à envoyer
    * @return string|null
    */
-  public function sendNotification(string $title, string $body, string $token, array $data = []): ?string
+  public function sendNotification(string $title, string $body, string $token, array $data = [], int $attempt = 1): ?string
   {
-    $data['route'] = "ListMessages";
-
-    $message = CloudMessage::withTarget('token', $token)
-    ->withNotification([
-      'title' => $title,
-      'body'  => $body,
-    ])
-    ->withData($data)
-    // ->withDefaultSounds() 
-    ->withApnsConfig(
-      ApnsConfig::new()
-      ->withSound('notif.wav')
-      ->withBadge(1)
-    );
-    // ->withAndroidConfig(
-    //   AndroidConfig::fromArray([
-    //     'notification' => [
-    //       'sound' => 'default'
-    //     ]
-    //   ])
-    // );
+    if (isset($data['type']) && $data['type'] === 'vente') {
+      $apnsConfig = ApnsConfig::new()->withSound('notif_vente.wav')->withBadge(1);
+      $androidConfig = AndroidConfig::fromArray([
+        'notification' => [
+          'sound' => 'notif_vente'
+        ]
+      ]);
+    } else {
+      $apnsConfig = ApnsConfig::new()->withSound('default')->withBadge(1);
+      $androidConfig = AndroidConfig::fromArray([
+        'notification' => [
+          'sound' => 'default'
+        ]
+      ]);
+    }
 
     try {
-      // Envoyer le message via Firebase Messaging
+      $message = CloudMessage::withTarget('token', $token)
+      ->withNotification([
+        'title' => $title,
+        'body'  => $body,
+      ])
+      ->withData($data)
+      ->withApnsConfig($apnsConfig)
+      ->withAndroidConfig($androidConfig);
+
       $this->messaging->send($message);
       return 'Notification envoyée avec succès';
     } catch (MessagingException $e) {
-      // Gestion des erreurs liées au messaging
-      return 'Erreur Messaging: ' . $e->getMessage();
+      if ($attempt < 3) {
+        sleep(2);
+        return $this->sendNotification($title, $body, $token, $data, $attempt + 1);
+      } else {
+        return 'Échec de l\'envoi après plusieurs tentatives : ' . $e->getMessage();
+      }
     } catch (FirebaseException $e) {
-      // Gestion des autres erreurs Firebase
       return 'Erreur Firebase: ' . $e->getMessage();
     }
   }
-}
+
