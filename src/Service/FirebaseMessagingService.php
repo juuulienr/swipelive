@@ -47,7 +47,7 @@ class FirebaseMessagingService
     ->withData($data)
     ->withApnsConfig(
       ApnsConfig::new()
-      ->withSound($this->params->get('notification_swipe'))
+      ->withSound('notif.aiff')
       ->withBadge(1)
     );
     // ->withAndroidConfig(

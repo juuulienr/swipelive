@@ -20,7 +20,6 @@ parameters:
     s3_access_key: '%env(S3_ACCESS_KEY)%'
     s3_secret_key: '%env(S3_SECRET_KEY)%'
     firebase_credentials_path: '%kernel.project_dir%/config/firebase/swipe-live-firebase-adminsdk-o1xd4-d5db2c22a7.json'
-    notification_swipe: '%kernel.project_dir%/public/notification_swipe.aiff'
 
 
 
