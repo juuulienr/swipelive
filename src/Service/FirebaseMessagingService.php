@@ -45,9 +45,10 @@ class FirebaseMessagingService
       'body'  => $body,
     ])
     ->withData($data)
+    // ->withDefaultSounds() 
     ->withApnsConfig(
       ApnsConfig::new()
-      ->withSound('notif.aiff')
+      ->withSound('notif.wav')
       ->withBadge(1)
     );
     // ->withAndroidConfig(
