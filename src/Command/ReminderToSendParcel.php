@@ -6,7 +6,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Service\NotifPushService;
+use App\Service\FirebaseMessagingService;
 use App\Repository\OrderRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -16,7 +16,7 @@ class ReminderToSendParcel extends Command
   protected static $defaultName = 'reminder:send:parcel';
   private $orderRepo;
   private $entityManager;
-  private $notifPushService;
+  private $firebaseMessagingService;
   private $parameterBag;
   private $logger;
   private $bugsnag;
@@ -24,7 +24,7 @@ class ReminderToSendParcel extends Command
   public function __construct(
     OrderRepository $orderRepo,
     EntityManagerInterface $entityManager,
-    NotifPushService $notifPushService,
+    FirebaseMessagingService $firebaseMessagingService,
     ParameterBagInterface $parameterBag,
     LoggerInterface $logger,
     \Bugsnag\Client $bugsnag
@@ -32,7 +32,7 @@ class ReminderToSendParcel extends Command
     parent::__construct();
     $this->orderRepo = $orderRepo;
     $this->entityManager = $entityManager;
-    $this->notifPushService = $notifPushService;
+    $this->firebaseMessagingService = $firebaseMessagingService;
     $this->parameterBag = $parameterBag;
     $this->logger = $logger;
     $this->bugsnag = $bugsnag;
@@ -128,7 +128,7 @@ class ReminderToSendParcel extends Command
   {
     if ($pushToken) {
       try {
-        $this->notifPushService->send('SWIPE LIVE', $message, $pushToken);
+        $this->firebaseMessagingService->sendNotification('SWIPE LIVE', $message, $pushToken);
       } catch (\Exception $error) {
         $this->logger->error('Failed to send push notification', ['exception' => $error]);
         $this->bugsnag->notifyException($error);

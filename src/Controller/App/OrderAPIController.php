@@ -30,16 +30,16 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use App\Service\NotifPushService;
+use App\Service\FirebaseMessagingService;
 
 
 
 class OrderAPIController extends AbstractController {
 
-  private $notifPushService;
+  private $firebaseMessagingService;
 
-  public function __construct(NotifPushService $notifPushService) {
-      $this->notifPushService = $notifPushService;
+  public function __construct(FirebaseMessagingService $firebaseMessagingService) {
+      $this->firebaseMessagingService = $firebaseMessagingService;
   }
 
 
@@ -305,7 +305,7 @@ class OrderAPIController extends AbstractController {
     
     // if ($order->getBuyer->getPushToken()) {
     //   try {
-    //     $this->notifPushService->send("SWIPE LIVE", "La commande a été annulée ", $order->getBuyer->getPushToken());
+    //     $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "La commande a été annulée ", $order->getBuyer->getPushToken());
     //   } catch (\Exception $error) {
     //     $this->bugsnag->notifyException($error);
     //   }
@@ -357,7 +357,7 @@ class OrderAPIController extends AbstractController {
       // send notif push to buyer/vendor
       // if ($order->getBuyer->getPushToken()) {
       //   try {
-      //     $this->notifPushService->send("SWIPE LIVE", "La commande a été annulée ", $order->getBuyer->getPushToken());
+      //     $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "La commande a été annulée ", $order->getBuyer->getPushToken());
       //   } catch (\Exception $error) {
       //     $this->bugsnag->notifyException($error);
       //   }

@@ -14,7 +14,7 @@ use App\Entity\Message;
 use App\Entity\Order;
 use App\Entity\LiveProducts;
 use App\Entity\Upload;
-use App\Service\NotifPushService;
+use App\Service\FirebaseMessagingService;
 use App\Repository\LiveProductsRepository;
 use App\Repository\FollowRepository;
 use App\Repository\VendorRepository;
@@ -43,10 +43,10 @@ use Cloudinary\Cloudinary;
 
 class DiscussionAPIController extends AbstractController {
 
-  private $notifPushService;
+  private $firebaseMessagingService;
 
-  public function __construct(NotifPushService $notifPushService) {
-      $this->notifPushService = $notifPushService;
+  public function __construct(FirebaseMessagingService $firebaseMessagingService) {
+      $this->firebaseMessagingService = $firebaseMessagingService;
   }
 
 
@@ -191,7 +191,7 @@ class DiscussionAPIController extends AbstractController {
 
       if ($receiver->getPushToken()) {
         try {
-          $this->notifPushService->send("SWIPE LIVE", "Tu as un nouveau message de " . $name, $receiver->getPushToken());
+          $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message de " . $name, $receiver->getPushToken());
         } catch (\Exception $error) {
           $this->bugsnag->notifyException($error);
         }
@@ -351,7 +351,7 @@ class DiscussionAPIController extends AbstractController {
 
       if ($receiver->getPushToken()) {
         try {
-          $this->notifPushService->send("SWIPE LIVE", "Tu as un nouveau message de " . $name, $receiver->getPushToken());
+          $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message de " . $name, $receiver->getPushToken());
         } catch (\Exception $error) {
           $this->bugsnag->notifyException($error);
         }

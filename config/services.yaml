@@ -19,6 +19,7 @@ parameters:
     s3_bucket: '%env(S3_BUCKET)%'
     s3_access_key: '%env(S3_ACCESS_KEY)%'
     s3_secret_key: '%env(S3_SECRET_KEY)%'
+    firebase_credentials_path: '%kernel.project_dir%/config/firebase/swipe-live-firebase-adminsdk-o1xd4-d5db2c22a7.json'
 
 
 
@@ -62,7 +63,7 @@ services:
 
     Doctrine\Persistence\ObjectManager: '@doctrine.orm.default_entity_manager'
 
-    App\Service\NotifPushService:
+    App\Service\FirebaseMessagingService:
         arguments: []
         
     Bugsnag\Client: '@bugsnag'
@@ -72,5 +73,13 @@ services:
     Logtail\Monolog\LogtailHandler:
         arguments:
             $sourceToken: '%env(LOGTAIL_TOKEN)%'
+
+    Kreait\Firebase\Factory:
+        class: Kreait\Firebase\Factory
+        arguments:
+            - '%kernel.project_dir%/config/firebase/swipe-live-firebase-adminsdk-o1xd4-d5db2c22a7.json'
+
+    Kreait\Firebase\Messaging:
+        factory: ['@Kreait\Firebase\Factory', 'createMessaging']
 
 

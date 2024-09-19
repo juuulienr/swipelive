@@ -32,7 +32,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use App\Service\NotifPushService;
+use App\Service\FirebaseMessagingService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
@@ -40,11 +40,11 @@ use GuzzleHttp\Psr7\Response;
 
 class LiveAPIController extends AbstractController {
 
-  private $notifPushService;
+  private $firebaseMessagingService;
   private $bugsnag;
 
-  public function __construct(NotifPushService $notifPushService, \Bugsnag\Client $bugsnag) {
-    $this->notifPushService = $notifPushService;
+  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag) {
+    $this->firebaseMessagingService = $firebaseMessagingService;
     $this->bugsnag = $bugsnag;
   }
 
@@ -162,7 +162,7 @@ class LiveAPIController extends AbstractController {
         foreach ($followers as $follower) {
           if ($follower->getPushToken()) {
             try {
-              $this->notifPushService->send("SWIPE LIVE", "🔴 " . $pseudo . " est actuellement en direct", $follower->getPushToken());
+              $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "🔴 " . $pseudo . " est actuellement en direct", $follower->getPushToken());
             } catch (\Exception $error) {
               $this->bugsnag->notifyException($error);
             }

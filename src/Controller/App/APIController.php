@@ -31,17 +31,17 @@ use BoogieFromZk\AgoraToken\RtcTokenBuilder2;
 use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
-use App\Service\NotifPushService;
+use App\Service\FirebaseMessagingService;
 use Cloudinary\Cloudinary;
 
 
 class APIController extends AbstractController {
 
-  private $notifPushService;
+  private $firebaseMessagingService;
   private $bugsnag;
 
-  public function __construct(NotifPushService $notifPushService, \Bugsnag\Client $bugsnag) {
-    $this->notifPushService = $notifPushService;
+  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag) {
+    $this->firebaseMessagingService = $firebaseMessagingService;
     $this->bugsnag = $bugsnag;
   }
 
@@ -318,13 +318,26 @@ class APIController extends AbstractController {
   public function categories(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
     $categories = $categoryRepo->findAll();
 
-   try {
-      $this->notifPushService->send("SWIPE LIVE", "Tu as un nouveau message", "eltucWMI60iUmx34IIFz3X:APA91bHgfYJhHcBMvpe4dpjBDACnjufQVCijAyG3MqHxvCeqkU4rMCbdME11gru-TnwzRAvX7a-bfLIy1thUzPzlWb8OPuD1pHHhB0V57wuMOqjtnJZGL0EXmaIEMl4lUutYP9WpYXbU");
-    } catch (\Exception $error) {
-      $this->bugsnag->notifyException($error);
-    }
-
     return $this->json($categories, 200, [], ['groups' => 'category:read']);
+  }
+
+
+
+
+  /**
+   * Test
+   *
+   * @Route("/api/test", name="api_test", methods={"GET"})
+   */
+  public function test(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
+
+   // try {
+    $test =  $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message", "dKohBffLnkWJjXhLGM8DM0:APA91bGHM7TV18DY3NNWVBOwUqbx8C4fdIk2waxn93a9RN465Db2Dmmvmcjt9eA5ZIhBHUhAX1D8yskc4GJpNP7li45TmNwvm7jVgZgx07gBvGBnxyXysMmQhpnR1MVu4C1EVPWrZkWP");
+
+      return $this->json($test, 200);
+    // } catch (\Exception $error) {
+      // $this->bugsnag->notifyException($error);
+    // }
   }
 
 

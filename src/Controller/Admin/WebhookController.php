@@ -27,16 +27,16 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use App\Service\NotifPushService;
+use App\Service\FirebaseMessagingService;
 
 
 class WebhookController extends AbstractController {
 
-  private $notifPushService;
+  private $firebaseMessagingService;
   private $bugsnag;
 
-  public function __construct(NotifPushService $notifPushService, \Bugsnag\Client $bugsnag) {
-    $this->notifPushService = $notifPushService;
+  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag) {
+    $this->firebaseMessagingService = $firebaseMessagingService;
     $this->bugsnag = $bugsnag;
   }
 
@@ -80,7 +80,7 @@ class WebhookController extends AbstractController {
 
           if (!$live && $vendor->getUser()->getPushToken()) {
             try {
-              $this->notifPushService->send("SWIPE LIVE", "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", $vendor->getUser()->getPushToken());
+              $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", $vendor->getUser()->getPushToken());
             } catch (\Exception $error) {
               $this->bugsnag->notifyException($error);
             }
