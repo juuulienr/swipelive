@@ -6,6 +6,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Exception\MessagingException;
 use Kreait\Firebase\Exception\FirebaseException;
+use Kreait\Firebase\Messaging\ApnsConfig;
+use Kreait\Firebase\Messaging\AndroidConfig;
 use Kreait\Firebase\Messaging;
 use Kreait\Firebase\Factory;
 
@@ -19,7 +21,7 @@ class FirebaseMessagingService
     $firebaseCredentialsPath = $params->get('firebase_credentials_path');
     $factory = (new Factory)
     ->withServiceAccount($firebaseCredentialsPath);
-    
+
     $this->messaging = $factory->createMessaging();
     $this->params = $params;
   }
@@ -43,7 +45,26 @@ class FirebaseMessagingService
       'title' => $title,
       'body'  => $body,
     ])
-    ->withData($data);
+    ->withData($data)
+    ->withApnsConfig(
+      // ApnsConfig::fromArray([
+      //   'payload' => [
+      //     'aps' => [
+      //       'sound' => 'default'
+      //     ]
+      //   ]
+      // ])
+      ApnsConfig::fromArray([
+        'payload' => ['aps' => ['sound' => $this->params->get('notification_swipe')]]
+      ])
+    )
+    ->withAndroidConfig(
+      AndroidConfig::fromArray([
+        'notification' => [
+          'sound' => 'default'
+        ]
+      ])
+    );
 
     try {
       // Envoyer le message via Firebase Messaging
