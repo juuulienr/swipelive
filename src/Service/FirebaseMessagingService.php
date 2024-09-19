@@ -76,4 +76,5 @@ class FirebaseMessagingService
       return 'Erreur Firebase: ' . $e->getMessage();
     }
   }
+}
 
