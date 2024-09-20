@@ -128,7 +128,11 @@ class ReminderToSendParcel extends Command
   {
     if ($pushToken) {
       try {
-        $this->firebaseMessagingService->sendNotification('SWIPE LIVE', $message, $pushToken);
+        $data = [
+          'route' => "ListOrders",
+        ];
+
+        $this->firebaseMessagingService->sendNotification('SWIPE LIVE', $message, $pushToken, $data);
       } catch (\Exception $error) {
         $this->logger->error('Failed to send push notification', ['exception' => $error]);
         $this->bugsnag->notifyException($error);

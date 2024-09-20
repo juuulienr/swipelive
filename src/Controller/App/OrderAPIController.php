@@ -303,9 +303,13 @@ class OrderAPIController extends AbstractController {
     // Si non : transfert du litige vers nous
     // Exemple de litige : Colis non reçu, colis non conforme, Contrefaçon….
     
-    // if ($order->getBuyer->getPushToken()) {
+    // if ($order->getVendor()->getUser()->getPushToken()) {
     //   try {
-    //     $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "La commande a été annulée ", $order->getBuyer->getPushToken());
+        // $data = [
+        //   'route' => "ListOrders",
+        //   'type' => 'vente'
+        // ];
+    //     $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "La commande a été cloturée !", $order->getVendor()->getUser()->getPushToken());
     //   } catch (\Exception $error) {
     //     $this->bugsnag->notifyException($error);
     //   }
@@ -357,7 +361,12 @@ class OrderAPIController extends AbstractController {
       // send notif push to buyer/vendor
       // if ($order->getBuyer->getPushToken()) {
       //   try {
-      //     $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "La commande a été annulée ", $order->getBuyer->getPushToken());
+            // $data = [
+            //   'route' => "ListOrders",
+            //   'type' => 'vente'
+            // ];
+
+      //     $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "La commande a été annulée ", $order->getBuyer->getPushToken(), $data);
       //   } catch (\Exception $error) {
       //     $this->bugsnag->notifyException($error);
       //   }

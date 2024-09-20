@@ -164,11 +164,11 @@ class DiscussionAPIController extends AbstractController {
 
       if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
         $discussion->setUnseenVendor(true);
-        $name = $discussion->getVendor()->getPseudo();
+        $name = $discussion->getUser()->getFullName();
         $receiver = $discussion->getVendor()->getUser();
       } else {
         $discussion->setUnseen(true);
-        $name = $discussion->getUser()->getFullName();
+        $name = $discussion->getVendor()->getPseudo();
         $receiver = $discussion->getUser();
       }
 
@@ -326,14 +326,14 @@ class DiscussionAPIController extends AbstractController {
       $discussion->setPreview("A envoyé une image");
       $discussion->setUpdatedAt(new \DateTime('now', timezone_open('UTC')));
 
-      if ($discussion->getUser()->getId() == $user->getId()) {
+      if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
         $discussion->setUnseenVendor(true);
-        $name = $discussion->getVendor()->getPseudo();
+        $name = $discussion->getUser()->getFullName();
         $receiver = $discussion->getVendor()->getUser();
       } else {
         $discussion->setUnseen(true);
-        $name = $user->getFullName();
-        $receiver = $user;
+        $name = $discussion->getVendor()->getPseudo();
+        $receiver = $discussion->getUser();
       }
 
       $manager->flush();

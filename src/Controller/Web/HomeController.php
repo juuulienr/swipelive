@@ -11,17 +11,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use App\Service\FirebaseMessagingService;
 
 
 class HomeController extends AbstractController {
-
-  private $firebaseMessagingService;
-
-  public function __construct(FirebaseMessagingService $firebaseMessagingService) {
-      $this->firebaseMessagingService = $firebaseMessagingService;
-  }
-
 
   /**
    * @Route("/", name="landing")

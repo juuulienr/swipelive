@@ -31,20 +31,10 @@ use BoogieFromZk\AgoraToken\RtcTokenBuilder2;
 use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
-use App\Service\FirebaseMessagingService;
 use Cloudinary\Cloudinary;
 
 
 class APIController extends AbstractController {
-
-  private $firebaseMessagingService;
-  private $bugsnag;
-
-  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag) {
-    $this->firebaseMessagingService = $firebaseMessagingService;
-    $this->bugsnag = $bugsnag;
-  }
-
 
   /**
    * @Route("/user/api/agora/token/{id}", name="generate_agora_token")
