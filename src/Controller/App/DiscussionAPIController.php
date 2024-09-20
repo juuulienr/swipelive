@@ -189,17 +189,18 @@ class DiscussionAPIController extends AbstractController {
       $pusher->trigger("discussion_channel", "new_message", $data);
       $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
 
-      if ($receiver->getPushToken()) {
+      // if ($receiver->getPushToken()) {
         try {
           $data = [
             'route' => "ListDiscussions",
           ];
+          $body = "Tu as un nouveau message de " . $name;
 
-          $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message de " . $name, $receiver->getPushToken(), $data);
+          $this->firebaseMessagingService->sendNotification("SWIPE LIVE", $body, $receiver->getPushToken(), $data);
         } catch (\Exception $error) {
           $this->bugsnag->notifyException($error);
         }
-      }
+      // }
 
       return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',
