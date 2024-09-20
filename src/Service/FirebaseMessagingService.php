@@ -63,7 +63,7 @@ class FirebaseMessagingService
       ->withApnsConfig($apnsConfig)
       ->withAndroidConfig($androidConfig);
 
-      $this->messaging->send($message);
+      $test = $this->messaging->send($message);
       return 'Notification envoyée avec succès';
     } catch (MessagingException $e) {
       if ($attempt < 3) {

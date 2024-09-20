@@ -32,9 +32,34 @@ use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
 use Cloudinary\Cloudinary;
+use App\Service\FirebaseMessagingService;
 
 
 class APIController extends AbstractController {
+
+  private $firebaseMessagingService;
+  private $bugsnag;
+
+  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag) {
+    $this->firebaseMessagingService = $firebaseMessagingService;
+    $this->bugsnag = $bugsnag;
+  }
+
+
+   /**
+   * Test
+   *
+   * @Route("/api/test", name="api_test", methods={"GET"})
+   */
+  public function test(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
+   // try {
+    $test =  $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message", "fDcnYcSGsUiZtLtphDPIt0:APA91bEuLBHjDklxZb9znVs23nLcmeTaQ-oG6Odm8lFaG8p83wblKo3OpK2cDWxlhZnIP8VzU2NtZmdTC1ld6kqd0zkiVUhlQX_Ztb49LSp2t0iaTvIYUAM_7hltrqre2JIaTzsIBV5a");
+      return $this->json($test, 200);
+    // } catch (\Exception $error) {
+      // $this->bugsnag->notifyException($error);
+    // }
+  }
+
 
   /**
    * @Route("/user/api/agora/token/{id}", name="generate_agora_token")
