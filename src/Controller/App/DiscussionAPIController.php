@@ -164,11 +164,11 @@ class DiscussionAPIController extends AbstractController {
 
       if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
         $discussion->setUnseenVendor(true);
-        $name = $discussion->getVendor()->getVendor()->getPseudo();
+        $name = $discussion->getUser()->getFullName();
         $receiver = $discussion->getVendor();
       } else {
         $discussion->setUnseen(true);
-        $name = $discussion->getUser()->getFullName();
+        $name = $discussion->getVendor()->getVendor()->getPseudo();
         $receiver = $discussion->getUser();
       }
 
@@ -189,7 +189,7 @@ class DiscussionAPIController extends AbstractController {
       $pusher->trigger("discussion_channel", "new_message", $data);
       $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
 
-      // if ($receiver->getPushToken()) {
+      if ($receiver->getPushToken()) {
         try {
           $data = [
             'route' => "ListDiscussions",
@@ -200,7 +200,7 @@ class DiscussionAPIController extends AbstractController {
         } catch (\Exception $error) {
           $this->bugsnag->notifyException($error);
         }
-      // }
+      }
 
       return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',
@@ -329,11 +329,11 @@ class DiscussionAPIController extends AbstractController {
 
       if ($discussion->getUser()->getId() == $user->getId()) {
         $discussion->setUnseenVendor(true);
-        $name = $discussion->getVendor()->getVendor()->getPseudo();
+        $name = $user->getFullName();
         $receiver = $discussion->getVendor();
       } else {
         $discussion->setUnseen(true);
-        $name = $user->getFullName();
+        $name = $discussion->getVendor()->getVendor()->getPseudo();
         $receiver = $user;
       }
 
