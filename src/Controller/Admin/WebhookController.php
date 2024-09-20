@@ -86,7 +86,7 @@ class WebhookController extends AbstractController {
 
               $this->firebaseMessagingService->sendNotification(
                 "SWIPE LIVE", 
-                "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $pending) . "€", 
+                "CLING 💰! Nouvelle commande pour un montant de " . str_replace('.', ',', $order->getTotal()) . "€", 
                 $vendor->getUser()->getPushToken(),
                 $data
               );

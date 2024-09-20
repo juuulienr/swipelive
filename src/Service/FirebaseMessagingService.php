@@ -41,7 +41,7 @@ class FirebaseMessagingService
       $apnsConfig = ApnsConfig::new()->withSound('notif.wav')->withBadge(1);
       $androidConfig = AndroidConfig::fromArray([
         'notification' => [
-          'sound' => 'notif'
+          'sound' => 'notif.wav'
         ]
       ]);
     } else {
