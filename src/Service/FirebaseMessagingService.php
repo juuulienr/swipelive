@@ -40,7 +40,7 @@ class FirebaseMessagingService
     try {
       if (isset($data['type']) && $data['type'] === 'vente') {
         $apnsConfig = ApnsConfig::new()->withSound('notif.wav')->withBadge(1);
-        $androidConfig = AndroidConfig::new()->withSound('notif');
+        $androidConfig = AndroidConfig::new()->withSound('notif.wav');
       } else {
         $apnsConfig = ApnsConfig::new()->withDefaultSound()->withBadge(1);
         $androidConfig = AndroidConfig::new()->withDefaultSound();

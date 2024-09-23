@@ -81,7 +81,8 @@ class WebhookController extends AbstractController {
             try {
               $data = [
                 'route' => "ListOrders",
-                'type' => 'vente'
+                'isOrder' => true,
+                'orderId' => $order->getId()
               ];
 
               $this->firebaseMessagingService->sendNotification(

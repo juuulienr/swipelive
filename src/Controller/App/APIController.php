@@ -52,8 +52,13 @@ class APIController extends AbstractController {
    * @Route("/api/test", name="api_test", methods={"GET"})
    */
   public function test(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
+    $data = [
+      'route' => "ListMessages",
+      'userId' => 138,
+    ];
    // try {
-    $test =  $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message", "fDcnYcSGsUiZtLtphDPIt0:APA91bEuLBHjDklxZb9znVs23nLcmeTaQ-oG6Odm8lFaG8p83wblKo3OpK2cDWxlhZnIP8VzU2NtZmdTC1ld6kqd0zkiVUhlQX_Ztb49LSp2t0iaTvIYUAM_7hltrqre2JIaTzsIBV5a");
+    // $test =  $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message", "dyiRQco-60DDlenK6FfM8c:APA91bHoNi-l7KtbCz-t2x5G46li5uvaLlhmkm9btL7htymr2M7rZAcj9p5rm6ifoGV1l9gHWW8Y4-CBAmUHEaHMvHvCYq6goB11wzq74aztSu2sQe4XzVh7J4mp8Snc7q-sWRkoxMmU", $data);
+    $test =  $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message", "cCsnyuLBRlC2n2v0A99FRF:APA91bEOSy8C9JhHjIs0EpIAKe_j3HK9Rl9uS3iy2RyoZXsZ7k7GI4xlCOm3R344gadKzoOZbwVjaWQIM0_7UWDR-Td0UKrmNhvx1ij0UN_1VJjLk_M5JC7OGGtCYwBrTG3A-vv_xfLu", $data);
       return $this->json($test, 200);
     // } catch (\Exception $error) {
       // $this->bugsnag->notifyException($error);
