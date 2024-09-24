@@ -80,7 +80,8 @@ class WebhookController extends AbstractController {
           if (!$live && $vendor->getUser()->getPushToken()) {
             try {
               $data = [
-                'route' => "ListOrders",
+                'route' => 'ListOrders',
+                'type' => 'vente',
                 'isOrder' => true,
                 'orderId' => $order->getId()
               ];

@@ -55,11 +55,12 @@ class APIController extends AbstractController {
     $data = [
       'route' => "ListOrders",
       'isOrder' => true,
+      'type' => 'vente',
       'orderId' => 446
     ];
+    
    // try {
-    // $test =  $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message", "dyiRQco-60DDlenK6FfM8c:APA91bHoNi-l7KtbCz-t2x5G46li5uvaLlhmkm9btL7htymr2M7rZAcj9p5rm6ifoGV1l9gHWW8Y4-CBAmUHEaHMvHvCYq6goB11wzq74aztSu2sQe4XzVh7J4mp8Snc7q-sWRkoxMmU", $data);
-    $test =  $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message", "cCsnyuLBRlC2n2v0A99FRF:APA91bEOSy8C9JhHjIs0EpIAKe_j3HK9Rl9uS3iy2RyoZXsZ7k7GI4xlCOm3R344gadKzoOZbwVjaWQIM0_7UWDR-Td0UKrmNhvx1ij0UN_1VJjLk_M5JC7OGGtCYwBrTG3A-vv_xfLu", $data);
+    $test =  $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message", "c3dUNp9DAEY_sCbIRKXxWC:APA91bFAXPgxrJV-m8j5JvoJfwUUts632rXAl3j6G-LtrJ36XEdnYvu3nJD76V9ARCHbPGiJ-urLZefR_HpDN5QJvcLsA7P3CniZ9qM35TE0cKMK3f6ZV9opVoDuxNedX82N-hDtEnyy", $data);
       return $this->json($test, 200);
     // } catch (\Exception $error) {
       // $this->bugsnag->notifyException($error);

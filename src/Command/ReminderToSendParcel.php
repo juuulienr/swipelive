@@ -133,7 +133,7 @@ class ReminderToSendParcel extends Command
     if ($pushToken) {
       try {
         $data = [
-          'route' => "ListOrders",
+          'route' => 'ListOrders',
           'isOrder' => true,
           'orderId' => $order->getId()
         ];
