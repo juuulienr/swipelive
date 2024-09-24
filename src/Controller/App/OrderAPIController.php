@@ -305,10 +305,11 @@ class OrderAPIController extends AbstractController {
     
     // if ($order->getVendor()->getUser()->getPushToken()) {
     //   try {
-        // $data = [
-        //   'route' => "ListOrders",
-        //   'type' => 'vente'
-        // ];
+          // $data = [
+          //   'route' => "ListOrders",
+          //   'isOrder' => true,
+          //   'orderId' => $order->getId()
+          // ];
     //     $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "La commande a été cloturée !", $order->getVendor()->getUser()->getPushToken());
     //   } catch (\Exception $error) {
     //     $this->bugsnag->notifyException($error);
@@ -361,10 +362,11 @@ class OrderAPIController extends AbstractController {
       // send notif push to buyer/vendor
       // if ($order->getBuyer->getPushToken()) {
       //   try {
-            // $data = [
-            //   'route' => "ListOrders",
-            //   'type' => 'vente'
-            // ];
+          // $data = [
+          //   'route' => "ListOrders",
+          //   'isOrder' => true,
+          //   'orderId' => $order->getId()
+          // ];
 
       //     $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "La commande a été annulée ", $order->getBuyer->getPushToken(), $data);
       //   } catch (\Exception $error) {

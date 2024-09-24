@@ -53,8 +53,9 @@ class APIController extends AbstractController {
    */
   public function test(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
     $data = [
-      'route' => "ListMessages",
-      'userId' => 138,
+      'route' => "ListOrders",
+      'isOrder' => true,
+      'orderId' => 446
     ];
    // try {
     // $test =  $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message", "dyiRQco-60DDlenK6FfM8c:APA91bHoNi-l7KtbCz-t2x5G46li5uvaLlhmkm9btL7htymr2M7rZAcj9p5rm6ifoGV1l9gHWW8Y4-CBAmUHEaHMvHvCYq6goB11wzq74aztSu2sQe4XzVh7J4mp8Snc7q-sWRkoxMmU", $data);

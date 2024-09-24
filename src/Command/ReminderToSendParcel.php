@@ -80,12 +80,14 @@ class ReminderToSendParcel extends Command
     $this->refundCustomer($order);
     $this->sendPushNotification(
       $order->getVendor()->getUser()->getPushToken(),
-      'Commande annulée, le client a été remboursé'
+      'Commande annulée, le client a été remboursé',
+      $order
     );
 
     $this->sendPushNotification(
       $order->getBuyer()->getPushToken(),
-      'Commande annulée, le vendeur n\'a pas envoyé le colis. Vous allez être remboursé'
+      'Commande annulée, le vendeur n\'a pas envoyé le colis. Vous allez être remboursé',
+      $order
     );
 
     $this->logger->info('Order cancelled and customer refunded for order ID: ' . $order->getId());
@@ -110,7 +112,8 @@ class ReminderToSendParcel extends Command
   {
     $this->sendPushNotification(
       $order->getVendor()->getUser()->getPushToken(),
-      'N’oublie pas d’imprimer le bon de livraison et d’expédier ta commande'
+      'N’oublie pas d’imprimer le bon de livraison et d’expédier ta commande',
+      $order
     );
     $this->logger->info('First reminder sent for order ID: ' . $order->getId());
   }
@@ -119,17 +122,20 @@ class ReminderToSendParcel extends Command
   {
     $this->sendPushNotification(
       $order->getVendor()->getUser()->getPushToken(),
-      'Plus que 24h pour expédier ta commande ou elle sera annulée'
+      'Plus que 24h pour expédier ta commande ou elle sera annulée',
+      $order
     );
     $this->logger->info('Second reminder sent for order ID: ' . $order->getId());
   }
 
-  private function sendPushNotification(?string $pushToken, string $message): void
+  private function sendPushNotification(?string $pushToken, string $message, $order): void
   {
     if ($pushToken) {
       try {
         $data = [
           'route' => "ListOrders",
+          'isOrder' => true,
+          'orderId' => $order->getId()
         ];
 
         $this->firebaseMessagingService->sendNotification('SWIPE LIVE', $message, $pushToken, $data);
