@@ -51,8 +51,8 @@ class WebhookController extends AbstractController {
   {
     try {
       $result = json_decode($request->getContent(), true);
-        throw new \Exception('RTC Channel Event');
-
+        // throw new \Exception('RTC Channel Event');
+// 
       // if (isset($result['eventType'])) {
       //   // switch ($result['eventType']) {
       //   //   case 103:
@@ -118,7 +118,6 @@ class WebhookController extends AbstractController {
           break;
 
           default:
-          throw new \Exception('Unknown event type: ' . $result['eventType']);
         }
       }
     } catch (\Exception $e) {
