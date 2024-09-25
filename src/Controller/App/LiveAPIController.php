@@ -125,7 +125,6 @@ class LiveAPIController extends AbstractController {
       $param = json_decode($json, true);
 
       $live->setCreatedAt(new \DateTime('now', timezone_open('UTC')));
-      $live->setBroadcastId("test");
       $live->setPreview("test");
       $live->setStatus(1);
       $manager->flush();
