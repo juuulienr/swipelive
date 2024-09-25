@@ -46,26 +46,26 @@ class APIController extends AbstractController {
   }
 
 
-   /**
-   * Test
-   *
-   * @Route("/api/test", name="api_test", methods={"GET"})
-   */
-  public function test(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
-    $data = [
-      'route' => "ListOrders",
-      'isOrder' => true,
-      'type' => 'vente',
-      'orderId' => 446
-    ];
-    
-   // try {
-    $test =  $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message", "c3dUNp9DAEY_sCbIRKXxWC:APA91bFAXPgxrJV-m8j5JvoJfwUUts632rXAl3j6G-LtrJ36XEdnYvu3nJD76V9ARCHbPGiJ-urLZefR_HpDN5QJvcLsA7P3CniZ9qM35TE0cKMK3f6ZV9opVoDuxNedX82N-hDtEnyy", $data);
-      return $this->json($test, 200);
-    // } catch (\Exception $error) {
-      // $this->bugsnag->notifyException($error);
-    // }
-  }
+  //  /**
+  //  * Test
+  //  *
+  //  * @Route("/api/notif/push/test", name="api_notif_push_test", methods={"GET"})
+  //  */
+  // public function testNotifPush(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
+  //   $data = [
+  //     'route' => "ListOrders",
+  //     'type' => 'vente',
+  //     'isOrder' => true,
+  //     'orderId' => 446
+  //   ];
+
+  //   try {
+  //     $response =  $this->firebaseMessagingService->sendNotification($title, $body, $token, $data);
+  //     return $this->json($response, 200);
+  //   } catch (\Exception $error) {
+  //     $this->bugsnag->notifyException($error);
+  //   }
+  // }
 
 
   /**

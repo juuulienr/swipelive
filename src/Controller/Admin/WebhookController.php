@@ -41,6 +41,56 @@ class WebhookController extends AbstractController {
   }
 
 
+
+  /**
+   * Webhooks Agora
+   *
+   * @Route("/api/agora/webhooks", name="api_agora_webhooks", methods={"POST"})
+   */
+  public function agora(Request $request, ObjectManager $manager, LiveRepository $liveRepo)
+  {
+    try {
+      $result = json_decode($request->getContent(), true);
+
+      if (isset($result['eventType'])) {
+        // throw new \Exception('Analyser les fichiers');
+
+        if ($result['eventType'] == 31) {
+          // 
+          $fileList = $result['payload']['details']['fileList'] ?? [];
+          $cname = $result['payload']['cname'];
+          $live = $liveRepo->findOneByCname($cname);
+
+          if ($live && !$live->getFileList() && $filelist) {
+            $live->setFileList($fileList);
+            $manager->flush();
+          }
+        } else if ($result['eventType'] == 45) {
+          // 
+          $fileName = $result['payload']['details']['fileName'] ?? [];
+          $cname = $result['payload']['cname'];
+          $live = $liveRepo->findOneByCname($cname);
+
+          if ($live && $fileName) {
+            $live->setPreview($fileName);
+            $manager->flush();
+          }
+        }
+      }
+    } catch (\Exception $e) {
+      $this->bugsnag->notifyException($e);
+
+      return $this->json([
+        'status' => 'error',
+        'message' => 'Webhook processing failed: ' . $e->getMessage()
+      ], 500);
+    }
+
+    return $this->json(true, 200);
+  }
+
+
+
   /**
    * Webhooks Stripe
    *
@@ -145,52 +195,6 @@ class WebhookController extends AbstractController {
         default:
         break;
       }
-    }
-
-    return $this->json(true, 200);
-  }
-
-
-
-  /**
-   * Webhooks Agora
-   *
-   * @Route("/api/agora/webhooks", name="api_agora_webhooks", methods={"POST"})
-   */
-  public function agora(Request $request, ObjectManager $manager, LiveRepository $liveRepo)
-  {
-    try {
-      $result = json_decode($request->getContent(), true);
-
-      if (isset($result['eventType'])) {
-        // throw new \Exception('Analyser les fichiers');
-        if ($result['eventType'] == 31) {
-          $fileList = $result['payload']['details']['fileList'] ?? [];
-          $cname = $result['payload']['cname'];
-          $live = $liveRepo->findOneByCname($cname);
-
-          if ($live && !$live->getFileList() && $filelist) {
-            $live->setFileList($fileList);
-            $manager->flush();
-          }
-        } else if ($result['eventType'] == 45) {
-          $fileName = $result['payload']['details']['fileName'] ?? [];
-          $cname = $result['payload']['cname'];
-          $live = $liveRepo->findOneByCname($cname);
-
-          if ($live && $fileName) {
-            $live->setPreview($fileName);
-            $manager->flush();
-          }
-        }
-      }
-    } catch (\Exception $e) {
-      $this->bugsnag->notifyException($e);
-
-      return $this->json([
-        'status' => 'error',
-        'message' => 'Webhook processing failed: ' . $e->getMessage()
-      ], 500);
     }
 
     return $this->json(true, 200);
