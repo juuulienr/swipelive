@@ -193,7 +193,7 @@ class DiscussionAPIController extends AbstractController {
         try {
           $data = [
             'route' => "ListMessages",
-            'userId' => $discussion->getUser()->getId()
+            'discussionId' => $discussion->getId()
           ];
           $body = "Tu as un nouveau message de " . $name;
 
@@ -359,7 +359,7 @@ class DiscussionAPIController extends AbstractController {
         try {
           $data = [
             'route' => "ListMessages",
-            'userId' => $discussion->getUser()->getId()
+            'discussionId' => $discussion->getId()
           ];
 
           $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "Tu as un nouveau message de " . $name, $receiver->getPushToken(), $data);
