@@ -73,11 +73,6 @@ class Clip
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $broadcastId;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups("clip:read")
      */
     private $status;
@@ -213,18 +208,6 @@ class Clip
     public function setPreview(?string $preview): self
     {
         $this->preview = $preview;
-
-        return $this;
-    }
-
-    public function getBroadcastId(): ?string
-    {
-        return $this->broadcastId;
-    }
-
-    public function setBroadcastId(?string $broadcastId): self
-    {
-        $this->broadcastId = $broadcastId;
 
         return $this;
     }

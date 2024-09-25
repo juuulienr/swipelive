@@ -30,13 +30,6 @@ class Live
     
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("live:read")
-     * @Groups("clip:read")
-     */
-    private $broadcastId;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $eventId;
 
@@ -185,18 +178,6 @@ class Live
     public function setVendor(?Vendor $vendor): self
     {
         $this->vendor = $vendor;
-
-        return $this;
-    }
-
-    public function getBroadcastId(): ?string
-    {
-        return $this->broadcastId;
-    }
-
-    public function setBroadcastId(?string $broadcastId): self
-    {
-        $this->broadcastId = $broadcastId;
 
         return $this;
     }

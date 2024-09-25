@@ -43,20 +43,58 @@ class WebhookController extends AbstractController {
 
 
   /**
-   * Webhooks Agora
+   * Webhooks Agora RTC Channel Event
    *
-   * @Route("/api/agora/webhooks", name="api_agora_webhooks", methods={"POST"})
+   * @Route("/api/agora/rtc/channel/event/webhooks", name="api_agora_rtc_channel_event", methods={"POST"})
    */
-  public function agora(Request $request, ObjectManager $manager, LiveRepository $liveRepo)
+  public function agoraRTCChannelEvent(Request $request, ObjectManager $manager, LiveRepository $liveRepo)
+  {
+    try {
+      $result = json_decode($request->getContent(), true);
+        throw new \Exception('RTC Channel Event');
+
+      // if (isset($result['eventType'])) {
+      //   // switch ($result['eventType']) {
+      //   //   case 103:
+      //   //   // In the streaming profile, the host joins the channel.
+
+      //   //   case 104:
+
+      //   //   break;
+
+      //   //   default:
+      //   //   throw new \Exception('Unknown event type: ' . $result['eventType']);
+      //   // }
+      // }
+    } catch (\Exception $e) {
+      $this->bugsnag->notifyException($e);
+
+      return $this->json([
+        'status' => 'error',
+        'message' => 'Webhook processing failed: ' . $e->getMessage()
+      ], 500);
+    }
+
+    return $this->json(true, 200);
+  }
+
+
+
+  /**
+   * Webhooks Agora Cloud Recording
+   *
+   * @Route("/api/agora/cloud/recording/webhooks", name="api_agora_webhooks", methods={"POST"})
+   */
+  public function agoraCloudRecording(Request $request, ObjectManager $manager, LiveRepository $liveRepo)
   {
     try {
       $result = json_decode($request->getContent(), true);
 
       if (isset($result['eventType'])) {
         // throw new \Exception('Analyser les fichiers');
-
-        if ($result['eventType'] == 31) {
-          // 
+        switch ($result['eventType']) {
+          case 31:
+          // All the recorded files are uploaded to the specified third-party cloud storage.
           $fileList = $result['payload']['details']['fileList'] ?? [];
           $cname = $result['payload']['cname'];
           $live = $liveRepo->findOneByCname($cname);
@@ -65,16 +103,22 @@ class WebhookController extends AbstractController {
             $live->setFileList($fileList);
             $manager->flush();
           }
-        } else if ($result['eventType'] == 45) {
-          // 
-          $fileName = $result['payload']['details']['fileName'] ?? [];
-          $cname = $result['payload']['cname'];
-          $live = $liveRepo->findOneByCname($cname);
+          break;
 
-          if ($live && $fileName) {
-            $live->setPreview($fileName);
-            $manager->flush();
-          }
+          case 45:
+            // The screenshot is captured successfully.
+            $fileName = $result['payload']['details']['fileName'] ?? [];
+            $cname = $result['payload']['cname'];
+            $live = $liveRepo->findOneByCname($cname);
+
+            if ($live && $fileName) {
+              $live->setPreview($fileName);
+              $manager->flush();
+            }
+          break;
+
+          default:
+          throw new \Exception('Unknown event type: ' . $result['eventType']);
         }
       }
     } catch (\Exception $e) {
