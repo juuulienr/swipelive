@@ -73,13 +73,11 @@ class WebhookController extends AbstractController {
       }
 
       // check noticeId
-      if (isset($result['noticeId'])) {
-        $noticeId = $result['noticeId'];
-        $live = $liveRepo->findOneByNoticeId($noticeId);
+      $noticeId = $result['noticeId'];
+      $live = $liveRepo->findOneByNoticeId($noticeId);
 
-        if ($live) {
-          return $this->json(true, 200);
-        }
+      if ($live) {
+        return $this->json(true, 200);
       }
 
 
