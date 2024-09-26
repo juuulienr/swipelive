@@ -68,8 +68,7 @@ class WebhookController extends AbstractController {
       $result = json_decode($request->getContent(), true);
 
       // test_webhook
-      if (isset($result['payload']['channelName']) && isset($result['payload']['channelName']) == "test_webhook") {
-                throw new \Exception('test');
+      if (isset($result['payload']['channelName']) && $result['payload']['channelName'] == "test_webhook") {
         return $this->json(true, 200);
       }
 
@@ -79,7 +78,6 @@ class WebhookController extends AbstractController {
         $live = $liveRepo->findOneByNoticeId($noticeId);
 
         if ($live) {
-                throw new \Exception('test live');
           return $this->json(true, 200);
         }
       }
