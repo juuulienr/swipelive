@@ -9,13 +9,22 @@ use App\Entity\Vendor;
 use App\Entity\Message;
 use App\Entity\Product;
 use App\Entity\Category;
+use App\Entity\Comment;
+use App\Entity\Follow;
+use App\Entity\Product;
+use App\Entity\Order;
+use App\Entity\Upload;
 use App\Entity\OrderStatus;
+use App\Entity\LiveProducts;
 use App\Repository\ClipRepository;
 use App\Repository\CommentRepository;
 use App\Repository\OrderRepository;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use App\Repository\LiveRepository;
+use App\Repository\FollowRepository;
+use App\Repository\VendorRepository;
+use App\Repository\UserRepository;
 use App\Repository\OrderStatusRepository;
 use App\Repository\LiveProductsRepository;
 use Doctrine\Persistence\ObjectManager;
@@ -24,10 +33,17 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use App\Service\FirebaseMessagingService;
+use Symfony\Component\Filesystem\Filesystem;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Client;
 
 
 class WebhookController extends AbstractController {
@@ -47,24 +63,153 @@ class WebhookController extends AbstractController {
    *
    * @Route("/api/agora/rtc/channel/event/webhooks", name="api_agora_rtc_channel_event", methods={"POST"})
    */
-  public function agoraRTCChannelEvent(Request $request, ObjectManager $manager, LiveRepository $liveRepo)
+  public function agoraRTCChannelEvent(Request $request, ObjectManager $manager, LiveRepository $liveRepo, UserRepository $userRepo)
   {
     try {
       $result = json_decode($request->getContent(), true);
-// 
-      // if (isset($result['eventType'])) {
-      //   // switch ($result['eventType']) {
-      //   //   case 103:
-      //   //   // In the streaming profile, the host joins the channel.
 
-      //   //   case 104:
+      if (isset($result['eventType'])) {
+        switch ($result['eventType']) {
+          case 103:
+            // broadcaster join channel
+            $cname = $result['payload']['cname'];
+            $live = $liveRepo->findOneByCname($cname);
 
-      //   //   break;
+            if ($live) {
+              $live->setStatus(1);
+              $manager->flush();
+            }
 
-      //   //   default:
-      //   //   throw new \Exception('Unknown event type: ' . $result['eventType']);
-      //   // }
-      // }
+            try {
+              $client = new Client();
+              $vname = "vendor" . $live->getVendor()->getId();
+              $appId = $this->getParameter('agora_app_id');
+
+              // 1. Récupérer le token via votre propre route API
+              $tokenUrl = $this->generateUrl('generate_agora_token_record', ['id' => $live->getId()], 0);
+              $tokenResponse = $client->request('GET', $tokenUrl);
+              $tokenData = json_decode($tokenResponse->getBody(), true);
+
+              if (!isset($tokenData['token'])) {
+                return new JsonResponse([
+                  'status' => 'error',
+                  'message' => 'Impossible de récupérer le token Agora.'
+                ], 400);
+              }
+
+              $tokenAgora = $tokenData['token'];
+
+              // 2. Requête pour acquérir un resourceId
+              $urlAcquire = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $appId);
+              $headers = ['Content-Type' => 'application/json'];
+              $bodyAcquire = json_encode([
+                'cname' => $cname,
+                'uid' => '123456789',
+                'clientRequest' => new \stdClass()
+              ]);
+
+              $resAcquire = $client->request('POST', $urlAcquire, [
+                'headers' => $headers,
+                'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
+                'body' => $bodyAcquire
+              ]);
+
+              $acquireData = json_decode($resAcquire->getBody(), true);
+              if (!isset($acquireData['resourceId'])) {
+                return new JsonResponse([
+                  'status' => 'error',
+                  'message' => 'resourceId manquant lors de l\'acquisition.'
+                ], 400);
+              }
+
+              // Récupérer le resourceId
+              $resourceId = $acquireData['resourceId'];
+              $live->setResourceId($resourceId);
+              $manager->flush();
+
+              // 3. Démarrer l'enregistrement en utilisant le tokenAgora
+              $urlStart = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/mode/mix/start', $appId, $resourceId);
+              $bodyStart = json_encode([
+                'cname' => $cname,
+                'uid' => '123456789',
+                'clientRequest' => [
+                  'token' => $tokenAgora,
+                  'recordingConfig' => [
+                    'maxIdleTime' => 120,
+                    'streamTypes' => 2,
+                    'channelType' => 0,
+                    'videoStreamType' => 0,
+                    'transcodingConfig' => [
+                      'width' => 1080,
+                      'height' => 1920,
+                      'bitrate' => 3150,
+                      'fps' => 30
+                    ]
+                  ],
+                  'snapshotConfig' => [
+                    'captureInterval' => 3600,
+                    'fileType' => [
+                      'jpg'
+                    ]
+                  ],
+                  'recordingFileConfig' => [
+                    'avFileType' => [
+                      'hls'
+                    ]
+                  ],
+                  'storageConfig' => [
+                    'vendor' => $this->getParameter('s3_vendor'),
+                    'region' => $this->getParameter('s3_region'),
+                    'bucket' => $this->getParameter('s3_bucket'),
+                    'accessKey' => $this->getParameter('s3_access_key'),
+                    'secretKey' => $this->getParameter('s3_secret_key'),
+                    'fileNamePrefix' => [$vname, $cname]
+                  ]
+                ]
+              ]);
+
+              $resStart = $client->request('POST', $urlStart, [
+                'headers' => $headers,
+                'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
+                'body' => $bodyStart
+              ]);
+
+              $responseStart = json_decode($resStart->getBody(), true);
+
+              if (isset($responseStart['sid'])) {
+                $sid = $responseStart['sid'];
+
+                $live->setSid($sid);
+                $manager->flush();
+              } else {
+                throw new \Exception('Impossible de démarrer l\'enregistrement.');
+              }
+
+              $followers = $userRepo->findUserFollowers($live->getVendor()->getUser());
+
+              if ($followers) {
+                foreach ($followers as $follower) {
+                  if ($follower->getPushToken()) {
+                    try {
+                      $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "🔴 " . $pseudo . " est actuellement en direct", $follower->getPushToken());
+                    } catch (\Exception $error) {
+                      $this->bugsnag->notifyException($error);
+                    }
+                  }
+                }
+              }
+
+            } catch (\Exception $e) {
+              throw new \Exception('Exception: ' . $e->getMessage());
+            }
+
+          case 104:
+          break;
+
+          default:
+          throw new \Exception('Unknown event type: ' . $result['eventType']);
+        }
+      }
     } catch (\Exception $e) {
       $this->bugsnag->notifyException($e);
 

@@ -7,60 +7,60 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ORM\Entity(repositoryClass=FollowRepository::class)
- */
+* @ORM\Entity(repositoryClass=FollowRepository::class)
+*/
 class Follow
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     * @Groups("user:read")
-     * @Groups("user:follow")
-     * @Groups("clip:read")
-     * @Groups("live:read")
-     */
-    private $id;
+  /**
+   * @ORM\Id
+   * @ORM\GeneratedValue
+   * @ORM\Column(type="integer")
+   * @Groups("user:read")
+   * @Groups("user:follow")
+   * @Groups("clip:read")
+   * @Groups("live:read")
+   */
+  private $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="followers")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $following;
+  /**
+   * @ORM\ManyToOne(targetEntity=User::class, inversedBy="followers")
+   * @ORM\JoinColumn(nullable=false)
+   */
+  private $following;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="following")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $follower;
+  /**
+   * @ORM\ManyToOne(targetEntity=User::class, inversedBy="following")
+   * @ORM\JoinColumn(nullable=false)
+   */
+  private $follower;
 
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+  public function getId(): ?int
+  {
+    return $this->id;
+  }
 
-    public function getFollowing(): ?User
-    {
-        return $this->following;
-    }
+  public function getFollowing(): ?User
+  {
+    return $this->following;
+  }
 
-    public function setFollowing(?User $following): self
-    {
-        $this->following = $following;
+  public function setFollowing(?User $following): self
+  {
+    $this->following = $following;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getFollower(): ?User
-    {
-        return $this->follower;
-    }
+  public function getFollower(): ?User
+  {
+    return $this->follower;
+  }
 
-    public function setFollower(?User $follower): self
-    {
-        $this->follower = $follower;
+  public function setFollower(?User $follower): self
+  {
+    $this->follower = $follower;
 
-        return $this;
-    }
+    return $this;
+  }
 }

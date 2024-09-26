@@ -123,6 +123,28 @@ class AccountAPIController extends AbstractController {
   }
 
 
+  //  /**
+  //  * Test Notif Push
+  //  *
+  //  * @Route("/api/notif/push/test", name="api_notif_push_test", methods={"GET"})
+  //  */
+  // public function testNotifPush(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
+  //   $data = [
+  //     'route' => "ListOrders",
+  //     'type' => 'vente',
+  //     'isOrder' => true,
+  //     'orderId' => 446
+  //   ];
+
+  //   try {
+  //     $response =  $this->firebaseMessagingService->sendNotification($title, $body, $token, $data);
+  //     return $this->json($response, 200);
+  //   } catch (\Exception $error) {
+  //     $this->bugsnag->notifyException($error);
+  //   }
+  // }
+
+
   /**
    * Récupérer le profil
    *

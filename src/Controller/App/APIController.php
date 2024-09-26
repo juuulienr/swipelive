@@ -28,11 +28,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Response;
 use BoogieFromZk\AgoraToken\RtcTokenBuilder2;
+use App\Service\FirebaseMessagingService;
 use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
 use Cloudinary\Cloudinary;
-use App\Service\FirebaseMessagingService;
 
 
 class APIController extends AbstractController {
@@ -45,88 +45,6 @@ class APIController extends AbstractController {
     $this->bugsnag = $bugsnag;
   }
 
-
-  //  /**
-  //  * Test
-  //  *
-  //  * @Route("/api/notif/push/test", name="api_notif_push_test", methods={"GET"})
-  //  */
-  // public function testNotifPush(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
-  //   $data = [
-  //     'route' => "ListOrders",
-  //     'type' => 'vente',
-  //     'isOrder' => true,
-  //     'orderId' => 446
-  //   ];
-
-  //   try {
-  //     $response =  $this->firebaseMessagingService->sendNotification($title, $body, $token, $data);
-  //     return $this->json($response, 200);
-  //   } catch (\Exception $error) {
-  //     $this->bugsnag->notifyException($error);
-  //   }
-  // }
-
-
-  /**
-   * @Route("/user/api/agora/token/{id}", name="generate_agora_token")
-   */
-  public function generateToken(Live $live, ObjectManager $manager) {
-    $appID = $this->getParameter('agora_app_id');
-    $appCertificate = $this->getParameter('agora_app_certificate');
-    $expiresInSeconds = 86400;
-    $cname = "Live" . $live->getId();
-    $uid = (int) $this->getUser()->getId();
-    $role = RtcTokenBuilder2::ROLE_PUBLISHER;
-
-    $live->setCname($cname);
-    $manager->flush();
-
-    try {
-      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $cname, $uid, $role, $expiresInSeconds);
-      return $this->json([ "token" => $token ], 200);
-    } catch (\Exception $e) {
-      return $this->json('Failed to generate token', 500);
-    }
-  }
-
-
-  /**
-   * @Route("/user/api/agora/token/audience/{id}", name="generate_agora_token_audience")
-   */
-  public function generateAudienceToken(Live $live) {
-    $appID = $this->getParameter('agora_app_id');
-    $appCertificate = $this->getParameter('agora_app_certificate');
-    $expiresInSeconds = 86400; 
-    $cname = "Live" . $live->getId();
-    $role = RtcTokenBuilder2::ROLE_SUBSCRIBER;
-    $uid = (int) $this->getUser()->getId();
-
-    try {
-      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $cname, $uid, $role, $expiresInSeconds);
-      return $this->json([ "token" => $token ], 200);
-    } catch (\Exception $e) {
-      return $this->json('Failed to generate token', 500);
-    }
-  }
-
-
-  /**
-   * @Route("/agora/token/record/{id}", name="generate_agora_token_record")
-   */
-  public function generateRecordToken(Live $live) {
-    $appID = $this->getParameter('agora_app_id');
-    $appCertificate = $this->getParameter('agora_app_certificate');
-    $expiresInSeconds = 86400; // Expire dans 24 heures
-    $role = RtcTokenBuilder2::ROLE_SUBSCRIBER;
-
-    try {
-      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $live->getCname(), 123456789, $role, $expiresInSeconds);
-      return $this->json([ "token" => $token ], 200);
-    } catch (\Exception $e) {
-      return $this->json('Failed to generate token', 500);
-    }
-  }
 
 
   /**

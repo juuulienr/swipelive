@@ -50,6 +50,67 @@ class LiveAPIController extends AbstractController {
 
 
   /**
+   * @Route("/user/api/agora/token/host/{id}", name="generate_agora_token_host")
+   */
+  public function generateHostToken(Live $live, ObjectManager $manager) {
+    $appID = $this->getParameter('agora_app_id');
+    $appCertificate = $this->getParameter('agora_app_certificate');
+    $expiresInSeconds = 86400;
+    $cname = "Live" . $live->getId();
+    $uid = (int) $this->getUser()->getId();
+    $role = RtcTokenBuilder2::ROLE_PUBLISHER;
+
+    $live->setCname($cname);
+    $manager->flush();
+
+    try {
+      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $cname, $uid, $role, $expiresInSeconds);
+      return $this->json([ "token" => $token ], 200);
+    } catch (\Exception $e) {
+      return $this->json('Failed to generate token', 500);
+    }
+  }
+
+
+  /**
+   * @Route("/user/api/agora/token/audience/{id}", name="generate_agora_token_audience")
+   */
+  public function generateAudienceToken(Live $live) {
+    $appID = $this->getParameter('agora_app_id');
+    $appCertificate = $this->getParameter('agora_app_certificate');
+    $expiresInSeconds = 86400; 
+    $cname = "Live" . $live->getId();
+    $role = RtcTokenBuilder2::ROLE_SUBSCRIBER;
+    $uid = (int) $this->getUser()->getId();
+
+    try {
+      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $cname, $uid, $role, $expiresInSeconds);
+      return $this->json([ "token" => $token ], 200);
+    } catch (\Exception $e) {
+      return $this->json('Failed to generate token', 500);
+    }
+  }
+
+
+  /**
+   * @Route("/agora/token/record/{id}", name="generate_agora_token_record")
+   */
+  public function generateRecordToken(Live $live) {
+    $appID = $this->getParameter('agora_app_id');
+    $appCertificate = $this->getParameter('agora_app_certificate');
+    $expiresInSeconds = 86400; // Expire dans 24 heures
+    $role = RtcTokenBuilder2::ROLE_SUBSCRIBER;
+
+    try {
+      $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $live->getCname(), 123456789, $role, $expiresInSeconds);
+      return $this->json([ "token" => $token ], 200);
+    } catch (\Exception $e) {
+      return $this->json('Failed to generate token', 500);
+    }
+  }
+
+
+  /**
    * Préparer un live
    *
    * @Route("/user/api/prelive", name="user_api_prelive_step1", methods={"POST"})
@@ -120,178 +181,25 @@ class LiveAPIController extends AbstractController {
    *
    * @Route("/user/api/live/update/{id}", name="user_api_live_update", methods={"PUT"})
    */
-  public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, UserRepository $userRepo) {
+  public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
-
-      $live->setCreatedAt(new \DateTime('now', timezone_open('UTC')));
-      $live->setStatus(1);
-      $manager->flush();
-   
       $channel = "channel" . $live->getId();
       $event = "event" . $live->getId();
       $user = $this->getUser();
       $pseudo = $user->getVendor()->getPseudo();
 
-      $data = [
-        "comment" => [
-          "content" => "Début du live", 
-          "user" => [
-            "vendor" => [
-              "pseudo" => $pseudo,
-            ],
-            "firstname" => $user->getFirstname(),
-            "lastname" => $user->getLastname(),
-            "picture" => $user->getPicture()
-          ]
-        ]
-      ];
-
-      $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
-      $pusher->trigger($channel, $event, $data);
-
       $live->setChannel($channel);
       $live->setEvent($event);
       $manager->flush();
 
-      $followers = $userRepo->findUserFollowers($user);
-
-      if ($followers) {
-        foreach ($followers as $follower) {
-          if ($follower->getPushToken()) {
-            try {
-              $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "🔴 " . $pseudo . " est actuellement en direct", $follower->getPushToken());
-            } catch (\Exception $error) {
-              $this->bugsnag->notifyException($error);
-            }
-          }
-        }
-      }
-
-
-      try {
-        $client = new Client();
-        $cname = $live->getCname();
-        $vname = "vendor" . $live->getVendor()->getId();
-        $appId = $this->getParameter('agora_app_id');
-
-        // 1. Récupérer le token via votre propre route API
-        $tokenUrl = $this->generateUrl('generate_agora_token_record', ['id' => $live->getId()], 0);
-        $tokenResponse = $client->request('GET', $tokenUrl);
-        $tokenData = json_decode($tokenResponse->getBody(), true);
-
-        if (!isset($tokenData['token'])) {
-          return new JsonResponse([
-            'status' => 'error',
-            'message' => 'Impossible de récupérer le token Agora.'
-          ], 400);
-        }
-
-        $tokenAgora = $tokenData['token'];
-
-        // 2. Requête pour acquérir un resourceId
-        $urlAcquire = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $appId);
-        $headers = ['Content-Type' => 'application/json'];
-        $bodyAcquire = json_encode([
-          'cname' => $cname,
-          'uid' => '123456789',
-          'clientRequest' => new \stdClass()
-        ]);
-
-        $resAcquire = $client->request('POST', $urlAcquire, [
-          'headers' => $headers,
-          'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
-          'body' => $bodyAcquire
-        ]);
-
-        $acquireData = json_decode($resAcquire->getBody(), true);
-        if (!isset($acquireData['resourceId'])) {
-          return new JsonResponse([
-            'status' => 'error',
-            'message' => 'resourceId manquant lors de l\'acquisition.'
-          ], 400);
-        }
-
-        // Récupérer le resourceId
-        $resourceId = $acquireData['resourceId'];
-        $live->setResourceId($resourceId);
-        $manager->flush();
-
-        // 3. Démarrer l'enregistrement en utilisant le tokenAgora
-        $urlStart = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/mode/mix/start', $appId, $resourceId);
-        $bodyStart = json_encode([
-          'cname' => $cname,
-          'uid' => '123456789',
-          'clientRequest' => [
-            'token' => $tokenAgora,
-            'recordingConfig' => [
-              'maxIdleTime' => 120,
-              'streamTypes' => 2,
-              'channelType' => 0,
-              'videoStreamType' => 0,
-              'transcodingConfig' => [
-                'width' => 1080,
-                'height' => 1920,
-                'bitrate' => 3150,
-                'fps' => 30
-              ]
-            ],
-            'snapshotConfig' => [
-              'captureInterval' => 3600,
-              'fileType' => [
-                'jpg'
-              ]
-            ],
-            'recordingFileConfig' => [
-              'avFileType' => [
-                'hls'
-              ]
-            ],
-            'storageConfig' => [
-              'vendor' => $this->getParameter('s3_vendor'),
-              'region' => $this->getParameter('s3_region'),
-              'bucket' => $this->getParameter('s3_bucket'),
-              'accessKey' => $this->getParameter('s3_access_key'),
-              'secretKey' => $this->getParameter('s3_secret_key'),
-              'fileNamePrefix' => [$vname, $cname]
-            ]
-          ]
-        ]);
-
-        $resStart = $client->request('POST', $urlStart, [
-          'headers' => $headers,
-          'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
-          'body' => $bodyStart
-        ]);
-
-        $responseStart = json_decode($resStart->getBody(), true);
-
-        if (isset($responseStart['sid'])) {
-          $sid = $responseStart['sid'];
-
-          $live->setSid($sid);
-          $manager->flush();
-
-          return $this->json($live, 200, [], [
-            'groups' => 'live:read', 
-            'circular_reference_limit' => 1, 
-            'circular_reference_handler' => function ($object) {
-              return $object->getId();
-            } 
-          ]);
-        }
-
-        return new JsonResponse([
-          'status' => 'error',
-          'message' => 'Impossible de démarrer l\'enregistrement.'
-        ], 400);
-
-      } catch (\Exception $e) {
-        return new JsonResponse([
-          'status' => 'error',
-          'message' => 'Exception: ' . $e->getMessage()
-        ], 500);
-      }
+      return $this->json($live, 200, [], [
+        'groups' => 'live:read', 
+        'circular_reference_limit' => 1, 
+        'circular_reference_handler' => function ($object) {
+          return $object->getId();
+        } 
+      ]);
     }
     
     return $this->json(false, 404);
@@ -651,7 +559,10 @@ class LiveAPIController extends AbstractController {
     $info = $pusher->getChannelInfo($live->getChannel(), ['info' => 'subscription_count']);
     $count = $info->subscription_count;
     $user = $this->getUser();
-    $count = $count - 1;
+
+    if ($count > 0) {
+      $count = $count - 1;
+    }
 
     if ($user->getVendor()) {
       $vendor = [

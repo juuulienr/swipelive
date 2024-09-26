@@ -7,288 +7,288 @@ use App\Repository\SecurityUserRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=SecurityUserRepository::class)
- */
+* @ORM\Entity(repositoryClass=SecurityUserRepository::class)
+*/
 class SecurityUser
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+  /**
+   * @ORM\Id
+   * @ORM\GeneratedValue
+   * @ORM\Column(type="integer")
+   */
+  private $id;
 
-    /**
-     * @ORM\Column(type="datetime")
-     * @Groups("user:read")
-     */
-    private $createdAt;
+  /**
+   * @ORM\Column(type="datetime")
+   * @Groups("user:read")
+   */
+  private $createdAt;
 
-    /**
-     * @ORM\Column(type="datetime")
-     * @Groups("user:read")
-     * @Groups("discussion:read")
-     */
-    private $connectedAt;
+  /**
+   * @ORM\Column(type="datetime")
+   * @Groups("user:read")
+   * @Groups("discussion:read")
+   */
+  private $connectedAt;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="securityUsers")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $user;
+  /**
+   * @ORM\ManyToOne(targetEntity=User::class, inversedBy="securityUsers")
+   * @ORM\JoinColumn(nullable=false)
+   */
+  private $user;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $wifiIPAddress;
+  /**
+   * @ORM\Column(type="string", length=255, nullable=true)
+   */
+  private $wifiIPAddress;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $carrierIPAddress;
+  /**
+   * @ORM\Column(type="string", length=255, nullable=true)
+   */
+  private $carrierIPAddress;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $connection;
+  /**
+   * @ORM\Column(type="string", length=255, nullable=true)
+   */
+  private $connection;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $model;
+  /**
+   * @ORM\Column(type="string", length=255, nullable=true)
+   */
+  private $model;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("user:read")
-     */
-    private $platform;
+  /**
+   * @ORM\Column(type="string", length=255, nullable=true)
+   * @Groups("user:read")
+   */
+  private $platform;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $uuid;
+  /**
+   * @ORM\Column(type="string", length=255, nullable=true)
+   */
+  private $uuid;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $version;
+  /**
+   * @ORM\Column(type="string", length=255, nullable=true)
+   */
+  private $version;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $manufacturer;
+  /**
+   * @ORM\Column(type="string", length=255, nullable=true)
+   */
+  private $manufacturer;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $isVirtual;
+  /**
+   * @ORM\Column(type="boolean", nullable=true)
+   */
+  private $isVirtual;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $serial;
+  /**
+   * @ORM\Column(type="string", length=255, nullable=true)
+   */
+  private $serial;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("user:read")
-     */
-    private $timezone;
+  /**
+   * @ORM\Column(type="string", length=255, nullable=true)
+   * @Groups("user:read")
+   */
+  private $timezone;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups("user:read")
-     */
-    private $locale;
+  /**
+   * @ORM\Column(type="string", length=255, nullable=true)
+   * @Groups("user:read")
+   */
+  private $locale;
 
 
-    public function __construct()
-    {
-      $this->createdAt = new \DateTime('now', timezone_open('UTC'));
-      $this->connectedAt = new \DateTime('now', timezone_open('UTC'));
-    }
+  public function __construct()
+  {
+    $this->createdAt = new \DateTime('now', timezone_open('UTC'));
+    $this->connectedAt = new \DateTime('now', timezone_open('UTC'));
+  }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+  public function getId(): ?int
+  {
+    return $this->id;
+  }
 
-    public function getCreatedAt(): ?\DateTimeInterface
-    {
-        return $this->createdAt;
-    }
+  public function getCreatedAt(): ?\DateTimeInterface
+  {
+    return $this->createdAt;
+  }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
-    {
-        $this->createdAt = $createdAt;
+  public function setCreatedAt(\DateTimeInterface $createdAt): self
+  {
+    $this->createdAt = $createdAt;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getConnectedAt(): ?\DateTimeInterface
-    {
-        return $this->connectedAt;
-    }
+  public function getConnectedAt(): ?\DateTimeInterface
+  {
+    return $this->connectedAt;
+  }
 
-    public function setConnectedAt(\DateTimeInterface $connectedAt): self
-    {
-        $this->connectedAt = $connectedAt;
+  public function setConnectedAt(\DateTimeInterface $connectedAt): self
+  {
+    $this->connectedAt = $connectedAt;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
+  public function getUser(): ?User
+  {
+    return $this->user;
+  }
 
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
+  public function setUser(?User $user): self
+  {
+    $this->user = $user;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getWifiIPAddress(): ?string
-    {
-        return $this->wifiIPAddress;
-    }
+  public function getWifiIPAddress(): ?string
+  {
+    return $this->wifiIPAddress;
+  }
 
-    public function setWifiIPAddress(?string $wifiIPAddress): self
-    {
-        $this->wifiIPAddress = $wifiIPAddress;
+  public function setWifiIPAddress(?string $wifiIPAddress): self
+  {
+    $this->wifiIPAddress = $wifiIPAddress;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getCarrierIPAddress(): ?string
-    {
-        return $this->carrierIPAddress;
-    }
+  public function getCarrierIPAddress(): ?string
+  {
+    return $this->carrierIPAddress;
+  }
 
-    public function setCarrierIPAddress(?string $carrierIPAddress): self
-    {
-        $this->carrierIPAddress = $carrierIPAddress;
+  public function setCarrierIPAddress(?string $carrierIPAddress): self
+  {
+    $this->carrierIPAddress = $carrierIPAddress;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getConnection(): ?string
-    {
-        return $this->connection;
-    }
+  public function getConnection(): ?string
+  {
+    return $this->connection;
+  }
 
-    public function setConnection(?string $connection): self
-    {
-        $this->connection = $connection;
+  public function setConnection(?string $connection): self
+  {
+    $this->connection = $connection;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getModel(): ?string
-    {
-        return $this->model;
-    }
+  public function getModel(): ?string
+  {
+    return $this->model;
+  }
 
-    public function setModel(?string $model): self
-    {
-        $this->model = $model;
+  public function setModel(?string $model): self
+  {
+    $this->model = $model;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getPlatform(): ?string
-    {
-        return $this->platform;
-    }
+  public function getPlatform(): ?string
+  {
+    return $this->platform;
+  }
 
-    public function setPlatform(?string $platform): self
-    {
-        $this->platform = $platform;
+  public function setPlatform(?string $platform): self
+  {
+    $this->platform = $platform;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getUuid(): ?string
-    {
-        return $this->uuid;
-    }
+  public function getUuid(): ?string
+  {
+    return $this->uuid;
+  }
 
-    public function setUuid(?string $uuid): self
-    {
-        $this->uuid = $uuid;
+  public function setUuid(?string $uuid): self
+  {
+    $this->uuid = $uuid;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getVersion(): ?string
-    {
-        return $this->version;
-    }
+  public function getVersion(): ?string
+  {
+    return $this->version;
+  }
 
-    public function setVersion(?string $version): self
-    {
-        $this->version = $version;
+  public function setVersion(?string $version): self
+  {
+    $this->version = $version;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getManufacturer(): ?string
-    {
-        return $this->manufacturer;
-    }
+  public function getManufacturer(): ?string
+  {
+    return $this->manufacturer;
+  }
 
-    public function setManufacturer(?string $manufacturer): self
-    {
-        $this->manufacturer = $manufacturer;
+  public function setManufacturer(?string $manufacturer): self
+  {
+    $this->manufacturer = $manufacturer;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getIsVirtual(): ?bool
-    {
-        return $this->isVirtual;
-    }
+  public function getIsVirtual(): ?bool
+  {
+    return $this->isVirtual;
+  }
 
-    public function setIsVirtual(?bool $isVirtual): self
-    {
-        $this->isVirtual = $isVirtual;
+  public function setIsVirtual(?bool $isVirtual): self
+  {
+    $this->isVirtual = $isVirtual;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getSerial(): ?string
-    {
-        return $this->serial;
-    }
+  public function getSerial(): ?string
+  {
+    return $this->serial;
+  }
 
-    public function setSerial(?string $serial): self
-    {
-        $this->serial = $serial;
+  public function setSerial(?string $serial): self
+  {
+    $this->serial = $serial;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getTimezone(): ?string
-    {
-        return $this->timezone;
-    }
+  public function getTimezone(): ?string
+  {
+    return $this->timezone;
+  }
 
-    public function setTimezone(?string $timezone): self
-    {
-        $this->timezone = $timezone;
+  public function setTimezone(?string $timezone): self
+  {
+    $this->timezone = $timezone;
 
-        return $this;
-    }
+    return $this;
+  }
 
-    public function getLocale(): ?string
-    {
-        return $this->locale;
-    }
+  public function getLocale(): ?string
+  {
+    return $this->locale;
+  }
 
-    public function setLocale(?string $locale): self
-    {
-        $this->locale = $locale;
+  public function setLocale(?string $locale): self
+  {
+    $this->locale = $locale;
 
-        return $this;
-    }
+    return $this;
+  }
 }
