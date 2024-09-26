@@ -11,7 +11,6 @@ use App\Entity\Product;
 use App\Entity\Category;
 use App\Entity\Comment;
 use App\Entity\Follow;
-use App\Entity\Product;
 use App\Entity\Order;
 use App\Entity\Upload;
 use App\Entity\OrderStatus;
