@@ -71,7 +71,7 @@ class WebhookController extends AbstractController {
         switch ($result['eventType']) {
           case 103:
             // broadcaster join channel
-            $cname = $result['payload']['cname'];
+            $cname = $result['payload']['channelName'];
             $live = $liveRepo->findOneByCname($cname);
 
             if ($live) {
