@@ -53,6 +53,12 @@ class Live
   private $status;
 
   /**
+   * @ORM\Column(type="integer", nullable=true)
+   * @Groups("live:read")
+   */
+  private $reason;
+
+  /**
    * @ORM\Column(type="string", length=255, nullable=true)
    * @Groups("live:read")
    */
@@ -251,6 +257,18 @@ class Live
   public function setStatus(?int $status): self
   {
     $this->status = $status;
+
+    return $this;
+  }
+
+  public function getReason(): ?int
+  {
+    return $this->reason;
+  }
+
+  public function setReason(?int $reason): self
+  {
+    $this->reason = $reason;
 
     return $this;
   }
