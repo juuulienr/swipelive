@@ -90,13 +90,13 @@ class WebhookController extends AbstractController {
               $tokenData = json_decode($tokenResponse->getBody(), true);
 
               if (!isset($tokenData['token'])) {
-                return new JsonResponse([
-                  'status' => 'error',
-                  'message' => 'Impossible de récupérer le token Agora.'
-                ], 400);
+                throw new \Exception('Impossible de récupérer le token Agora.');
               }
 
               $tokenAgora = $tokenData['token'];
+
+              $this->bugsnag->leaveBreadcrumb($tokenAgora);
+
 
               // 2. Requête pour acquérir un resourceId
               $urlAcquire = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $appId);
@@ -107,6 +107,9 @@ class WebhookController extends AbstractController {
                 'clientRequest' => new \stdClass()
               ]);
 
+              $this->bugsnag->leaveBreadcrumb($bodyAcquire);
+              $this->bugsnag->leaveBreadcrumb($urlAcquire);
+
               $resAcquire = $client->request('POST', $urlAcquire, [
                 'headers' => $headers,
                 'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
@@ -115,10 +118,7 @@ class WebhookController extends AbstractController {
 
               $acquireData = json_decode($resAcquire->getBody(), true);
               if (!isset($acquireData['resourceId'])) {
-                return new JsonResponse([
-                  'status' => 'error',
-                  'message' => 'resourceId manquant lors de l\'acquisition.'
-                ], 400);
+                throw new \Exception('resourceId manquant lors de l\'acquisition.');
               }
 
               // Récupérer le resourceId
