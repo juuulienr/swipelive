@@ -86,6 +86,9 @@ class WebhookController extends AbstractController {
       if (isset($result['eventType'])) {
         switch ($result['eventType']) {
           case 103:
+            $live->setNoticeId($noticeId);
+            $manager->flush();
+            
             // broadcaster join channel
             $cname = $result['payload']['channelName'];
             $live = $liveRepo->findOneByCname($cname);
@@ -134,6 +137,7 @@ class WebhookController extends AbstractController {
             $resourceId = $acquireData['resourceId'];
             $live->setResourceId($resourceId);
             $manager->flush();
+            throw new \Exception('double record ????');
 
             // 3. Démarrer l'enregistrement en utilisant le tokenAgora
             $urlStart = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/mode/mix/start', $appId, $resourceId);
@@ -228,9 +232,6 @@ class WebhookController extends AbstractController {
     } catch (\Exception $e) {
       $this->bugsnag->notifyException($e);
     }
-
-    $live->setNoticeId($noticeId);
-    $manager->flush();
 
     return $this->json(true, 200);
   }
