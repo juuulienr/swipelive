@@ -31,7 +31,7 @@ class Live
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
    */
-  private $eventId;
+  private $noticeId;
 
   /**
    * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="live", orphanRemoval=true)
@@ -387,14 +387,14 @@ class Live
     return $this;
   }
 
-  public function getEventId(): ?string
+  public function getNoticeId(): ?string
   {
-    return $this->eventId;
+    return $this->noticeId;
   }
 
-  public function setEventId(?string $eventId): self
+  public function setNoticeId(?string $noticeId): self
   {
-    $this->eventId = $eventId;
+    $this->noticeId = $noticeId;
 
     return $this;
   }

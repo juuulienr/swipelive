@@ -67,6 +67,11 @@ class WebhookController extends AbstractController {
     try {
       $result = json_decode($request->getContent(), true);
 
+      // test_webhook
+      if (isset($result['payload']['channelName']) && isset($result['payload']['channelName']) == "test_webhook") {
+        return $this->json(true, 200);
+      }
+
       if (isset($result['eventType'])) {
         switch ($result['eventType']) {
           case 103:
@@ -74,7 +79,7 @@ class WebhookController extends AbstractController {
             $cname = $result['payload']['channelName'];
             $live = $liveRepo->findOneByCname($cname);
 
-            if ($live) {
+            if ($live && $live->getStatus() != 2) {
               $live->setStatus(1);
               $manager->flush();
             }
@@ -95,8 +100,6 @@ class WebhookController extends AbstractController {
 
               $tokenAgora = $tokenData['token'];
 
-              $this->bugsnag->leaveBreadcrumb($tokenAgora);
-
               // 2. Requête pour acquérir un resourceId
               $urlAcquire = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $appId);
               $headers = ['Content-Type' => 'application/json'];
@@ -105,9 +108,6 @@ class WebhookController extends AbstractController {
                 'uid' => '123456789',
                 'clientRequest' => new \stdClass()
               ]);
-
-              $this->bugsnag->leaveBreadcrumb($bodyAcquire);
-              $this->bugsnag->leaveBreadcrumb($urlAcquire);
 
               $resAcquire = $client->request('POST', $urlAcquire, [
                 'headers' => $headers,
@@ -196,9 +196,8 @@ class WebhookController extends AbstractController {
                   }
                 }
               }
-
             } catch (\Exception $e) {
-              throw new \Exception('Exception: ' . $e->getMessage());
+              $this->bugsnag->notifyException($e);
             }
 
           case 104:
@@ -212,18 +211,10 @@ class WebhookController extends AbstractController {
             }
 
           break;
-
-          default:
-          throw new \Exception('Unknown event type: ' . $result['eventType']);
         }
       }
     } catch (\Exception $e) {
       $this->bugsnag->notifyException($e);
-
-      return $this->json([
-        'status' => 'error',
-        'message' => 'Webhook processing failed: ' . $e->getMessage()
-      ], 500);
     }
 
     return $this->json(true, 200);
@@ -244,20 +235,31 @@ class WebhookController extends AbstractController {
       if (isset($result['eventType'])) {
         // throw new \Exception('Analyser les fichiers');
         switch ($result['eventType']) {
-          case 31:
-          // All the recorded files are uploaded to the specified third-party cloud storage.
-          $fileList = $result['payload']['details']['fileList'] ?? [];
-          $cname = $result['payload']['cname'];
-          $live = $liveRepo->findOneByCname($cname);
+          case 4:
+          // cloud_recording_file_infos
+            $fileList = $result['payload']['details']['fileList'] ?? [];
+            $cname = $result['payload']['cname'];
+            $live = $liveRepo->findOneByCname($cname);
 
-          if ($live && !$live->getFileList() && $filelist) {
-            $live->setFileList($fileList);
-            $manager->flush();
-          }
+            if ($live && !$live->getFileList() && $filelist) {
+              $live->setFileList($fileList);
+              $manager->flush();
+            }
+          break;
+          case 31:
+            // uploaded
+            $fileList = $result['payload']['details']['fileList'] ?? [];
+            $cname = $result['payload']['cname'];
+            $live = $liveRepo->findOneByCname($cname);
+
+            if ($live && !$live->getFileList() && $filelist) {
+              $live->setFileList($fileList);
+              $manager->flush();
+            }
           break;
 
           case 45:
-            // The screenshot is captured successfully.
+            // recorder_snapshot_file
             $fileName = $result['payload']['details']['fileName'] ?? [];
             $cname = $result['payload']['cname'];
             $live = $liveRepo->findOneByCname($cname);
