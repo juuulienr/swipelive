@@ -77,7 +77,6 @@ class AccountAPIController extends AbstractController {
             $security->setVersion($param['device']['version']);
             $security->setManufacturer($param['device']['manufacturer']);
             $security->setIsVirtual($param['device']['isVirtual']);
-            $security->setSerial($param['device']['serial']);
           }
 
           $manager->persist($security);
@@ -227,7 +226,6 @@ class AccountAPIController extends AbstractController {
             $security->setVersion($param['device']['version']);
             $security->setManufacturer($param['device']['manufacturer']);
             $security->setIsVirtual($param['device']['isVirtual']);
-            $security->setSerial($param['device']['serial']);
           }
 
           $manager->persist($security);
@@ -335,7 +333,6 @@ class AccountAPIController extends AbstractController {
             $security->setVersion($param['device']['version']);
             $security->setManufacturer($param['device']['manufacturer']);
             $security->setIsVirtual($param['device']['isVirtual']);
-            $security->setSerial($param['device']['serial']);
           }
 
           $manager->persist($security);
@@ -442,7 +439,6 @@ class AccountAPIController extends AbstractController {
             $security->setVersion($param['device']['version']);
             $security->setManufacturer($param['device']['manufacturer']);
             $security->setIsVirtual($param['device']['isVirtual']);
-            $security->setSerial($param['device']['serial']);
           }
 
           $manager->persist($security);

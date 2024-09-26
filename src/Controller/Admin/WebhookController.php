@@ -97,7 +97,6 @@ class WebhookController extends AbstractController {
 
               $this->bugsnag->leaveBreadcrumb($tokenAgora);
 
-
               // 2. Requête pour acquérir un resourceId
               $urlAcquire = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $appId);
               $headers = ['Content-Type' => 'application/json'];
@@ -190,7 +189,7 @@ class WebhookController extends AbstractController {
                 foreach ($followers as $follower) {
                   if ($follower->getPushToken()) {
                     try {
-                      $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "🔴 " . $pseudo . " est actuellement en direct", $follower->getPushToken());
+                      $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "🔴 " . $live->getVendor()->getPseudo() . " est actuellement en direct", $follower->getPushToken());
                     } catch (\Exception $error) {
                       $this->bugsnag->notifyException($error);
                     }
@@ -203,6 +202,15 @@ class WebhookController extends AbstractController {
             }
 
           case 104:
+            // broadcaster leave channel
+            $cname = $result['payload']['channelName'];
+            $live = $liveRepo->findOneByCname($cname);
+
+            if ($live) {
+              $live->setStatus(2);
+              $manager->flush();
+            }
+
           break;
 
           default:

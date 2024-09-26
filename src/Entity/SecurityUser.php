@@ -85,11 +85,6 @@ class SecurityUser
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
-   */
-  private $serial;
-
-  /**
-   * @ORM\Column(type="string", length=255, nullable=true)
    * @Groups("user:read")
    */
   private $timezone;
@@ -252,18 +247,6 @@ class SecurityUser
   public function setIsVirtual(?bool $isVirtual): self
   {
     $this->isVirtual = $isVirtual;
-
-    return $this;
-  }
-
-  public function getSerial(): ?string
-  {
-    return $this->serial;
-  }
-
-  public function setSerial(?string $serial): self
-  {
-    $this->serial = $serial;
 
     return $this;
   }

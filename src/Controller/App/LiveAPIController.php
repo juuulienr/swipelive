@@ -188,8 +188,6 @@ class LiveAPIController extends AbstractController {
       $param = json_decode($json, true);
       $channel = "channel" . $live->getId();
       $event = "event" . $live->getId();
-      $user = $this->getUser();
-      $pseudo = $user->getVendor()->getPseudo();
 
       $live->setChannel($channel);
       $live->setEvent($event);
