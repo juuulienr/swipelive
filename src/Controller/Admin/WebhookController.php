@@ -210,7 +210,9 @@ class WebhookController extends AbstractController {
     
           case 104:
             // broadcaster leave channel
+            $ts = $result['payload']['ts'];
             $cname = $result['payload']['channelName'];
+            $duration = $result['payload']['duration'];
             $reason = $result['payload']['reason'];
             $live = $liveRepo->findOneByCname($cname);
 
@@ -246,21 +248,17 @@ class WebhookController extends AbstractController {
       $result = json_decode($request->getContent(), true);
 
       if (isset($result['eventType'])) {
-        // throw new \Exception('Analyser les fichiers');
         switch ($result['eventType']) {
-          case 4:
-          // cloud_recording_file_infos
-            $fileList = $result['payload']['details']['fileList'] ?? [];
-            $cname = $result['payload']['cname'];
-            $live = $liveRepo->findOneByCname($cname);
-
-            if ($live && !$live->getFileList() && $filelist) {
-              $live->setFileList($fileList);
-              $manager->flush();
-            }
+          case 1:
+            throw new \Exception('An error occurs during the recording (cloud recording service)');
           break;
+
+          case 2:
+            throw new \Exception('A warning occurs during the recording (cloud recording service)');
+          break;
+
           case 31:
-            // uploaded
+            // All the recorded files are uploaded to the specified third-party cloud storage
             $fileList = $result['payload']['details']['fileList'] ?? [];
             $cname = $result['payload']['cname'];
             $live = $liveRepo->findOneByCname($cname);
@@ -269,10 +267,22 @@ class WebhookController extends AbstractController {
               $live->setFileList($fileList);
               $manager->flush();
             }
+
+            // voir pour sliceStartTime (The Unix time (ms) when the recording starts)
+            // lancer la création des clips
+          
+          break;
+
+          case 40:
+          // The recording starts
+          break;
+
+          case 41:
+          //  The recording exits
           break;
 
           case 45:
-            // recorder_snapshot_file
+            // The screenshot is captured successfully
             $fileName = $result['payload']['details']['fileName'] ?? [];
             $cname = $result['payload']['cname'];
             $live = $liveRepo->findOneByCname($cname);
@@ -282,17 +292,10 @@ class WebhookController extends AbstractController {
               $manager->flush();
             }
           break;
-
-          default:
         }
       }
     } catch (\Exception $e) {
       $this->bugsnag->notifyException($e);
-
-      return $this->json([
-        'status' => 'error',
-        'message' => 'Webhook processing failed: ' . $e->getMessage()
-      ], 500);
     }
 
     return $this->json(true, 200);
