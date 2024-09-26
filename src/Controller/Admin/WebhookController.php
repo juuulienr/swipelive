@@ -206,6 +206,7 @@ class WebhookController extends AbstractController {
                 }
               }
             }
+          break;
     
           case 104:
             // broadcaster leave channel
