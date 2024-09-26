@@ -72,6 +72,17 @@ class WebhookController extends AbstractController {
         return $this->json(true, 200);
       }
 
+      // check noticeId
+      if (isset($result['noticeId'])) {
+        $noticeId = $result['noticeId'];
+        $live = $liveRepo->findOneByNoticeId($noticeId);
+
+        if ($live) {
+          return $this->json(true, 200);
+        }
+      }
+
+
       if (isset($result['eventType'])) {
         switch ($result['eventType']) {
           case 103:
@@ -203,10 +214,12 @@ class WebhookController extends AbstractController {
           case 104:
             // broadcaster leave channel
             $cname = $result['payload']['channelName'];
+            $reason = $result['payload']['reason'];
             $live = $liveRepo->findOneByCname($cname);
 
             if ($live) {
               $live->setStatus(2);
+              $live->setReason($reason);
               $manager->flush();
             }
 
@@ -216,6 +229,9 @@ class WebhookController extends AbstractController {
     } catch (\Exception $e) {
       $this->bugsnag->notifyException($e);
     }
+
+    $live->setNoticeId($noticeId);
+    $manager->flush();
 
     return $this->json(true, 200);
   }
