@@ -69,6 +69,7 @@ class WebhookController extends AbstractController {
 
       // test_webhook
       if (isset($result['payload']['channelName']) && isset($result['payload']['channelName']) == "test_webhook") {
+                throw new \Exception('test');
         return $this->json(true, 200);
       }
 
@@ -78,6 +79,7 @@ class WebhookController extends AbstractController {
         $live = $liveRepo->findOneByNoticeId($noticeId);
 
         if ($live) {
+                throw new \Exception('test live');
           return $this->json(true, 200);
         }
       }
@@ -95,122 +97,118 @@ class WebhookController extends AbstractController {
               $manager->flush();
             }
 
-            try {
-              $client = new Client();
-              $vname = "vendor" . $live->getVendor()->getId();
-              $appId = $this->getParameter('agora_app_id');
+            $client = new Client();
+            $vname = "vendor" . $live->getVendor()->getId();
+            $appId = $this->getParameter('agora_app_id');
 
-              // 1. Récupérer le token via votre propre route API
-              $tokenUrl = $this->generateUrl('generate_agora_token_record', ['id' => $live->getId()], 0);
-              $tokenResponse = $client->request('GET', $tokenUrl);
-              $tokenData = json_decode($tokenResponse->getBody(), true);
+            // 1. Récupérer le token via votre propre route API
+            $tokenUrl = $this->generateUrl('generate_agora_token_record', ['id' => $live->getId()], 0);
+            $tokenResponse = $client->request('GET', $tokenUrl);
+            $tokenData = json_decode($tokenResponse->getBody(), true);
 
-              if (!isset($tokenData['token'])) {
-                throw new \Exception('Impossible de récupérer le token Agora.');
-              }
+            if (!isset($tokenData['token'])) {
+              throw new \Exception('Impossible de récupérer le token Agora.');
+            }
 
-              $tokenAgora = $tokenData['token'];
+            $tokenAgora = $tokenData['token'];
 
-              // 2. Requête pour acquérir un resourceId
-              $urlAcquire = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $appId);
-              $headers = ['Content-Type' => 'application/json'];
-              $bodyAcquire = json_encode([
-                'cname' => $cname,
-                'uid' => '123456789',
-                'clientRequest' => new \stdClass()
-              ]);
+            // 2. Requête pour acquérir un resourceId
+            $urlAcquire = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/acquire', $appId);
+            $headers = ['Content-Type' => 'application/json'];
+            $bodyAcquire = json_encode([
+              'cname' => $cname,
+              'uid' => '123456789',
+              'clientRequest' => new \stdClass()
+            ]);
 
-              $resAcquire = $client->request('POST', $urlAcquire, [
-                'headers' => $headers,
-                'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
-                'body' => $bodyAcquire
-              ]);
+            $resAcquire = $client->request('POST', $urlAcquire, [
+              'headers' => $headers,
+              'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
+              'body' => $bodyAcquire
+            ]);
 
-              $acquireData = json_decode($resAcquire->getBody(), true);
-              if (!isset($acquireData['resourceId'])) {
-                throw new \Exception('resourceId manquant lors de l\'acquisition.');
-              }
+            $acquireData = json_decode($resAcquire->getBody(), true);
+            if (!isset($acquireData['resourceId'])) {
+              throw new \Exception('resourceId manquant lors de l\'acquisition.');
+            }
 
-              // Récupérer le resourceId
-              $resourceId = $acquireData['resourceId'];
-              $live->setResourceId($resourceId);
-              $manager->flush();
+            // Récupérer le resourceId
+            $resourceId = $acquireData['resourceId'];
+            $live->setResourceId($resourceId);
+            $manager->flush();
 
-              // 3. Démarrer l'enregistrement en utilisant le tokenAgora
-              $urlStart = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/mode/mix/start', $appId, $resourceId);
-              $bodyStart = json_encode([
-                'cname' => $cname,
-                'uid' => '123456789',
-                'clientRequest' => [
-                  'token' => $tokenAgora,
-                  'recordingConfig' => [
-                    'maxIdleTime' => 120,
-                    'streamTypes' => 2,
-                    'channelType' => 0,
-                    'videoStreamType' => 0,
-                    'transcodingConfig' => [
-                      'width' => 1080,
-                      'height' => 1920,
-                      'bitrate' => 3150,
-                      'fps' => 30
-                    ]
-                  ],
-                  'snapshotConfig' => [
-                    'captureInterval' => 3600,
-                    'fileType' => [
-                      'jpg'
-                    ]
-                  ],
-                  'recordingFileConfig' => [
-                    'avFileType' => [
-                      'hls'
-                    ]
-                  ],
-                  'storageConfig' => [
-                    'vendor' => $this->getParameter('s3_vendor'),
-                    'region' => $this->getParameter('s3_region'),
-                    'bucket' => $this->getParameter('s3_bucket'),
-                    'accessKey' => $this->getParameter('s3_access_key'),
-                    'secretKey' => $this->getParameter('s3_secret_key'),
-                    'fileNamePrefix' => [$vname, $cname]
+            // 3. Démarrer l'enregistrement en utilisant le tokenAgora
+            $urlStart = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/mode/mix/start', $appId, $resourceId);
+            $bodyStart = json_encode([
+              'cname' => $cname,
+              'uid' => '123456789',
+              'clientRequest' => [
+                'token' => $tokenAgora,
+                'recordingConfig' => [
+                  'maxIdleTime' => 120,
+                  'streamTypes' => 2,
+                  'channelType' => 0,
+                  'videoStreamType' => 0,
+                  'transcodingConfig' => [
+                    'width' => 1080,
+                    'height' => 1920,
+                    'bitrate' => 3150,
+                    'fps' => 30
                   ]
+                ],
+                'snapshotConfig' => [
+                  'captureInterval' => 3600,
+                  'fileType' => [
+                    'jpg'
+                  ]
+                ],
+                'recordingFileConfig' => [
+                  'avFileType' => [
+                    'hls'
+                  ]
+                ],
+                'storageConfig' => [
+                  'vendor' => $this->getParameter('s3_vendor'),
+                  'region' => $this->getParameter('s3_region'),
+                  'bucket' => $this->getParameter('s3_bucket'),
+                  'accessKey' => $this->getParameter('s3_access_key'),
+                  'secretKey' => $this->getParameter('s3_secret_key'),
+                  'fileNamePrefix' => [$vname, $cname]
                 ]
-              ]);
+              ]
+            ]);
 
-              $resStart = $client->request('POST', $urlStart, [
-                'headers' => $headers,
-                'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
-                'body' => $bodyStart
-              ]);
+            $resStart = $client->request('POST', $urlStart, [
+              'headers' => $headers,
+              'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
+              'body' => $bodyStart
+            ]);
 
-              $responseStart = json_decode($resStart->getBody(), true);
+            $responseStart = json_decode($resStart->getBody(), true);
 
-              if (isset($responseStart['sid'])) {
-                $sid = $responseStart['sid'];
+            if (isset($responseStart['sid'])) {
+              $sid = $responseStart['sid'];
 
-                $live->setSid($sid);
-                $manager->flush();
-              } else {
-                throw new \Exception('Impossible de démarrer l\'enregistrement.');
-              }
+              $live->setSid($sid);
+              $manager->flush();
+            } else {
+              throw new \Exception('Impossible de démarrer l\'enregistrement.');
+            }
 
-              $followers = $userRepo->findUserFollowers($live->getVendor()->getUser());
+            $followers = $userRepo->findUserFollowers($live->getVendor()->getUser());
 
-              if ($followers) {
-                foreach ($followers as $follower) {
-                  if ($follower->getPushToken()) {
-                    try {
-                      $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "🔴 " . $live->getVendor()->getPseudo() . " est actuellement en direct", $follower->getPushToken());
-                    } catch (\Exception $error) {
-                      $this->bugsnag->notifyException($error);
-                    }
+            if ($followers) {
+              foreach ($followers as $follower) {
+                if ($follower->getPushToken()) {
+                  try {
+                    $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "🔴 " . $live->getVendor()->getPseudo() . " est actuellement en direct", $follower->getPushToken());
+                  } catch (\Exception $error) {
+                    $this->bugsnag->notifyException($error);
                   }
                 }
               }
-            } catch (\Exception $e) {
-              $this->bugsnag->notifyException($e);
             }
-
+    
           case 104:
             // broadcaster leave channel
             $cname = $result['payload']['channelName'];
