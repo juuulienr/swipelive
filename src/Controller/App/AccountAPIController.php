@@ -33,6 +33,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use App\Service\FirebaseMessagingService;
 use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
@@ -40,6 +41,15 @@ use Cloudinary\Cloudinary;
 
 
 class AccountAPIController extends AbstractController {
+
+  private $firebaseMessagingService;
+  private $bugsnag;
+
+  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag) {
+    $this->firebaseMessagingService = $firebaseMessagingService;
+    $this->bugsnag = $bugsnag;
+  }
+  
 
 
   /**
