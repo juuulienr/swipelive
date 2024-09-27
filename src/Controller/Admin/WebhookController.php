@@ -279,10 +279,12 @@ class WebhookController extends AbstractController {
 
           case 40:
           // The recording starts
+            throw new \Exception('The recording starts');
           break;
 
           case 41:
           //  The recording exits
+            throw new \Exception('The recording exits');
           break;
 
           case 45:
