@@ -127,7 +127,7 @@ class AccountAPIController extends AbstractController {
    *
    * @Route("/api/notif/push/test/{id}", name="api_notif_push_test", methods={"GET"})
    */
-  public function testNotifPush(User $user, Request $request, ObjectManager $manager, CategoryRepository $categoryRepo) {
+  public function testNotifPush(User $user, Request $request, ObjectManager $manager) {
     $data = [
       'route' => "ListOrders",
       'type' => 'vente',
