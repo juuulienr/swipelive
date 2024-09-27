@@ -135,7 +135,7 @@ class AccountAPIController extends AbstractController {
    /**
    * Test Notif Push
    *
-   * @Route("/api/notif/push/test/{id}", name="api_notif_push_test", methods={"GET"})
+   * @Route("/api/test/{id}", name="api_notif_push_test", methods={"GET"})
    */
   public function testNotifPush(User $user, Request $request, ObjectManager $manager) {
     $data = [
