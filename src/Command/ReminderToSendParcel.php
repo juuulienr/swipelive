@@ -53,11 +53,12 @@ class ReminderToSendParcel extends Command
         $createdAt = $order->getCreatedAt();
         if ($createdAt->modify('+7 days') < $now) {
           $this->cancelOrder($order);
-        } elseif ($createdAt->modify('+4 days') < $now) {
-          $this->sendSecondReminder($order);
-        } elseif ($createdAt->modify('+2 days') < $now) {
-          $this->sendFirstReminder($order);
         }
+        // } elseif ($createdAt->modify('+4 days') < $now) {
+        //   $this->sendSecondReminder($order);
+        // } elseif ($createdAt->modify('+2 days') < $now) {
+        //   $this->sendFirstReminder($order);
+        // }
       }
     }
 

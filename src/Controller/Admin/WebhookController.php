@@ -140,7 +140,6 @@ class WebhookController extends AbstractController {
             $resourceId = $acquireData['resourceId'];
             $live->setResourceId($resourceId);
             $manager->flush();
-            throw new \Exception('double record ????');
 
             // 3. Démarrer l'enregistrement en utilisant le tokenAgora
             $urlStart = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/mode/mix/start', $appId, $resourceId);
