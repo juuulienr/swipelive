@@ -278,18 +278,18 @@ public function agoraRTCChannelEvent(Request $request, ObjectManager $manager, L
 
             // voir pour sliceStartTime (The Unix time (ms) when the recording starts)
             // lancer la création des clips
-            throw new \Exception('sliceStartTime');
+            // throw new \Exception('sliceStartTime');
           
           break;
 
           case 40:
           // The recording starts
-            throw new \Exception('The recording starts');
+            // throw new \Exception('The recording starts');
           break;
 
           case 41:
           //  The recording exits
-            throw new \Exception('The recording exits');
+            // throw new \Exception('The recording exits');
           break;
 
           case 45:
