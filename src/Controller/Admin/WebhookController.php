@@ -84,17 +84,22 @@ class WebhookController extends AbstractController {
       if (isset($result['eventType'])) {
         switch ($result['eventType']) {
           case 103:
-            $live->setNoticeId($noticeId);
-            $manager->flush();
             
             // broadcaster join channel
             $cname = $result['payload']['channelName'];
             $live = $liveRepo->findOneByCname($cname);
 
-            if ($live && $live->getStatus() != 2) {
-              $live->setStatus(1);
-              $manager->flush();
+            if ($live) {
+              if ($live->getStatus() != 2) {
+                $live->setStatus(1);
+                $manager->flush();
+              }
+              if ($live && $noticeId) {
+                $live->setNoticeId($noticeId);
+                $manager->flush();
+              }
             }
+
 
             $client = new Client();
             $vname = "vendor" . $live->getVendor()->getId();
