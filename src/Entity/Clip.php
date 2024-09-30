@@ -59,6 +59,12 @@ class Clip
   private $resourceId;
 
   /**
+   * @ORM\Column(type="text", nullable=true)
+   * @Groups("clip:read")
+   */
+  private $fileList;
+
+  /**
    * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="clips")
    * @ORM\JoinColumn(nullable=false)
    * @Groups("clip:read")
@@ -184,6 +190,18 @@ class Clip
   public function setResourceId(?string $resourceId): self
   {
     $this->resourceId = $resourceId;
+
+    return $this;
+  }
+
+  public function getFileList(): ?string
+  {
+    return $this->fileList;
+  }
+
+  public function setFileList(?string $fileList): self
+  {
+    $this->fileList = $fileList;
 
     return $this;
   }
