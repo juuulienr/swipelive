@@ -337,6 +337,7 @@ class LiveAPIController extends AbstractController {
           $clip->setVendor($user->getVendor());
           $clip->setLive($live);
           $clip->setProduct($liveProduct->getProduct());
+          $clip->setFileList($live->getFileList());
           $clip->setPreview($live->getPreview());
           $clip->setStart($start);
           $clip->setEnd($end);
@@ -441,58 +442,53 @@ class LiveAPIController extends AbstractController {
 
 
 
-    // if ($live->getBroadcastId()) {
-    //   // créer le dernier clip
-    //   $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
+    if ($live->getFileList()) {
+      // créer le dernier clip
+      $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
 
-    //   if ($liveProduct) {
-    //     if ($live->getDisplay() == 1) {
-    //       $start = 5;
-    //     } else {
-    //       $start = $live->getDuration() + 1;
-    //     }
+      if ($liveProduct) {
+        if ($live->getDisplay() == 1) {
+          $start = 5;
+        } else {
+          $start = $live->getDuration() + 1;
+        }
 
-    //     $url = "https://api.bambuser.com/broadcasts/" . $live->getBroadcastId();
-    //     $ch = curl_init();
+        $created = $live->getCreatedAt();
+        $now = new \DateTime('now', timezone_open('UTC'));
+        $diff = $now->diff($created);
+        $end = $this->dateIntervalToSeconds($diff);
+        $duration = $end - $start;
 
-    //     curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/vnd.bambuser.v1+json", "Authorization: Bearer RkbHZdUPzA8Rcu2w4b1jn9"]);
-    //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    //     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-    //     curl_setopt($ch, CURLOPT_URL, $url);
+        if ($result && $result->id) {
+          $end = $result->length - 5;
+          $duration = $end - $start;
 
-    //     $result = curl_exec($ch);
-    //     $result = json_decode($result);
-    //     curl_close($ch);
+          if ($duration > 15) {
+            $clip = new Clip();
+            $clip->setVendor($this->getUser()->getVendor());
+            $clip->setLive($live);
+            $clip->setProduct($liveProduct->getProduct());
+            $clip->setPreview($live->getPreview());
+            $clip->setFileList($live->getFileList());
+            $clip->setStart($start);
+            $clip->setEnd($end);
+            $clip->setDuration($duration);
 
-    //     if ($result && $result->id) {
-    //       $end = $result->length - 5;
-    //       $duration = $end - $start;
+            $manager->persist($clip);
+            $manager->flush();
 
-    //       if ($duration > 15) {
-    //         $clip = new Clip();
-    //         $clip->setVendor($this->getUser()->getVendor());
-    //         $clip->setLive($live);
-    //         $clip->setProduct($liveProduct->getProduct());
-    //         $clip->setPreview($live->getPreview());
-    //         $clip->setStart($start);
-    //         $clip->setEnd($end);
-    //         $clip->setDuration($duration);
+            $live->setDuration($end);
+            $comments = $commentRepo->findByLiveAndClipNull($live);
 
-    //         $manager->persist($clip);
-    //         $manager->flush();
+            foreach ($comments as $comment) {
+              $comment->setClip($clip);
+            }
 
-    //         $live->setDuration($end);
-    //         $comments = $commentRepo->findByLiveAndClipNull($live);
-
-    //         foreach ($comments as $comment) {
-    //           $comment->setClip($clip);
-    //         }
-
-    //         $manager->flush();
-    //       }
-    //     }
-    //   }
-    // }
+            $manager->flush();
+          }
+        }
+      }
+    }
   }
 
 
