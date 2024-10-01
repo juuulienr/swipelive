@@ -250,8 +250,7 @@ class User implements UserInterface
     return $this;
   }    
 
-  public function getRoles() {
-
+  public function getRoles(): array {
     return ['ROLE_USER'];
   }
 
@@ -259,10 +258,10 @@ class User implements UserInterface
     return $this->hash;
   }
 
-  public function getSalt() {}
-  
-  public function getUsername() {
-    return $this->email;
+  // Remplacer getUsername par getUserIdentifier
+  public function getUserIdentifier(): string
+  {
+      return $this->email;  // ou une autre propriété qui représente l'identifiant unique de l'utilisateur
   }
 
   public function eraseCredentials() {}

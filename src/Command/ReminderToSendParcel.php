@@ -38,12 +38,12 @@ class ReminderToSendParcel extends Command
     $this->bugsnag = $bugsnag;
   }
 
-  protected function configure()
+  protected function configure(): void
   {
     $this->setDescription('Reminder to print label and send parcel.');
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
+  protected function execute(InputInterface $input, OutputInterface $output): int
   {
     $orders = $this->orderRepo->findAll();
     $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));

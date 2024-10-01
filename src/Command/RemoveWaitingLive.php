@@ -24,13 +24,13 @@ class RemoveWaitingLive extends Command
     $this->logger = $logger;
   }
 
-  protected function configure()
+  protected function configure(): void
   {
     $this
     ->setDescription('Delete lives without clips that are older than 1 day with specific statuses');
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
+  protected function execute(InputInterface $input, OutputInterface $output): int
   {
     // Set the threshold date to 1 day ago
     $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
