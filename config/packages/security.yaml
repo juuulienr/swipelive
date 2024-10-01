@@ -1,4 +1,6 @@
 security:
+    enable_authenticator_manager: true  # Activer le gestionnaire d'authenticators pour Symfony 5.4 et plus
+
     password_hashers:
         App\Entity\User:
             algorithm: auto
@@ -13,29 +15,23 @@ security:
                 property: email
 
     firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-
-        userAPILogin:
-            pattern:  ^/user/api/login
-            provider: in_user
+        # Firewall pour l'authentification via /api/login
+        login:
+            pattern: ^/user/api/login
             stateless: true
+            provider: in_user  # Fournisseur explicite pour les utilisateurs
             json_login:
                 check_path: /user/api/login_check
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
-        userAPI:
-            pattern: ^/user/api
-            provider: in_user
+        # Firewall pour les autres routes API protégées par JWT
+        api:
+            pattern:   ^/user/api
             stateless: true
-            custom_authenticators:
-                - lexik_jwt_authentication.jwt_manager
-            # optional authentication mechanisms you can activate:
-            # http_basic: true
-            # form_login: true
+            provider: in_user  # Assure-toi que le même provider est utilisé ici si nécessaire
+            jwt: ~  # Activer l'authentification JWT via Lexik JWT Authentication Bundle
 
     access_control:
-        - { path: ^/user/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/user/api,       roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/user/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/user/api, roles: IS_AUTHENTICATED_FULLY }

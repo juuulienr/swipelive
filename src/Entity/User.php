@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -18,7 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 *  message="L'adresse mail est indisponible"
 * )
 */
-class User implements UserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
   /**
    * @ORM\Id
@@ -254,9 +255,11 @@ class User implements UserInterface
     return ['ROLE_USER'];
   }
 
-  public function getPassword() {
-    return $this->hash;
+  public function getPassword(): ?string
+  {
+      return $this->hash;
   }
+
 
   // Remplacer getUsername par getUserIdentifier
   public function getUserIdentifier(): string
