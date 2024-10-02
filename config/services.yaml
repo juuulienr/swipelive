@@ -87,5 +87,13 @@ services:
             $entityManager: '@doctrine.orm.entity_manager'
             $s3Client: '@Aws\S3\S3Client'
 
-
+    Aws\S3\S3Client:
+        factory: ['Aws\S3\S3Client', 'factory']
+        arguments:
+            - 
+                version: 'latest'
+                region: 'eu-west-3'
+                credentials:
+                    key: '%env(S3_ACCESS_KEY)%'
+                    secret: '%env(S3_SECRET_KEY)%'
 
