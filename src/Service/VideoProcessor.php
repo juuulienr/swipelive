@@ -59,8 +59,8 @@ class VideoProcessor
     if ($returnVar !== 0) {
       return false;  // Échec de la conversion et du découpage
     }
-    
-    $fileList = 'https://' . $this->parameters->get('s3_bucket') '.s3.eu-west-3.amazonaws.com/clips/clip_' . $clip->getId() . '/clip_' . $clip->getId() . '.m3u8';
+
+    $fileList = 'https://' . $this->parameters->get('s3_bucket') . '.s3.eu-west-3.amazonaws.com/clips/clip_' . $clip->getId() . '/clip_' . $clip->getId() . '.m3u8';
 
   // Upload des fichiers M3U8 et des segments découpés sur S3
     $this->uploadDirectoryToS3($outputDir, 'clips/clip_' . $clip->getId());
