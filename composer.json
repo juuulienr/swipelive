@@ -4,6 +4,7 @@
   "require": {
     "php": "^8.2",
     "ext-iconv": "*",
+    "aws/aws-sdk-php": "*",
     "boogiefromzk/agora-token": "^1.0",
     "bugsnag/bugsnag-symfony": "^1.13",
     "cloudinary/cloudinary_php": "^2.11",

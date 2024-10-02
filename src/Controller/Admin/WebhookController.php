@@ -37,8 +37,9 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use App\Service\FirebaseMessagingService;
 use Symfony\Component\Filesystem\Filesystem;
+use App\Service\FirebaseMessagingService;
+use App\Service\VideoProcessor;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response;
@@ -49,10 +50,12 @@ class WebhookController extends AbstractController {
 
   private $firebaseMessagingService;
   private $bugsnag;
+  private $videoProcessor;
 
-  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag) {
+  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag, VideoProcessor $videoProcessor) {
     $this->firebaseMessagingService = $firebaseMessagingService;
     $this->bugsnag = $bugsnag;
+    $this->videoProcessor = $videoProcessor;
   }
 
 
@@ -266,30 +269,21 @@ public function agoraRTCChannelEvent(Request $request, ObjectManager $manager, L
           break;
 
           case 31:
-            // All the recorded files are uploaded to the specified third-party cloud storage
+             // All the recorded files are uploaded to the specified third-party cloud storage
             $fileList = $result['payload']['details']['fileList'] ?? [];
             $cname = $result['payload']['cname'];
             $live = $liveRepo->findOneByCname($cname);
 
-            if ($live && $filelist) {
-              $live->setFileList($fileList);
-              $manager->flush();
+            if ($live && $fileList) {
+                $live->setFileList($fileList);
+                $manager->flush();
+
+                // Process clips after receiving fileList
+                $clips = $live->getClips();
+                foreach ($clips as $clip) {
+                    $this->videoProcessor->processClip($clip);
+                }
             }
-
-            // voir pour sliceStartTime (The Unix time (ms) when the recording starts)
-            // lancer la création des clips
-            // throw new \Exception('sliceStartTime');
-          
-          break;
-
-          case 40:
-          // The recording starts
-            // throw new \Exception('The recording starts');
-          break;
-
-          case 41:
-          //  The recording exits
-            // throw new \Exception('The recording exits');
           break;
 
           case 45:

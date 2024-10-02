@@ -82,4 +82,10 @@ services:
     Kreait\Firebase\Messaging:
         factory: ['@Kreait\Firebase\Factory', 'createMessaging']
 
+    App\Service\VideoProcessor:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+            $s3Client: '@Aws\S3\S3Client'
+
+
 

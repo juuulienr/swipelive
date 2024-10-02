@@ -198,52 +198,56 @@ class AccountAPIController extends AbstractController {
       $param = json_decode($json, true);
 
       if ($param) {
-        $appleId = $param['appleId'];
-        $password = $param['password'];
-        $email = $param['email'];
+        try {
+          $appleId = $param['appleId'];
+          $password = $param['password'];
+          $email = $param['email'];
 
-        $userExist = $userRepo->findOneByEmail($email);
-        $user = $userRepo->findOneByAppleId($appleId);
+          $userExist = $userRepo->findOneByEmail($email);
+          $user = $userRepo->findOneByAppleId($appleId);
 
-        if ($userExist) {
-          $hash = $encoder->encodePassword($userExist, $password);
-          $userExist->setHash($hash);
-          $userExist->setAppleId($appleId);
-          $manager->flush();
+          if ($userExist) {
+            $hash = $encoder->encodePassword($userExist, $password);
+            $userExist->setHash($hash);
+            $userExist->setAppleId($appleId);
+            $manager->flush();
 
-          return $this->json(false, 200);
-        } else if (!$user) {
-          $user = $serializer->deserialize($json, User::class, "json");
-          $hash = $encoder->encodePassword($user, $password);
+            return $this->json(false, 200);
+          } else if (!$user) {
+            $user = $serializer->deserialize($json, User::class, "json");
+            $hash = $encoder->encodePassword($user, $password);
 
-          $user->setAppleId($appleId);
-          $user->setHash($hash);
-          $manager->persist($user);
-          $manager->flush();
+            $user->setAppleId($appleId);
+            $user->setHash($hash);
+            $manager->persist($user);
+            $manager->flush();
 
-          $security = new SecurityUser();
-          $security->setUser($user);
-          $security->setWifiIPAddress($param['wifiIPAddress']);
-          $security->setCarrierIPAddress($param['carrierIPAddress']);
-          $security->setConnection($param['connection']);
-          $security->setTimezone($param['timezone']);
-          $security->setLocale($param['locale']);
+            $security = new SecurityUser();
+            $security->setUser($user);
+            $security->setWifiIPAddress($param['wifiIPAddress']);
+            $security->setCarrierIPAddress($param['carrierIPAddress']);
+            $security->setConnection($param['connection']);
+            $security->setTimezone($param['timezone']);
+            $security->setLocale($param['locale']);
 
-          if ($param['device'] && $param['device'] != null) {
-            $security->setModel($param['device']['model']);
-            $security->setPlatform($param['device']['platform']);
-            $security->setUuid($param['device']['uuid']);
-            $security->setVersion($param['device']['version']);
-            $security->setManufacturer($param['device']['manufacturer']);
-            $security->setIsVirtual($param['device']['isVirtual']);
+            if ($param['device'] && $param['device'] != null) {
+              $security->setModel($param['device']['model']);
+              $security->setPlatform($param['device']['platform']);
+              $security->setUuid($param['device']['uuid']);
+              $security->setVersion($param['device']['version']);
+              $security->setManufacturer($param['device']['manufacturer']);
+              $security->setIsVirtual($param['device']['isVirtual']);
+            }
+
+            $manager->persist($security);
+            $manager->flush();
+
+            return $this->json(true, 200);
+          } else {
+            return $this->json(false, 200);
           }
-
-          $manager->persist($security);
-          $manager->flush();
-
-          return $this->json(true, 200);
-        } else {
-          return $this->json(false, 200);
+        } catch (\Exception $e) {
+          $this->bugsnag->notifyException($e);
         }
       }
     }
