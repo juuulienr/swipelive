@@ -247,7 +247,7 @@ class AccountAPIController extends AbstractController {
             return $this->json(false, 200);
           }
         } catch (\Exception $e) {
-          $this->bugsnag->notifyException($e);
+          return $this->json($e, 404);
         }
       }
     }
