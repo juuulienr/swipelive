@@ -66,7 +66,7 @@ class AccountAPIController extends AbstractController {
 
         if (!$user) {
           $user = $serializer->deserialize($json, User::class, "json");
-          $hash = $encoder->encodePassword($user, $param['password']);
+          $hash = $passwordHasher->hashPassword($user, $param['password']);
           $user->setHash($hash);
 
           $manager->persist($user);
@@ -207,7 +207,7 @@ class AccountAPIController extends AbstractController {
           $user = $userRepo->findOneByAppleId($appleId);
 
           if ($userExist) {
-            $hash = $encoder->encodePassword($userExist, $password);
+            $hash = $passwordHasher->hashPassword($userExist, $password);
             $userExist->setHash($hash);
             $userExist->setAppleId($appleId);
             $manager->flush();
@@ -297,7 +297,7 @@ class AccountAPIController extends AbstractController {
             }
           }
 
-          $hash = $encoder->encodePassword($userExist, $password);
+          $hash = $passwordHasher->hashPassword($userExist, $password);
           $userExist->setHash($hash);
           $userExist->setGoogleId($googleId);
           $manager->flush();
@@ -404,7 +404,7 @@ class AccountAPIController extends AbstractController {
             }
           }
 
-          $hash = $encoder->encodePassword($userExist, $password);
+          $hash = $passwordHasher->hashPassword($userExist, $password);
           $userExist->setHash($hash);
           $userExist->setFacebookId($facebookId);
           $manager->flush();
