@@ -30,7 +30,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use App\Service\FirebaseMessagingService;
@@ -57,7 +57,7 @@ class AccountAPIController extends AbstractController {
    *
   * @Route("/api/user/register", name="user_api_register")
   */
-  public function register(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
+  public function register(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
@@ -193,7 +193,7 @@ class AccountAPIController extends AbstractController {
    *
   * @Route("/api/authentication/apple", name="api_authentification_apple")
   */
-  public function appleAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
+  public function appleAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
@@ -215,7 +215,7 @@ class AccountAPIController extends AbstractController {
             return $this->json(false, 200);
           } else if (!$user) {
             $user = $serializer->deserialize($json, User::class, "json");
-            $hash = $encoder->encodePassword($user, $password);
+            $hash = $passwordHasher->hashPassword($user, $password);
 
             $user->setAppleId($appleId);
             $user->setHash($hash);
@@ -261,7 +261,7 @@ class AccountAPIController extends AbstractController {
    *
   * @Route("/api/authentication/google", name="api_authentification_google")
   */
-  public function googleAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
+  public function googleAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
@@ -305,7 +305,7 @@ class AccountAPIController extends AbstractController {
           return $this->json(false, 200);
         } else if (!$user) {
           $user = $serializer->deserialize($json, User::class, "json");
-          $hash = $encoder->encodePassword($user, $password);
+          $hash = $passwordHasher->hashPassword($user, $password);
           $user->setHash($hash);
           $user->setGoogleId($googleId);
 
@@ -368,7 +368,7 @@ class AccountAPIController extends AbstractController {
    *
   * @Route("/api/authentication/facebook", name="api_authentification_facebook")
   */
-  public function facebookAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordEncoderInterface $encoder, SerializerInterface $serializer) {
+  public function facebookAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher, SerializerInterface $serializer) {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
@@ -412,7 +412,7 @@ class AccountAPIController extends AbstractController {
           return $this->json(false, 200);
         } else if (!$user) {
           $user = $serializer->deserialize($json, User::class, "json");
-          $hash = $encoder->encodePassword($user, $password);
+          $hash = $passwordHasher->hashPassword($user, $password);
           $filename = md5(uniqid());
           $fullname = $filename . ".jpg"; 
           $file->move($this->getParameter('uploads_directory'), $fullname);
