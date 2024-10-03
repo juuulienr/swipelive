@@ -1,6 +1,6 @@
 <?php
 
-namespace App\EventListener;
+namespace App\Listener;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
