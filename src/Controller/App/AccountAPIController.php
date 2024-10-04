@@ -374,7 +374,7 @@ class AccountAPIController extends AbstractController {
 
       if ($param) {
         $facebookId = $param['facebookId'];
-        $picture = $param['picture'];
+        $facebookImageUrl = $param['picture'];
         $email = $param['email'];
         $password = $param['password'];
 
