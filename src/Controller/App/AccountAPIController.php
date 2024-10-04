@@ -385,19 +385,23 @@ class AccountAPIController extends AbstractController {
           if (!$userExist->getPicture()) {
             $filename = md5(uniqid());
             $fullname = $filename . ".jpg"; 
-            $file->move($this->getParameter('uploads_directory'), $fullname);
-            $file = $this->getParameter('uploads_directory') . '/' . $fullname;
+            $uploadsDir = $this->getParameter('uploads_directory');
+            $tempFilePath = $uploadsDir . '/' . $fullname;
+
+            $imageData = file_get_contents($facebookImageUrl);
+            file_put_contents($tempFilePath, $imageData);
 
             try {
               Configuration::instance($this->getParameter('cloudinary'));
-              $result = (new UploadApi())->upload($file, [
+              $result = (new UploadApi())->upload($tempFilePath, [
                 'public_id' => $filename,
-                'use_filename' => TRUE,
+                'use_filename' => true,
                 "height" => 256, 
                 "width" => 256, 
                 "crop" => "thumb"
               ]);
 
+              unlink($tempFilePath);
               $userExist->setPicture($fullname);
             } catch (\Exception $e) {
               return $this->json($e->getMessage(), 404);
@@ -415,23 +419,28 @@ class AccountAPIController extends AbstractController {
           $hash = $passwordHasher->hashPassword($user, $password);
           $filename = md5(uniqid());
           $fullname = $filename . ".jpg"; 
-          $file->move($this->getParameter('uploads_directory'), $fullname);
-          $file = $this->getParameter('uploads_directory') . '/' . $fullname;
+          $uploadsDir = $this->getParameter('uploads_directory');
+          $tempFilePath = $uploadsDir . '/' . $fullname;
+
+          $imageData = file_get_contents($facebookImageUrl);
+          file_put_contents($tempFilePath, $imageData);
 
           try {
             Configuration::instance($this->getParameter('cloudinary'));
-            $result = (new UploadApi())->upload($file, [
+            $result = (new UploadApi())->upload($tempFilePath, [
               'public_id' => $filename,
-              'use_filename' => TRUE,
+              'use_filename' => true,
               "height" => 256, 
               "width" => 256, 
               "crop" => "thumb"
             ]);
 
-            $user->setPicture($fullname);
+            unlink($tempFilePath);
+            $userExist->setPicture($fullname);
           } catch (\Exception $e) {
             return $this->json($e->getMessage(), 404);
           }
+
             
           $user->setHash($hash);
 
@@ -476,7 +485,6 @@ class AccountAPIController extends AbstractController {
    * @Route("/api/facebook/oauth", name="api_facebook_oauth")
    */
   public function facebookOauth(Request $request, ObjectManager $manager) {
-    // return true;
     return $this->json(true, 200);
   }
 
