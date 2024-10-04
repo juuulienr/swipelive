@@ -476,7 +476,8 @@ class AccountAPIController extends AbstractController {
    * @Route("/api/facebook/oauth", name="api_facebook_oauth")
    */
   public function facebookOauth(Request $request, ObjectManager $manager) {
-    return true;
+    // return true;
+    return $this->json(true, 200);
   }
 
 
