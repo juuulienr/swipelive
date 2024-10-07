@@ -274,7 +274,7 @@ public function agoraRTCChannelEvent(Request $request, ObjectManager $manager, L
             $live = $liveRepo->findOneByCname($cname);
 
             if ($live && !empty($fileList)) {
-                $live->setFileList($fileList[0]);
+                $live->setFileList($fileList[0]["fileName"]);
                 $manager->flush();
 
                 // Process clips after receiving fileList
