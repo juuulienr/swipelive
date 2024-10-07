@@ -403,7 +403,7 @@ class AccountAPIController extends AbstractController {
 
               unlink($tempFilePath);
               $userExist->setPicture($fullname);
-            } catch (\Exception $e) {
+            } catch (\Exception $error) {
               $this->bugsnag->notifyException($error);
             }
           }
@@ -437,7 +437,7 @@ class AccountAPIController extends AbstractController {
 
             unlink($tempFilePath);
             $user->setPicture($fullname);
-          } catch (\Exception $e) {
+          } catch (\Exception $error) {
             $this->bugsnag->notifyException($error);
           }
 
