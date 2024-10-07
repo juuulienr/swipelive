@@ -222,75 +222,73 @@ class LiveAPIController extends AbstractController {
       $pages = $param["pages"];
       $groups = $param["groups"];
 
-
-      // create fb stream
-      $fb = new \Facebook\Facebook([
-        'app_id' => $this->getParameter('facebook_app_id'),
-        'app_secret' => $this->getParameter('facebook_app_secret'),
-        'default_graph_version' => 'v2.10',
-      ]);
+      $client = new Client();
 
       $data = [
         'title' => 'Live sur Swipe Live',
         'description' => 'Live sur Swipe Live',
-        'status' => 'LIVE_NOW',
-        // 'privacy' => [
-          // 'value' => "EVERYONE"
-        // ]
+        'status' => 'LIVE_NOW'
       ];
 
+      $url = sprintf('https://graph.facebook.com/v21.0/%s/live_videos?fields=id,permalink_url,secure_stream_url', $fbIdentifier);
+
+      $body = json_encode($data);
+      $headers = [
+        'Authorization' => 'Bearer ' . $fbToken,
+        'Content-Type' => 'application/json',
+      ];
 
       try {
-        if ($fbTokenPage && $fbPageIdentifier) {
-          $url = $fbPageIdentifier . "/live_videos?fields=id,permalink_url,secure_stream_url";
-          $response = $fb->post($url, $data, $fbTokenPage);
-        } else {
-          $url = $fbIdentifier . "/live_videos?fields=id,permalink_url,secure_stream_url";
-          $response = $fb->post($url, $data, $fbToken);
-        }
-      } catch(\Facebook\Exceptions\FacebookResponseException $e) {
-        return $this->json("Graph returned an error: " . $e->getMessage(), 404);
-      } catch(\Facebook\Exceptions\FacebookSDKException $e) {
-        return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
-      }
+        $response = $client->post($url, [
+          'headers' => $headers,
+          'body' => $body
+        ]);
 
-      $result = $response->getGraphNode();
+        $result = json_decode($response->getBody(), true);
 
-      if ($result) {
-        $fbStreamId = $result["id"];
-        $fbStreamUrl = $result["secure_stream_url"];
-        $fbPermalinkUrl = $result["permalink_url"];
-        $postUrl = 'https://www.facebook.com' . $fbPermalinkUrl;
+        if ($result) {
+          $fbStreamId = $result['id'];
+          $fbStreamUrl = $result['secure_stream_url'];
+          $fbPermalinkUrl = $result['permalink_url'];
+          $postUrl = 'https://www.facebook.com' . $fbPermalinkUrl;
 
-        if ($groups && sizeof($groups) > 0) {
-          foreach ($groups as $group) {
-            if ($group["name"] == "Test Live") {
-              $url = '/' . $group['id'] . '/feed';
+          if ($groups && sizeof($groups) > 0) {
+            foreach ($groups as $group) {
+              if ($group["name"] == "Test Live") {
+                $urlGroup = sprintf('https://graph.facebook.com/v21.0/%s/feed', $group['id']);
 
-              try {
-                $response = $fb->post($url, [ 'link' => $postUrl, "message" => "Partage du live" ], $fbToken);
-              } catch (Facebook\Exceptions\FacebookResponseException $e) {
-                return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
-              } catch (Facebook\Exceptions\FacebookSDKException $e) {
-                return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
+                $bodyGroup = json_encode([
+                  'link' => $postUrl,
+                  'message' => 'Partage du live'
+                ]);
+
+                $client->post($urlGroup, [
+                  'headers' => $headers,
+                  'body' => $bodyGroup
+                ]);
               }
             }
           }
+
+          $live->setFbStreamId($fbStreamId);
+          $live->setFbStreamUrl($fbStreamUrl);
+          $live->setPostUrl($postUrl);
+          $manager->flush();
+
+          return $this->json([ "fbStreamId" => $fbStreamId ], 200, [], [
+            'groups' => 'live:read',
+            'circular_reference_limit' => 1,
+            'circular_reference_handler' => function ($object) {
+              return $object->getId();
+            } 
+          ]);
         }
+      } catch (\Exception $e) {
+        return $this->json([
+          'error' => 'Une erreur est survenue lors de la création du live sur facebook',
+          'message' => $e->getMessage()
+        ], 500);
       }
-
-      $live->setFbStreamId($fbStreamId);
-      $live->setFbStreamUrl($fbStreamUrl);
-      $live->setPostUrl($postUrl);
-      $manager->flush();
-
-      return $this->json([ "fbStreamId" => $fbStreamId ], 200, [], [
-        'groups' => 'live:read',
-        'circular_reference_limit' => 1,
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
-      ]);
     }
     
     return $this->json(false, 404);
