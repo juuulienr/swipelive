@@ -436,7 +436,7 @@ class AccountAPIController extends AbstractController {
             ]);
 
             unlink($tempFilePath);
-            $userExist->setPicture($fullname);
+            $user->setPicture($fullname);
           } catch (\Exception $e) {
             $this->bugsnag->notifyException($error);
           }
