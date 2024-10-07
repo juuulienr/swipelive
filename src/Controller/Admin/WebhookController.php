@@ -280,7 +280,7 @@ public function agoraRTCChannelEvent(Request $request, ObjectManager $manager, L
                 // Process clips after receiving fileList
                 $clips = $live->getClips();
                 foreach ($clips as $clip) {
-                    $this->videoProcessor->processClip($clip);
+                    // $this->videoProcessor->processClip($clip);
                 }
             }
           break;
