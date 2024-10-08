@@ -274,13 +274,13 @@ public function agoraRTCChannelEvent(Request $request, ObjectManager $manager, L
             $live = $liveRepo->findOneByCname($cname);
 
             if ($live && !empty($fileList)) {
-                $live->setFileList($fileList[0]["fileName"]);
-                $manager->flush();
+              $live->setFileList($fileList[0]["fileName"]);
+              $manager->flush();
 
-                $clips = $live->getClips();
-                foreach ($clips as $clip) {
-                  $this->videoProcessor->processClip($clip);
-                }
+              $clips = $live->getClips();
+              foreach ($clips as $clip) {
+                $this->videoProcessor->processClip($clip);
+              }
             }
           break;
 

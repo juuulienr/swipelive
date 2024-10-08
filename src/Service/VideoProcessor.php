@@ -20,6 +20,9 @@ class VideoProcessor
     $this->parameters = $parameters;
     $this->s3Client = $s3Client;
     $this->bugsnag = $bugsnag;
+
+    // Log when the constructor is called
+    error_log('VideoProcessor service instantiated.');
   }
 
   /**
@@ -31,8 +34,14 @@ class VideoProcessor
   public function processClip(Clip $clip): bool
   {
     try {
+      // Log au début de l'exécution de processClip
+      error_log('Processing clip ID: ' . $clip->getId());
+
       // Récupérer l'URL du fichier M3U8 depuis S3
       $fileUrl = 'https://' . $this->parameters->get('s3_bucket') . '.s3.eu-west-3.amazonaws.com/' . $clip->getLive()->getFileList();
+
+      // Log avant d'exécuter la commande FFmpeg
+      error_log('File URL: ' . $fileUrl);
 
       // Créer un répertoire temporaire pour stocker les segments découpés
       $outputDir = '/tmp/clip_' . $clip->getId();  // Dossier temporaire sur Heroku pour les segments
@@ -40,47 +49,56 @@ class VideoProcessor
       $outputFile = $outputDir . '/' . $fileList;
 
       // Convertir les timestamps en format H:i:s
-      $start = gmdate("H:i:s", $clip->getStart());  // Timestamp de début
-      $end = gmdate("H:i:s", $clip->getEnd());      // Timestamp de fin
+      $start = gmdate("H:i:s", $clip->getStart());
+      $end = gmdate("H:i:s", $clip->getEnd());
 
-      // Récupérer la durée réelle de la vidéo (optionnel si le fichier M3U8 est valide)
-      $videoDuration = $this->getVideoDuration($fileUrl);
-      if ($clip->getEnd() > $videoDuration) {
-        $end = gmdate("H:i:s", $videoDuration);
-      }
+      // Log avant d'exécuter la commande FFmpeg
+      error_log('FFmpeg command: Start ' . $start . ', End ' . $end);
 
-      // Appel de la commande FFmpeg pour découper et convertir le fichier M3U8 distant
+      // Appel de la commande FFmpeg
       $command = sprintf(
         'ffmpeg -i %s -ss %s -to %s -hls_time 10 -hls_playlist_type vod -hls_segment_filename "%s/segment_%%03d.ts" %s',
         escapeshellarg($fileUrl),
         escapeshellarg($start),
-        escapeshellarg($end), 
+        escapeshellarg($end),
         escapeshellarg($outputDir),
         escapeshellarg($outputFile)
       );
 
       exec($command, $output, $returnVar);
 
+      // Log le retour de FFmpeg
+      error_log('FFmpeg command return value: ' . $returnVar);
+
       if ($returnVar !== 0) {
-        return false;  // Échec de la conversion et du découpage
+        error_log('FFmpeg command failed.');
+        return false;
       }
 
+      // Log après l'upload S3
       $key = 'vendor' . $clip->getVendor()->getId() . '/Live' . $clip->getLive()->getId() . '/Clip' . $clip->getId() . $fileList;
+      error_log('Uploading to S3: Key ' . $key);
 
-    // Upload des fichiers M3U8 et des segments découpés sur S3
       $this->uploadDirectoryToS3($outputFile, $key);
 
-    // Mettre à jour le chemin du fichier M3U8 dans l'entité Clip
+      // Log de mise à jour de l'entité Clip
       $clip->setFileList($fileList);
       $clip->setStatus('découpé');
       $this->entityManager->flush();
 
+      error_log('Clip updated with status "découpé".');
+
     } catch (\Exception $e) {
+      // Log en cas d'erreur
+      error_log('Error processing clip: ' . $e->getMessage());
       $this->bugsnag->notifyException($e);
     }
 
     return true;
   }
+
+  // Les autres méthodes sont similaires mais ajoutent des logs à des endroits clés
+
 
   /**
    * Récupérer la durée d'une vidéo avec FFmpeg
