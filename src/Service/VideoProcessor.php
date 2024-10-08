@@ -54,7 +54,7 @@ class VideoProcessor
         'ffmpeg -i %s -ss %s -to %s -hls_time 10 -hls_playlist_type vod -hls_segment_filename "%s/segment_%%03d.ts" %s',
         escapeshellarg($fileUrl),
         escapeshellarg($start),
-        escapeshellarg($end),
+        escapeshellarg($end), 
         escapeshellarg($outputDir),
         escapeshellarg($outputFile)
       );
@@ -74,7 +74,7 @@ class VideoProcessor
       $clip->setFileList($fileList);
       $clip->setStatus('découpé');
       $this->entityManager->flush();
-    
+
     } catch (\Exception $e) {
       $this->bugsnag->notifyException($e);
     }
