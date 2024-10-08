@@ -396,9 +396,7 @@ class AccountAPIController extends AbstractController {
               $result = (new UploadApi())->upload($tempFilePath, [
                 'public_id' => $filename,
                 'use_filename' => true,
-                "height" => 256, 
-                "width" => 256, 
-                "crop" => "thumb"
+                'resource_type' => 'image'
               ]);
 
               unlink($tempFilePath);
@@ -430,9 +428,7 @@ class AccountAPIController extends AbstractController {
             $result = (new UploadApi())->upload($tempFilePath, [
               'public_id' => $filename,
               'use_filename' => true,
-              "height" => 256, 
-              "width" => 256, 
-              "crop" => "thumb"
+              'resource_type' => 'image'
             ]);
 
             unlink($tempFilePath);
