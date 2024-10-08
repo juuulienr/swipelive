@@ -16,6 +16,7 @@ class VideoProcessor
   public function __construct(EntityManagerInterface $entityManager, S3Client $s3Client, ParameterBagInterface $parameters)
   {
     $this->entityManager = $entityManager;
+    $this->parameters = $parameters;
     $this->s3Client = $s3Client;
   }
 
@@ -32,7 +33,8 @@ class VideoProcessor
 
     // Créer un répertoire temporaire pour stocker les segments découpés
     $outputDir = '/tmp/clip_' . $clip->getId();  // Dossier temporaire sur Heroku pour les segments
-    $outputFile = $outputDir . '/clip_' . $clip->getId() . '.m3u8';  // Fichier M3U8 temporaire découpé
+    $fileList = md5(uniqid()) . '_Clip' . $clip->getId() . '.m3u8';
+    $outputFile = $outputDir . '/' . $fileList;
 
     // Convertir les timestamps en format H:i:s
     $start = gmdate("H:i:s", $clip->getStart());  // Timestamp de début
@@ -60,10 +62,10 @@ class VideoProcessor
       return false;  // Échec de la conversion et du découpage
     }
 
-    $fileList = 'https://' . $this->parameters->get('s3_bucket') . '.s3.eu-west-3.amazonaws.com/clips/clip_' . $clip->getId() . '/clip_' . $clip->getId() . '.m3u8';
+    $key = 'vendor' . $clip->getVendor()->getId() . '/Live' . $clip->getLive()->getId() . '/Clip' . $clip->getId() . $fileList;
 
   // Upload des fichiers M3U8 et des segments découpés sur S3
-    $this->uploadDirectoryToS3($outputDir, 'clips/clip_' . $clip->getId());
+    $this->uploadDirectoryToS3($outputFile, $key);
 
   // Mettre à jour le chemin du fichier M3U8 dans l'entité Clip
     $clip->setFileList($fileList);
