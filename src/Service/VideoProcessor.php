@@ -12,12 +12,14 @@ class VideoProcessor
   private $entityManager;
   private $s3Client;
   private $parameters;
+  private $bugsnag;
 
-  public function __construct(EntityManagerInterface $entityManager, S3Client $s3Client, ParameterBagInterface $parameters)
+  public function __construct(EntityManagerInterface $entityManager, S3Client $s3Client, ParameterBagInterface $parameters, \Bugsnag\Client $bugsnag)
   {
     $this->entityManager = $entityManager;
     $this->parameters = $parameters;
     $this->s3Client = $s3Client;
+    $this->bugsnag = $bugsnag;
   }
 
   /**
@@ -28,49 +30,54 @@ class VideoProcessor
    */
   public function processClip(Clip $clip): bool
   {
+    try {
       // Récupérer l'URL du fichier M3U8 depuis S3
-    $fileUrl = 'https://' . $this->parameters->get('s3_bucket') . '.s3.eu-west-3.amazonaws.com/' . $clip->getLive()->getFileList();
+      $fileUrl = 'https://' . $this->parameters->get('s3_bucket') . '.s3.eu-west-3.amazonaws.com/' . $clip->getLive()->getFileList();
 
-    // Créer un répertoire temporaire pour stocker les segments découpés
-    $outputDir = '/tmp/clip_' . $clip->getId();  // Dossier temporaire sur Heroku pour les segments
-    $fileList = md5(uniqid()) . '_Clip' . $clip->getId() . '.m3u8';
-    $outputFile = $outputDir . '/' . $fileList;
+      // Créer un répertoire temporaire pour stocker les segments découpés
+      $outputDir = '/tmp/clip_' . $clip->getId();  // Dossier temporaire sur Heroku pour les segments
+      $fileList = md5(uniqid()) . '_Clip' . $clip->getId() . '.m3u8';
+      $outputFile = $outputDir . '/' . $fileList;
 
-    // Convertir les timestamps en format H:i:s
-    $start = gmdate("H:i:s", $clip->getStart());  // Timestamp de début
-    $end = gmdate("H:i:s", $clip->getEnd());      // Timestamp de fin
+      // Convertir les timestamps en format H:i:s
+      $start = gmdate("H:i:s", $clip->getStart());  // Timestamp de début
+      $end = gmdate("H:i:s", $clip->getEnd());      // Timestamp de fin
 
-    // Récupérer la durée réelle de la vidéo (optionnel si le fichier M3U8 est valide)
-    $videoDuration = $this->getVideoDuration($fileUrl);
-    if ($clip->getEnd() > $videoDuration) {
-      $end = gmdate("H:i:s", $videoDuration);
+      // Récupérer la durée réelle de la vidéo (optionnel si le fichier M3U8 est valide)
+      $videoDuration = $this->getVideoDuration($fileUrl);
+      if ($clip->getEnd() > $videoDuration) {
+        $end = gmdate("H:i:s", $videoDuration);
+      }
+
+      // Appel de la commande FFmpeg pour découper et convertir le fichier M3U8 distant
+      $command = sprintf(
+        'ffmpeg -i %s -ss %s -to %s -hls_time 10 -hls_playlist_type vod -hls_segment_filename "%s/segment_%%03d.ts" %s',
+        escapeshellarg($fileUrl),
+        escapeshellarg($start),
+        escapeshellarg($end),
+        escapeshellarg($outputDir),
+        escapeshellarg($outputFile)
+      );
+
+      exec($command, $output, $returnVar);
+
+      if ($returnVar !== 0) {
+        return false;  // Échec de la conversion et du découpage
+      }
+
+      $key = 'vendor' . $clip->getVendor()->getId() . '/Live' . $clip->getLive()->getId() . '/Clip' . $clip->getId() . $fileList;
+
+    // Upload des fichiers M3U8 et des segments découpés sur S3
+      $this->uploadDirectoryToS3($outputFile, $key);
+
+    // Mettre à jour le chemin du fichier M3U8 dans l'entité Clip
+      $clip->setFileList($fileList);
+      $clip->setStatus('découpé');
+      $this->entityManager->flush();
+    
+    } catch (\Exception $e) {
+      $this->bugsnag->notifyException($e);
     }
-
-    // Appel de la commande FFmpeg pour découper et convertir le fichier M3U8 distant
-    $command = sprintf(
-      'ffmpeg -i %s -ss %s -to %s -hls_time 10 -hls_playlist_type vod -hls_segment_filename "%s/segment_%%03d.ts" %s',
-      escapeshellarg($fileUrl),
-      escapeshellarg($start),
-      escapeshellarg($end),
-      escapeshellarg($outputDir),
-      escapeshellarg($outputFile)
-    );
-
-    exec($command, $output, $returnVar);
-
-    if ($returnVar !== 0) {
-      return false;  // Échec de la conversion et du découpage
-    }
-
-    $key = 'vendor' . $clip->getVendor()->getId() . '/Live' . $clip->getLive()->getId() . '/Clip' . $clip->getId() . $fileList;
-
-  // Upload des fichiers M3U8 et des segments découpés sur S3
-    $this->uploadDirectoryToS3($outputFile, $key);
-
-  // Mettre à jour le chemin du fichier M3U8 dans l'entité Clip
-    $clip->setFileList($fileList);
-    $clip->setStatus('découpé');
-    $this->entityManager->flush();
 
     return true;
   }
