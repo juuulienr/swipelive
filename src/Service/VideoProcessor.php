@@ -54,7 +54,7 @@ class VideoProcessor
           // Convertir les timestamps en format H:i:s
       $start = gmdate("H:i:s", $clip->getStart());
       $end = gmdate("H:i:s", $clip->getEnd());
-
+ 
           // Log avant d'exécuter la commande FFmpeg
       error_log('FFmpeg command: Start ' . $start . ', End ' . $end);
 
