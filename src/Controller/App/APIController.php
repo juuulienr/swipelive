@@ -28,6 +28,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Response;
 use App\Service\FirebaseMessagingService;
+use App\Service\VideoProcessor;
 use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
@@ -38,11 +39,33 @@ class APIController extends AbstractController {
 
   private $firebaseMessagingService;
   private $bugsnag;
+  private $videoProcessor;
 
-  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag) {
+  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag, VideoProcessor $videoProcessor) {
     $this->firebaseMessagingService = $firebaseMessagingService;
     $this->bugsnag = $bugsnag;
+    $this->videoProcessor = $videoProcessor;
   }
+
+
+
+  /**
+   * Test VideoProcessor
+   *
+   * @Route("/api/processor/{id}", name="api_processor", methods={"GET"})
+   */
+  public function processor(Live $live, Request $request, ObjectManager $manager) {
+    $clips = $live->getClips();
+
+    foreach ($clips as $clip) {
+      $this->videoProcessor->processClip($clip);
+    }
+
+    return $this->json(true, 200);
+  }
+
+
+
 
 
 
