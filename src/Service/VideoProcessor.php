@@ -44,7 +44,7 @@ class VideoProcessor
       error_log('File URL: ' . $fileUrl);
 
           // Générer un nom unique pour le fichier M3U8
-      $uniqueFileName = md5(uniqid()) . '_Clip' . $clip->getId() . '.m3u8';
+      $uniqueFileName = md5(uniqid()) . '_Clip' . $clip->getId() . '.m3u8'; 
 
           // Chemin S3 où les segments et le fichier M3U8 seront stockés
       $bucket = $this->parameters->get('s3_bucket');
