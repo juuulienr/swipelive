@@ -55,14 +55,13 @@ class VideoProcessor
       // Log avant d'exécuter la commande FFmpeg
       error_log('FFmpeg command: Start ' . $start . ', End ' . $end);
 
-      // Appel de la commande FFmpeg
       $command = sprintf(
-        'ffmpeg -loglevel debug -i %s -ss %s -to %s -threads 1 -hls_time 10 -hls_playlist_type vod -hls_segment_filename "%s/segment_%%03d.ts" %s',
-        escapeshellarg($fileUrl),
-        escapeshellarg($start),
-        escapeshellarg($end),
-        escapeshellarg($outputDir),
-        escapeshellarg($outputFile)
+        'ffmpeg -loglevel debug -i %s -ss %s -to %s -threads 1 -hls_time 10 -hls_playlist_type vod -hls_segment_filename %s %s',
+        escapeshellarg($fileUrl),  // URL du fichier M3U8 source
+        escapeshellarg($start),    // Timestamp de début
+        escapeshellarg($end),      // Timestamp de fin
+        escapeshellarg($outputDir . '/segment_%03d.ts'),  // Correction ici
+        escapeshellarg($outputFile) // Fichier M3U8 généré
       );
 
       exec($command, $output, $returnVar);
