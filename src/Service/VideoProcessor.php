@@ -54,21 +54,22 @@ class VideoProcessor
           // Convertir les timestamps en format H:i:s
       $start = gmdate("H:i:s", $clip->getStart());
       $end = gmdate("H:i:s", $clip->getEnd());
- 
+
           // Log avant d'exécuter la commande FFmpeg
       error_log('FFmpeg command: Start ' . $start . ', End ' . $end);
 
           // Utilisation de S3 pour les segments et le fichier M3U8
       $command = sprintf(
-        'ffmpeg -loglevel debug -i %s -ss %s -to %s -threads 1 -hls_time 10 -hls_playlist_type vod -hls_segment_filename "s3://%s/%s" "s3://%s/%s"',
-        escapeshellarg($fileUrl),
-        escapeshellarg($start),
-        escapeshellarg($end),
-        escapeshellarg($bucket),
-        escapeshellarg($segmentKey),
-        escapeshellarg($bucket),
-        escapeshellarg($m3u8Key)
+       'ffmpeg -loglevel debug -i %s -ss %s -to %s -threads 1 -hls_time 10 -hls_playlist_type vod -hls_segment_filename s3://%s/%s s3://%s/%s',
+        escapeshellarg($fileUrl),  // URL du fichier M3U8 source
+        escapeshellarg($start),    // Timestamp de début
+        escapeshellarg($end),      // Timestamp de fin
+        escapeshellarg($bucket),   // Nom du bucket S3 pour les segments TS
+        escapeshellarg($segmentKey), // Chemin S3 pour les segments TS
+        escapeshellarg($bucket),   // Nom du bucket S3 pour le fichier M3U8
+        escapeshellarg($m3u8Key)   // Chemin S3 pour le fichier M3U8
       );
+
 
       exec($command, $output, $returnVar);
 
