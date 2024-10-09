@@ -57,7 +57,7 @@ class VideoProcessor
 
       // Appel de la commande FFmpeg
       $command = sprintf(
-        'ffmpeg -i %s -ss %s -to %s -hls_time 10 -hls_playlist_type vod -hls_segment_filename "%s/segment_%%03d.ts" %s',
+        'ffmpeg -i %s -ss %s -to %s -threads 1 -hls_time 10 -hls_playlist_type vod -hls_segment_filename "%s/segment_%%03d.ts" %s',
         escapeshellarg($fileUrl),
         escapeshellarg($start),
         escapeshellarg($end),
