@@ -34,8 +34,8 @@ class VideoProcessor
   public function processClip(Clip $clip): bool
   {
     try {
-          // Log au début de l'exécution de processClip
-      error_log('Processing clip ID: ' . $clip->getId());
+          // Log au début de l'exécution de processClip 
+      error_log('Processing clip ID: ' . $clip->getId()); 
 
           // Récupérer l'URL du fichier M3U8 depuis S3
       $fileUrl = 'https://' . $this->parameters->get('s3_bucket') . '.s3.eu-west-3.amazonaws.com/' . $clip->getLive()->getFileList();
