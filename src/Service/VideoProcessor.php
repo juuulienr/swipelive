@@ -21,7 +21,7 @@ class VideoProcessor
     $this->s3Client = $s3Client;
     $this->bugsnag = $bugsnag;
 
-    // Log when the constructor is called
+        // Log when the constructor is called
     error_log('VideoProcessor service instantiated.');
   }
 
@@ -34,39 +34,45 @@ class VideoProcessor
   public function processClip(Clip $clip): bool
   {
     try {
-      // Log au début de l'exécution de processClip
+          // Log au début de l'exécution de processClip
       error_log('Processing clip ID: ' . $clip->getId());
 
-      // Récupérer l'URL du fichier M3U8 depuis S3
+          // Récupérer l'URL du fichier M3U8 depuis S3
       $fileUrl = 'https://' . $this->parameters->get('s3_bucket') . '.s3.eu-west-3.amazonaws.com/' . $clip->getLive()->getFileList();
 
-      // Log avant d'exécuter la commande FFmpeg
+          // Log avant d'exécuter la commande FFmpeg
       error_log('File URL: ' . $fileUrl);
 
-      // Créer un répertoire temporaire pour stocker les segments découpés
-      $outputDir = '/tmp/clip_' . $clip->getId();  // Dossier temporaire sur Heroku pour les segments
-      $fileList = md5(uniqid()) . '_Clip' . $clip->getId() . '.m3u8';
-      $outputFile = $outputDir . '/' . $fileList;
+          // Générer un nom unique pour le fichier M3U8
+      $uniqueFileName = md5(uniqid()) . '_Clip' . $clip->getId() . '.m3u8';
 
-      // Convertir les timestamps en format H:i:s
+          // Chemin S3 où les segments et le fichier M3U8 seront stockés
+      $bucket = $this->parameters->get('s3_bucket');
+      $segmentKey = 'vendor' . $clip->getVendor()->getId() . '/Live' . $clip->getLive()->getId() . '/Clip' . $clip->getId() . '/segment_%03d.ts';
+      $m3u8Key = 'vendor' . $clip->getVendor()->getId() . '/Live' . $clip->getLive()->getId() . '/Clip' . $clip->getId() . '/' . $uniqueFileName;
+
+          // Convertir les timestamps en format H:i:s
       $start = gmdate("H:i:s", $clip->getStart());
       $end = gmdate("H:i:s", $clip->getEnd());
 
-      // Log avant d'exécuter la commande FFmpeg
+          // Log avant d'exécuter la commande FFmpeg
       error_log('FFmpeg command: Start ' . $start . ', End ' . $end);
 
+          // Utilisation de S3 pour les segments et le fichier M3U8
       $command = sprintf(
-        'ffmpeg -loglevel debug -i %s -ss %s -to %s -threads 1 -hls_time 10 -hls_playlist_type vod -hls_segment_filename %s %s',
-        escapeshellarg($fileUrl),  // URL du fichier M3U8 source
-        escapeshellarg($start),    // Timestamp de début
-        escapeshellarg($end),      // Timestamp de fin
-        escapeshellarg($outputDir . '/segment_%03d.ts'),  // Correction ici
-        escapeshellarg($outputFile) // Fichier M3U8 généré
+        'ffmpeg -loglevel debug -i %s -ss %s -to %s -threads 1 -hls_time 10 -hls_playlist_type vod -hls_segment_filename "s3://%s/%s" "s3://%s/%s"',
+        escapeshellarg($fileUrl),
+        escapeshellarg($start),
+        escapeshellarg($end),
+        escapeshellarg($bucket),
+        escapeshellarg($segmentKey),
+        escapeshellarg($bucket),
+        escapeshellarg($m3u8Key)
       );
 
       exec($command, $output, $returnVar);
 
-      // Log le retour de FFmpeg
+          // Log du résultat de la commande FFmpeg
       error_log('FFmpeg command return value: ' . $returnVar);
 
       if ($returnVar !== 0) {
@@ -74,30 +80,21 @@ class VideoProcessor
         return false;
       }
 
-      // Log après l'upload S3
-      $key = 'vendor' . $clip->getVendor()->getId() . '/Live' . $clip->getLive()->getId() . '/Clip' . $clip->getId() . $fileList;
-      error_log('Uploading to S3: Key ' . $key);
-
-      $this->uploadDirectoryToS3($outputFile, $key);
-
-      // Log de mise à jour de l'entité Clip
-      $clip->setFileList($fileList);
+          // Mise à jour de l'entité Clip avec le chemin S3 du fichier M3U8
+      $clip->setFileList($m3u8Key);
       $clip->setStatus('découpé');
       $this->entityManager->flush();
 
       error_log('Clip updated with status "découpé".');
 
     } catch (\Exception $e) {
-      // Log en cas d'erreur
+          // Log en cas d'erreur
       error_log('Error processing clip: ' . $e->getMessage());
       $this->bugsnag->notifyException($e);
     }
 
     return true;
   }
-
-  // Les autres méthodes sont similaires mais ajoutent des logs à des endroits clés
-
 
   /**
    * Récupérer la durée d'une vidéo avec FFmpeg

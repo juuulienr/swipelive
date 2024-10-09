@@ -58,14 +58,7 @@ class FirebaseMessagingService
 
       $test = $this->messaging->send($message);
       return 'Notification envoyée avec succès';
-    } catch (MessagingException $e) {
-      if ($attempt < 3) {
-        sleep(2);
-        return $this->sendNotification($title, $body, $token, $data, $attempt + 1);
-      } else {
-        return 'Échec de l\'envoi après plusieurs tentatives : ' . $e->getMessage();
-      }
-    } catch (FirebaseException $e) {
+    } catch (\Exception $error) {
       return 'Erreur Firebase: ' . $e->getMessage();
     }
   }
