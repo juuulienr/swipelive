@@ -379,6 +379,48 @@ class LiveAPIController extends AbstractController {
     $fbToken = $param["fbToken"];
 
     try {
+      // créer le dernier clip
+      $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
+
+      if ($liveProduct) {
+        if ($live->getDisplay() == 1) {
+          $start = 5;
+        } else {
+          $start = $live->getDuration() + 1;
+        }
+
+        $created = $live->getCreatedAt();
+        $now = new \DateTime('now', timezone_open('UTC'));
+        $diff = $now->diff($created);
+        $end = $this->dateIntervalToSeconds($diff);
+        $duration = $end - $start;
+
+
+        if ($duration > 15) {
+          $clip = new Clip();
+          $clip->setVendor($this->getUser()->getVendor());
+          $clip->setLive($live);
+          $clip->setProduct($liveProduct->getProduct());
+          $clip->setPreview($live->getPreview());
+          $clip->setStart($start);
+          $clip->setEnd($end);
+          $clip->setDuration($duration);
+
+          $manager->persist($clip);
+          $manager->flush();
+
+          $live->setDuration($end);
+          $comments = $commentRepo->findByLiveAndClipNull($live);
+
+          foreach ($comments as $comment) {
+            $comment->setClip($clip);
+          }
+
+          $manager->flush();
+        }
+      }
+
+        
       $client = new Client();
       $appId = $this->getParameter('agora_app_id');
       $urlStop = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/sid/%s/mode/mix/stop', $appId, $live->getResourceId(), $live->getSid());
@@ -401,51 +443,6 @@ class LiveAPIController extends AbstractController {
         $fileList = $stopData['serverResponse']['fileList'];
         $live->setFileList($fileList);
         $manager->flush();
-      }
-
-      
-      if ($live->getFileList()) {
-        // créer le dernier clip
-        $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
-
-        if ($liveProduct) {
-          if ($live->getDisplay() == 1) {
-            $start = 5;
-          } else {
-            $start = $live->getDuration() + 1;
-          }
-
-          $created = $live->getCreatedAt();
-          $now = new \DateTime('now', timezone_open('UTC'));
-          $diff = $now->diff($created);
-          $end = $this->dateIntervalToSeconds($diff);
-          $duration = $end - $start;
-
-
-          if ($duration > 15) {
-            $clip = new Clip();
-            $clip->setVendor($this->getUser()->getVendor());
-            $clip->setLive($live);
-            $clip->setProduct($liveProduct->getProduct());
-            $clip->setPreview($live->getPreview());
-            $clip->setFileList($live->getFileList());
-            $clip->setStart($start);
-            $clip->setEnd($end);
-            $clip->setDuration($duration);
-
-            $manager->persist($clip);
-            $manager->flush();
-
-            $live->setDuration($end);
-            $comments = $commentRepo->findByLiveAndClipNull($live);
-
-            foreach ($comments as $comment) {
-              $comment->setClip($clip);
-            }
-
-            $manager->flush();
-          }
-        }
       }
 
 
