@@ -19,6 +19,10 @@ parameters:
     s3_bucket: '%env(S3_BUCKET)%'
     s3_access_key: '%env(S3_ACCESS_KEY)%'
     s3_secret_key: '%env(S3_SECRET_KEY)%'
+    mediaconvert_access_key: '%env(MEDIACONVERT_ACCESS_KEY)%'
+    mediaconvert_secret_key: '%env(MEDIACONVERT_SECRET_KEY)%'
+    mediaconvert_endpoint: '%env(MEDIACONVERT_ENDPOINT)%'
+    mediaconvert_role_arn: '%env(MEDIACONVERT_ROLE_ARN)%'
     firebase_credentials_path: '%kernel.project_dir%/config/firebase/swipe-live-firebase-adminsdk-o1xd4-d5db2c22a7.json'
 
 

@@ -5,11 +5,13 @@ namespace App\Service;
 use App\Entity\Clip;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Aws\MediaConvert\MediaConvertClient;
 use Aws\S3\S3Client;
 
 class VideoProcessor
 {
   private $entityManager;
+  private $mediaConvertClient;
   private $s3Client;
   private $parameters;
   private $bugsnag;
@@ -17,16 +19,24 @@ class VideoProcessor
   public function __construct(EntityManagerInterface $entityManager, S3Client $s3Client, ParameterBagInterface $parameters, \Bugsnag\Client $bugsnag)
   {
     $this->entityManager = $entityManager;
-    $this->parameters = $parameters;
     $this->s3Client = $s3Client;
+    $this->parameters = $parameters;
     $this->bugsnag = $bugsnag;
 
-        // Log when the constructor is called
-    error_log('VideoProcessor service instantiated.');
+    $this->mediaConvertClient = new MediaConvertClient([
+      'version' => 'latest',
+      'region' => 'eu-west-3',
+      'credentials' => [
+        'key' => $this->parameters->get('mediaconvert_access_key'),
+        'secret' => $this->parameters->get('mediaconvert_secret_key'),
+      ],
+    ]);
+
+    error_log('VideoProcessor service with Media Convert instantiated.');
   }
 
   /**
-   * Découpe une vidéo à partir d'un fichier M3U8 distant et envoie les fichiers découpés sur AWS S3
+   * Utiliser AWS MediaConvert pour découper une vidéo et envoyer les fichiers découpés sur S3
    *
    * @param Clip $clip L'entité Clip contenant les informations sur le produit et le timing
    * @return bool Retourne true si la découpe et la conversion ont réussi, false sinon
@@ -34,136 +44,91 @@ class VideoProcessor
   public function processClip(Clip $clip): bool
   {
     try {
-          // Log au début de l'exécution de processClip 
-      error_log('Processing clip ID: ' . $clip->getId()); 
+      // Log au début de l'exécution de processClip
+      error_log('Processing clip ID: ' . $clip->getId());
 
-          // Récupérer l'URL du fichier M3U8 depuis S3
-      $fileUrl = 'https://' . $this->parameters->get('s3_bucket') . '.s3.eu-west-3.amazonaws.com/' . $clip->getLive()->getFileList();
+      // URL de la vidéo source dans S3
+      $inputFileUrl = 's3://' . $this->parameters->get('s3_bucket') . '/' . $clip->getLive()->getFileList();
+      error_log('Url du fichier video : ' . $inputFileUrl);
 
-          // Log avant d'exécuter la commande FFmpeg
-      error_log('File URL: ' . $fileUrl);
+      // Chemin de sortie pour le fichier M3U8 et les segments TS
+      $outputFileKey = 'vendor' . $clip->getVendor()->getId() . '/Live' . $clip->getLive()->getId() . '/Clip' . $clip->getId() . '/';
+      $nameModifier = '_Clip' . $clip->getId(); 
+      $filename = md5(uniqid());
+      $filelist = $outputFileKey . $filename . $nameModifier . '.m3u8';
+      $startTime = $clip->getStart();
+      $endTime = $clip->getEnd();
 
-          // Générer un nom unique pour le fichier M3U8
-      $uniqueFileName = md5(uniqid()) . '_Clip' . $clip->getId() . '.m3u8'; 
+      $jobSettings = [
+        'Role' => $this->parameters->get('mediaconvert_role_arn'),  
+        'Settings' => [
+          'Inputs' => [
+            [
+              'FileInput' => $inputFileUrl, 
+              'TimecodeSource' => 'ZEROBASED',
+              'InputClippings' => [
+                [
+                  'StartTimecode' => sprintf('%02d:%02d:%02d:00', floor($startTime / 3600), ($startTime / 60) % 60, $startTime % 60),  // Format HH:MM:SS:FF
+                  'EndTimecode' => sprintf('%02d:%02d:%02d:00', floor($endTime / 3600), ($endTime / 60) % 60, $endTime % 60),  // Format HH:MM:SS:FF
+                ]
+              ],
+            ]
+          ],
+          'OutputGroups' => [
+            [
+              'Name' => 'HLS Group',
+              'Outputs' => [
+                [
+                  'ContainerSettings' => [
+                    'Container' => 'M3U8'
+                  ],
+                  'VideoDescription' => [
+                    'CodecSettings' => [
+                      'Codec' => 'H_264',
+                      'H264Settings' => [
+                        'RateControlMode' => 'QVBR',   // QVBR pour qualité variable
+                        'MaxBitrate' => 5000000,       // MaxBitrate, sans Bitrate
+                        'GopSize' => 90,
+                        'GopClosedCadence' => 1,
+                        'CodecLevel' => 'AUTO',
+                        'CodecProfile' => 'MAIN'
+                      ]
+                    ]
+                  ],
+                  'NameModifier' => $nameModifier,  // Suffixe pour modifier le nom des fichiers de sortie
+                ]
+              ],
+              'OutputGroupSettings' => [
+                'Type' => 'HLS_GROUP_SETTINGS',  // Type de groupe HLS
+                'HlsGroupSettings' => [
+                  'Destination' => 's3://' . $this->parameters->get('s3_bucket') . '/' . $outputFileKey . '/' . $filename,
+                  'SegmentLength' => 10,
+                  'MinSegmentLength' => 1  // Longueur minimale des segments (1 seconde)
+                ]
+              ]
+            ]
+          ]
+        ]
+      ];
 
-          // Chemin S3 où les segments et le fichier M3U8 seront stockés
-      $bucket = $this->parameters->get('s3_bucket');
-      $segmentKey = 'vendor' . $clip->getVendor()->getId() . '/Live' . $clip->getLive()->getId() . '/Clip' . $clip->getId() . '/segment_%03d.ts';
-      $m3u8Key = 'vendor' . $clip->getVendor()->getId() . '/Live' . $clip->getLive()->getId() . '/Clip' . $clip->getId() . '/' . $uniqueFileName;
+      $result = $this->mediaConvertClient->createJob($jobSettings);
 
-          // Convertir les timestamps en format H:i:s
-      $start = gmdate("H:i:s", $clip->getStart());
-      $end = gmdate("H:i:s", $clip->getEnd());
+      // Log l'ID du job MediaConvert
+      error_log('MediaConvert Job ID: ' . $result['Job']['Id']);
 
-          // Log avant d'exécuter la commande FFmpeg
-      error_log('FFmpeg command: Start ' . $start . ', End ' . $end);
-
-          // Utilisation de S3 pour les segments et le fichier M3U8
-      $command = sprintf(
-       'ffmpeg -i %s -ss %s -to %s -threads 1 -hls_time 10 -hls_playlist_type vod -hls_segment_filename s3://%s/%s s3://%s/%s',
-        escapeshellarg($fileUrl),  // URL du fichier M3U8 source
-        escapeshellarg($start),    // Timestamp de début
-        escapeshellarg($end),      // Timestamp de fin
-        escapeshellarg($bucket),   // Nom du bucket S3 pour les segments TS
-        escapeshellarg($segmentKey), // Chemin S3 pour les segments TS
-        escapeshellarg($bucket),   // Nom du bucket S3 pour le fichier M3U8
-        escapeshellarg($m3u8Key)   // Chemin S3 pour le fichier M3U8
-      );
-
-
-      exec($command, $output, $returnVar);
-
-          // Log du résultat de la commande FFmpeg
-      error_log('FFmpeg command return value: ' . $returnVar);
-
-      if ($returnVar !== 0) {
-        error_log('FFmpeg command failed.');
-        return false;
-      }
-
-          // Mise à jour de l'entité Clip avec le chemin S3 du fichier M3U8
-      $clip->setFileList($m3u8Key);
-      $clip->setStatus('découpé');
+      // Enregistrer le chemin du fichier M3U8 dans l'entité Clip
+      $clip->setFileList($filelist);
+      $clip->setStatus('progressing');
       $this->entityManager->flush();
 
-      error_log('Clip updated with status "découpé".');
+      error_log('Clip updated');
 
     } catch (\Exception $e) {
-          // Log en cas d'erreur
-      error_log('Error processing clip: ' . $e->getMessage());
+      error_log('Error progressing clip: ' . $e->getMessage());
       $this->bugsnag->notifyException($e);
+      return false;
     }
 
     return true;
-  }
-
-  /**
-   * Récupérer la durée d'une vidéo avec FFmpeg
-   */
-  private function getVideoDuration($filePath): ?int
-  {
-    $command = sprintf('ffmpeg -i %s 2>&1 | grep "Duration"', escapeshellarg($filePath));
-    $output = shell_exec($command);
-
-    if (preg_match('/Duration: (\d+):(\d+):(\d+\.\d+)/', $output, $matches)) {
-      $hours = (int) $matches[1];
-      $minutes = (int) $matches[2];
-      $seconds = (float) $matches[3];
-      return ($hours * 3600) + ($minutes * 60) + $seconds;
-    }
-
-    return null;
-  }
-
-  /**
-   * Upload des fichiers découpés (M3U8 et segments .ts) sur S3
-   *
-   * @param string $directoryPath Le chemin du dossier temporaire contenant les fichiers M3U8 et .ts
-   * @param string $s3Key Le chemin du répertoire de destination sur S3
-   */
-  private function uploadDirectoryToS3($directoryPath, $s3Key): void
-  {
-      // Ouvrir le dossier temporaire
-    $files = scandir($directoryPath);
-    foreach ($files as $file) {
-      if ($file !== '.' && $file !== '..') {
-        $filePath = $directoryPath . '/' . $file;
-        $this->uploadToS3($filePath, $s3Key . '/' . $file);
-      }
-    }
-  }
-
-  /**
-   * Upload d'un fichier unique sur S3
-   */
-  private function uploadToS3($filePath, $key): void
-  {
-    try {
-      $this->s3Client->putObject([
-        'Bucket' => $this->parameters->get('s3_bucket'),
-        'Key' => $key,
-        'SourceFile' => $filePath,
-        'ACL' => 'public-read',
-        'ContentType' => $this->getMimeType($filePath)
-      ]);
-    } catch (\Exception $e) {
-      error_log('Error uploading to S3: ' . $e->getMessage());
-    }
-  }
-
-  /**
-   * Obtenir le type MIME en fonction du fichier
-   */
-  private function getMimeType($filePath): string
-  {
-    $ext = pathinfo($filePath, PATHINFO_EXTENSION);
-    switch ($ext) {
-      case 'm3u8':
-      return 'application/vnd.apple.mpegurl';
-      case 'ts':
-      return 'video/MP2T';
-      default:
-      return 'application/octet-stream';
-    }
   }
 }
