@@ -66,35 +66,28 @@ class WebhookController extends AbstractController {
   public function mediaconvert(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
     try {
       $result = json_decode($request->getContent(), true);
-      $this->bugsnag->leaveBreadcrumb($result['Type']);
-      throw new \Exception('This is a forced error for testing Bugsnag');
 
       if (isset($result['Type']) && $result['Type'] === 'Notification') {
-        // Récupérer les détails du job depuis le message SNS
         $message = json_decode($result['Message'], true);
         $jobId = $message['jobId'];
         $status = $message['status'];
+        $clip = $clipRepo->findOneByJobId($jobId);
 
-        // Traiter les informations en fonction du statut reçu
-        if ($status === 'COMPLETE') {
-          // Job terminé, mise à jour du clip
-          $clip = $clipRepo->findOneByJobId($jobId);
-
+        if ($status === 'COMPLETE' && $clip) {
           if ($clip) {
             $clip->setStatus('available');
             $this->entityManager->flush();
           }
-        } elseif ($status === 'ERROR') {
-          // Gérer l'erreur
-          error_log('Error in MediaConvert job ID: ' . $jobId);
-          $this->bugsnag->notifyError('MediaConvertError', 'Error in MediaConvert job ID: ' . $jobId);
+        } 
+
+        if ($status === 'ERROR' && $clip) {
+          $clip->setStatus('error');
+          $this->entityManager->flush();
+          throw new \Exception('MediaConvertError');
         }
-      } else {
-        throw new \Exception('Invalid SNS message format');
       }
     } catch (\Exception $error) {
       $this->bugsnag->notifyException($error);
-      return $this->json(['error' => 'Error processing webhook'], 500);
     }
 
     return $this->json(true, 200);

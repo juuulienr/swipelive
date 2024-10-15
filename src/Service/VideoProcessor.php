@@ -114,10 +114,6 @@ class VideoProcessor
         // ],
         'UserMetadata' => [
           'clipId' => $clip->getId()
-        ],
-        // 'Queue' => 'arn:aws:mediaconvert:eu-west-3:600627343574:queues/Default',
-        'Notification' => [
-          'SnsTopicArn' => $this->parameters->get('sns_topic_arn')
         ]
       ];
 
