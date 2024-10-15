@@ -66,21 +66,16 @@ class WebhookController extends AbstractController {
    */
   public function mediaconvert(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
     try {
-      // Décodage du contenu de la requête SNS
       $result = json_decode($request->getContent(), true);
 
       if (isset($result['Type']) && $result['Type'] === 'Notification') {
-        // Décodage du message de la notification
         $message = json_decode($result['Message'], true);
-
-        // Récupérer le jobId et le status
         $jobId = $message['detail']['jobId'];
         $status = $message['detail']['status'];
         $clipId = $message['detail']['userMetadata']['clipId'];
         $clip = $clipRepo->findOneById($clipId);
 
         if ($clip) {
-          // Mise à jour du statut en fonction de la réponse de MediaConvert
           if ($status === 'COMPLETE') {
             $clip->setStatus('available');
           } elseif ($status === 'ERROR') {
@@ -89,12 +84,10 @@ class WebhookController extends AbstractController {
             $clip->setStatus($status);
           }
 
-          // Enregistrer les changements en base de données
-          $this->entityManager->flush();
+          $manager->flush();
         }
       }
     } catch (\Exception $error) {
-      // Capture l'exception et log avec Bugsnag
       $this->bugsnag->notifyException($error, function ($report) use ($request) {
         $report->setMetaData([
           'sns' => [
