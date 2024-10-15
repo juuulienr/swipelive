@@ -93,9 +93,7 @@ class WebhookController extends AbstractController {
         throw new \Exception('Invalid SNS message format');
       }
     } catch (\Exception $error) {
-      error_log('Error processing MediaConvert webhook: ' . $e->getMessage());
       $this->bugsnag->notifyException($error);
-
       return $this->json(['error' => 'Error processing webhook'], 500);
     }
 
