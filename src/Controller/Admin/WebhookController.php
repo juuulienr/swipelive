@@ -66,7 +66,8 @@ class WebhookController extends AbstractController {
   public function mediaconvert(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
     try {
       $result = json_decode($request->getContent(), true);
-        // $this->bugsnag->leaveBreadcrumb($topicArn);
+      $this->bugsnag->leaveBreadcrumb($result['Type']);
+      throw new \Exception('This is a forced error for testing Bugsnag');
 
       if (isset($result['Type']) && $result['Type'] === 'Notification') {
         // Récupérer les détails du job depuis le message SNS
@@ -78,7 +79,7 @@ class WebhookController extends AbstractController {
         if ($status === 'COMPLETE') {
           // Job terminé, mise à jour du clip
           $clip = $clipRepo->findOneByJobId($jobId);
-          
+
           if ($clip) {
             $clip->setStatus('available');
             $this->entityManager->flush();
@@ -313,7 +314,7 @@ class WebhookController extends AbstractController {
           break;
 
           case 31:
-             // All the recorded files are uploaded to the specified third-party cloud storage
+            // All the recorded files are uploaded to the specified third-party cloud storage
             $fileList = $result['payload']['details']['fileList'] ?? [];
             $cname = $result['payload']['cname'];
             $live = $liveRepo->findOneByCname($cname);

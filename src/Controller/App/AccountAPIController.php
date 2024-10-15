@@ -114,13 +114,19 @@ class AccountAPIController extends AbstractController {
    *
    * @Route("/user/api/push/add", name="user_push_add")
    */
-  public function addPush(Request $request, ObjectManager $manager)
+  public function addPush(Request $request, ObjectManager $manager, UserRepository $userRepo)
   {
-    $user = $this->getUser();
-
     if ($content = $request->getContent()) {
       $result = json_decode($content, true);
+      $user = $this->getUser();
+      
       if ($result) {
+        $exist = $userRepo->findOneByPushToken($result['pushToken']);
+
+        if ($exist) {
+          $exist->setPushToken(null);
+        }
+
         $user->setPushToken($result['pushToken']);
         $manager->flush();
 
