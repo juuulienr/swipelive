@@ -107,6 +107,11 @@ class Clip
    */
   private $totalLikes;
 
+  /**
+   * @ORM\Column(type="string", length=255, nullable=true)
+   */
+  private $jobId;
+
   
   public function __construct()
   {
@@ -307,4 +312,16 @@ class Clip
 
     return $this;
   }
+
+  public function setJobId(string $jobId): self
+  {
+      $this->jobId = $jobId;
+      return $this;
+  }
+
+  public function getJobId(): ?string
+  {
+      return $this->jobId;
+  }
+
 }
