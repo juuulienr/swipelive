@@ -58,53 +58,67 @@ class WebhookController extends AbstractController {
   }
 
 
-  /**
-   * Webhooks Amazon Media Convert
-   *
-   * @Route("/api/mediaconvert/webhooks", name="api_mediaconvert_webhooks", methods={"POST"})
-   */
-  public function mediaconvert(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
+/**
+ * Webhooks Amazon Media Convert
+ *
+ * @Route("/api/mediaconvert/webhooks", name="api_mediaconvert_webhooks", methods={"POST"})
+ */
+public function mediaconvert(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
     try {
-      $result = json_decode($request->getContent(), true);
+        // Décodage du contenu de la requête
+        $result = json_decode($request->getContent(), true);
 
-      throw new \Exception('check2');
+        // Log pour déboguer la requête reçue
+        $this->bugsnag->leaveBreadcrumb('Received SNS Payload', [
+            'content' => $request->getContent(),
+        ]);
 
-      if (isset($result['Type']) && $result['Type'] === 'Notification') {
-
-        $message = json_decode($result['Message'], true);
-        $jobId = $message['jobId'];
-        $status = $message['status'];
-        $clip = $clipRepo->findOneByJobId($jobId);
-
-        if ($status === 'COMPLETE' && $clip) {
-          if ($clip) {
-            $clip->setStatus('available');
-            $this->entityManager->flush();
-          }
-        } 
-
-        if ($status === 'ERROR' && $clip) {
-          $clip->setStatus('error');
-          $this->entityManager->flush();
-          throw new \Exception('MediaConvertError');
+        if (!$result) {
+            throw new \Exception('Invalid SNS message format');
         }
 
-        throw new \Exception($status);
-      }
+        if (isset($result['Type']) && $result['Type'] === 'Notification') {
+            $message = json_decode($result['Message'], true);
+
+            if (!$message) {
+                throw new \Exception('Invalid SNS message body');
+            }
+
+            $jobId = $message['jobId'];
+            $status = $message['status'];
+            $clip = $clipRepo->findOneByJobId($jobId);
+
+            if ($clip) {
+                if ($status === 'COMPLETE') {
+                    $clip->setStatus('available');
+                    $this->entityManager->flush();
+                } elseif ($status === 'ERROR') {
+                    $clip->setStatus('error');
+                    $this->entityManager->flush();
+                    throw new \Exception('MediaConvertError');
+                }
+            }
+
+            throw new \Exception($status);
+        } else {
+            throw new \Exception('Unhandled SNS message type');
+        }
     } catch (\Exception $error) {
-      // $this->bugsnag->notifyException($error);
-      $this->bugsnag->notifyException($error, function ($report) use ($request) {
-        $report->setMetaData([
-          'sns' => [
-            'params' => $request->request->all(),  // Capture des paramètres envoyés dans la requête
-            'headers' => $request->headers->all()  // Capture des headers de la requête
-          ]
-        ]);
-      });
+        // Capture l'exception et log avec les détails SNS
+        $this->bugsnag->notifyException($error, function ($report) use ($request) {
+            $report->setMetaData([
+                'sns' => [
+                    'body' => $request->getContent(),
+                    'params' => $request->request->all(),  // Capture des paramètres envoyés dans la requête
+                    'headers' => $request->headers->all()  // Capture des headers de la requête
+                ]
+            ]);
+        });
     }
 
     return $this->json(true, 200);
-  }
+}
+
 
 
 
