@@ -70,10 +70,12 @@ class WebhookController extends AbstractController {
   public function mediaconvert(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
     try {
       // Simuler une erreur pour tester Bugsnag
-      throw new \Exception('This is a forced error for testing Bugsnag');
 
       // Le reste de ton code de traitement ici
       $result = json_decode($request->getContent(), true);
+      $this->bugsnag->leaveBreadcrumb($result);
+
+      throw new \Exception('This is a forced error for testing Bugsnag');
 
       if (isset($result['Type']) && $result['Type'] === 'Notification') {
         // Récupérer les détails du job depuis le message SNS

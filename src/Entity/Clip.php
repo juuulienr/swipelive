@@ -118,7 +118,7 @@ class Clip
     $this->status = "waiting";
     $this->createdAt = new \DateTime('now', timezone_open('UTC'));
     $this->comments = new ArrayCollection();
-    $this->totalLikes = 200;
+    $this->totalLikes = rand(10, 200);
   }
 
 
