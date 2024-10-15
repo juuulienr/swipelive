@@ -72,6 +72,13 @@ class VideoProcessor
                   'EndTimecode' => sprintf('%02d:%02d:%02d:00', floor($endTime / 3600), ($endTime / 60) % 60, $endTime % 60),  // Format HH:MM:SS:FF
                 ]
               ],
+              'AudioSelectors' => [
+                'Audio Selector 1' => [
+                  'DefaultSelection' => 'DEFAULT',  // Sélection par défaut de l'audio
+                  'Tracks' => [1],  // Spécifiez la piste audio si nécessaire
+                  'SelectorType' => 'TRACK'
+                ],
+              ]
             ]
           ],
           'OutputGroups' => [
@@ -95,7 +102,19 @@ class VideoProcessor
                       ]
                     ]
                   ],
-                  'NameModifier' => $nameModifier,  // Suffixe pour modifier le nom des fichiers de sortie
+                  'AudioDescriptions' => [
+                    [
+                      'CodecSettings' => [
+                        'Codec' => 'AAC',
+                        'AacSettings' => [
+                          'Bitrate' => 96000,
+                          'CodingMode' => 'CODING_MODE_2_0',
+                          'SampleRate' => 48000
+                        ]
+                      ]
+                    ]
+                  ],
+                  'NameModifier' => $nameModifier,
                 ]
               ],
               'OutputGroupSettings' => [
