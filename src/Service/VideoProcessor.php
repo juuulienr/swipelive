@@ -59,9 +59,9 @@ class VideoProcessor
       $jobSettings = [
         'Role' => $this->parameters->get('mediaconvert_role_arn'),  
         'Settings' => [
-          'TimecodeConfig' => [  // Ajout du paramètre TimecodeConfig
-            'Source' => 'ZEROBASED'
-          ],
+          // 'TimecodeConfig' => [  // Ajout du paramètre TimecodeConfig
+          //   'Source' => 'ZEROBASED'
+          // ],
           'Inputs' => [
             [
               'FileInput' => $inputFileUrl, 
@@ -109,15 +109,15 @@ class VideoProcessor
             ]
           ]
         ],
-        'AccelerationSettings' => [  // Activer l'accélération
-          'Mode' => 'ENABLED'     // 'ENABLED' pour activer l'accélération
-        ],
-        'UserMetadata' => [ // Pour attacher des métadonnées si besoin
-            'clipId' => $clip->getId()
+        // 'AccelerationSettings' => [  // Activer l'accélération
+        //   'Mode' => 'ENABLED'     // 'ENABLED' pour activer l'accélération
+        // ],
+        'UserMetadata' => [
+          'clipId' => $clip->getId()
         ],
         'Queue' => 'arn:aws:mediaconvert:eu-west-3:600627343574:queues/Default',
         'Notification' => [  // Notification via SNS
-            'SnsTopicArn' => 'arn:aws:sns:eu-west-3:600627343574:MediaConvertNotifications:094289b6-36cf-4e47-811d-ebafc7baf77c'
+          'SnsTopicArn' => 'arn:aws:sns:eu-west-3:600627343574:MediaConvertNotifications:094289b6-36cf-4e47-811d-ebafc7baf77c'
         ]
       ];
 

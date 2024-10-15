@@ -67,7 +67,7 @@ class WebhookController extends AbstractController {
    *
    * @Route("/api/mediaconvert/webhooks", name="api_mediaconvert_webhooks", methods={"POST"})
    */
-  public function mediaconvert(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+  public function mediaconvert(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
     try {
       // Simuler une erreur pour tester Bugsnag
       throw new \Exception('This is a forced error for testing Bugsnag');
