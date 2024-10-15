@@ -94,7 +94,7 @@ class WebhookController extends AbstractController {
       }
     } catch (\Exception $error) {
       // $this->bugsnag->notifyException($error);
-      $this->bugsnag->notifyException($e, function ($report) use ($request) {
+      $this->bugsnag->notifyException($error, function ($report) use ($request) {
         $report->setMetaData([
           'sns' => [
             'params' => $request->request->all(),  // Capture des paramètres envoyés dans la requête
