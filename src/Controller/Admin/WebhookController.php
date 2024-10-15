@@ -73,6 +73,10 @@ class WebhookController extends AbstractController {
         $status = $message['status'];
         $clip = $clipRepo->findOneByJobId($jobId);
 
+        $this->bugsnag->leaveBreadcrumb($jobId);
+        $this->bugsnag->leaveBreadcrumb($status);
+          throw new \Exception('check');
+
         if ($status === 'COMPLETE' && $clip) {
           if ($clip) {
             $clip->setStatus('available');
@@ -85,6 +89,8 @@ class WebhookController extends AbstractController {
           $this->entityManager->flush();
           throw new \Exception('MediaConvertError');
         }
+
+        throw new \Exception($status);
       }
     } catch (\Exception $error) {
       $this->bugsnag->notifyException($error);
