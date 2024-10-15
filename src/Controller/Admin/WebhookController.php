@@ -66,8 +66,9 @@ class WebhookController extends AbstractController {
   public function mediaconvert(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
     try {
       $result = json_decode($request->getContent(), true);
-      $this->bugsnag->leaveBreadcrumb('Status update', 'log', [], $result);
-      throw new \Exception('check');
+      $this->bugsnag->leaveBreadcrumb('Status update', 'log', json_encode($result));
+
+      throw new \Exception('check2');
 
       if (isset($result['Type']) && $result['Type'] === 'Notification') {
 
@@ -75,10 +76,6 @@ class WebhookController extends AbstractController {
         $jobId = $message['jobId'];
         $status = $message['status'];
         $clip = $clipRepo->findOneByJobId($jobId);
-
-        $this->bugsnag->leaveBreadcrumb($jobId);
-        $this->bugsnag->leaveBreadcrumb($status);
-          throw new \Exception('check');
 
         if ($status === 'COMPLETE' && $clip) {
           if ($clip) {
@@ -96,7 +93,15 @@ class WebhookController extends AbstractController {
         throw new \Exception($status);
       }
     } catch (\Exception $error) {
-      $this->bugsnag->notifyException($error);
+      // $this->bugsnag->notifyException($error);
+      $this->bugsnag->notifyException($e, function ($report) use ($request) {
+        $report->setMetaData([
+          'sns' => [
+            'params' => $request->request->all(),  // Capture des paramètres envoyés dans la requête
+            'headers' => $request->headers->all()  // Capture des headers de la requête
+          ]
+        ]);
+      });
     }
 
     return $this->json(true, 200);
