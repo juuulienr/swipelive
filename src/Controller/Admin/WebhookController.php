@@ -66,8 +66,11 @@ class WebhookController extends AbstractController {
   public function mediaconvert(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
     try {
       $result = json_decode($request->getContent(), true);
+      $this->bugsnag->leaveBreadcrumb('Status update', 'log', [], $result);
+      throw new \Exception('check');
 
       if (isset($result['Type']) && $result['Type'] === 'Notification') {
+
         $message = json_decode($result['Message'], true);
         $jobId = $message['jobId'];
         $status = $message['status'];
