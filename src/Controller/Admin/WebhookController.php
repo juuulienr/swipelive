@@ -65,49 +65,8 @@ class WebhookController extends AbstractController {
    */
   public function mediaconvert(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
     try {
-      // Simuler une erreur pour tester Bugsnag
-
-      // Le reste de ton code de traitement ici
       $result = json_decode($request->getContent(), true);
-
-
-      if (isset($result['Type']) && $result['Type'] === 'SubscriptionConfirmation') {
-        // Récupérer le token de confirmation et le topic ARN
-        $token = $result['Token'];
-        $topicArn = $result['TopicArn'];
-        $this->bugsnag->leaveBreadcrumb($token);
-        $this->bugsnag->leaveBreadcrumb($topicArn);
-
-
-        // Confirmer l'abonnement en appelant l'API SNS
-        try {
-          throw new \Exception('This is a forced error for testing Bugsnag');
-          // $snsClient = new \Aws\Sns\SnsClient([
-          //   'version' => 'latest',
-          //   'region' => 'eu-west-3',
-          //   'credentials' => [
-          //     'key' => $this->parameters->get('sns_access_key'),
-          //     'secret' => $this->parameters->get('sns_secret_key'),
-          //   ],
-          // ]);
-
-          //   // Confirmer l'abonnement
-          // $snsClient->confirmSubscription([
-          //   'TopicArn' => $topicArn,
-          //   'Token' => $token,
-          // ]);
-
-          error_log('SNS subscription confirmed.');
-        } catch (\Exception $e) {
-          error_log('Error confirming SNS subscription: ' . $e->getMessage());
-      error_log('Error processing MediaConvert webhook: ' . $e->getMessage());
-      $this->bugsnag->notifyException($e);
-        }
-      }
-
-
-
-
+        // $this->bugsnag->leaveBreadcrumb($topicArn);
 
       if (isset($result['Type']) && $result['Type'] === 'Notification') {
         // Récupérer les détails du job depuis le message SNS
@@ -118,9 +77,10 @@ class WebhookController extends AbstractController {
         // Traiter les informations en fonction du statut reçu
         if ($status === 'COMPLETE') {
           // Job terminé, mise à jour du clip
-          $clip = $this->entityManager->getRepository(Clip::class)->findOneBy(['mediaConvertJobId' => $jobId]);
+          $clip = $clipRepo->findOneByJobId($jobId);
+          
           if ($clip) {
-            $clip->setStatus('complete');
+            $clip->setStatus('available');
             $this->entityManager->flush();
           }
         } elseif ($status === 'ERROR') {
@@ -131,10 +91,9 @@ class WebhookController extends AbstractController {
       } else {
         throw new \Exception('Invalid SNS message format');
       }
-    } catch (\Exception $e) {
-      // Log l'erreur et l'envoyer à Bugsnag
+    } catch (\Exception $error) {
       error_log('Error processing MediaConvert webhook: ' . $e->getMessage());
-      $this->bugsnag->notifyException($e);
+      $this->bugsnag->notifyException($error);
 
       return $this->json(['error' => 'Error processing webhook'], 500);
     }
@@ -295,7 +254,7 @@ class WebhookController extends AbstractController {
                         "🔴 " . $live->getVendor()->getPseudo() . " est actuellement en direct",
                         $follower->getPushToken()
                       );
-                    } catch (\Exception $error) {
+                    } catch (\Exception $error) { 
                       $this->bugsnag->notifyException($error);
                     }
                   }

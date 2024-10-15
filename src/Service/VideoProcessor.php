@@ -59,7 +59,7 @@ class VideoProcessor
       $jobSettings = [
         'Role' => $this->parameters->get('mediaconvert_role_arn'),  
         'Settings' => [
-          // 'TimecodeConfig' => [  // Ajout du paramètre TimecodeConfig
+          // 'TimecodeConfig' => [  // Ajout du paramètre TimecodeConfig pour AccelerationSettings ENABLED
           //   'Source' => 'ZEROBASED'
           // ],
           'Inputs' => [
@@ -86,8 +86,8 @@ class VideoProcessor
                     'CodecSettings' => [
                       'Codec' => 'H_264',
                       'H264Settings' => [
-                        'RateControlMode' => 'QVBR',   // QVBR pour qualité variable
-                        'MaxBitrate' => 5000000,       // MaxBitrate, sans Bitrate
+                        'RateControlMode' => 'QVBR', 
+                        'MaxBitrate' => 5000000,    
                         'GopSize' => 90,
                         'GopClosedCadence' => 1,
                         'CodecLevel' => 'AUTO',
@@ -109,15 +109,15 @@ class VideoProcessor
             ]
           ]
         ],
-        // 'AccelerationSettings' => [  // Activer l'accélération
-        //   'Mode' => 'ENABLED'     // 'ENABLED' pour activer l'accélération
+        // 'AccelerationSettings' => [
+        //   'Mode' => 'ENABLED' 
         // ],
         'UserMetadata' => [
           'clipId' => $clip->getId()
         ],
-        'Queue' => 'arn:aws:mediaconvert:eu-west-3:600627343574:queues/Default',
-        'Notification' => [  // Notification via SNS
-          'SnsTopicArn' => 'arn:aws:sns:eu-west-3:600627343574:MediaConvertNotifications:094289b6-36cf-4e47-811d-ebafc7baf77c'
+        // 'Queue' => 'arn:aws:mediaconvert:eu-west-3:600627343574:queues/Default',
+        'Notification' => [
+          'SnsTopicArn' => $this->parameters->get('sns_topic_arn')
         ]
       ];
 
@@ -128,6 +128,7 @@ class VideoProcessor
 
       // Enregistrer le chemin du fichier M3U8 dans l'entité Clip
       $clip->setFileList($filelist);
+      $clip->setJobId($result['Job']['Id']);
       $clip->setStatus('progressing');
       $this->entityManager->flush();
 
