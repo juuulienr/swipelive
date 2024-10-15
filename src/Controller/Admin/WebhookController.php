@@ -58,10 +58,6 @@ class WebhookController extends AbstractController {
   }
 
 
-
-
-
-
   /**
    * Webhooks Amazon Media Convert
    *
@@ -73,9 +69,45 @@ class WebhookController extends AbstractController {
 
       // Le reste de ton code de traitement ici
       $result = json_decode($request->getContent(), true);
-      $this->bugsnag->leaveBreadcrumb($result);
 
-      throw new \Exception('This is a forced error for testing Bugsnag');
+
+      if (isset($result['Type']) && $result['Type'] === 'SubscriptionConfirmation') {
+        // Récupérer le token de confirmation et le topic ARN
+        $token = $result['Token'];
+        $topicArn = $result['TopicArn'];
+        $this->bugsnag->leaveBreadcrumb($token);
+        $this->bugsnag->leaveBreadcrumb($topicArn);
+
+
+        // Confirmer l'abonnement en appelant l'API SNS
+        try {
+          throw new \Exception('This is a forced error for testing Bugsnag');
+          // $snsClient = new \Aws\Sns\SnsClient([
+          //   'version' => 'latest',
+          //   'region' => 'eu-west-3',
+          //   'credentials' => [
+          //     'key' => $this->parameters->get('sns_access_key'),
+          //     'secret' => $this->parameters->get('sns_secret_key'),
+          //   ],
+          // ]);
+
+          //   // Confirmer l'abonnement
+          // $snsClient->confirmSubscription([
+          //   'TopicArn' => $topicArn,
+          //   'Token' => $token,
+          // ]);
+
+          error_log('SNS subscription confirmed.');
+        } catch (\Exception $e) {
+          error_log('Error confirming SNS subscription: ' . $e->getMessage());
+      error_log('Error processing MediaConvert webhook: ' . $e->getMessage());
+      $this->bugsnag->notifyException($e);
+        }
+      }
+
+
+
+
 
       if (isset($result['Type']) && $result['Type'] === 'Notification') {
         // Récupérer les détails du job depuis le message SNS
