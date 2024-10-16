@@ -55,11 +55,13 @@ class WebhookController extends AbstractController {
   private $firebaseMessagingService;
   private $bugsnag;
   private $videoProcessor;
+  private $lockFactory;
 
-  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag, VideoProcessor $videoProcessor) {
+  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag, VideoProcessor $videoProcessor, LockFactory $lockFactory) {
     $this->firebaseMessagingService = $firebaseMessagingService;
     $this->bugsnag = $bugsnag;
     $this->videoProcessor = $videoProcessor;
+    $this->lockFactory = $lockFactory;
   }
 
 
@@ -150,7 +152,7 @@ class WebhookController extends AbstractController {
         if ($live) {
           return $this->json(['message' => 'Enregistrement déjà effectué pour ce noticeId.'], 200);
         }
-      
+
         if (isset($result['eventType'])) {
           switch ($result['eventType']) {
             case 103:
