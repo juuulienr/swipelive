@@ -36,7 +36,10 @@ class ClipAPIController extends AbstractController {
    * @Route("/user/api/clips", name="user_api_clips", methods={"GET"})
    */
   public function clips(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
-    $clips = $clipRepo->findByVendor($this->getUser()->getVendor());
+    $clips = $clipRepo->findBy(
+      ['vendor' => $this->getUser()->getVendor()], 
+      ['createdAt' => 'DESC']
+    );
 
     return $this->json($clips, 200, [], [
     	'groups' => 'clip:read', 
