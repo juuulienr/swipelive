@@ -139,7 +139,7 @@ class WebhookController extends AbstractController {
       }
 
       // Création du verrou basé sur le noticeId pour éviter les traitements concurrents
-      $lock = $lockFactory->createLock('agora_notice_' . $noticeId);
+      $lock = $this->lockFactory->createLock('agora_notice_' . $noticeId);
 
       try {
         // Tente d'acquérir le verrou
@@ -341,7 +341,7 @@ class WebhookController extends AbstractController {
         }
 
         // Création du verrou basé sur le cname pour éviter les traitements concurrents
-        $lock = $lockFactory->createLock('agora_cloud_recording_' . $cname);
+        $lock = $this->lockFactory->createLock('agora_cloud_recording_' . $cname);
 
         try {
           // Tente d'acquérir le verrou
