@@ -56,12 +56,6 @@ class Clip
    * @ORM\Column(type="text", nullable=true)
    * @Groups("clip:read")
    */
-  private $resourceId;
-
-  /**
-   * @ORM\Column(type="text", nullable=true)
-   * @Groups("clip:read")
-   */
   private $fileList;
 
   /**
@@ -88,11 +82,6 @@ class Clip
    * @Groups("clip:read")
    */
   private $createdAt;
-
-  /**
-   * @ORM\Column(type="string", length=255, nullable=true)
-   */
-  private $eventId;
 
   /**
    * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="clip")
@@ -187,18 +176,6 @@ class Clip
     return $this;
   }
 
-  public function getResourceId(): ?string
-  {
-    return $this->resourceId;
-  }
-
-  public function setResourceId(?string $resourceId): self
-  {
-    $this->resourceId = $resourceId;
-
-    return $this;
-  }
-
   public function getFileList(): ?string
   {
     return $this->fileList;
@@ -259,17 +236,6 @@ class Clip
     return $this;
   }
 
-  public function getEventId(): ?string
-  {
-    return $this->eventId;
-  }
-
-  public function setEventId(?string $eventId): self
-  {
-    $this->eventId = $eventId;
-
-    return $this;
-  }
 
   /**
    * @return Collection|Comment[]
