@@ -48,25 +48,6 @@ class APIController extends AbstractController {
   }
 
 
-
-
-  /**
-   * Test VideoProcessor
-   *
-   * @Route("/api/processor/{id}", name="api_processor", methods={"GET"})
-   */
-  public function processor(Live $live, Request $request, ObjectManager $manager) {
-    $clips = $live->getClips();
-
-    foreach ($clips as $clip) {
-      $this->videoProcessor->processClip($clip);
-    }
-
-    return $this->json(true, 200);
-  }
-
-
-
   /**
    * Afficher le feed
    *
