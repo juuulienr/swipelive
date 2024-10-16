@@ -41,14 +41,9 @@ class VideoProcessor
   public function processClip(Clip $clip): bool
   {
     try {
-      // Log au début de l'exécution de processClip
       error_log('Processing clip ID: ' . $clip->getId());
 
-      // URL de la vidéo source dans S3
       $inputFileUrl = 's3://' . $this->parameters->get('s3_bucket') . '/' . $clip->getLive()->getFileList();
-      error_log('Url du fichier video : ' . $inputFileUrl);
-
-      // Chemin de sortie pour le fichier M3U8 et les segments TS
       $outputFileKey = 'vendor' . $clip->getVendor()->getId() . '/Live' . $clip->getLive()->getId() . '/Clip' . $clip->getId() . '/';
       $nameModifier = '_Clip' . $clip->getId(); 
       $filename = md5(uniqid());
@@ -74,8 +69,8 @@ class VideoProcessor
               ],
               'AudioSelectors' => [
                 'Audio Selector 1' => [
-                  'DefaultSelection' => 'DEFAULT',  // Sélection par défaut de l'audio
-                  'Tracks' => [1],  // Spécifiez la piste audio si nécessaire
+                  'DefaultSelection' => 'DEFAULT', 
+                  'Tracks' => [1],
                   'SelectorType' => 'TRACK'
                 ],
               ]
@@ -118,11 +113,11 @@ class VideoProcessor
                 ]
               ],
               'OutputGroupSettings' => [
-                'Type' => 'HLS_GROUP_SETTINGS',  // Type de groupe HLS
+                'Type' => 'HLS_GROUP_SETTINGS',
                 'HlsGroupSettings' => [
                   'Destination' => 's3://' . $this->parameters->get('s3_bucket') . '/' . $outputFileKey . '/' . $filename,
                   'SegmentLength' => 10,
-                  'MinSegmentLength' => 1  // Longueur minimale des segments (1 seconde)
+                  'MinSegmentLength' => 1
                 ]
               ]
             ]
@@ -137,18 +132,12 @@ class VideoProcessor
       ];
 
       $result = $this->mediaConvertClient->createJob($jobSettings);
-
-      // Log l'ID du job MediaConvert
-      error_log('MediaConvert Job ID: ' . $result['Job']['Id']);
-
-      // Enregistrer le chemin du fichier M3U8 dans l'entité Clip
       $clip->setFileList($filelist);
       $clip->setJobId($result['Job']['Id']);
       $clip->setStatus('progressing');
       $this->entityManager->flush();
 
-      error_log('Clip updated');
-
+      error_log('Clip updated: ' . $result['Job']['Id']);
     } catch (\Exception $e) {
       error_log('Error progressing clip: ' . $e->getMessage());
       $this->bugsnag->notifyException($e);

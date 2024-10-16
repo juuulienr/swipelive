@@ -43,6 +43,11 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Client;
+use Symfony\Component\Lock\Factory;
+use Symfony\Component\Lock\Store\FlockStore;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Exception\LockConflictedException;
+
 
 
 class WebhookController extends AbstractController {
@@ -76,12 +81,18 @@ class WebhookController extends AbstractController {
         $clip = $clipRepo->findOneById($clipId);
 
         if ($clip) {
-          if ($status === 'COMPLETE') {
+          switch ($status) {
+            case 'COMPLETE':
             $clip->setStatus('available');
-          } elseif ($status === 'ERROR') {
+            break;
+
+            case 'ERROR':
             $clip->setStatus('error');
-          } else {
-            $clip->setStatus($status);
+            break;
+
+            case 'CANCELED':
+            $clip->setStatus('canceled');
+            break;
           }
 
           $manager->flush();
@@ -90,7 +101,7 @@ class WebhookController extends AbstractController {
     } catch (\Exception $error) {
       $this->bugsnag->notifyException($error, function ($report) use ($request) {
         $report->setMetaData([
-          'sns' => [
+          'mediaconvert' => [
             'body' => $request->getContent(),
             'headers' => $request->headers->all()
           ]
@@ -120,12 +131,26 @@ class WebhookController extends AbstractController {
 
       // check noticeId
       $noticeId = $result['noticeId'] ?? null;
-      $live = $liveRepo->findOneByNoticeId($noticeId);
 
-      if ($live) {
-        return $this->json(true, 200);
+      if (!$noticeId) {
+        return $this->json(['message' => 'Notice ID manquant.'], 400); // 400 Bad Request
       }
 
+      // Création du verrou basé sur le noticeId pour éviter les traitements concurrents
+      $lock = $lockFactory->createLock('agora_notice_' . $noticeId);
+
+      try {
+        // Tente d'acquérir le verrou
+        if (!$lock->acquire()) {
+          return $this->json(['message' => 'Traitement déjà en cours pour ce noticeId.'], 423); // 423 Locked
+        }
+
+        $live = $liveRepo->findOneByNoticeId($noticeId);
+
+        if ($live) {
+          return $this->json(['message' => 'Enregistrement déjà effectué pour ce noticeId.'], 200);
+        }
+      
       if (isset($result['eventType'])) {
         switch ($result['eventType']) {
           case 103:
@@ -280,7 +305,12 @@ class WebhookController extends AbstractController {
 
           break;
         }
+      } catch (LockConflictedException $e) {
+        return $this->json(['message' => 'Conflit de verrouillage. Traitement déjà en cours pour ce noticeId.'], 423); // 423 Locked
+      } finally {
+        $lock->release();
       }
+
     } catch (\Exception $e) {
       $this->bugsnag->notifyException($e);
     }
