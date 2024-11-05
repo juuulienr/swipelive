@@ -212,21 +212,14 @@ class APIController extends AbstractController {
    */
   public function profileClips(User $user, Request $request, ObjectManager $manager, ClipRepository $clipRepo, SerializerInterface $serializer) {
     $clips = $clipRepo->retrieveClips($user->getVendor());
-    $array = [];
 
-    if ($clips) {
-      foreach ($clips as $clip) {
-        $array[] = [ "type" => "clip", "value" => $serializer->serialize($clip, "json", [
-          'groups' => 'clip:read', 
-          'circular_reference_limit' => 1, 
-          'circular_reference_handler' => function ($object) {
-            return $object->getId();
-          } 
-        ])];
+    return $this->json($clips, 200, [], [
+      'groups' => 'clip:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
       } 
-    }
-
-    return $this->json($array);
+    ]);
   }
 
 

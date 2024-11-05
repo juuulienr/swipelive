@@ -45,7 +45,7 @@ class ReminderToSendParcel extends Command
 
   protected function execute(InputInterface $input, OutputInterface $output): int
   {
-    $orders = $this->orderRepo->findAll();
+    $orders = $this->orderRepo->findSucceededOrders();
     $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
 
     foreach ($orders as $order) {

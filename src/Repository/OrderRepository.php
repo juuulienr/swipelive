@@ -31,6 +31,15 @@ class OrderRepository extends ServiceEntityRepository
                     ->getResult();
     }
 
+    public function findSucceededOrders() {
+      return $this->createQueryBuilder('o')
+      ->where('o.status = :status')
+      ->setParameter('status', 'succeeded')
+      ->getQuery()
+      ->getResult();
+    }
+
+
     // /**
     //  * @return Order[] Returns an array of Order objects
     //  */
