@@ -109,26 +109,6 @@ class APIController extends AbstractController {
 
 
   /**
-   * Afficher les nouveaux clips
-   *
-   * @Route("/user/api/clips/latest", name="api_clips_latest", methods={"GET"})
-   */
-  public function clipsLatest(Request $request, ObjectManager $manager, ClipRepository $clipRepo, SerializerInterface $serializer)
-  {
-    $clips = $clipRepo->findLatestClips($this->getUser()->getVendor());
-
-    return $this->json($clips, 200, [], [
-      'groups' => 'clip:read', 
-      'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
-    ]);
-  }
-
-
-
-  /**
    * Afficher les produits tendance
    *
    * @Route("/user/api/products/trending", name="api_products_trending", methods={"GET"})
