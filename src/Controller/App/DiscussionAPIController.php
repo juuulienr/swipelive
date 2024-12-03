@@ -43,9 +43,11 @@ use Cloudinary\Cloudinary;
 class DiscussionAPIController extends AbstractController {
 
   private $firebaseMessagingService;
+  private $bugsnag;
 
-  public function __construct(FirebaseMessagingService $firebaseMessagingService) {
+  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag) {
       $this->firebaseMessagingService = $firebaseMessagingService;
+      $this->bugsnag = $bugsnag;
   }
 
 

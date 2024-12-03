@@ -183,25 +183,20 @@ class LiveAPIController extends AbstractController {
    * @Route("/user/api/live/update/{id}", name="user_api_live_update", methods={"PUT"})
    */
   public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    if ($json = $request->getContent()) {
-      $param = json_decode($json, true);
-      $channel = "channel" . $live->getId();
-      $event = "event" . $live->getId();
+    $channel = "channel" . $live->getId();
+    $event = "event" . $live->getId();
 
-      $live->setChannel($channel);
-      $live->setEvent($event);
-      $manager->flush();
+    $live->setChannel($channel);
+    $live->setEvent($event);
+    $manager->flush();
 
-      return $this->json($live, 200, [], [
-        'groups' => 'live:read', 
-        'circular_reference_limit' => 1, 
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
-      ]);
-    }
-    
-    return $this->json(false, 404);
+    return $this->json($live, 200, [], [
+      'groups' => 'live:read', 
+      'circular_reference_limit' => 1, 
+      'circular_reference_handler' => function ($object) {
+        return $object->getId();
+      } 
+    ]);
   }
 
 
@@ -419,30 +414,31 @@ class LiveAPIController extends AbstractController {
           $manager->flush();
         }
       }
-
         
-      $client = new Client();
-      $appId = $this->getParameter('agora_app_id');
-      $urlStop = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/sid/%s/mode/mix/stop', $appId, $live->getResourceId(), $live->getSid());
-      $headers = ['Content-Type' => 'application/json'];
-      $bodyStop = json_encode([
-        'cname' => $live->getCname(),
-        'uid' => '123456789',
-        'clientRequest' => new \stdClass()
-      ]);
+      if ($live->getSid()) {
+        $client = new Client();
+        $appId = $this->getParameter('agora_app_id');
+        $urlStop = sprintf('https://api.agora.io/v1/apps/%s/cloud_recording/resourceid/%s/sid/%s/mode/mix/stop', $appId, $live->getResourceId(), $live->getSid());
+        $headers = ['Content-Type' => 'application/json'];
+        $bodyStop = json_encode([
+          'cname' => $live->getCname(),
+          'uid' => '123456789',
+          'clientRequest' => new \stdClass()
+        ]);
 
-      $resStop = $client->request('POST', $urlStop, [
-        'headers' => $headers,
-        'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
-        'body' => $bodyStop
-      ]);
+        $resStop = $client->request('POST', $urlStop, [
+          'headers' => $headers,
+          'auth' => [$this->getParameter('agora_customer_id'), $this->getParameter('agora_customer_secret')],
+          'body' => $bodyStop
+        ]);
 
-      $stopData = json_decode($resStop->getBody(), true);
+        $stopData = json_decode($resStop->getBody(), true);
 
-      if (isset($stopData['serverResponse']['fileList'])) {
-        $fileList = $stopData['serverResponse']['fileList'];
-        $live->setFileList($fileList);
-        $manager->flush();
+        if (isset($stopData['serverResponse']['fileList'])) {
+          $fileList = $stopData['serverResponse']['fileList'];
+          $live->setFileList($fileList);
+          $manager->flush();
+        }
       }
 
 
