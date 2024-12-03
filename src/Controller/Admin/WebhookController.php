@@ -124,7 +124,6 @@ class WebhookController extends AbstractController {
   public function agoraRTCChannelEvent(Request $request, ObjectManager $manager, LiveRepository $liveRepo, UserRepository $userRepo)
   {
     try {
-      $test->setTest("test");
       $result = json_decode($request->getContent(), true);
 
       // test_webhook
