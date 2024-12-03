@@ -180,7 +180,7 @@ class LiveAPIController extends AbstractController {
   /**
    * Mettre à jour un live
    *
-   * @Route("/user/api/live/update/{id}", name="user_api_live_update", methods={"PUT"})
+   * @Route("/user/api/live/update/{id}", name="user_api_live_update", methods={"GET"})
    */
   public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
     $channel = "channel" . $live->getId();
