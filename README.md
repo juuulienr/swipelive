@@ -1,10 +1,18 @@
 # SwipeLive - Application de Live Shopping
 
-SwipeLive était une application mobile de live shopping, permettant aux vendeurs de présenter leurs produits en direct et aux acheteurs d'interagir et d'acheter en temps réel.
-Le project a été arrêté suite à l'arrivée de Tiktok Shop en France.
-Je partage le backend réalisé avec Symfony 6.4 pour faire fonctionner l'application mobile.
+[![PHP Version](https://img.shields.io/badge/PHP-8.2-777BB4.svg?style=flat&logo=php)](https://php.net)
+[![Symfony Version](https://img.shields.io/badge/Symfony-6.4-000000.svg?style=flat&logo=symfony)](https://symfony.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+## 📱 À propos
 
+SwipeLive était une application mobile innovante de live shopping, permettant aux vendeurs de présenter leurs produits en direct et aux acheteurs d'interagir et d'acheter en temps réel. Le projet combinait l'expérience immersive du streaming en direct avec la simplicité du commerce électronique.
+
+**État du projet :** Le développement a été arrêté suite à l'arrivée de TikTok Shop en France.
+
+### Composants du projet :
+- **Backend :** API REST développée avec Symfony 6.4 (ce dépôt)
+- **Frontend mobile :** Application développée avec Capacitor et Vue.js 3 (Me contacter si intéressé)
 
 ## 🚀 Fonctionnalités
 
@@ -134,13 +142,45 @@ Je partage le backend réalisé avec Symfony 6.4 pour faire fonctionner l'applic
    - Créer un compte Agora
    - Configurer l'App ID et le certificat
 
-## 🔒 Sécurité
+## 🏗 Architecture
 
-- Les clés API et secrets doivent être stockés dans `.env`
-- Ne jamais commiter de fichiers de configuration sensibles
-- Régénérer toutes les clés avant la mise en production
-- Suivre les bonnes pratiques de sécurité Symfony
+```mermaid
+graph TD
+    A[Client Mobile] -->|API Requests| B[API Symfony]
+    B -->|Authentication| C[Firebase]
+    B -->|Media Storage| D[AWS S3]
+    B -->|Image Processing| E[Cloudinary]
+    B -->|Real-time Events| F[Pusher]
+    B -->|Live Streaming| G[Agora]
+    B -->|Payments| H[Stripe]
+    B -->|Database| I[(MySQL)]
+```
 
+### Structure du Backend
+```
+src/
+├── Controller/     # Contrôleurs API REST
+├── Entity/         # Entités Doctrine
+├── Service/        # Services métier
+├── Repository/     # Repositories Doctrine
+└── EventListener/  # Listeners d'événements
+```
+
+## 👥 Contribution
+
+Les contributions sont les bienvenues ! Pour contribuer :
+
+1. Forkez le projet
+2. Créez une branche pour votre fonctionnalité (`git checkout -b feature/AmazingFeature`)
+3. Committez vos changements (`git commit -m 'Add some AmazingFeature'`)
+4. Poussez vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrez une Pull Request
+
+## 📬 Contact
+
+Julien - [@VotreTwitter](https://twitter.com/VotreTwitter)
+
+Lien du projet : [https://github.com/votre-username/swipelive](https://github.com/votre-username/swipelive)
 
 ## 📝 License
 
