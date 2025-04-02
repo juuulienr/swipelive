@@ -5,12 +5,16 @@ namespace App\Repository;
 use App\Entity\OrderStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Order;
 
 /**
+ * @extends ServiceEntityRepository<OrderStatus>
+ *
  * @method OrderStatus|null find($id, $lockMode = null, $lockVersion = null)
  * @method OrderStatus|null findOneBy(array $criteria, array $orderBy = null)
  * @method OrderStatus[]    findAll()
  * @method OrderStatus[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method OrderStatus|null findOneByShipping(Order $order)
  */
 class OrderStatusRepository extends ServiceEntityRepository
 {

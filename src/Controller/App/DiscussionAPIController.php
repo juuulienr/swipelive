@@ -2,6 +2,7 @@
 
 namespace App\Controller\App;
 
+use App\Entity\User;
 use App\Entity\Vendor;
 use App\Entity\Clip;
 use App\Entity\Live;
@@ -39,7 +40,6 @@ use Cloudinary\Api\Admin\AdminApi;
 use Cloudinary\Cloudinary;
 
 
-
 class DiscussionAPIController extends AbstractController {
 
   private $firebaseMessagingService;
@@ -50,6 +50,14 @@ class DiscussionAPIController extends AbstractController {
       $this->bugsnag = $bugsnag;
   }
 
+
+  /**
+   * @return User|null
+   */
+  public function getUser(): ?User
+  {
+      return parent::getUser();
+  }
 
 
   /**

@@ -41,6 +41,13 @@ use Cloudinary\Cloudinary;
 
 class ShippingAPIController extends AbstractController {
 
+  /**
+   * @return User|null
+   */
+  public function getUser(): ?User
+  {
+      return parent::getUser();
+  }
 
   /**
    * Récupérer les prix pour les livraisons
@@ -48,6 +55,10 @@ class ShippingAPIController extends AbstractController {
    * @Route("/user/api/shipping/price", name="user_api_shipping_price")
    */
   public function shippingPrice(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, ShippingAddressRepository $shippingAddressRepo, VendorRepository $vendorRepo) {
+    // Initialize variables
+    $array = [];
+    $vendor = null;
+    
     if ($json = $request->getContent()) {
 	    $param = json_decode($json, true);
 

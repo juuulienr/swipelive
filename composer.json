@@ -13,6 +13,7 @@
     "doctrine/doctrine-fixtures-bundle": "^3.4",
     "doctrine/doctrine-migrations-bundle": "^3.3",
     "doctrine/orm": "^2.15",
+    "facebook/graph-sdk": "^5.1",
     "guzzlehttp/guzzle": "^7.4",
     "kreait/firebase-php": "^7.15",
     "lexik/jwt-authentication-bundle": "^3.1",
@@ -51,6 +52,7 @@
     "twig/twig": "^3.0"
   },
   "require-dev": {
+    "phpstan/phpstan": "^2.1",
     "phpunit/phpunit": "^9.6",
     "symfony/browser-kit": "^6.4",
     "symfony/css-selector": "^6.4",

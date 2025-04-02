@@ -2,6 +2,7 @@
 
 namespace App\Controller\App;
 
+use App\Entity\User;
 use App\Entity\Vendor;
 use App\Entity\Clip;
 use App\Entity\Live;
@@ -29,6 +30,14 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 class ClipAPIController extends AbstractController {
 
+
+  /**
+   * @return User|null
+   */
+  public function getUser(): ?User
+  {
+      return parent::getUser();
+  }
 
   /**
    * Récupérer tous les clips

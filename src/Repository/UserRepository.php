@@ -7,10 +7,17 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
+ * @extends ServiceEntityRepository<User>
+ *
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
  * @method User|null findOneBy(array $criteria, array $orderBy = null)
  * @method User[]    findAll()
  * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method User|null findOneByEmail(string $email)
+ * @method User|null findOneByPushToken(string $pushToken)
+ * @method User|null findOneByAppleId(string $appleId)
+ * @method User|null findOneByGoogleId(string $googleId)
+ * @method User|null findOneByFacebookId(string $facebookId)
  */
 class UserRepository extends ServiceEntityRepository
 {

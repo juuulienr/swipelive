@@ -50,6 +50,10 @@ class Comment
    */
   private $createdAt;
 
+  /**
+   * @ORM\Column(type="boolean", nullable=true)
+   */
+  private $isVendor;
 
   public function __construct()
   {
@@ -118,6 +122,17 @@ class Comment
   {
     $this->createdAt = $createdAt;
 
+    return $this;
+  }
+
+  public function getIsVendor(): ?bool
+  {
+    return $this->isVendor;
+  }
+
+  public function setIsVendor(?bool $isVendor): self
+  {
+    $this->isVendor = $isVendor;
     return $this;
   }
 }

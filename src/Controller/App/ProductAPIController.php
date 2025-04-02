@@ -2,6 +2,7 @@
 
 namespace App\Controller\App;
 
+use App\Entity\User;
 use App\Entity\Vendor;
 use App\Entity\Clip;
 use App\Entity\Live;
@@ -33,9 +34,19 @@ use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
 use Cloudinary\Cloudinary;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class ProductAPIController extends AbstractController {
+
+  /**
+   * @return User|null
+   */
+  public function getUser(): ?User
+  {
+      return parent::getUser();
+  }
+
 
   /**
    * Récupérer les produits
@@ -43,7 +54,7 @@ class ProductAPIController extends AbstractController {
    * @Route("/user/api/products", name="user_api_products", methods={"GET"})
    */
   public function products(Request $request, ObjectManager $manager, ProductRepository $productRepo) {
-    $products = $productRepo->findBy([ "vendor" => $this->getUser()->getVendor() ], [ "title" => "ASC" ]);
+    $products = $productRepo->findByVendor($this->getUser()->getVendor());
 
     return $this->json($products, 200, [], ['groups' => 'product:read']);
   }
@@ -54,7 +65,8 @@ class ProductAPIController extends AbstractController {
    *
    * @Route("/user/api/product/{id}", name="user_api_product", methods={"GET"})
    */
-  public function product(Product $product) {
+  public function product(Product $product, Request $request, ObjectManager $manager)
+  {
     return $this->json($product, 200, [], ['groups' => 'product:read']);
   }
 
@@ -76,13 +88,11 @@ class ProductAPIController extends AbstractController {
       $manager->persist($product);
       $manager->flush();
 
-      return $this->json($this->getUser(), 200, [], [
-        'groups' => 'user:read', 
-        'circular_reference_limit' => 1, 
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
-      ]);
+      return $this->json([
+        'success' => true,
+        'message' => 'Product created successfully',
+        'product' => $product
+      ], Response::HTTP_CREATED);
     }
 
     return $this->json("Une erreur est survenue", 404);
@@ -104,13 +114,11 @@ class ProductAPIController extends AbstractController {
 
       $manager->flush();
 
-      return $this->json($this->getUser(), 200, [], [
-        'groups' => 'user:read', 
-        'circular_reference_limit' => 1, 
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
-      ]);
+      return $this->json([
+        'success' => true,
+        'message' => 'Product updated successfully',
+        'product' => $product
+      ], Response::HTTP_OK);
     }
 
     return $this->json("Une erreur est survenue", 404);
@@ -238,7 +246,7 @@ class ProductAPIController extends AbstractController {
       $serializer->deserialize($json, Variant::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $variant]);
       $manager->flush();
 
-      return $this->json($variant, 200, [], ['groups' => 'variant:read'], 200);
+      return $this->json($variant, 200, [], ['groups' => 'variant:read']);
     }
 
     return $this->json("Une erreur est survenue", 404);
@@ -310,7 +318,7 @@ class ProductAPIController extends AbstractController {
       'circular_reference_handler' => function ($object) {
         return $object->getId();
       } 
-    ], 200);
+    ]);
   }
 
 

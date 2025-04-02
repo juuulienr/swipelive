@@ -42,6 +42,15 @@ class OrderAPIController extends AbstractController {
       $this->firebaseMessagingService = $firebaseMessagingService;
   }
 
+  
+  /**
+   * @return User|null
+   */
+  public function getUser(): ?User
+  {
+      return parent::getUser();
+  }
+
 
   /**
    * Récupérer les ventes
@@ -74,6 +83,14 @@ class OrderAPIController extends AbstractController {
    * @Route("/user/api/orders/payment", name="user_api_orders_payment", methods={"POST"})
    */
   public function payment(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, PromotionRepository $promotionRepo, SerializerInterface $serializer) {
+    // Initialize variables
+    $weightUnit = '';
+    $weight = 0;
+    $price = 0;
+    $title = '';
+    $lineTotal = 0;
+    $vendor = null;
+    
     if ($json = $request->getContent()) {
 	    $param = json_decode($json, true);
 
@@ -186,8 +203,7 @@ class OrderAPIController extends AbstractController {
           $fees = ($subTotal - $promotionAmount) * 0.08; // commission
           $total = $subTotal - $promotionAmount + $shippingPrice;
 
-  	      $order->setWeight($totalWeight);
-  	      $order->setIdentifier($identifier);
+  	      $order->setWeight((string)$weight);
           $order->setShippingPrice($shippingPrice);
           $order->setShippingCarrierId($shippingCarrierId);
           $order->setShippingCarrierName($shippingCarrierName);
@@ -199,9 +215,9 @@ class OrderAPIController extends AbstractController {
           $order->setDropoffCountryCode($dropoffCountryCode);
           $order->setDropoffPostcode($dropoffPostcode);
   	      $order->setDropoffName($dropoffName);
-          $order->setSubTotal($subTotal);
-          $order->setTotal($total);
-  	      $order->setFees($fees);
+          $order->setSubTotal((string)$subTotal);
+          $order->setTotal((string)$total);
+          $order->setFees((string)$fees);
   	      $order->setShippingStatus("ready-to-send");
           $order->setStatus("created");
           $manager->persist($order);

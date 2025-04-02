@@ -5,12 +5,16 @@ namespace App\Repository;
 use App\Entity\LiveProducts;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Product;
 
 /**
+ * @extends ServiceEntityRepository<LiveProducts>
+ *
  * @method LiveProducts|null find($id, $lockMode = null, $lockVersion = null)
  * @method LiveProducts|null findOneBy(array $criteria, array $orderBy = null)
  * @method LiveProducts[]    findAll()
  * @method LiveProducts[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method LiveProducts[]    findByProduct(Product $product)
  */
 class LiveProductsRepository extends ServiceEntityRepository
 {

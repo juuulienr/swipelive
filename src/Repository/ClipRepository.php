@@ -5,12 +5,16 @@ namespace App\Repository;
 use App\Entity\Clip;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Product;
 
 /**
+ * @extends ServiceEntityRepository<Clip>
+ *
  * @method Clip|null find($id, $lockMode = null, $lockVersion = null)
  * @method Clip|null findOneBy(array $criteria, array $orderBy = null)
  * @method Clip[]    findAll()
  * @method Clip[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Clip[]    findByProduct(Product $product)
  */
 class ClipRepository extends ServiceEntityRepository
 {

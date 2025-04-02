@@ -5,12 +5,16 @@ namespace App\Repository;
 use App\Entity\ShippingAddress;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\User;
 
 /**
+ * @extends ServiceEntityRepository<ShippingAddress>
+ *
  * @method ShippingAddress|null find($id, $lockMode = null, $lockVersion = null)
  * @method ShippingAddress|null findOneBy(array $criteria, array $orderBy = null)
  * @method ShippingAddress[]    findAll()
  * @method ShippingAddress[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ShippingAddress|null findOneByUser(User $user)
  */
 class ShippingAddressRepository extends ServiceEntityRepository
 {

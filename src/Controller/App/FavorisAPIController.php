@@ -42,6 +42,14 @@ class FavorisAPIController extends AbstractController {
 
 
   /**
+   * @return User|null
+   */
+  public function getUser(): ?User
+  {
+      return parent::getUser();
+  }
+
+  /**
    * Récupérer les favoris
    *
    * @Route("/user/api/favoris", name="user_api_favoris", methods={"GET"})

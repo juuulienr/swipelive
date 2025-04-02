@@ -23,7 +23,7 @@ parameters:
     mediaconvert_secret_key: '%env(MEDIACONVERT_SECRET_KEY)%'
     mediaconvert_endpoint: '%env(MEDIACONVERT_ENDPOINT)%'
     mediaconvert_role_arn: '%env(MEDIACONVERT_ROLE_ARN)%'
-    firebase_credentials_path: '%kernel.project_dir%/config/firebase/swipe-live-firebase-adminsdk-o1xd4-d5db2c22a7.json'
+    firebase_credentials_path: '%env(FIREBASE_CREDENTIALS_PATH)%'
 
 
 
@@ -46,9 +46,6 @@ services:
     # App\Controller\Admin\:
         # resource: '../src/Controller/Admin'
         # tags: ['controller.service_arguments']
-    App\Controller\Admin\:
-        resource: '../src/Controller/Admin'
-        tags: ['controller.service_arguments']
     App\Controller\App\:
         resource: '../src/Controller/App'
         tags: ['controller.service_arguments']
@@ -63,8 +60,8 @@ services:
         autowire: true
         autoconfigure: true
         tags:
-          - { name: serializer.normalizer }services:
-
+          - { name: serializer.normalizer }
+          
     Doctrine\Persistence\ObjectManager: '@doctrine.orm.default_entity_manager'
 
     App\Service\FirebaseMessagingService:
@@ -79,7 +76,7 @@ services:
     Kreait\Firebase\Factory:
         class: Kreait\Firebase\Factory
         arguments:
-            - '%kernel.project_dir%/config/firebase/swipe-live-firebase-adminsdk-o1xd4-d5db2c22a7.json'
+            - '%firebase_credentials_path%'
 
     Kreait\Firebase\Messaging:
         factory: ['@Kreait\Firebase\Factory', 'createMessaging']

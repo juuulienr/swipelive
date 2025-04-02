@@ -3,7 +3,7 @@
 namespace App\Normalizer;
 
 use Doctrine\ORM\EntityManagerInterface;
-
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -13,13 +13,15 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 /**
  * Entity normalizer
  */
-class EntityNormalizer extends ObjectNormalizer
+class EntityNormalizer implements NormalizerInterface
 {
     /**
      * Entity manager
      * @var EntityManagerInterface
      */
-    protected $em;
+    private $em;
+
+    private $normalizer;
 
     /**
      * Entity normalizer
@@ -36,17 +38,24 @@ class EntityNormalizer extends ObjectNormalizer
         ?PropertyAccessorInterface $propertyAccessor = null,
         ?PropertyTypeExtractorInterface $propertyTypeExtractor = null
     ) {
-        parent::__construct($classMetadataFactory, $nameConverter, $propertyAccessor, $propertyTypeExtractor);
-
-        // Entity manager
         $this->em = $em;
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, $nameConverter, $propertyAccessor, $propertyTypeExtractor);
     }
 
     /**
      * @inheritDoc
      */
-    public function supportsNormalization($data, $format = null) {
-        return false;
+    public function normalize($object, string $format = null, array $context = [])
+    {
+        return $this->normalizer->normalize($object, $format, $context);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    {
+        return $this->normalizer->supportsNormalization($data, $format);
     }
 
     /**

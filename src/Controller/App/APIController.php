@@ -47,6 +47,13 @@ class APIController extends AbstractController {
     $this->videoProcessor = $videoProcessor;
   }
 
+  /**
+   * @return User|null
+   */
+  public function getUser(): ?User
+  {
+      return parent::getUser();
+  }
 
   /**
    * Afficher le feed

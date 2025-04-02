@@ -1,5 +1,8 @@
 ###> symfony/framework-bundle ###
 /.env
+/.env.local
+/.env.local.php
+/.env.*.local
 /public/bundles/
 /var/
 /vendor/
@@ -26,3 +29,30 @@ yarn-error.log
 /phpunit.xml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
+
+###> JWT ###
+/config/jwt/*.pem
+###< JWT ###
+
+###> Firebase ###
+/config/firebase/*
+firebase-credentials.json
+###< Firebase ###
+
+###> IDE and System files ###
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+###< IDE and System files ###
+
+###> Logs and Cache ###
+*.log
+/var/cache/*
+/var/log/*
+###< Logs and Cache ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###

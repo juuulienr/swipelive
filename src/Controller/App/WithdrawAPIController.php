@@ -29,10 +29,20 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Cloudinary\Cloudinary;
 
 
 class WithdrawAPIController extends AbstractController {
 
+  /**
+   * @return User|null
+   */
+  public function getUser(): ?User
+  {
+      return parent::getUser();
+  }
+
+  
   /**
    * @Route("/user/api/bank/add", name="user_api_bank_add")
    */
@@ -212,17 +222,16 @@ class WithdrawAPIController extends AbstractController {
         return $this->json("Le document est introuvable !", 404);
       }
 
+      // Code commenté pour le moment
       // $filename = md5(time().uniqid()). "." . $file->guessExtension(); 
       // $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
       // file_put_contents($filepath, file_get_contents($file));
-
       // $upload = new Upload();
       // $upload->setFilename($filename);
-
       // $manager->persist($upload);
       // $manager->flush();
 
-      return $this->json($upload, 200);
+      return $this->json(true, 200);
     }
 
     return $this->json("Le document est introuvable !", 404);

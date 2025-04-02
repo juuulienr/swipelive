@@ -40,6 +40,13 @@ use Cloudinary\Cloudinary;
 
 class FollowAPIController extends AbstractController {
 
+  /**
+   * @return User|null
+   */
+  public function getUser(): ?User
+  {
+      return parent::getUser();
+  }
 
   /**
    * Follow/Unfollow un utilisateur

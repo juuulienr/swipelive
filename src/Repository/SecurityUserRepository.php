@@ -5,12 +5,16 @@ namespace App\Repository;
 use App\Entity\SecurityUser;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\User;
 
 /**
+ * @extends ServiceEntityRepository<SecurityUser>
+ *
  * @method SecurityUser|null find($id, $lockMode = null, $lockVersion = null)
  * @method SecurityUser|null findOneBy(array $criteria, array $orderBy = null)
  * @method SecurityUser[]    findAll()
  * @method SecurityUser[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method SecurityUser|null findOneByUser(User $user)
  */
 class SecurityUserRepository extends ServiceEntityRepository
 {

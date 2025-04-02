@@ -54,9 +54,6 @@ class VideoProcessor
       $jobSettings = [
         'Role' => $this->parameters->get('mediaconvert_role_arn'),  
         'Settings' => [
-          // 'TimecodeConfig' => [  // Ajout du paramètre TimecodeConfig pour AccelerationSettings ENABLED
-          //   'Source' => 'ZEROBASED'
-          // ],
           'Inputs' => [
             [
               'FileInput' => $inputFileUrl, 

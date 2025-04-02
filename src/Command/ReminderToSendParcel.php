@@ -54,11 +54,6 @@ class ReminderToSendParcel extends Command
         if ($createdAt->modify('+7 days') < $now) {
           $this->cancelOrder($order);
         }
-        // } elseif ($createdAt->modify('+4 days') < $now) {
-        //   $this->sendSecondReminder($order);
-        // } elseif ($createdAt->modify('+2 days') < $now) {
-        //   $this->sendFirstReminder($order);
-        // }
       }
     }
 
@@ -97,7 +92,6 @@ class ReminderToSendParcel extends Command
   private function refundCustomer($order): void
   {
     try {
-      // Récupérer la clé secrète Stripe depuis les paramètres
       $stripeSecretKey = $this->parameterBag->get('stripe_sk');
       $stripe = new \Stripe\StripeClient($stripeSecretKey);
       $stripe->refunds->create([
@@ -109,25 +103,6 @@ class ReminderToSendParcel extends Command
     }
   }
 
-  private function sendFirstReminder($order): void
-  {
-    $this->sendPushNotification(
-      $order->getVendor()->getUser()->getPushToken(),
-      'N’oublie pas d’imprimer le bon de livraison et d’expédier ta commande',
-      $order
-    );
-    $this->logger->info('First reminder sent for order ID: ' . $order->getId());
-  }
-
-  private function sendSecondReminder($order): void
-  {
-    $this->sendPushNotification(
-      $order->getVendor()->getUser()->getPushToken(),
-      'Plus que 24h pour expédier ta commande ou elle sera annulée',
-      $order
-    );
-    $this->logger->info('Second reminder sent for order ID: ' . $order->getId());
-  }
 
   private function sendPushNotification(?string $pushToken, string $message, $order): void
   {

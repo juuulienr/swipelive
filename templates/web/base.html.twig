@@ -4,7 +4,6 @@
     <title>{% block title %}{% endblock %}</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui, maximum-scale=1, user-scalable=0, shrink-to-fit=no">
-    <meta name="facebook-domain-verification" content="c9wn1mwlbvsytpf5xoyct80f54atfy" />
     <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png"/>
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png"/>
     <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png"/>
@@ -17,57 +16,6 @@
 
     {% block javascripts %}
     {% endblock %}
-      
-    {% if app.environment == 'prod' %}
-      <!-- Global site tag (gtag.js) - Google Analytics -->
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZQNW2EXYGW"></script>
-      <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', 'G-ZQNW2EXYGW');
-      </script>
-
-
-      <!-- Facebook Pixel Code -->
-  {#     <script>
-        !function(f,b,e,v,n,t,s)
-        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-        n.queue=[];t=b.createElement(e);t.async=!0;
-        t.src=v;s=b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t,s)}(window,document,'script',
-          'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '1027920418136224'); 
-        fbq('track', 'PageView');
-      </script>
-      <noscript>
-      <img height="1" width="1" 
-      src="https://www.facebook.com/tr?id=1027920418136224&ev=PageView
-      &noscript=1"/>
-      </noscript> #}
-      <!-- End Facebook Pixel Code -->
-
-
-      <!-- Snap Pixel Code -->
-      <script type='text/javascript'>
-      (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()
-        {a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};
-        a.queue=[];var s='script';r=t.createElement(s);r.async=!0;
-        r.src=n;var u=t.getElementsByTagName(s)[0];
-        u.parentNode.insertBefore(r,u);})(window,document,
-        'https://sc-static.net/scevent.min.js');
-
-        snaptr('init', 'd7ebd90a-6b8d-4ed2-a60d-7e619bc5dfcc', {
-          'user_email': '_INSERT_USER_EMAIL_'
-        });
-
-        snaptr('track', 'PAGE_VIEW');
-      </script>
-      <!-- End Snap Pixel Code -->
-    {% endif %}
   </head>
   <body>
     {% block body %}{% endblock %}

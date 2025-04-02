@@ -38,6 +38,7 @@ use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
 use Cloudinary\Cloudinary;
+use Exception;
 
 
 class AccountAPIController extends AbstractController {
@@ -48,6 +49,14 @@ class AccountAPIController extends AbstractController {
   public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag) {
     $this->firebaseMessagingService = $firebaseMessagingService;
     $this->bugsnag = $bugsnag;
+  }
+
+  /**
+   * @return User
+   */
+  public function getUser(): ?User
+  {
+      return parent::getUser();
   }
   
 
@@ -284,12 +293,15 @@ class AccountAPIController extends AbstractController {
           if (!$userExist->getPicture()) {
             $filename = md5(uniqid());
             $fullname = $filename . ".jpg"; 
-            $file->move($this->getParameter('uploads_directory'), $fullname);
-            $file = $this->getParameter('uploads_directory') . '/' . $fullname;
+            $uploadsDir = $this->getParameter('uploads_directory');
+            $tempFilePath = $uploadsDir . '/' . $fullname;
+
+            $imageData = file_get_contents($picture);
+            file_put_contents($tempFilePath, $imageData);
 
             try {
               Configuration::instance($this->getParameter('cloudinary'));
-              $result = (new UploadApi())->upload($file, [
+              $result = (new UploadApi())->upload($tempFilePath, [
                 'public_id' => $filename,
                 'use_filename' => TRUE,
                 "height" => 256, 
@@ -297,6 +309,7 @@ class AccountAPIController extends AbstractController {
                 "crop" => "thumb"
               ]);
 
+              unlink($tempFilePath);
               $userExist->setPicture($fullname);
             } catch (\Exception $e) {
               return $this->json($e->getMessage(), 404);
@@ -317,12 +330,15 @@ class AccountAPIController extends AbstractController {
 
           $filename = md5(uniqid());
           $fullname = $filename . ".jpg"; 
-          $file->move($this->getParameter('uploads_directory'), $fullname);
-          $file = $this->getParameter('uploads_directory') . '/' . $fullname;
+          $uploadsDir = $this->getParameter('uploads_directory');
+          $tempFilePath = $uploadsDir . '/' . $fullname;
+
+          $imageData = file_get_contents($picture);
+          file_put_contents($tempFilePath, $imageData);
 
           try {
             Configuration::instance($this->getParameter('cloudinary'));
-            $result = (new UploadApi())->upload($file, [
+            $result = (new UploadApi())->upload($tempFilePath, [
               'public_id' => $filename,
               'use_filename' => TRUE,
               "height" => 256, 
@@ -330,6 +346,7 @@ class AccountAPIController extends AbstractController {
               "crop" => "thumb"
             ]);
 
+            unlink($tempFilePath);
             $user->setPicture($fullname);
           } catch (\Exception $e) {
             return $this->json($e->getMessage(), 404);
@@ -380,7 +397,7 @@ class AccountAPIController extends AbstractController {
 
       if ($param) {
         $facebookId = $param['facebookId'];
-        $facebookImageUrl = $param['picture'];
+        $picture = $param['picture'];
         $email = $param['email'];
         $password = $param['password'];
 
@@ -394,21 +411,23 @@ class AccountAPIController extends AbstractController {
             $uploadsDir = $this->getParameter('uploads_directory');
             $tempFilePath = $uploadsDir . '/' . $fullname;
 
-            $imageData = file_get_contents($facebookImageUrl);
+            $imageData = file_get_contents($picture);
             file_put_contents($tempFilePath, $imageData);
 
             try {
               Configuration::instance($this->getParameter('cloudinary'));
               $result = (new UploadApi())->upload($tempFilePath, [
                 'public_id' => $filename,
-                'use_filename' => true,
-                'resource_type' => 'image'
+                'use_filename' => TRUE,
+                "height" => 256, 
+                "width" => 256, 
+                "crop" => "thumb"
               ]);
 
               unlink($tempFilePath);
               $userExist->setPicture($fullname);
-            } catch (\Exception $error) {
-              $this->bugsnag->notifyException($error);
+            } catch (\Exception $e) {
+              $this->bugsnag->notifyException($e);
             }
           }
 
@@ -426,21 +445,23 @@ class AccountAPIController extends AbstractController {
           $uploadsDir = $this->getParameter('uploads_directory');
           $tempFilePath = $uploadsDir . '/' . $fullname;
 
-          $imageData = file_get_contents($facebookImageUrl);
+          $imageData = file_get_contents($picture);
           file_put_contents($tempFilePath, $imageData);
 
           try {
             Configuration::instance($this->getParameter('cloudinary'));
             $result = (new UploadApi())->upload($tempFilePath, [
               'public_id' => $filename,
-              'use_filename' => true,
-              'resource_type' => 'image'
+              'use_filename' => TRUE,
+              "height" => 256, 
+              "width" => 256, 
+              "crop" => "thumb"
             ]);
 
             unlink($tempFilePath);
             $user->setPicture($fullname);
-          } catch (\Exception $error) {
-            $this->bugsnag->notifyException($error);
+          } catch (\Exception $e) {
+            $this->bugsnag->notifyException($e);
           }
 
             

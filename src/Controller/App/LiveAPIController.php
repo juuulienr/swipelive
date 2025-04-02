@@ -2,6 +2,7 @@
 
 namespace App\Controller\App;
 
+use App\Entity\User;
 use App\Entity\Vendor;
 use App\Entity\Clip;
 use App\Entity\Live;
@@ -37,6 +38,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response;
+use Cloudinary\Cloudinary;
 
 
 class LiveAPIController extends AbstractController {
@@ -47,6 +49,15 @@ class LiveAPIController extends AbstractController {
   public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag) {
     $this->firebaseMessagingService = $firebaseMessagingService;
     $this->bugsnag = $bugsnag;
+  }
+
+
+  /**
+   * @return User|null
+   */
+  public function getUser(): ?User
+  {
+      return parent::getUser();
   }
 
 

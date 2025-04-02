@@ -35,6 +35,15 @@ use Cloudinary\Cloudinary;
 class PromotionAPIController extends AbstractController {
 
   /**
+   * @return User|null
+   */
+  public function getUser(): ?User
+  {
+      return parent::getUser();
+  }
+
+  
+  /**
    * Afficher les promotions
    *
    * @Route("/user/api/promotions", name="user_api_promotions", methods={"GET"})
@@ -43,7 +52,7 @@ class PromotionAPIController extends AbstractController {
   {
     $promotions = $promotionRepo->findByVendor($this->getUser()->getVendor());
     
-    return $this->json($promotions, 200, [], ['groups' => 'promotion:read'], 200);
+    return $this->json($promotions, 200, [], ['groups' => 'promotion:read']);
   }
 
 
@@ -57,7 +66,7 @@ class PromotionAPIController extends AbstractController {
     $promotion = $promotionRepo->findOneBy([ "vendor" => $product->getVendor(), "isActive" => true ]);
 
     if ($promotion) {
-      return $this->json($promotion, 200, [], ['groups' => 'promotion:read'], 200);
+      return $this->json($promotion, 200, [], ['groups' => 'promotion:read']);
     } else {
       return $this->json("Aucune promotion disponible", 404);
     }

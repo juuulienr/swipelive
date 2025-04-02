@@ -8,21 +8,24 @@ use Kreait\Firebase\Exception\MessagingException;
 use Kreait\Firebase\Exception\FirebaseException;
 use Kreait\Firebase\Messaging\ApnsConfig;
 use Kreait\Firebase\Messaging\AndroidConfig;
-use Kreait\Firebase\Messaging;
+use Kreait\Firebase\Contract\Messaging;
 use Kreait\Firebase\Factory;
 
 class FirebaseMessagingService
 {
-  private Messaging $messaging;
+  /**
+   * @var Messaging
+   */
+  private $messaging;
   private $params;
 
-  public function __construct(ParameterBagInterface $params)
+  public function __construct(Messaging $messaging, ParameterBagInterface $params)
   {
     $firebaseCredentialsPath = $params->get('firebase_credentials_path');
     $factory = (new Factory)
     ->withServiceAccount($firebaseCredentialsPath);
 
-    $this->messaging = $factory->createMessaging();
+    $this->messaging = $messaging;
     $this->params = $params;
   }
 
@@ -42,7 +45,6 @@ class FirebaseMessagingService
         $apnsConfig = ApnsConfig::new()->withSound('sales.wav');
         $androidConfig = AndroidConfig::new()->withSound('sales.wav');
       } else {
-        // $apnsConfig = ApnsConfig::new()->withDefaultSound()->withBadge(1);
         $apnsConfig = ApnsConfig::new()->withDefaultSound();
         $androidConfig = AndroidConfig::new()->withDefaultSound();
       }

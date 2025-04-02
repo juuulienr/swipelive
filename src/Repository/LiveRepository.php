@@ -51,20 +51,6 @@ class LiveRepository extends ServiceEntityRepository
     }
 
 
-    // public function findByLiveAndVendor($vendor){
-    //     return $this->createQueryBuilder('l')
-    //                 ->join('l.vendor', 'v')
-    //                 ->andWhere('l.resourceId IS NOT NULL')
-    //                 ->andWhere('l.status = 1')
-    //                 ->andWhere('v.id != :vendor')
-    //                 ->setParameter('vendor', $vendor)
-    //                 ->orderBy('RAND()')
-    //                 // ->setMaxResults(20)
-    //                 ->getQuery()
-    //                 ->getResult();
-    // }
-
-
     // /**
     //  * @return Live[] Returns an array of Live objects
     //  */
