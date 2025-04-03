@@ -56,7 +56,7 @@ class Upload
   /**
    * @ORM\Column(type="datetime")
    */
-  private $createdAt;
+  private \DateTime $createdAt;
 
   /**
    * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="uploads")

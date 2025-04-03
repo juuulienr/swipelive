@@ -2,13 +2,14 @@
 
 namespace App\Listener;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class ExceptionListener
 {
-  public function onKernelException(ExceptionEvent $event)
+  public function onKernelException(ExceptionEvent $event): void
   {
     $request = $event->getRequest();
     $exception = $event->getThrowable();
@@ -29,8 +30,8 @@ class ExceptionListener
     }
   }
 
-  private function isApiRequest($request): bool
+  private function isApiRequest(Request $request): bool
   {
-    return strpos($request->getPathInfo(), '/api') === 0 || strpos($request->getPathInfo(), '/user/api') === 0;
+    return str_starts_with($request->getPathInfo(), '/api') || str_starts_with($request->getPathInfo(), '/user/api');
   }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Command;
 
+use Bugsnag\Client;
+use Stripe\StripeClient;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,28 +16,16 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class ReminderToSendParcel extends Command
 {
   protected static $defaultName = 'reminder:send:parcel';
-  private $orderRepo;
-  private $entityManager;
-  private $firebaseMessagingService;
-  private $parameterBag;
-  private $logger;
-  private $bugsnag;
 
   public function __construct(
-    OrderRepository $orderRepo,
-    EntityManagerInterface $entityManager,
-    FirebaseMessagingService $firebaseMessagingService,
-    ParameterBagInterface $parameterBag,
-    LoggerInterface $logger,
-    \Bugsnag\Client $bugsnag
+    private readonly OrderRepository $orderRepo,
+    private readonly EntityManagerInterface $entityManager,
+    private readonly FirebaseMessagingService $firebaseMessagingService,
+    private readonly ParameterBagInterface $parameterBag,
+    private readonly LoggerInterface $logger,
+    private readonly Client $bugsnag
   ) {
     parent::__construct();
-    $this->orderRepo = $orderRepo;
-    $this->entityManager = $entityManager;
-    $this->firebaseMessagingService = $firebaseMessagingService;
-    $this->parameterBag = $parameterBag;
-    $this->logger = $logger;
-    $this->bugsnag = $bugsnag;
   }
 
   protected function configure(): void
@@ -93,7 +83,7 @@ class ReminderToSendParcel extends Command
   {
     try {
       $stripeSecretKey = $this->parameterBag->get('stripe_sk');
-      $stripe = new \Stripe\StripeClient($stripeSecretKey);
+      $stripe = new StripeClient($stripeSecretKey);
       $stripe->refunds->create([
         'payment_intent' => $order->getPaymentId(),
       ]);

@@ -2,6 +2,10 @@
 
 namespace App\Controller\App;
 
+use Bugsnag\Client;
+use Stripe\StripeClient;
+use Stripe\Stripe;
+use Stripe\Account;
 use App\Entity\User;
 use App\Entity\Vendor;
 use App\Entity\Clip;
@@ -43,12 +47,8 @@ use Exception;
 
 class AccountAPIController extends AbstractController {
 
-  private $firebaseMessagingService;
-  private $bugsnag;
-
-  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag) {
-    $this->firebaseMessagingService = $firebaseMessagingService;
-    $this->bugsnag = $bugsnag;
+  public function __construct(private readonly FirebaseMessagingService $firebaseMessagingService, private readonly Client $bugsnag)
+  {
   }
 
   /**
@@ -66,7 +66,7 @@ class AccountAPIController extends AbstractController {
    *
   * @Route("/api/user/register", name="user_api_register")
   */
-  public function register(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher, SerializerInterface $serializer) {
+  public function register(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
@@ -104,13 +104,10 @@ class AccountAPIController extends AbstractController {
           return $this->json($user, 200, [], [
             'groups' => 'user:read', 
 			    	'circular_reference_limit' => 1, 
-			    	'circular_reference_handler' => function ($object) {
-			    		return $object->getId();
-			    	} 
+			    	'circular_reference_handler' => fn($object) => $object->getId() 
 			    ]);
-        } else {
-          return $this->json("Un compte existe avec cette adresse mail", 404);
         }
+        return $this->json("Un compte existe avec cette adresse mail", 404);
       }
     }
 
@@ -123,7 +120,7 @@ class AccountAPIController extends AbstractController {
    *
    * @Route("/user/api/push/add", name="user_push_add")
    */
-  public function addPush(Request $request, ObjectManager $manager, UserRepository $userRepo)
+  public function addPush(Request $request, ObjectManager $manager, UserRepository $userRepo): JsonResponse
   {
     if ($content = $request->getContent()) {
       $result = json_decode($content, true);
@@ -152,7 +149,7 @@ class AccountAPIController extends AbstractController {
    *
    * @Route("/api/test/{id}", name="api_notif_push_test", methods={"GET"})
    */
-  public function testNotifPush(User $user, Request $request, ObjectManager $manager) {
+  public function testNotifPush(User $user, Request $request, ObjectManager $manager): ?JsonResponse {
     $data = [
       'route' => "ListOrders",
       'type' => 'vente',
@@ -166,6 +163,7 @@ class AccountAPIController extends AbstractController {
     } catch (\Exception $error) {
       $this->bugsnag->notifyException($error);
     }
+    return null;
   }
 
 
@@ -174,13 +172,11 @@ class AccountAPIController extends AbstractController {
    *
    * @Route("/user/api/profile", name="user_api_profile", methods={"GET"})
    */
-  public function profile(Request $request, ObjectManager $manager) {
+  public function profile(Request $request, ObjectManager $manager): JsonResponse {
     return $this->json($this->getUser(), 200, [], [
     	'groups' => 'user:read', 
     	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => function ($object) {
-    		return $object->getId();
-    	} 
+    	'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -190,7 +186,7 @@ class AccountAPIController extends AbstractController {
    *
    * @Route("/user/api/ping", name="user_api_ping", methods={"GET"})
    */
-  public function ping(Request $request, ObjectManager $manager, SecurityUserRepository $securityRepo) {
+  public function ping(Request $request, ObjectManager $manager, SecurityUserRepository $securityRepo): JsonResponse {
     $user = $this->getUser(); 
     $security = $securityRepo->findOneByUser($user);
 
@@ -208,7 +204,7 @@ class AccountAPIController extends AbstractController {
    *
   * @Route("/api/authentication/apple", name="api_authentification_apple")
   */
-  public function appleAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher, SerializerInterface $serializer) {
+  public function appleAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
@@ -220,45 +216,41 @@ class AccountAPIController extends AbstractController {
 
           $userExist = $userRepo->findOneByEmail($email);
           $user = $userRepo->findOneByAppleId($appleId);
-
           if ($userExist) {
-            $hash = $passwordHasher->hashPassword($userExist, $password);
-            $userExist->setHash($hash);
-            $userExist->setAppleId($appleId);
-            $manager->flush();
+              $hash = $passwordHasher->hashPassword($userExist, $password);
+              $userExist->setHash($hash);
+              $userExist->setAppleId($appleId);
+              $manager->flush();
+              return $this->json(false, 200);
+          }
 
-            return $this->json(false, 200);
-          } else if (!$user) {
-            $user = $serializer->deserialize($json, User::class, "json");
-            $hash = $passwordHasher->hashPassword($user, $password);
-
-            $user->setAppleId($appleId);
-            $user->setHash($hash);
-            $manager->persist($user);
-            $manager->flush();
-
-            $security = new SecurityUser();
-            $security->setUser($user);
-            $security->setWifiIPAddress($param['wifiIPAddress']);
-            $security->setCarrierIPAddress($param['carrierIPAddress']);
-            $security->setConnection($param['connection']);
-            $security->setTimezone($param['timezone']);
-            $security->setLocale($param['locale']);
-
-            if ($param['device'] && $param['device'] != null) {
-              $security->setModel($param['device']['model']);
-              $security->setPlatform($param['device']['platform']);
-              $security->setUuid($param['device']['uuid']);
-              $security->setVersion($param['device']['version']);
-              $security->setManufacturer($param['device']['manufacturer']);
-              $security->setIsVirtual($param['device']['isVirtual']);
-            }
-
-            $manager->persist($security);
-            $manager->flush();
-
-            return $this->json(true, 200);
-          } else {
+          if (!$user) {
+              $user = $serializer->deserialize($json, User::class, "json");
+              $hash = $passwordHasher->hashPassword($user, $password);
+              $user->setAppleId($appleId);
+              $user->setHash($hash);
+              $manager->persist($user);
+              $manager->flush();
+              $security = new SecurityUser();
+              $security->setUser($user);
+              $security->setWifiIPAddress($param['wifiIPAddress']);
+              $security->setCarrierIPAddress($param['carrierIPAddress']);
+              $security->setConnection($param['connection']);
+              $security->setTimezone($param['timezone']);
+              $security->setLocale($param['locale']);
+              if ($param['device'] && $param['device'] != null) {
+                $security->setModel($param['device']['model']);
+                $security->setPlatform($param['device']['platform']);
+                $security->setUuid($param['device']['uuid']);
+                $security->setVersion($param['device']['version']);
+                $security->setManufacturer($param['device']['manufacturer']);
+                $security->setIsVirtual($param['device']['isVirtual']);
+              }
+              $manager->persist($security);
+              $manager->flush();
+              return $this->json(true, 200);
+          }
+          else {
             return $this->json(false, 200);
           }
         } catch (\Exception $e) {
@@ -276,7 +268,7 @@ class AccountAPIController extends AbstractController {
    *
   * @Route("/api/authentication/google", name="api_authentification_google")
   */
-  public function googleAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher, SerializerInterface $serializer) {
+  public function googleAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
@@ -288,17 +280,50 @@ class AccountAPIController extends AbstractController {
 
         $userExist = $userRepo->findOneByEmail($email);
         $user = $userRepo->findOneByGoogleId($googleId);
-
         if ($userExist) {
-          if (!$userExist->getPicture()) {
+            if (!$userExist->getPicture()) {
+              $filename = md5(uniqid());
+              $fullname = $filename . ".jpg"; 
+              $uploadsDir = $this->getParameter('uploads_directory');
+              $tempFilePath = $uploadsDir . '/' . $fullname;
+  
+              $imageData = file_get_contents($picture);
+              file_put_contents($tempFilePath, $imageData);
+  
+              try {
+                Configuration::instance($this->getParameter('cloudinary'));
+                $result = (new UploadApi())->upload($tempFilePath, [
+                  'public_id' => $filename,
+                  'use_filename' => TRUE,
+                  "height" => 256, 
+                  "width" => 256, 
+                  "crop" => "thumb"
+                ]);
+  
+                unlink($tempFilePath);
+                $userExist->setPicture($fullname);
+              } catch (\Exception $e) {
+                return $this->json($e->getMessage(), 404);
+              }
+            }
+            $hash = $passwordHasher->hashPassword($userExist, $password);
+            $userExist->setHash($hash);
+            $userExist->setGoogleId($googleId);
+            $manager->flush();
+            return $this->json(false, 200);
+        }
+
+        if (!$user) {
+            $user = $serializer->deserialize($json, User::class, "json");
+            $hash = $passwordHasher->hashPassword($user, $password);
+            $user->setHash($hash);
+            $user->setGoogleId($googleId);
             $filename = md5(uniqid());
-            $fullname = $filename . ".jpg"; 
+            $fullname = $filename . ".jpg";
             $uploadsDir = $this->getParameter('uploads_directory');
             $tempFilePath = $uploadsDir . '/' . $fullname;
-
             $imageData = file_get_contents($picture);
             file_put_contents($tempFilePath, $imageData);
-
             try {
               Configuration::instance($this->getParameter('cloudinary'));
               $result = (new UploadApi())->upload($tempFilePath, [
@@ -308,75 +333,34 @@ class AccountAPIController extends AbstractController {
                 "width" => 256, 
                 "crop" => "thumb"
               ]);
-
+  
               unlink($tempFilePath);
-              $userExist->setPicture($fullname);
+              $user->setPicture($fullname);
             } catch (\Exception $e) {
               return $this->json($e->getMessage(), 404);
             }
-          }
-
-          $hash = $passwordHasher->hashPassword($userExist, $password);
-          $userExist->setHash($hash);
-          $userExist->setGoogleId($googleId);
-          $manager->flush();
-
-          return $this->json(false, 200);
-        } else if (!$user) {
-          $user = $serializer->deserialize($json, User::class, "json");
-          $hash = $passwordHasher->hashPassword($user, $password);
-          $user->setHash($hash);
-          $user->setGoogleId($googleId);
-
-          $filename = md5(uniqid());
-          $fullname = $filename . ".jpg"; 
-          $uploadsDir = $this->getParameter('uploads_directory');
-          $tempFilePath = $uploadsDir . '/' . $fullname;
-
-          $imageData = file_get_contents($picture);
-          file_put_contents($tempFilePath, $imageData);
-
-          try {
-            Configuration::instance($this->getParameter('cloudinary'));
-            $result = (new UploadApi())->upload($tempFilePath, [
-              'public_id' => $filename,
-              'use_filename' => TRUE,
-              "height" => 256, 
-              "width" => 256, 
-              "crop" => "thumb"
-            ]);
-
-            unlink($tempFilePath);
-            $user->setPicture($fullname);
-          } catch (\Exception $e) {
-            return $this->json($e->getMessage(), 404);
-          }
-            
-          $manager->persist($user);
-          $manager->flush();
-
-          $security = new SecurityUser();
-          $security->setUser($user);
-          $security->setWifiIPAddress($param['wifiIPAddress']);
-          $security->setCarrierIPAddress($param['carrierIPAddress']);
-          $security->setConnection($param['connection']);
-          $security->setTimezone($param['timezone']);
-          $security->setLocale($param['locale']);
-
-          if ($param['device'] && $param['device'] != null) {
-            $security->setModel($param['device']['model']);
-            $security->setPlatform($param['device']['platform']);
-            $security->setUuid($param['device']['uuid']);
-            $security->setVersion($param['device']['version']);
-            $security->setManufacturer($param['device']['manufacturer']);
-            $security->setIsVirtual($param['device']['isVirtual']);
-          }
-
-          $manager->persist($security);
-          $manager->flush();
-
-          return $this->json(true, 200);
-        } else {
+            $manager->persist($user);
+            $manager->flush();
+            $security = new SecurityUser();
+            $security->setUser($user);
+            $security->setWifiIPAddress($param['wifiIPAddress']);
+            $security->setCarrierIPAddress($param['carrierIPAddress']);
+            $security->setConnection($param['connection']);
+            $security->setTimezone($param['timezone']);
+            $security->setLocale($param['locale']);
+            if ($param['device'] && $param['device'] != null) {
+              $security->setModel($param['device']['model']);
+              $security->setPlatform($param['device']['platform']);
+              $security->setUuid($param['device']['uuid']);
+              $security->setVersion($param['device']['version']);
+              $security->setManufacturer($param['device']['manufacturer']);
+              $security->setIsVirtual($param['device']['isVirtual']);
+            }
+            $manager->persist($security);
+            $manager->flush();
+            return $this->json(true, 200);
+        }
+        else {
           return $this->json(false, 200);
         }
       }
@@ -391,7 +375,7 @@ class AccountAPIController extends AbstractController {
    *
   * @Route("/api/authentication/facebook", name="api_authentification_facebook")
   */
-  public function facebookAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher, SerializerInterface $serializer) {
+  public function facebookAuthentication(Request $request, ObjectManager $manager, UserRepository $userRepo, UserPasswordHasherInterface $passwordHasher, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
@@ -403,17 +387,48 @@ class AccountAPIController extends AbstractController {
 
         $userExist = $userRepo->findOneByEmail($email);
         $user = $userRepo->findOneByFacebookId($facebookId);
-
         if ($userExist) {
-          if (!$userExist->getPicture()) {
+            if (!$userExist->getPicture()) {
+              $filename = md5(uniqid());
+              $fullname = $filename . ".jpg"; 
+              $uploadsDir = $this->getParameter('uploads_directory');
+              $tempFilePath = $uploadsDir . '/' . $fullname;
+  
+              $imageData = file_get_contents($picture);
+              file_put_contents($tempFilePath, $imageData);
+  
+              try {
+                Configuration::instance($this->getParameter('cloudinary'));
+                $result = (new UploadApi())->upload($tempFilePath, [
+                  'public_id' => $filename,
+                  'use_filename' => TRUE,
+                  "height" => 256, 
+                  "width" => 256, 
+                  "crop" => "thumb"
+                ]);
+  
+                unlink($tempFilePath);
+                $userExist->setPicture($fullname);
+              } catch (\Exception $e) {
+                $this->bugsnag->notifyException($e);
+              }
+            }
+            $hash = $passwordHasher->hashPassword($userExist, $password);
+            $userExist->setHash($hash);
+            $userExist->setFacebookId($facebookId);
+            $manager->flush();
+            return $this->json(false, 200);
+        }
+
+        if (!$user) {
+            $user = $serializer->deserialize($json, User::class, "json");
+            $hash = $passwordHasher->hashPassword($user, $password);
             $filename = md5(uniqid());
-            $fullname = $filename . ".jpg"; 
+            $fullname = $filename . ".jpg";
             $uploadsDir = $this->getParameter('uploads_directory');
             $tempFilePath = $uploadsDir . '/' . $fullname;
-
             $imageData = file_get_contents($picture);
             file_put_contents($tempFilePath, $imageData);
-
             try {
               Configuration::instance($this->getParameter('cloudinary'));
               $result = (new UploadApi())->upload($tempFilePath, [
@@ -423,75 +438,35 @@ class AccountAPIController extends AbstractController {
                 "width" => 256, 
                 "crop" => "thumb"
               ]);
-
+  
               unlink($tempFilePath);
-              $userExist->setPicture($fullname);
+              $user->setPicture($fullname);
             } catch (\Exception $e) {
               $this->bugsnag->notifyException($e);
             }
-          }
-
-          $hash = $passwordHasher->hashPassword($userExist, $password);
-          $userExist->setHash($hash);
-          $userExist->setFacebookId($facebookId);
-          $manager->flush();
-
-          return $this->json(false, 200);
-        } else if (!$user) {
-          $user = $serializer->deserialize($json, User::class, "json");
-          $hash = $passwordHasher->hashPassword($user, $password);
-          $filename = md5(uniqid());
-          $fullname = $filename . ".jpg"; 
-          $uploadsDir = $this->getParameter('uploads_directory');
-          $tempFilePath = $uploadsDir . '/' . $fullname;
-
-          $imageData = file_get_contents($picture);
-          file_put_contents($tempFilePath, $imageData);
-
-          try {
-            Configuration::instance($this->getParameter('cloudinary'));
-            $result = (new UploadApi())->upload($tempFilePath, [
-              'public_id' => $filename,
-              'use_filename' => TRUE,
-              "height" => 256, 
-              "width" => 256, 
-              "crop" => "thumb"
-            ]);
-
-            unlink($tempFilePath);
-            $user->setPicture($fullname);
-          } catch (\Exception $e) {
-            $this->bugsnag->notifyException($e);
-          }
-
-            
-          $user->setHash($hash);
-
-          $manager->persist($user);
-          $manager->flush();
-
-          $security = new SecurityUser();
-          $security->setUser($user);
-          $security->setWifiIPAddress($param['wifiIPAddress']);
-          $security->setCarrierIPAddress($param['carrierIPAddress']);
-          $security->setConnection($param['connection']);
-          $security->setTimezone($param['timezone']);
-          $security->setLocale($param['locale']);
-
-          if ($param['device'] && $param['device'] != null) {
-            $security->setModel($param['device']['model']);
-            $security->setPlatform($param['device']['platform']);
-            $security->setUuid($param['device']['uuid']);
-            $security->setVersion($param['device']['version']);
-            $security->setManufacturer($param['device']['manufacturer']);
-            $security->setIsVirtual($param['device']['isVirtual']);
-          }
-
-          $manager->persist($security);
-          $manager->flush();
-
-          return $this->json(true, 200);
-        } else {
+            $user->setHash($hash);
+            $manager->persist($user);
+            $manager->flush();
+            $security = new SecurityUser();
+            $security->setUser($user);
+            $security->setWifiIPAddress($param['wifiIPAddress']);
+            $security->setCarrierIPAddress($param['carrierIPAddress']);
+            $security->setConnection($param['connection']);
+            $security->setTimezone($param['timezone']);
+            $security->setLocale($param['locale']);
+            if ($param['device'] && $param['device'] != null) {
+              $security->setModel($param['device']['model']);
+              $security->setPlatform($param['device']['platform']);
+              $security->setUuid($param['device']['uuid']);
+              $security->setVersion($param['device']['version']);
+              $security->setManufacturer($param['device']['manufacturer']);
+              $security->setIsVirtual($param['device']['isVirtual']);
+            }
+            $manager->persist($security);
+            $manager->flush();
+            return $this->json(true, 200);
+        }
+        else {
           return $this->json(false, 200);
         }
       }
@@ -507,7 +482,7 @@ class AccountAPIController extends AbstractController {
    *
    * @Route("/api/facebook/oauth", name="api_facebook_oauth")
    */
-  public function facebookOauth(Request $request, ObjectManager $manager) {
+  public function facebookOauth(Request $request, ObjectManager $manager): JsonResponse {
     return $this->json(true, 200);
   }
 
@@ -517,7 +492,7 @@ class AccountAPIController extends AbstractController {
    *
   * @Route("/user/api/profile/edit", name="user_api_profile_edit", methods={"POST"})
   */
-  public function editProfile(Request $request, ObjectManager $manager, UserRepository $userRepo, SerializerInterface $serializer) {
+  public function editProfile(Request $request, ObjectManager $manager, UserRepository $userRepo, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
       $user = $this->getUser();
@@ -528,7 +503,7 @@ class AccountAPIController extends AbstractController {
         
       if ($user->getVendor() && $vendor->getStripeAcc()) {
         try {
-          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+          $stripe = new StripeClient($this->getParameter('stripe_sk'));
           $stripe->accounts->update($vendor->getStripeAcc(), [
             'business_profile' => [
               'name' => $param['pseudo'],
@@ -553,9 +528,7 @@ class AccountAPIController extends AbstractController {
       return $this->json($this->getUser(), 200, [], [
         'groups' => 'user:read', 
         'circular_reference_limit' => 1, 
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
+        'circular_reference_handler' => fn($object) => $object->getId() 
       ]);
     }
 
@@ -568,7 +541,7 @@ class AccountAPIController extends AbstractController {
    *
   * @Route("/user/api/vendor", name="user_api_vendor", methods={"POST"})
   */
-  public function vendor(Request $request, ObjectManager $manager, UserRepository $userRepo, SerializerInterface $serializer) {
+  public function vendor(Request $request, ObjectManager $manager, UserRepository $userRepo, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $user = $this->getUser();
       $param = json_decode($json, true);
@@ -594,7 +567,7 @@ class AccountAPIController extends AbstractController {
 
 
         try {
-          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+          $stripe = new StripeClient($this->getParameter('stripe_sk'));
           $response = $stripe->accounts->create([
             'country' => 'FR',
             'type' => 'custom',
@@ -619,8 +592,8 @@ class AccountAPIController extends AbstractController {
 
           if ($param['businessType'] == "company") {
             try {
-              \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
-              $person = \Stripe\Account::createPerson($response->id, [
+              Stripe::setApiKey($this->getParameter('stripe_sk'));
+              $person = Account::createPerson($response->id, [
                 'person_token' => $param['tokenPerson'],
               ]);
 
@@ -640,9 +613,7 @@ class AccountAPIController extends AbstractController {
         return $this->json($user, 200, [], [
           'groups' => 'user:read', 
           'circular_reference_limit' => 1, 
-          'circular_reference_handler' => function ($object) {
-            return $object->getId();
-          } 
+          'circular_reference_handler' => fn($object) => $object->getId() 
         ]);
       }
     }
@@ -656,17 +627,17 @@ class AccountAPIController extends AbstractController {
    *
    * @Route("/user/api/profile/picture", name="user_api_profile_picture", methods={"POST"})
    */
-  public function picture(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function picture(Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
     $file = json_decode($request->getContent(), true);
     $user = $this->getUser();
     $oldfilename = $user->getPicture();
 
     if ($file && array_key_exists("picture", $file)) {
-      $file = $file["picture"];
-      $extension = 'jpg';
-    } else if ($request->files->get('picture')) {
-      $file = $request->files->get('picture');
-      $extension = $file->guessExtension();
+        $file = $file["picture"];
+        $extension = 'jpg';
+    } elseif ($request->files->get('picture')) {
+        $file = $request->files->get('picture');
+        $extension = $file->guessExtension();
     } else {
       return $this->json("L'image est introuvable !", 404);
     }
@@ -700,9 +671,7 @@ class AccountAPIController extends AbstractController {
     return $this->json($user, 200, [], [
     	'groups' => 'user:read', 
     	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => function ($object) {
-    		return $object->getId();
-    	} 
+    	'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 

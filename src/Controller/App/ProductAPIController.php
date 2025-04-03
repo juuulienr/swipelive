@@ -39,9 +39,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ProductAPIController extends AbstractController {
 
-  /**
-   * @return User|null
-   */
   public function getUser(): ?User
   {
       return parent::getUser();
@@ -53,7 +50,7 @@ class ProductAPIController extends AbstractController {
    *
    * @Route("/user/api/products", name="user_api_products", methods={"GET"})
    */
-  public function products(Request $request, ObjectManager $manager, ProductRepository $productRepo) {
+  public function products(Request $request, ObjectManager $manager, ProductRepository $productRepo): JsonResponse {
     $products = $productRepo->findByVendor($this->getUser()->getVendor());
 
     return $this->json($products, 200, [], ['groups' => 'product:read']);
@@ -65,7 +62,7 @@ class ProductAPIController extends AbstractController {
    *
    * @Route("/user/api/product/{id}", name="user_api_product", methods={"GET"})
    */
-  public function product(Product $product, Request $request, ObjectManager $manager)
+  public function product(Product $product, Request $request, ObjectManager $manager): JsonResponse
   {
     return $this->json($product, 200, [], ['groups' => 'product:read']);
   }
@@ -76,7 +73,7 @@ class ProductAPIController extends AbstractController {
    *
    * @Route("/user/api/product/add", name="user_api_product_add", methods={"POST"})
    */
-  public function addProduct(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function addProduct(Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $product = $serializer->deserialize($json, Product::class, "json");
       $product->setVendor($this->getUser()->getVendor());
@@ -104,7 +101,7 @@ class ProductAPIController extends AbstractController {
    *
    * @Route("/user/api/product/edit/{id}", name="user_api_product_edit", methods={"PUT"})
    */
-  public function editProduct(Product $product, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function editProduct(Product $product, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $serializer->deserialize($json, Product::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $product]);
 
@@ -130,7 +127,7 @@ class ProductAPIController extends AbstractController {
    *
    * @Route("/user/api/product/delete/{id}", name="user_api_product_delete", methods={"GET"})
    */
-  public function deleteProduct(Product $product, Request $request, LiveProductsRepository $liveProductRepo, ClipRepository $clipRepo, LineItemRepository $lineItemRepo, ObjectManager $manager) {
+  public function deleteProduct(Product $product, Request $request, LiveProductsRepository $liveProductRepo, ClipRepository $clipRepo, LineItemRepository $lineItemRepo, ObjectManager $manager): JsonResponse {
     if ($product) {
       $clips = $clipRepo->findByProduct($product);
       $env = $this->getParameter('environment');
@@ -150,7 +147,7 @@ class ProductAPIController extends AbstractController {
           $manager->remove($clip);
           $manager->flush();
 
-          if (!sizeof($live->getClips())) {
+          if (count($live->getClips()) === 0) {
             $liveProducts = $live->getLiveProducts();
             $comments = $live->getComments();
 
@@ -210,7 +207,7 @@ class ProductAPIController extends AbstractController {
 
       foreach ($product->getUploads()->toArray() as $upload) {
         try {
-          $filename = explode(".", $upload->getFilename());
+          $filename = explode(".", (string) $upload->getFilename());
           $result = (new AdminApi())->deleteAssets($filename[0], []);
         } catch (\Exception $e) {
           return $this->json($e->getMessage(), 404);
@@ -226,9 +223,7 @@ class ProductAPIController extends AbstractController {
       return $this->json($this->getUser(), 200, [], [
         'groups' => 'user:read', 
         'circular_reference_limit' => 1, 
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
+        'circular_reference_handler' => fn($object) => $object->getId() 
       ]);
     }
 
@@ -241,7 +236,7 @@ class ProductAPIController extends AbstractController {
    *
    * @Route("/user/api/variant/edit/{id}", name="user_api_variant_edit", methods={"POST"})
    */
-  public function editVariant(Variant $variant, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function editVariant(Variant $variant, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $serializer->deserialize($json, Variant::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $variant]);
       $manager->flush();
@@ -258,7 +253,7 @@ class ProductAPIController extends AbstractController {
    *
    * @Route("/user/api/variant/delete/{id}", name="user_api_variant_delete", methods={"GET"})
    */
-  public function deleteVariant(Variant $variant, Request $request, ObjectManager $manager) {
+  public function deleteVariant(Variant $variant, Request $request, ObjectManager $manager): JsonResponse {
     if ($variant) {
       $manager->remove($variant);
       $manager->flush();
@@ -275,15 +270,15 @@ class ProductAPIController extends AbstractController {
    *
    * @Route("/user/api/product/upload", name="user_api__product_upload", methods={"POST"})
    */
-  public function addPicture(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function addPicture(Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
     $file = json_decode($request->getContent(), true);
 
     if ($file && array_key_exists("picture", $file)) {
-      $file = $file["picture"];
-      $extension = 'jpg';
-    } else if ($request->files->get('picture')) {
-      $file = $request->files->get('picture');
-      $extension = $file->guessExtension();
+        $file = $file["picture"];
+        $extension = 'jpg';
+    } elseif ($request->files->get('picture')) {
+        $file = $request->files->get('picture');
+        $extension = $file->guessExtension();
     } else {
       return $this->json("L'image est introuvable !", 404);
     }
@@ -315,9 +310,7 @@ class ProductAPIController extends AbstractController {
     return $this->json($upload, 200, [], [
       'groups' => 'upload:read',
       'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
+      'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -327,7 +320,7 @@ class ProductAPIController extends AbstractController {
    *
    * @Route("/user/api/product/upload/delete/{id}", name="user_api_upload_delete", methods={"GET"})
    */
-  public function deleteUpload(Upload $upload, Request $request, ObjectManager $manager) {
+  public function deleteUpload(Upload $upload, Request $request, ObjectManager $manager): JsonResponse {
     if ($upload->getFilename()) {
       $oldFilename = explode(".", $upload->getFilename());
 

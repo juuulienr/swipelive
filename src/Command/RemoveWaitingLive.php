@@ -12,16 +12,10 @@ use Psr\Log\LoggerInterface;
 class RemoveWaitingLive extends Command
 {
   protected static $defaultName = 'remove:lives';
-  private $liveRepo;
-  private $entityManager;
-  private $logger;
 
-  public function __construct(LiveRepository $liveRepo, EntityManagerInterface $entityManager, LoggerInterface $logger)
+  public function __construct(private readonly LiveRepository $liveRepo, private readonly EntityManagerInterface $entityManager, private readonly LoggerInterface $logger)
   {
     parent::__construct();
-    $this->liveRepo = $liveRepo;
-    $this->entityManager = $entityManager;
-    $this->logger = $logger;
   }
 
   protected function configure(): void

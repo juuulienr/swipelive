@@ -40,9 +40,6 @@ use Cloudinary\Cloudinary;
 
 class FollowAPIController extends AbstractController {
 
-  /**
-   * @return User|null
-   */
   public function getUser(): ?User
   {
       return parent::getUser();
@@ -53,7 +50,7 @@ class FollowAPIController extends AbstractController {
    *
    * @Route("/user/api/follow/{id}", name="user_api_follow", methods={"GET"})
    */
-  public function follow(User $user, Request $request, ObjectManager $manager, FollowRepository $followRepo) {
+  public function follow(User $user, Request $request, ObjectManager $manager, FollowRepository $followRepo): JsonResponse {
     $follow = $followRepo->findOneBy(['following' => $user, 'follower' => $this->getUser() ]);
 
     if (!$follow) {
@@ -70,9 +67,7 @@ class FollowAPIController extends AbstractController {
     return $this->json($this->getUser(), 200, [], [
     	'groups' => 'user:read', 
     	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => function ($object) {
-    		return $object->getId();
-    	} 
+    	'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -82,15 +77,13 @@ class FollowAPIController extends AbstractController {
    *
    * @Route("/user/api/following", name="user_api_following", methods={"GET"})
    */
-  public function following(Request $request, ObjectManager $manager, UserRepository $userRepo) {
+  public function following(Request $request, ObjectManager $manager, UserRepository $userRepo): JsonResponse {
     $following = $userRepo->findUserFollowing($this->getUser());
 
     return $this->json($following, 200, [], [
     	'groups' => 'user:follow', 
     	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => function ($object) {
-    		return $object->getId();
-    	} 
+    	'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -100,15 +93,13 @@ class FollowAPIController extends AbstractController {
    *
    * @Route("/user/api/followers", name="user_api_followers", methods={"GET"})
    */
-  public function followers(Request $request, ObjectManager $manager, UserRepository $userRepo) {
+  public function followers(Request $request, ObjectManager $manager, UserRepository $userRepo): JsonResponse {
     $followers = $userRepo->findUserFollowers($this->getUser());
 
     return $this->json($followers, 200, [], [
     	'groups' => 'user:follow', 
     	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => function ($object) {
-    		return $object->getId();
-    	} 
+    	'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -118,7 +109,7 @@ class FollowAPIController extends AbstractController {
    *
    * @Route("/user/api/followers/remove/{id}", name="user_api_followers_remove", methods={"GET"})
    */
-  public function removeFollower(User $user, Request $request, ObjectManager $manager, UserRepository $userRepo, FollowRepository $followRepo) {
+  public function removeFollower(User $user, Request $request, ObjectManager $manager, UserRepository $userRepo, FollowRepository $followRepo): JsonResponse {
     $follow = $followRepo->findOneBy(['following' => $this->getUser(), 'follower' => $user ]);
 
     if ($follow) {
@@ -129,9 +120,7 @@ class FollowAPIController extends AbstractController {
     return $this->json($this->getUser(), 200, [], [
       'groups' => 'user:read', 
       'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
+      'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 }

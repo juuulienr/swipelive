@@ -50,7 +50,7 @@ class Live
    * @ORM\Column(type="integer", nullable=true)
    * @Groups("live:read")
    */
-  private $status;
+  private $status = 0;
 
   /**
    * @ORM\Column(type="integer", nullable=true)
@@ -74,7 +74,7 @@ class Live
    * @ORM\Column(type="integer", nullable=true)
    * @Groups("live:read")
    */
-  private $display;
+  private $display = 1;
 
   /**
    * @ORM\Column(type="text", nullable=true)
@@ -115,17 +115,17 @@ class Live
   /**
    * @ORM\Column(type="integer", nullable=true)
    */
-  private $viewers;
+  private $viewers = 0;
 
   /**
    * @ORM\Column(type="integer", nullable=true)
    */
-  private $totalViewers;
+  private $totalViewers = 0;
 
   /**
    * @ORM\Column(type="integer", nullable=true)
    */
-  private $duration;
+  private $duration = 0;
 
   /**
    * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="live")
@@ -139,7 +139,7 @@ class Live
    * @ORM\Column(type="integer", nullable=true)
    * @Groups("live:read")
    */
-  private $totalLikes;
+  private $totalLikes = 0;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
@@ -163,12 +163,6 @@ class Live
     $this->clips = new ArrayCollection();
     $this->liveProducts = new ArrayCollection();
     $this->comments = new ArrayCollection();
-    $this->duration = 0;
-    $this->viewers = 0;
-    $this->totalViewers = 0;
-    $this->totalLikes = 0;
-    $this->status = 0;
-    $this->display = 1;
   }
 
 
@@ -209,11 +203,9 @@ class Live
 
   public function removeClip(Clip $clip): self
   {
-    if ($this->clips->removeElement($clip)) {
-          // set the owning side to null (unless already changed)
-      if ($clip->getLive() === $this) {
-        $clip->setLive(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->clips->removeElement($clip) && $clip->getLive() === $this) {
+          $clip->setLive(null);
     }
 
     return $this;
@@ -239,11 +231,9 @@ class Live
 
   public function removeLiveProduct(LiveProducts $liveProduct): self
   {
-    if ($this->liveProducts->removeElement($liveProduct)) {
-          // set the owning side to null (unless already changed)
-      if ($liveProduct->getLive() === $this) {
-        $liveProduct->setLive(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->liveProducts->removeElement($liveProduct) && $liveProduct->getLive() === $this) {
+          $liveProduct->setLive(null);
     }
 
     return $this;
@@ -437,11 +427,9 @@ class Live
 
   public function removeComment(Comment $comment): self
   {
-    if ($this->comments->removeElement($comment)) {
-          // set the owning side to null (unless already changed)
-      if ($comment->getLive() === $this) {
-        $comment->setLive(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->comments->removeElement($comment) && $comment->getLive() === $this) {
+          $comment->setLive(null);
     }
 
     return $this;

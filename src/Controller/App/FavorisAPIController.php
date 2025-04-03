@@ -41,9 +41,6 @@ use Cloudinary\Cloudinary;
 class FavorisAPIController extends AbstractController {
 
 
-  /**
-   * @return User|null
-   */
   public function getUser(): ?User
   {
       return parent::getUser();
@@ -54,15 +51,13 @@ class FavorisAPIController extends AbstractController {
    *
    * @Route("/user/api/favoris", name="user_api_favoris", methods={"GET"})
    */
-  public function favoris(Request $request, ObjectManager $manager, FavorisRepository $favorisRepo) {
+  public function favoris(Request $request, ObjectManager $manager, FavorisRepository $favorisRepo): JsonResponse {
     $favoris = $favorisRepo->findByUser($this->getUser());
 
     return $this->json($favoris, 200, [], [
       'groups' => 'favoris:read', 
       'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
+      'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -72,7 +67,7 @@ class FavorisAPIController extends AbstractController {
    *
    * @Route("/user/api/favoris/{id}", name="user_api_favoris_update", methods={"GET"})
    */
-  public function updateFavoris(Product $product, Request $request, ObjectManager $manager, FavorisRepository $favorisRepo) {
+  public function updateFavoris(Product $product, Request $request, ObjectManager $manager, FavorisRepository $favorisRepo): JsonResponse {
     $favoris = $favorisRepo->findOneBy(['user' => $this->getUser(), 'product' => $product ]);
 
     if (!$favoris) {
@@ -89,9 +84,7 @@ class FavorisAPIController extends AbstractController {
     return $this->json($this->getUser(), 200, [], [
       'groups' => 'user:read', 
       'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
+      'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 }

@@ -58,7 +58,7 @@ class Promotion
    * @Groups("live:read")
    * @Groups("user:read")
    */
-  private $isActive;
+  private $isActive = true;
 
   /**
    * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="promotions")
@@ -79,7 +79,6 @@ class Promotion
 
   public function __construct()
   {
-    $this->isActive = true;
     $this->createdAt = new \DateTime('now', timezone_open('UTC'));
     $this->orders = new ArrayCollection();
   }
@@ -181,11 +180,9 @@ class Promotion
 
   public function removeOrder(Order $order): self
   {
-    if ($this->orders->removeElement($order)) {
-          // set the owning side to null (unless already changed)
-      if ($order->getPromotion() === $this) {
-        $order->setPromotion(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->orders->removeElement($order) && $order->getPromotion() === $this) {
+          $order->setPromotion(null);
     }
 
     return $this;

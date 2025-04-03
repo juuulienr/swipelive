@@ -13,20 +13,11 @@ use Kreait\Firebase\Factory;
 
 class FirebaseMessagingService
 {
-  /**
-   * @var Messaging
-   */
-  private $messaging;
-  private $params;
-
-  public function __construct(Messaging $messaging, ParameterBagInterface $params)
+  public function __construct(private readonly Messaging $messaging, ParameterBagInterface $params)
   {
     $firebaseCredentialsPath = $params->get('firebase_credentials_path');
-    $factory = (new Factory)
+    (new Factory)
     ->withServiceAccount($firebaseCredentialsPath);
-
-    $this->messaging = $messaging;
-    $this->params = $params;
   }
 
   /**
@@ -36,7 +27,6 @@ class FirebaseMessagingService
    * @param string $title Le titre de la notification
    * @param string $body Le corps de la notification
    * @param array $data (optionnel) Des données supplémentaires à envoyer
-   * @return string|null
    */
   public function sendNotification(string $title, string $body, string $token, array $data = [], int $attempt = 1): ?string
   {
@@ -64,9 +54,8 @@ class FirebaseMessagingService
       if ($attempt < 3) {
         sleep(2);
         return $this->sendNotification($title, $body, $token, $data, $attempt + 1);
-      } else {
-        return 'Échec de l\'envoi après plusieurs tentatives : ' . $e->getMessage();
       }
+      return 'Échec de l\'envoi après plusieurs tentatives : ' . $e->getMessage();
     } catch (FirebaseException $e) {
       return 'Erreur Firebase: ' . $e->getMessage();
     }

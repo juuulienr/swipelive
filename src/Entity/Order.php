@@ -355,11 +355,9 @@ class Order
 
   public function removeLineItem(LineItem $lineItem): self
   {
-    if ($this->lineItems->removeElement($lineItem)) {
-          // set the owning side to null (unless already changed)
-      if ($lineItem->getOrderId() === $this) {
-        $lineItem->setOrderId(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->lineItems->removeElement($lineItem) && $lineItem->getOrderId() === $this) {
+          $lineItem->setOrderId(null);
     }
 
     return $this;
@@ -493,11 +491,9 @@ class Order
 
   public function removeOrderStatus(OrderStatus $orderStatus): self
   {
-    if ($this->orderStatuses->removeElement($orderStatus)) {
-          // set the owning side to null (unless already changed)
-      if ($orderStatus->getShipping() === $this) {
-        $orderStatus->setShipping(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->orderStatuses->removeElement($orderStatus) && $orderStatus->getShipping() === $this) {
+          $orderStatus->setShipping(null);
     }
 
     return $this;
@@ -523,11 +519,9 @@ class Order
 
   public function removeDiscussion(Discussion $discussion): self
   {
-    if ($this->discussions->removeElement($discussion)) {
-          // set the owning side to null (unless already changed)
-      if ($discussion->getPurchase() === $this) {
-        $discussion->setPurchase(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->discussions->removeElement($discussion) && $discussion->getPurchase() === $this) {
+          $discussion->setPurchase(null);
     }
 
     return $this;

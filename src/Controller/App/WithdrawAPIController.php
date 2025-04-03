@@ -2,6 +2,7 @@
 
 namespace App\Controller\App;
 
+use Stripe\StripeClient;
 use App\Entity\Clip;
 use App\Entity\Live;
 use App\Entity\User;
@@ -34,9 +35,6 @@ use Cloudinary\Cloudinary;
 
 class WithdrawAPIController extends AbstractController {
 
-  /**
-   * @return User|null
-   */
   public function getUser(): ?User
   {
       return parent::getUser();
@@ -46,7 +44,7 @@ class WithdrawAPIController extends AbstractController {
   /**
    * @Route("/user/api/bank/add", name="user_api_bank_add")
    */
-  public function addBank(Request $request, ObjectManager $manager, BankAccountRepository $bankRepo){
+  public function addBank(Request $request, ObjectManager $manager, BankAccountRepository $bankRepo): JsonResponse{
   	if ($json = $request->getContent()) {
   		$param = json_decode($json, true);
 
@@ -75,7 +73,7 @@ class WithdrawAPIController extends AbstractController {
 
         try {
           $iban = $bank->getCountryCode() . $bank->getNumber();
-          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+          $stripe = new StripeClient($this->getParameter('stripe_sk'));
           $stripeBank = $stripe->accounts->createExternalAccount($vendor->getStripeAcc(), [
             'external_account' => [
               'object' => 'bank_account',
@@ -97,9 +95,7 @@ class WithdrawAPIController extends AbstractController {
         return $this->json($this->getUser(), 200, [], [
           'groups' => 'user:read', 
           'circular_reference_limit' => 1, 
-          'circular_reference_handler' => function ($object) {
-            return $object->getId();
-          } 
+          'circular_reference_handler' => fn($object) => $object->getId() 
         ]);
 	  	}
   	}
@@ -111,7 +107,7 @@ class WithdrawAPIController extends AbstractController {
   /**
   * @Route("/user/api/withdraw", name="user_api_withdraw")
   */
-  public function withdraw(Request $request, ObjectManager $manager, BankAccountRepository $bankRepo){
+  public function withdraw(Request $request, ObjectManager $manager, BankAccountRepository $bankRepo): JsonResponse{
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
@@ -123,7 +119,7 @@ class WithdrawAPIController extends AbstractController {
         if ($bank) {
           if ($vendor->getAvailable() >= $withdrawAmount) {
             try {
-              $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+              $stripe = new StripeClient($this->getParameter('stripe_sk'));
               $payout = $stripe->payouts->create(
                 ['amount' => $withdrawAmount * 100, 'currency' => $bank->getCurrency() ],
                 ['stripe_account' => $vendor->getStripeAcc() ]
@@ -145,9 +141,7 @@ class WithdrawAPIController extends AbstractController {
               return $this->json($this->getUser(), 200, [], [
                 'groups' => 'user:read', 
                 'circular_reference_limit' => 1, 
-                'circular_reference_handler' => function ($object) {
-                  return $object->getId();
-                } 
+                'circular_reference_handler' => fn($object) => $object->getId() 
               ]);
             } catch (\Exception $e) {
               return $this->json($e->getMessage(), 404);
@@ -166,14 +160,14 @@ class WithdrawAPIController extends AbstractController {
   /**
    * @Route("/user/api/verification/document/front", name="user_api_verification_front")
    */
-  public function verifFront(Request $request, ObjectManager $manager) {
+  public function verifFront(Request $request, ObjectManager $manager): JsonResponse {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
       if ($param) {
         try {
           $vendor = $this->getUser()->getVendor();
-          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+          $stripe = new StripeClient($this->getParameter('stripe_sk'));
           $stripe->accounts->updatePerson($vendor->getStripeAcc(), $vendor->getPersonId(), [ 'person_token' => $param['person_token'] ]);
 
           return $this->json(true, 200);
@@ -190,14 +184,14 @@ class WithdrawAPIController extends AbstractController {
   /**
    * @Route("/user/api/verification/document/back", name="user_api_verification_back")
    */
-  public function verifBack(Request $request, ObjectManager $manager) {
+  public function verifBack(Request $request, ObjectManager $manager): JsonResponse {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
       if ($param) {
         try {
           $vendor = $this->getUser()->getVendor();
-          $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+          $stripe = new StripeClient($this->getParameter('stripe_sk'));
           $update = $stripe->accounts->updatePerson($vendor->getStripeAcc(), $vendor->getPersonId(), [ 'person_token' => $param['person_token'] ]);
 
           return $this->json(true, 200);
@@ -214,7 +208,7 @@ class WithdrawAPIController extends AbstractController {
   /**
    * @Route("/user/api/verification/company/document", name="user_api_verification_company_document")
    */
-  public function verifCompany(Request $request, ObjectManager $manager){
+  public function verifCompany(Request $request, ObjectManager $manager): JsonResponse{
     if ($request->files->get('document')) {
       $file = $request->files->get('document');
 

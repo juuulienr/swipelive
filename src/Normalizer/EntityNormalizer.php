@@ -15,30 +15,21 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
  */
 class EntityNormalizer implements NormalizerInterface
 {
-    /**
-     * Entity manager
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    private $normalizer;
+    private readonly ObjectNormalizer $normalizer;
 
     /**
      * Entity normalizer
-     * @param EntityManagerInterface $em
-     * @param ClassMetadataFactoryInterface|null $classMetadataFactory
-     * @param NameConverterInterface|null $nameConverter
-     * @param PropertyAccessorInterface|null $propertyAccessor
-     * @param PropertyTypeExtractorInterface|null $propertyTypeExtractor
      */
     public function __construct(
-        EntityManagerInterface $em,
+        /**
+         * Entity manager
+         */
+        private readonly EntityManagerInterface $em,
         ?ClassMetadataFactoryInterface $classMetadataFactory = null,
         ?NameConverterInterface $nameConverter = null,
         ?PropertyAccessorInterface $propertyAccessor = null,
         ?PropertyTypeExtractorInterface $propertyTypeExtractor = null
     ) {
-        $this->em = $em;
         $this->normalizer = new ObjectNormalizer($classMetadataFactory, $nameConverter, $propertyAccessor, $propertyTypeExtractor);
     }
 
@@ -61,15 +52,15 @@ class EntityNormalizer implements NormalizerInterface
     /**
      * @inheritDoc
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null): bool
     {
-        return strpos($type, 'App\\Entity\\') === 0 && (is_numeric($data) || is_string($data));
+        return str_starts_with((string) $type, 'App\\Entity\\') && (is_numeric($data) || is_string($data));
     }
 
     /**
      * @inheritDoc
      */
-    public function denormalize($data, $class, $format = null, array $context = [])
+    public function denormalize($data, string $class, $format = null, array $context = [])
     {
         return $this->em->find($class, $data);
     }

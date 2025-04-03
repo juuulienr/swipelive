@@ -67,13 +67,12 @@ class Message
    * @Groups("discussion:read")
    * @Groups("user:read")
    */
-  private $loading;
+  private $loading = false;
 
   
   public function __construct()
   {
     $this->createdAt = new \DateTime('now', timezone_open('UTC'));
-    $this->loading = false;
   }
   
 

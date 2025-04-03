@@ -94,7 +94,7 @@ class Product
    * @Groups("clip:read")
    * @Groups("favoris:read")
    */
-  private $quantity;
+  private $quantity = 0;
 
   /**
    * @ORM\OneToMany(targetEntity=Upload::class, mappedBy="product", cascade={"persist"})
@@ -135,7 +135,7 @@ class Product
    * @Groups("live:read")
    * @Groups("favoris:read")
    */
-  private $weightUnit;
+  private $weightUnit = "kg";
 
   /**
    * @ORM\OneToMany(targetEntity=Option::class, mappedBy="product", cascade={"persist"})
@@ -179,8 +179,6 @@ class Product
     $this->variants = new ArrayCollection();
     $this->lineItems = new ArrayCollection();
     $this->favoris = new ArrayCollection();
-    $this->weightUnit = "kg";
-    $this->quantity = 0;
   }
 
   public function getId(): ?int
@@ -292,11 +290,9 @@ class Product
 
   public function removeUpload(Upload $upload): self
   {
-    if ($this->uploads->removeElement($upload)) {
-          // set the owning side to null (unless already changed)
-      if ($upload->getProduct() === $this) {
-        $upload->setProduct(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->uploads->removeElement($upload) && $upload->getProduct() === $this) {
+          $upload->setProduct(null);
     }
 
     return $this;
@@ -322,11 +318,9 @@ class Product
 
   public function removeClip(Clip $clip): self
   {
-    if ($this->clips->removeElement($clip)) {
-          // set the owning side to null (unless already changed)
-      if ($clip->getProduct() === $this) {
-        $clip->setProduct(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->clips->removeElement($clip) && $clip->getProduct() === $this) {
+          $clip->setProduct(null);
     }
 
     return $this;
@@ -352,11 +346,9 @@ class Product
 
   public function removeLiveProduct(LiveProducts $liveProduct): self
   {
-    if ($this->liveProducts->removeElement($liveProduct)) {
-          // set the owning side to null (unless already changed)
-      if ($liveProduct->getProduct() === $this) {
-        $liveProduct->setProduct(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->liveProducts->removeElement($liveProduct) && $liveProduct->getProduct() === $this) {
+          $liveProduct->setProduct(null);
     }
 
     return $this;
@@ -382,11 +374,9 @@ class Product
 
   public function removeOption(Option $option): self
   {
-    if ($this->options->removeElement($option)) {
-          // set the owning side to null (unless already changed)
-      if ($option->getProduct() === $this) {
-        $option->setProduct(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->options->removeElement($option) && $option->getProduct() === $this) {
+          $option->setProduct(null);
     }
 
     return $this;
@@ -412,11 +402,9 @@ class Product
 
   public function removeVariant(Variant $variant): self
   {
-    if ($this->variants->removeElement($variant)) {
-          // set the owning side to null (unless already changed)
-      if ($variant->getProduct() === $this) {
-        $variant->setProduct(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->variants->removeElement($variant) && $variant->getProduct() === $this) {
+          $variant->setProduct(null);
     }
 
     return $this;
@@ -442,11 +430,9 @@ class Product
 
   public function removeLineItem(LineItem $lineItem): self
   {
-    if ($this->lineItems->removeElement($lineItem)) {
-          // set the owning side to null (unless already changed)
-      if ($lineItem->getProduct() === $this) {
-        $lineItem->setProduct(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->lineItems->removeElement($lineItem) && $lineItem->getProduct() === $this) {
+          $lineItem->setProduct(null);
     }
 
     return $this;
@@ -496,11 +482,9 @@ class Product
 
   public function removeFavori(Favoris $favori): self
   {
-    if ($this->favoris->removeElement($favori)) {
-          // set the owning side to null (unless already changed)
-      if ($favori->getProduct() === $this) {
-        $favori->setProduct(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->favoris->removeElement($favori) && $favori->getProduct() === $this) {
+          $favori->setProduct(null);
     }
 
     return $this;

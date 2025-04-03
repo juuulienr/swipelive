@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use Bugsnag\Client;
 use App\Entity\Clip;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -10,16 +11,10 @@ use Aws\S3\S3Client;
 
 class VideoProcessor
 {
-  private $entityManager;
-  private $mediaConvertClient;
-  private $parameters;
-  private $bugsnag;
+  private readonly MediaConvertClient $mediaConvertClient;
 
-  public function __construct(EntityManagerInterface $entityManager, ParameterBagInterface $parameters, \Bugsnag\Client $bugsnag)
+  public function __construct(private readonly EntityManagerInterface $entityManager, private readonly ParameterBagInterface $parameters, private readonly Client $bugsnag)
   {
-    $this->entityManager = $entityManager;
-    $this->parameters = $parameters;
-    $this->bugsnag = $bugsnag;
     $this->mediaConvertClient = new MediaConvertClient([
       'version' => 'latest',
       'region' => 'eu-west-3',

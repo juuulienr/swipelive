@@ -2,6 +2,8 @@
 
 namespace App\Controller\App;
 
+use Bugsnag\Client;
+use Pusher\Pusher;
 use App\Entity\User;
 use App\Entity\Vendor;
 use App\Entity\Clip;
@@ -42,18 +44,11 @@ use Cloudinary\Cloudinary;
 
 class DiscussionAPIController extends AbstractController {
 
-  private $firebaseMessagingService;
-  private $bugsnag;
-
-  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag) {
-      $this->firebaseMessagingService = $firebaseMessagingService;
-      $this->bugsnag = $bugsnag;
+  public function __construct(private readonly FirebaseMessagingService $firebaseMessagingService, private readonly Client $bugsnag)
+  {
   }
 
 
-  /**
-   * @return User|null
-   */
   public function getUser(): ?User
   {
       return parent::getUser();
@@ -65,15 +60,13 @@ class DiscussionAPIController extends AbstractController {
    *
    * @Route("/user/api/discussions", name="user_api_discussions", methods={"GET"})
    */
-  public function discussions(Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo) {
+  public function discussions(Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo): JsonResponse {
     $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
 
     return $this->json($discussions, 200, [], [
       'groups' => 'discussion:read',
       'circular_reference_limit' => 1,
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
+      'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -83,7 +76,7 @@ class DiscussionAPIController extends AbstractController {
    *
    * @Route("/user/api/discussions/add", name="user_api_discussions_add", methods={"POST"})
    */
-  public function addDiscussion(Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo, SerializerInterface $serializer) {
+  public function addDiscussion(Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $discussion = $serializer->deserialize($json, Discussion::class, "json");
 
@@ -122,9 +115,7 @@ class DiscussionAPIController extends AbstractController {
       return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',
         'circular_reference_limit' => 1,
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
+        'circular_reference_handler' => fn($object) => $object->getId() 
       ]);
     }
 
@@ -137,8 +128,8 @@ class DiscussionAPIController extends AbstractController {
    *
    * @Route("/user/api/discussions/{id}/seen", name="user_api_discussions_seen", methods={"GET"})
    */
-  public function seenDiscussion(Discussion $discussion, Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo) {
-    if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
+  public function seenDiscussion(Discussion $discussion, Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo): JsonResponse {
+    if ($discussion->getUser()->getId() === $this->getUser()->getId()) {
       $discussion->setUnseen(false);
     } else {
       $discussion->setUnseenVendor(false);
@@ -151,9 +142,7 @@ class DiscussionAPIController extends AbstractController {
     return $this->json($discussions, 200, [], [
       'groups' => 'discussion:read',
       'circular_reference_limit' => 1,
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
+      'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -163,7 +152,7 @@ class DiscussionAPIController extends AbstractController {
    *
    * @Route("/user/api/discussions/{id}/message", name="user_api_discussions_message", methods={"POST"})
    */
-  public function addMessage(Discussion $discussion, Request $request, ObjectManager $manager, SerializerInterface $serializer, DiscussionRepository $discussionRepo) {
+  public function addMessage(Discussion $discussion, Request $request, ObjectManager $manager, SerializerInterface $serializer, DiscussionRepository $discussionRepo): JsonResponse {
     if ($json = $request->getContent()) {
       $message = $serializer->deserialize($json, Message::class, "json");
       $message->setDiscussion($discussion);
@@ -171,7 +160,7 @@ class DiscussionAPIController extends AbstractController {
       $discussion->setPreview($message->getText());
       $discussion->setUpdatedAt(new \DateTime('now', timezone_open('UTC')));
 
-      if ($discussion->getUser()->getId() == $this->getUser()->getId()) {
+      if ($discussion->getUser()->getId() === $this->getUser()->getId()) {
         $discussion->setUnseenVendor(true);
         $name = $discussion->getUser()->getFullName();
         $receiver = $discussion->getVendor();
@@ -194,7 +183,7 @@ class DiscussionAPIController extends AbstractController {
         ],
       ];
 
-      $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger("discussion_channel", "new_message", $data);
       $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
 
@@ -215,9 +204,7 @@ class DiscussionAPIController extends AbstractController {
       return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',
         'circular_reference_limit' => 1,
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
+        'circular_reference_handler' => fn($object) => $object->getId() 
       ]);
     }
 
@@ -230,7 +217,7 @@ class DiscussionAPIController extends AbstractController {
    *
    * @Route("/user/api/discussions/{id}/writing", name="user_api_discussions_writing", methods={"GET"})
    */
-  public function writing(Discussion $discussion, Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo) {
+  public function writing(Discussion $discussion, Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo): JsonResponse {
     $data = [
       "discussionId" => $discussion->getId(),
       "message" => [
@@ -239,16 +226,14 @@ class DiscussionAPIController extends AbstractController {
       ],
     ];
 
-    $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $pusher = new Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
     $pusher->trigger("discussion_channel", "new_message", $data);
     $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
 
     return $this->json($discussions, 200, [], [
       'groups' => 'discussion:read',
       'circular_reference_limit' => 1,
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
+      'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -258,7 +243,7 @@ class DiscussionAPIController extends AbstractController {
    *
    * @Route("/user/api/discussions/{id}/writing/stop", name="user_api_discussions_writing_stop", methods={"GET"})
    */
-  public function stopWriting(Discussion $discussion, Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo) {
+  public function stopWriting(Discussion $discussion, Request $request, ObjectManager $manager, DiscussionRepository $discussionRepo): JsonResponse {
     $data = [
       "discussionId" => $discussion->getId(),
       "message" => [
@@ -267,16 +252,14 @@ class DiscussionAPIController extends AbstractController {
       ],
     ];
 
-    $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
+    $pusher = new Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
     $pusher->trigger("discussion_channel", "new_message", $data);
     $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
 
     return $this->json($discussions, 200, [], [
       'groups' => 'discussion:read',
       'circular_reference_limit' => 1,
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
+      'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -286,18 +269,18 @@ class DiscussionAPIController extends AbstractController {
    *
    * @Route("/user/api/discussions/{id}/picture", name="user_api_discussions_picture", methods={"POST"})
    */
-  public function addPicture(Discussion $discussion, Request $request, ObjectManager $manager, SerializerInterface $serializer, DiscussionRepository $discussionRepo) {
+  public function addPicture(Discussion $discussion, Request $request, ObjectManager $manager, SerializerInterface $serializer, DiscussionRepository $discussionRepo): JsonResponse {
     $file = json_decode($request->getContent(), true);
     $user = $this->getUser();
 
     if ($file && array_key_exists("picture", $file)) {
-      $file = $file["picture"];
-      $content = $file;
-      $extension = 'jpg';
-    } else if ($request->files->get('picture')) {
-      $file = $request->files->get('picture');
-      $content = file_get_contents($file);
-      $extension = $file->guessExtension();
+        $file = $file["picture"];
+        $content = $file;
+        $extension = 'jpg';
+    } elseif ($request->files->get('picture')) {
+        $file = $request->files->get('picture');
+        $content = file_get_contents($file);
+        $extension = $file->guessExtension();
     } else {
       return $this->json("L'image est introuvable !", 404);
     }
@@ -322,9 +305,9 @@ class DiscussionAPIController extends AbstractController {
       $message->setText(null);
 
       if ($result["width"] > $result["height"]) {
-        $message->setPictureType("landscape");
-      } else if ($result["width"] == $result["height"]) {
-        $message->setPictureType("rounded");
+          $message->setPictureType("landscape");
+      } elseif ($result["width"] == $result["height"]) {
+          $message->setPictureType("rounded");
       } else {
         $message->setPictureType("portrait");
       }
@@ -337,7 +320,7 @@ class DiscussionAPIController extends AbstractController {
       $discussion->setPreview("A envoyé une image");
       $discussion->setUpdatedAt(new \DateTime('now', timezone_open('UTC')));
 
-      if ($discussion->getUser()->getId() == $user->getId()) {
+      if ($discussion->getUser()->getId() === $user->getId()) {
         $discussion->setUnseenVendor(true);
         $name = $user->getFullName();
         $receiver = $discussion->getVendor();
@@ -360,7 +343,7 @@ class DiscussionAPIController extends AbstractController {
         ],
       ];
 
-      $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger("discussion_channel", "new_message", $data);
       $discussions = $discussionRepo->findByVendorAndUser($this->getUser());
 
@@ -380,9 +363,7 @@ class DiscussionAPIController extends AbstractController {
       return $this->json($discussions, 200, [], [
         'groups' => 'discussion:read',
         'circular_reference_limit' => 1,
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
+        'circular_reference_handler' => fn($object) => $object->getId() 
       ]);
     } catch (\Exception $e) {
       return $this->json($e->getMessage(), 404);

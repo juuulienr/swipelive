@@ -34,9 +34,6 @@ use Cloudinary\Cloudinary;
 
 class PromotionAPIController extends AbstractController {
 
-  /**
-   * @return User|null
-   */
   public function getUser(): ?User
   {
       return parent::getUser();
@@ -48,7 +45,7 @@ class PromotionAPIController extends AbstractController {
    *
    * @Route("/user/api/promotions", name="user_api_promotions", methods={"GET"})
    */
-  public function promotions(Request $request, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer)
+  public function promotions(Request $request, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer): JsonResponse
   {
     $promotions = $promotionRepo->findByVendor($this->getUser()->getVendor());
     
@@ -61,15 +58,14 @@ class PromotionAPIController extends AbstractController {
    *
    * @Route("/user/api/promotions/active/{id}", name="user_api_promotions_active", methods={"GET"})
    */
-  public function active(Product $product, Request $request, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer)
+  public function active(Product $product, Request $request, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer): JsonResponse
   {
     $promotion = $promotionRepo->findOneBy([ "vendor" => $product->getVendor(), "isActive" => true ]);
 
     if ($promotion) {
       return $this->json($promotion, 200, [], ['groups' => 'promotion:read']);
-    } else {
-      return $this->json("Aucune promotion disponible", 404);
     }
+    return $this->json("Aucune promotion disponible", 404);
   }
 
 
@@ -78,7 +74,7 @@ class PromotionAPIController extends AbstractController {
    *
    * @Route("/user/api/promotion/delete/{id}", name="user_api_promotions_delete", methods={"GET"})
    */
-  public function deletePromotion(Promotion $promotion, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer)
+  public function deletePromotion(Promotion $promotion, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer): JsonResponse
   {
     if ($promotion) {
       if ($promotion->getOrders()) {
@@ -94,9 +90,7 @@ class PromotionAPIController extends AbstractController {
     return $this->json($this->getUser(), 200, [], [
       'groups' => 'user:read', 
       'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
+      'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -105,7 +99,7 @@ class PromotionAPIController extends AbstractController {
    *
    * @Route("/user/api/promotion/add", name="user_api_promotions_add", methods={"POST"})
    */
-  public function addPromotion(Request $request, ObjectManager $manager, SerializerInterface $serializer, PromotionRepository $promotionRepo) {
+  public function addPromotion(Request $request, ObjectManager $manager, SerializerInterface $serializer, PromotionRepository $promotionRepo): JsonResponse {
     if ($json = $request->getContent()) {
       $vendor = $this->getUser()->getVendor();
       $promotions = $promotionRepo->findByVendor($vendor);
@@ -128,9 +122,7 @@ class PromotionAPIController extends AbstractController {
       return $this->json($this->getUser(), 200, [], [
         'groups' => 'user:read', 
         'circular_reference_limit' => 1,  
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
+        'circular_reference_handler' => fn($object) => $object->getId() 
       ]);
     }
 
@@ -143,7 +135,7 @@ class PromotionAPIController extends AbstractController {
    *
    * @Route("/user/api/promotion/activate/{id}", name="user_api_promotions_activate", methods={"GET"})
    */
-  public function activate(Promotion $promotion, Request $request, ObjectManager $manager, PromotionRepository $promotionRepo) {
+  public function activate(Promotion $promotion, Request $request, ObjectManager $manager, PromotionRepository $promotionRepo): JsonResponse {
     $promotions = $promotionRepo->findByVendor($this->getUser()->getVendor());
 
     if ($promotion->getIsActive() == true) {
@@ -163,9 +155,7 @@ class PromotionAPIController extends AbstractController {
     return $this->json($this->getUser(), 200, [], [
       'groups' => 'user:read', 
       'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
+      'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 }

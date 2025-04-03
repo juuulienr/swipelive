@@ -75,7 +75,7 @@ class Clip
    * @ORM\Column(type="string", length=255, nullable=true)
    * @Groups("clip:read")
    */
-  private $status;
+  private $status = "waiting";
 
   /**
    * @ORM\Column(type="datetime", nullable=true)
@@ -104,10 +104,9 @@ class Clip
   
   public function __construct()
   {
-    $this->status = "waiting";
     $this->createdAt = new \DateTime('now', timezone_open('UTC'));
     $this->comments = new ArrayCollection();
-    $this->totalLikes = rand(10, 200);
+    $this->totalLikes = random_int(10, 200);
   }
 
 
@@ -257,11 +256,9 @@ class Clip
 
   public function removeComment(Comment $comment): self
   {
-    if ($this->comments->removeElement($comment)) {
-          // set the owning side to null (unless already changed)
-      if ($comment->getClip() === $this) {
-        $comment->setClip(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->comments->removeElement($comment) && $comment->getClip() === $this) {
+          $comment->setClip(null);
     }
 
     return $this;

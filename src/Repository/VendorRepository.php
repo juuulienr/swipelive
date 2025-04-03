@@ -22,7 +22,7 @@ class VendorRepository extends ServiceEntityRepository
         parent::__construct($registry, Vendor::class);
     }
 
-    
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

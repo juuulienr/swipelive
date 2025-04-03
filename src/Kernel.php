@@ -19,7 +19,7 @@ class Kernel extends BaseKernel
         date_default_timezone_set('UTC');
 
         // Bugsnag configuration callback
-        $this->container->get('bugsnag')->registerCallback(function ($report) {});
+        $this->container->get('bugsnag')->registerCallback(function ($report): void {});
     }
 
     public function getCacheDir(): string

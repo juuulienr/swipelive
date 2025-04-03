@@ -2,6 +2,10 @@
 
 namespace App\Controller\App;
 
+use Pusher\Pusher;
+use Facebook\Facebook;
+use Facebook\Exceptions\FacebookResponseException;
+use Facebook\Exceptions\FacebookSDKException;
 use App\Entity\User;
 use App\Entity\Vendor;
 use App\Entity\Clip;
@@ -43,18 +47,11 @@ use Cloudinary\Cloudinary;
 
 class LiveAPIController extends AbstractController {
 
-  private $firebaseMessagingService;
-  private $bugsnag;
-
-  public function __construct(FirebaseMessagingService $firebaseMessagingService, \Bugsnag\Client $bugsnag) {
-    $this->firebaseMessagingService = $firebaseMessagingService;
-    $this->bugsnag = $bugsnag;
+  public function __construct()
+  {
   }
 
 
-  /**
-   * @return User|null
-   */
   public function getUser(): ?User
   {
       return parent::getUser();
@@ -64,7 +61,7 @@ class LiveAPIController extends AbstractController {
   /**
    * @Route("/user/api/agora/token/host/{id}", name="generate_agora_token_host")
    */
-  public function generateHostToken(Live $live, ObjectManager $manager) {
+  public function generateHostToken(Live $live, ObjectManager $manager): JsonResponse {
     $appID = $this->getParameter('agora_app_id');
     $appCertificate = $this->getParameter('agora_app_certificate');
     $expiresInSeconds = 86400;
@@ -78,7 +75,7 @@ class LiveAPIController extends AbstractController {
     try {
       $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $cname, $uid, $role, $expiresInSeconds);
       return $this->json([ "token" => $token ], 200);
-    } catch (\Exception $e) {
+    } catch (\Exception) {
       return $this->json('Failed to generate token', 500);
     }
   }
@@ -87,7 +84,7 @@ class LiveAPIController extends AbstractController {
   /**
    * @Route("/user/api/agora/token/audience/{id}", name="generate_agora_token_audience")
    */
-  public function generateAudienceToken(Live $live) {
+  public function generateAudienceToken(Live $live): JsonResponse {
     $appID = $this->getParameter('agora_app_id');
     $appCertificate = $this->getParameter('agora_app_certificate');
     $expiresInSeconds = 86400; 
@@ -98,7 +95,7 @@ class LiveAPIController extends AbstractController {
     try {
       $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $cname, $uid, $role, $expiresInSeconds);
       return $this->json([ "token" => $token ], 200);
-    } catch (\Exception $e) {
+    } catch (\Exception) {
       return $this->json('Failed to generate token', 500);
     }
   }
@@ -107,7 +104,7 @@ class LiveAPIController extends AbstractController {
   /**
    * @Route("/agora/token/record/{id}", name="generate_agora_token_record")
    */
-  public function generateRecordToken(Live $live) {
+  public function generateRecordToken(Live $live): JsonResponse {
     $appID = $this->getParameter('agora_app_id');
     $appCertificate = $this->getParameter('agora_app_certificate');
     $expiresInSeconds = 86400; // Expire dans 24 heures
@@ -116,7 +113,7 @@ class LiveAPIController extends AbstractController {
     try {
       $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $live->getCname(), 123456789, $role, $expiresInSeconds);
       return $this->json([ "token" => $token ], 200);
-    } catch (\Exception $e) {
+    } catch (\Exception) {
       return $this->json('Failed to generate token', 500);
     }
   }
@@ -127,7 +124,7 @@ class LiveAPIController extends AbstractController {
    *
    * @Route("/user/api/prelive", name="user_api_prelive_step1", methods={"POST"})
    */
-  public function prelive(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function prelive(Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $live = $serializer->deserialize($json, Live::class, "json");
       $live->setVendor($this->getUser()->getVendor());
@@ -137,7 +134,7 @@ class LiveAPIController extends AbstractController {
 
       $liveProducts = $live->getLiveProducts()->toArray();
 
-      if (sizeof($liveProducts) == 1) {
+      if (count($liveProducts) == 1) {
         $liveProducts[0]->setPriority(1);
         $manager->flush();
       }
@@ -145,9 +142,7 @@ class LiveAPIController extends AbstractController {
 	    return $this->json($live, 200, [], [
 	    	'groups' => 'live:read', 
 	    	'circular_reference_limit' => 1, 
-	    	'circular_reference_handler' => function ($object) {
-	    		return $object->getId();
-	    	} 
+	    	'circular_reference_handler' => fn($object) => $object->getId() 
 	    ]);
     }
 
@@ -160,7 +155,7 @@ class LiveAPIController extends AbstractController {
    * 
    * @Route("/user/api/liveproducts/edit/{id}", name="user_api_liveproducts_edit", methods={"PUT"})
    */
-  public function prelive2(LiveProducts $liveProduct, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function prelive2(LiveProducts $liveProduct, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $serializer->deserialize($json, LiveProducts::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $liveProduct]);
       $manager->flush();
@@ -177,13 +172,11 @@ class LiveAPIController extends AbstractController {
    *
    * @Route("/user/api/live/{id}", name="user_api_live", methods={"GET"})
    */
-  public function live(Live $live, Request $request, ObjectManager $manager) {
+  public function live(Live $live, Request $request, ObjectManager $manager): JsonResponse {
     return $this->json($live, 200, [], [
     	'groups' => 'live:read', 
     	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => function ($object) {
-    		return $object->getId();
-    	} 
+    	'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -193,7 +186,7 @@ class LiveAPIController extends AbstractController {
    *
    * @Route("/user/api/live/update/{id}", name="user_api_live_update", methods={"PUT"})
    */
-  public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function updateLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
     $channel = "channel" . $live->getId();
     $event = "event" . $live->getId();
 
@@ -204,9 +197,7 @@ class LiveAPIController extends AbstractController {
     return $this->json($live, 200, [], [
       'groups' => 'live:read', 
       'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
+      'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -217,7 +208,7 @@ class LiveAPIController extends AbstractController {
    *
    * @Route("/user/api/live/update/stream/{id}", name="user_api_live_update_stream", methods={"PUT"})
    */
-  public function updateStream(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function updateStream(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
       $fbIdentifier = $param["fbIdentifier"];
@@ -258,7 +249,7 @@ class LiveAPIController extends AbstractController {
           $fbPermalinkUrl = $result['permalink_url'];
           $postUrl = 'https://www.facebook.com' . $fbPermalinkUrl;
 
-          if ($groups && sizeof($groups) > 0) {
+          if ($groups && count($groups) > 0) {
             foreach ($groups as $group) {
               if ($group["name"] == "Test Live") {
                 $urlGroup = sprintf('https://graph.facebook.com/v21.0/%s/feed', $group['id']);
@@ -284,9 +275,7 @@ class LiveAPIController extends AbstractController {
           return $this->json([ "fbStreamId" => $fbStreamId ], 200, [], [
             'groups' => 'live:read',
             'circular_reference_limit' => 1,
-            'circular_reference_handler' => function ($object) {
-              return $object->getId();
-            } 
+            'circular_reference_handler' => fn($object) => $object->getId() 
           ]);
         }
       } catch (\Exception $e) {
@@ -306,7 +295,7 @@ class LiveAPIController extends AbstractController {
    *
    * @Route("/user/api/live/{id}/update/display", name="user_api_live_update_display", methods={"PUT"})
    */
-  public function updateDisplay(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo, CommentRepository $commentRepo) {
+  public function updateDisplay(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo, CommentRepository $commentRepo): ?JsonResponse {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
       $display = $param["display"];
@@ -315,19 +304,15 @@ class LiveAPIController extends AbstractController {
       $live->setDisplay($display);
       $manager->flush();
 
-      $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger($live->getChannel(), $live->getEvent(), [ "display" => $display ]);
 
       // créer le clip pour le produit précédent
-      $display = $display - 1;
+      $display -= 1;
       $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $display ]);
 
       if ($liveProduct) {
-        if ($display == 1) {
-          $start = 5;
-        } else {
-          $start = $live->getDuration() + 1;
-        }
+        $start = $display == 1 ? 5 : $live->getDuration() + 1;
 
         $created = $live->getCreatedAt();
         $now = new \DateTime('now', timezone_open('UTC'));
@@ -363,11 +348,10 @@ class LiveAPIController extends AbstractController {
   		return $this->json($live, 200, [], [
 	    	'groups' => 'live:read', 
 	    	'circular_reference_limit' => 1, 
-	    	'circular_reference_handler' => function ($object) {
-	    		return $object->getId();
-	    	} 
+	    	'circular_reference_handler' => fn($object) => $object->getId() 
 	    ]);
     }
+    return null;
   }
 
 
@@ -376,7 +360,7 @@ class LiveAPIController extends AbstractController {
    *
    * @Route("/user/api/live/stop/{id}", name="user_api_live_stop", methods={"PUT"})
    */
-  public function stopLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo, CommentRepository $commentRepo) {
+  public function stopLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer, LiveProductsRepository $liveProductRepo, CommentRepository $commentRepo): JsonResponse {
     $json = $request->getContent();
     $param = json_decode($json, true);
     $live->setStatus(2);
@@ -389,11 +373,7 @@ class LiveAPIController extends AbstractController {
       $liveProduct = $liveProductRepo->findOneBy([ "live" => $live, "priority" => $live->getDisplay() ]);
 
       if ($liveProduct) {
-        if ($live->getDisplay() == 1) {
-          $start = 5;
-        } else {
-          $start = $live->getDuration() + 1;
-        }
+        $start = $live->getDisplay() == 1 ? 5 : $live->getDuration() + 1;
 
         $created = $live->getCreatedAt();
         $now = new \DateTime('now', timezone_open('UTC'));
@@ -456,7 +436,7 @@ class LiveAPIController extends AbstractController {
       // stop stream sur facebook
       if ($fbStreamId) {
         $url = "/" . $fbStreamId . "/?end_live_video=true";
-        $fb = new \Facebook\Facebook([
+        $fb = new Facebook([
           'app_id' => $this->getParameter('facebook_app_id'),
           'app_secret' => $this->getParameter('facebook_app_secret'),
           'default_graph_version' => 'v2.10',
@@ -464,9 +444,9 @@ class LiveAPIController extends AbstractController {
 
         try {
           $response = $fb->post($url, [], $fbToken);
-        } catch(\Facebook\Exceptions\FacebookResponseException $e) {
+        } catch(FacebookResponseException $e) {
           return $this->json("Graph returned an error: " . $e->getMessage(), 404);
-        } catch(\Facebook\Exceptions\FacebookSDKException $e) {
+        } catch(FacebookSDKException $e) {
           return $this->json("Facebook SDK returned an error: " . $e->getMessage(), 404);
         }
       }
@@ -474,9 +454,7 @@ class LiveAPIController extends AbstractController {
       return $this->json($this->getUser(), 200, [], [
         'groups' => 'user:read', 
         'circular_reference_limit' => 1, 
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
+        'circular_reference_handler' => fn($object) => $object->getId() 
       ]);
 
     } catch (\Exception $e) {
@@ -494,7 +472,7 @@ class LiveAPIController extends AbstractController {
    *
    * @Route("/user/api/live/{id}/comment/add", name="user_api_live_comment_add", methods={"POST"})
    */
-  public function addCommentLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function addCommentLive(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer): ?JsonResponse {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
       $content = $param["content"];
@@ -507,13 +485,9 @@ class LiveAPIController extends AbstractController {
       $manager->persist($comment);
       $manager->flush();
 
-      if ($user->getVendor()) {
-        $vendor = [
-          "pseudo" => $user->getVendor()->getPseudo(),
-        ];
-      } else {
-        $vendor = null;
-      }
+      $vendor = $user->getVendor() instanceof Vendor ? [
+        "pseudo" => $user->getVendor()->getPseudo(),
+      ] : null;
 
       $data = [
         "comment" => [
@@ -527,17 +501,16 @@ class LiveAPIController extends AbstractController {
         ]
       ];
       
-      $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
       $pusher->trigger($live->getChannel(), $live->getEvent(), $data);
 
 			return $this->json($live, 200, [], [
 	    	'groups' => 'live:read', 
 	    	'circular_reference_limit' => 1, 
-	    	'circular_reference_handler' => function ($object) {
-	    		return $object->getId();
-	    	} 
+	    	'circular_reference_handler' => fn($object) => $object->getId() 
 	    ]);
     }
+    return null;
   }
 
 
@@ -546,29 +519,21 @@ class LiveAPIController extends AbstractController {
    *
    * @Route("/user/api/live/{id}/update/viewers", name="user_api_live_update_viewers", methods={"PUT"})
    */
-  public function updateViewers(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
+  public function updateViewers(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
+    $pusher = new Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
     $info = $pusher->getChannelInfo($live->getChannel(), ['info' => 'subscription_count']);
     $count = $info->subscription_count;
     $user = $this->getUser();
 
     if ($count > 0) {
-      $count = $count - 1;
+      $count -= 1;
     }
 
-    if ($user->getVendor()) {
-      $vendor = [
-        "pseudo" => $user->getVendor()->getPseudo(),
-      ];
-    } else {
-      $vendor = null;
-    }
+    $vendor = $user->getVendor() instanceof Vendor ? [
+      "pseudo" => $user->getVendor()->getPseudo(),
+    ] : null;
 
-    if ($live->getViewers() > $count) {
-      $type = "remove";
-    } else {
-      $type = "add";
-    }
+    $type = $live->getViewers() > $count ? "remove" : "add";
 
     $live->setViewers($count);
     $live->setTotalViewers($live->getTotalViewers() + 1);
@@ -593,9 +558,7 @@ class LiveAPIController extends AbstractController {
 		return $this->json($live, 200, [], [
     	'groups' => 'live:read', 
     	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => function ($object) {
-    		return $object->getId();
-    	} 
+    	'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -605,8 +568,8 @@ class LiveAPIController extends AbstractController {
    *
    * @Route("/user/api/live/{id}/update/likes", name="user_api_live_update_likes", methods={"PUT"})
    */
-  public function updateLikes(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
-    $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
+  public function updateLikes(Live $live, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
+    $pusher = new Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
     $live->setTotalLikes($live->getTotalLikes() + 1);
     $manager->flush();
 
@@ -619,9 +582,7 @@ class LiveAPIController extends AbstractController {
     return $this->json($live, 200, [], [
       'groups' => 'live:read', 
       'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
+      'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -631,8 +592,8 @@ class LiveAPIController extends AbstractController {
    *
    * @Route("/user/api/live/{id}/update/banned/{userId}", name="user_api_live_update_banned", methods={"GET"})
    */
-  public function bannedViewer(Live $live, $userId, Request $request, ObjectManager $manager, FollowRepository $followRepo, SerializerInterface $serializer) {
-    $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
+  public function bannedViewer(Live $live, $userId, Request $request, ObjectManager $manager, FollowRepository $followRepo, SerializerInterface $serializer): JsonResponse {
+    $pusher = new Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
     $follow = $followRepo->findOneBy(['following' => $live->getVendor()->getUser(), 'follower' => $userId ]);
 
     if ($follow) {
@@ -649,9 +610,7 @@ class LiveAPIController extends AbstractController {
     return $this->json($live, 200, [], [
       'groups' => 'live:read', 
       'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
+      'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -661,7 +620,7 @@ class LiveAPIController extends AbstractController {
    *
    * @Route("/user/api/live/{id}/update/orders/{orderId}", name="user_api_live_update_orders", methods={"GET"})
    */
-  public function updateOrders(Live $live, $orderId, Request $request, ObjectManager $manager, OrderRepository $orderRepo, LiveProductsRepository $liveProductRepo, SerializerInterface $serializer) {
+  public function updateOrders(Live $live, $orderId, Request $request, ObjectManager $manager, OrderRepository $orderRepo, LiveProductsRepository $liveProductRepo, SerializerInterface $serializer): JsonResponse {
     $order = $orderRepo->findOneById($orderId);
     $upload = null; $vendor = null; $nbProducts = 0; $available = null;
     $display = $live->getDisplay();
@@ -671,9 +630,9 @@ class LiveAPIController extends AbstractController {
     if ($liveProduct) {
       $product = $liveProduct->getProduct();
 
-      if ($product && sizeof($product->getVariants()->toArray()) > 0) {
+      if ($product && count($product->getVariants()->toArray()) > 0) {
         foreach ($product->getVariants() as $variant) {
-          $available = $available + $variant->getQuantity();
+          $available += $variant->getQuantity();
         }
       } else {
         $available = $product->getQuantity();
@@ -681,18 +640,18 @@ class LiveAPIController extends AbstractController {
     }
 
     if ($order) {
-      $pusher = new \Pusher\Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
+      $pusher = new Pusher($this->getParameter('pusher_key'), $this->getParameter('pusher_secret'), $this->getParameter('pusher_app_id'), [ 'cluster' => 'eu', 'useTLS' => true ]);
 
       if ($order->getBuyer()->getVendor()) {
         $vendor = [ "pseudo" => $order->getBuyer()->getVendor()->getPseudo() ];
       }
 
-      if (sizeof($order->getLineItems()->toArray()[0]->getProduct()->getUploads()) > 0) {
+      if (count($order->getLineItems()->toArray()[0]->getProduct()->getUploads()) > 0) {
         $upload = $order->getLineItems()->toArray()[0]->getProduct()->getUploads()[0]->getFilename();
       }
 
       foreach ($order->getLineItems()->toArray() as $lineItem) {
-        $nbProducts = $nbProducts + $lineItem->getQuantity();
+        $nbProducts += $lineItem->getQuantity();
       }
 
       $data = [
@@ -717,9 +676,7 @@ class LiveAPIController extends AbstractController {
       return $this->json($live, 200, [], [
         'groups' => 'live:read', 
         'circular_reference_limit' => 1, 
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
+        'circular_reference_handler' => fn($object) => $object->getId() 
       ]);
     }
 
@@ -727,7 +684,7 @@ class LiveAPIController extends AbstractController {
   }
 
 
-  function dateIntervalToSeconds($dateInterval) {
+  function dateIntervalToSeconds(\DateInterval $dateInterval): int|float {
     $reference = new \DateTimeImmutable;
     $endTime = $reference->add($dateInterval);
 

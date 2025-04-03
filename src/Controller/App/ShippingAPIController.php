@@ -41,9 +41,6 @@ use Cloudinary\Cloudinary;
 
 class ShippingAPIController extends AbstractController {
 
-  /**
-   * @return User|null
-   */
   public function getUser(): ?User
   {
       return parent::getUser();
@@ -54,7 +51,7 @@ class ShippingAPIController extends AbstractController {
    *
    * @Route("/user/api/shipping/price", name="user_api_shipping_price")
    */
-  public function shippingPrice(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, ShippingAddressRepository $shippingAddressRepo, VendorRepository $vendorRepo) {
+  public function shippingPrice(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, ShippingAddressRepository $shippingAddressRepo, VendorRepository $vendorRepo): JsonResponse {
     // Initialize variables
     $array = [];
     $vendor = null;
@@ -156,13 +153,11 @@ class ShippingAPIController extends AbstractController {
               // pour la France, check pour les autres pays
               if ($shippingAddress->getCountryCode() == "FR" && $vendor->getCountryCode() == "FR") {
                 if (($value->service_id == '78cb1adc-1b18-40d7-85f0-28e2a4b1753d' && $value->service_name == 'Shop2Shop') || ($value->service_id == 'bd644fe6-a77a-4045-bf97-ee1049033f0e' && $value->service_name == 'Mondial Relay')) {
-                  if ($value->delivery_to_collection_point == true) {
-                    $array["service_point"][] = $data;
-                  }
-                } else {
-                  if ($value->service_id == '40bb5845-6a62-4198-8297-153a9bfc95fb' && $value->service_name == 'Colissimo sans signature') {
+                    if ($value->delivery_to_collection_point == true) {
+                      $array["service_point"][] = $data;
+                    }
+                } elseif ($value->service_id == '40bb5845-6a62-4198-8297-153a9bfc95fb' && $value->service_name == 'Colissimo sans signature') {
                     $array["domicile"][] = $data;
-                  }
                 }
               } else {
                 return $this->json("Livraison indisponible dans ce pays", 404);
@@ -197,7 +192,7 @@ class ShippingAPIController extends AbstractController {
    *
    * @Route("/user/api/dropoff-locations", name="user_api_dropoff_locations")
    */
-  public function dropoffLocations(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, ShippingAddressRepository $shippingAddressRepo, VendorRepository $vendorRepo) {
+  public function dropoffLocations(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, ShippingAddressRepository $shippingAddressRepo, VendorRepository $vendorRepo): JsonResponse {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
 
@@ -251,11 +246,11 @@ class ShippingAPIController extends AbstractController {
                   "carrier_id" => $point["carrier_id"],
                   "carrier_name" => $point["carrier_name"],
                   "location_id" => $value->location_id,
-                  "name" => trim($value->name),
-                  "address1" => trim($value->address1),
-                  "address2" => trim($value->address2),
+                  "name" => trim((string) $value->name),
+                  "address1" => trim((string) $value->address1),
+                  "address2" => trim((string) $value->address2),
                   "postcode" => $value->postcode,
-                  "city" => trim($value->city),
+                  "city" => trim((string) $value->city),
                   "country_code" => $value->country_code,
                   "latitude" => $value->latitude,
                   "longitude" => $value->longitude,
@@ -288,7 +283,7 @@ class ShippingAPIController extends AbstractController {
    *
    * @Route("/user/api/shipping/create/{id}", name="user_api_create")
    */
-  public function shipping(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo) {
+  public function shipping(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo): JsonResponse {
   	$shippingAddress = $order->getShippingAddress();
   	$vendor = $order->getVendor();
 
@@ -298,7 +293,7 @@ class ShippingAPIController extends AbstractController {
         "shipment" => [
           "id" => 0, 
           "type" => 2, 
-          "dropoff" => $order->getDropoffName() ? true : false,
+          "dropoff" => (bool) $order->getDropoffName(),
           "service_id" => $order->getShippingServiceId(), 
           "delivery_type" => $order->getDropoffName() ? "DELIVERY_TO_COLLECTION_POINT" : "HOME_DELIVERY",
           "label_format" => "PDF", 
@@ -309,7 +304,7 @@ class ShippingAPIController extends AbstractController {
           "email" => $vendor->getUser()->getEmail(), 
           "phone" => $vendor->getUser()->getPhone(), 
           "company" => $vendor->getBusinessType() === "company" ? $vendor->getCompany() : $vendor->getUser()->getFullName(),
-          "pro" => $vendor->getBusinessType() === "company" ? true : false
+          "pro" => $vendor->getBusinessType() === "company"
         ], 
         "ship_to" => [
           "address1" => $shippingAddress->getHouseNumber() . " " . $shippingAddress->getAddress(),
@@ -344,7 +339,7 @@ class ShippingAPIController extends AbstractController {
         $filename = md5(time().uniqid()); 
         $fullname = $filename. ".pdf"; 
         $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
-        file_put_contents($filepath, base64_decode($result->waybills[0]));
+        file_put_contents($filepath, base64_decode((string) $result->waybills[0]));
 
         try {
           Configuration::instance($this->getParameter('cloudinary'));
@@ -427,11 +422,10 @@ class ShippingAPIController extends AbstractController {
           return $this->json($order, 200, [], [
             'groups' => 'order:read', 
           ]);
-        } else {
-          return $this->json($order, 200, [], [
-            'groups' => 'order:read', 
-          ]);
         }
+        return $this->json($order, 200, [], [
+          'groups' => 'order:read', 
+        ]);
       } catch (\Exception $e) {
         return $this->json($order, 200, [], [
           'groups' => 'order:read', 
@@ -450,7 +444,7 @@ class ShippingAPIController extends AbstractController {
    *
    * @Route("/user/api/shipping/address", name="user_api_shipping_address", methods={"POST"})
    */
-  public function addShippingAddress(Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function addShippingAddress(Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $shippingAddress = $serializer->deserialize($json, ShippingAddress::class, "json");
       $shippingAddress->setUser($this->getUser());
@@ -461,9 +455,7 @@ class ShippingAPIController extends AbstractController {
       return $this->json($this->getUser(), 200, [], [
         'groups' => 'user:read', 
         'circular_reference_limit' => 1, 
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
+        'circular_reference_handler' => fn($object) => $object->getId() 
       ]);
     }
     return $this->json("Une erreur est survenue", 404);
@@ -475,7 +467,7 @@ class ShippingAPIController extends AbstractController {
    *
    * @Route("/user/api/shipping/address/edit/{id}", name="user_api_shipping_address_edit", methods={"POST"})
    */
-  public function editShippingAddress(ShippingAddress $shippingAddress, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function editShippingAddress(ShippingAddress $shippingAddress, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
     if ($json = $request->getContent()) {
       $serializer->deserialize($json, ShippingAddress::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $shippingAddress]);
       $manager->flush();
@@ -483,9 +475,7 @@ class ShippingAPIController extends AbstractController {
       return $this->json($this->getUser(), 200, [], [
         'groups' => 'user:read', 
         'circular_reference_limit' => 1, 
-        'circular_reference_handler' => function ($object) {
-          return $object->getId();
-        } 
+        'circular_reference_handler' => fn($object) => $object->getId() 
       ]);
     }
     return $this->json("Une erreur est survenue", 404);

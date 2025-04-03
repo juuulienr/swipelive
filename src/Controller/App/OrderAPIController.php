@@ -2,6 +2,10 @@
 
 namespace App\Controller\App;
 
+use Stripe\StripeClient;
+use Stripe\Stripe;
+use Stripe\EphemeralKey;
+use Stripe\PaymentIntent;
 use App\Entity\Clip;
 use App\Entity\Live;
 use App\Entity\User;
@@ -36,16 +40,11 @@ use App\Service\FirebaseMessagingService;
 
 class OrderAPIController extends AbstractController {
 
-  private $firebaseMessagingService;
-
-  public function __construct(FirebaseMessagingService $firebaseMessagingService) {
-      $this->firebaseMessagingService = $firebaseMessagingService;
+  public function __construct()
+  {
   }
 
   
-  /**
-   * @return User|null
-   */
   public function getUser(): ?User
   {
       return parent::getUser();
@@ -57,7 +56,7 @@ class OrderAPIController extends AbstractController {
    *
    * @Route("/user/api/orders", name="user_api_orders", methods={"GET"})
    */
-  public function orders(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+  public function orders(Request $request, ObjectManager $manager, OrderRepository $orderRepo): JsonResponse {
     $orders = $orderRepo->findBy([ "vendor" => $this->getUser()->getVendor() ], [ "createdAt" => "DESC" ]);
 
     return $this->json($orders, 200, [], [
@@ -70,7 +69,7 @@ class OrderAPIController extends AbstractController {
    *
    * @Route("/user/api/purchases", name="user_api_purchases", methods={"GET"})
    */
-  public function purchases(Request $request, ObjectManager $manager, OrderRepository $orderRepo) {
+  public function purchases(Request $request, ObjectManager $manager, OrderRepository $orderRepo): JsonResponse {
     $orders = $orderRepo->findBy([ "buyer" => $this->getUser() ], [ "createdAt" => "DESC" ]);
 
     return $this->json($orders, 200, [], [
@@ -82,7 +81,7 @@ class OrderAPIController extends AbstractController {
   /**
    * @Route("/user/api/orders/payment", name="user_api_orders_payment", methods={"POST"})
    */
-  public function payment(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, PromotionRepository $promotionRepo, SerializerInterface $serializer) {
+  public function payment(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, PromotionRepository $promotionRepo, SerializerInterface $serializer): JsonResponse {
     // Initialize variables
     $weightUnit = '';
     $weight = 0;
@@ -96,7 +95,7 @@ class OrderAPIController extends AbstractController {
 
 	    if ($param) {
 	    	$buyer = $this->getUser();
-        $nbOrders = sizeof($orderRepo->findAll());
+        $nbOrders = count($orderRepo->findAll());
         $lineItems = $param["lineItems"];
 	      $identifier = $param["identifier"];
         $promotionId = $param["promotionId"];
@@ -130,7 +129,7 @@ class OrderAPIController extends AbstractController {
             if ($productItem) {
               $product = $productRepo->findOneById($productItem["id"]);
 
-              if ($product) {
+              if ($product instanceof Product) {
                 if ($variantItem) {
                   $variant = $variantRepo->findOneById($variantItem["id"]);
 
@@ -181,7 +180,7 @@ class OrderAPIController extends AbstractController {
             }
           }
 
-          if ($soldOut && sizeof($lineItems) == 1) {
+          if ($soldOut && count($lineItems) == 1) {
             return $this->json("Le produit est en rupture de stock", 404); 
           }
 
@@ -196,7 +195,7 @@ class OrderAPIController extends AbstractController {
             $promotionAmount = 0;
           }
 
-  	      if (sizeof($buyer->getShippingAddresses()->toArray())) {
+  	      if (count($buyer->getShippingAddresses()->toArray()) !== 0) {
   		      $order->setShippingAddress($buyer->getShippingAddresses()->toArray()[0]);
   	      }
 
@@ -225,10 +224,10 @@ class OrderAPIController extends AbstractController {
 
           if (!$buyer->getStripeCustomer()) {
             try {
-              $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+              $stripe = new StripeClient($this->getParameter('stripe_sk'));
               $stripeCustomer = $stripe->customers->create([
                 'email' => $buyer->getEmail(),
-                'name' => ucwords($buyer->getFullName()),
+                'name' => ucwords((string) $buyer->getFullName()),
               ]);
 
               $buyer->setStripeCustomer($stripeCustomer->id);
@@ -238,13 +237,13 @@ class OrderAPIController extends AbstractController {
             }
           }
 
-          \Stripe\Stripe::setApiKey($this->getParameter('stripe_sk'));
-          $ephemeralKey = \Stripe\EphemeralKey::create([ 'customer' => $buyer->getStripeCustomer() ], [ 'stripe_version' => '2020-08-27' ]);
+          Stripe::setApiKey($this->getParameter('stripe_sk'));
+          $ephemeralKey = EphemeralKey::create([ 'customer' => $buyer->getStripeCustomer() ], [ 'stripe_version' => '2020-08-27' ]);
           $applicationAmount = round($fees * 100) + round($shippingPrice * 100);
           $order->setNumber(1000 + $nbOrders);
 
           try {
-            $intent = \Stripe\PaymentIntent::create([
+            $intent = PaymentIntent::create([
               'amount' => round($total * 100),
               'customer' => $buyer->getStripeCustomer(),
               'currency' => 'eur',
@@ -295,7 +294,7 @@ class OrderAPIController extends AbstractController {
    *
    * @Route("/user/api/orders/{id}", name="user_api_order", methods={"GET"})
    */
-  public function order(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo) {
+  public function order(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo): JsonResponse {
     return $this->json($order, 200, [], [
       'groups' => 'order:read', 
     ]);
@@ -307,7 +306,7 @@ class OrderAPIController extends AbstractController {
    *
    * @Route("/user/api/orders/{id}/closed", name="user_api_order_closed", methods={"GET"})
    */
-  public function closed(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo) {
+  public function closed(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo): JsonResponse {
     $order->setStatus('closed');
     $manager->flush();
 
@@ -343,7 +342,7 @@ class OrderAPIController extends AbstractController {
    *
    * @Route("/user/api/orders/{id}/cancel", name="user_api_order_cancel", methods={"GET"})
    */
-  public function cancel(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo) {
+  public function cancel(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo): JsonResponse {
     try {
       $data = [
         "order_id" => $order->getIdentifier(), 
@@ -370,7 +369,7 @@ class OrderAPIController extends AbstractController {
 
 
       // refund customer
-      $stripe = new \Stripe\StripeClient($this->getParameter('stripe_sk'));
+      $stripe = new StripeClient($this->getParameter('stripe_sk'));
       $stripe->refunds->create([
         'payment_intent' => $order->getPaymentId(),
       ]);
@@ -397,7 +396,5 @@ class OrderAPIController extends AbstractController {
     } catch (\Exception $e) {
       return $this->json($e->getMessage(), 404);
     }
-
-    return $this->json(true, 200);
   }
 }

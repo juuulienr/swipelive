@@ -73,7 +73,7 @@ class Variant
    * @Groups("order:read")
    * @Groups("favoris:read")
    */
-  private $quantity;
+  private $quantity = 0;
 
   /**
    * @ORM\Column(type="integer")
@@ -143,13 +143,11 @@ class Variant
    * @Groups("order:read")
    * @Groups("favoris:read")
    */
-  private $weightUnit;
+  private $weightUnit = "kg";
 
   public function __construct()
   {
     $this->lineItems = new ArrayCollection();
-    $this->quantity = 0;
-    $this->weightUnit = "kg";
   }
 
   public function getId(): ?int
@@ -273,11 +271,9 @@ class Variant
 
   public function removeLineItem(LineItem $lineItem): self
   {
-    if ($this->lineItems->removeElement($lineItem)) {
-          // set the owning side to null (unless already changed)
-      if ($lineItem->getVariant() === $this) {
-        $lineItem->setVariant(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->lineItems->removeElement($lineItem) && $lineItem->getVariant() === $this) {
+          $lineItem->setVariant(null);
     }
 
     return $this;

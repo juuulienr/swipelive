@@ -111,7 +111,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
    * @ORM\Column(type="string", length=255)
    * @Groups("user:read")
    */
-  private $type;
+  private $type = "user";
 
   /**
    * @ORM\OneToMany(targetEntity=Order::class, mappedBy="buyer")
@@ -215,10 +215,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     $this->discussions = new ArrayCollection();
     $this->securityUsers = new ArrayCollection();
     $this->favoris = new ArrayCollection();
-    $this->type = "user";
   }
 
-  public function getFullName() {
+  public function getFullName(): string {
     return "{$this->firstname} {$this->lastname}";
   }
 
@@ -351,11 +350,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   public function removeFollower(Follow $follower): self
   {
-    if ($this->followers->removeElement($follower)) {
-          // set the owning side to null (unless already changed)
-      if ($follower->getFollowing() === $this) {
-        $follower->setFollowing(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->followers->removeElement($follower) && $follower->getFollowing() === $this) {
+          $follower->setFollowing(null);
     }
 
     return $this;
@@ -381,11 +378,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   public function removeFollowing(Follow $following): self
   {
-    if ($this->following->removeElement($following)) {
-          // set the owning side to null (unless already changed)
-      if ($following->getFollower() === $this) {
-        $following->setFollower(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->following->removeElement($following) && $following->getFollower() === $this) {
+          $following->setFollower(null);
     }
 
     return $this;
@@ -423,11 +418,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   public function removePurchase(Order $purchase): self
   {
-    if ($this->purchases->removeElement($purchase)) {
-          // set the owning side to null (unless already changed)
-      if ($purchase->getBuyer() === $this) {
-        $purchase->setBuyer(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->purchases->removeElement($purchase) && $purchase->getBuyer() === $this) {
+          $purchase->setBuyer(null);
     }
 
     return $this;
@@ -465,11 +458,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   public function removeComment(Comment $comment): self
   {
-    if ($this->comments->removeElement($comment)) {
-          // set the owning side to null (unless already changed)
-      if ($comment->getUser() === $this) {
-        $comment->setUser(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->comments->removeElement($comment) && $comment->getUser() === $this) {
+          $comment->setUser(null);
     }
 
     return $this;
@@ -495,11 +486,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   public function removeShippingAddress(ShippingAddress $shippingAddress): self
   {
-    if ($this->shippingAddresses->removeElement($shippingAddress)) {
-          // set the owning side to null (unless already changed)
-      if ($shippingAddress->getUser() === $this) {
-        $shippingAddress->setUser(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->shippingAddresses->removeElement($shippingAddress) && $shippingAddress->getUser() === $this) {
+          $shippingAddress->setUser(null);
     }
 
     return $this;
@@ -585,11 +574,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   public function removeDiscussion(Discussion $discussion): self
   {
-    if ($this->discussions->removeElement($discussion)) {
-          // set the owning side to null (unless already changed)
-      if ($discussion->getUser() === $this) {
-        $discussion->setUser(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->discussions->removeElement($discussion) && $discussion->getUser() === $this) {
+          $discussion->setUser(null);
     }
 
     return $this;
@@ -615,11 +602,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   public function removeSecurityUser(SecurityUser $securityUser): self
   {
-    if ($this->securityUsers->removeElement($securityUser)) {
-          // set the owning side to null (unless already changed)
-      if ($securityUser->getUser() === $this) {
-        $securityUser->setUser(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->securityUsers->removeElement($securityUser) && $securityUser->getUser() === $this) {
+          $securityUser->setUser(null);
     }
 
     return $this;
@@ -645,11 +630,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   public function removeFavori(Favoris $favori): self
   {
-    if ($this->favoris->removeElement($favori)) {
-          // set the owning side to null (unless already changed)
-      if ($favori->getUser() === $this) {
-        $favori->setUser(null);
-      }
+    // set the owning side to null (unless already changed)
+    if ($this->favoris->removeElement($favori) && $favori->getUser() === $this) {
+          $favori->setUser(null);
     }
 
     return $this;

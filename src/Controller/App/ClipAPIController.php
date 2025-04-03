@@ -31,9 +31,6 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 class ClipAPIController extends AbstractController {
 
 
-  /**
-   * @return User|null
-   */
   public function getUser(): ?User
   {
       return parent::getUser();
@@ -44,7 +41,7 @@ class ClipAPIController extends AbstractController {
    *
    * @Route("/user/api/clips", name="user_api_clips", methods={"GET"})
    */
-  public function clips(Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
+  public function clips(Request $request, ObjectManager $manager, ClipRepository $clipRepo): JsonResponse {
     $clips = $clipRepo->findBy(
       ['vendor' => $this->getUser()->getVendor()], 
       ['createdAt' => 'DESC']
@@ -53,9 +50,7 @@ class ClipAPIController extends AbstractController {
     return $this->json($clips, 200, [], [
     	'groups' => 'clip:read', 
     	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => function ($object) {
-    		return $object->getId();
-    	} 
+    	'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 
@@ -64,7 +59,7 @@ class ClipAPIController extends AbstractController {
    *
    * @Route("/user/api/clip/{id}/comment/add", name="user_api_clip_comment_add", methods={"POST"})
    */
-  public function addComment(Clip $clip, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function addComment(Clip $clip, Request $request, ObjectManager $manager, SerializerInterface $serializer): ?JsonResponse {
     if ($json = $request->getContent()) {
       $param = json_decode($json, true);
       $content = $param["content"];
@@ -75,7 +70,7 @@ class ClipAPIController extends AbstractController {
       $comment->setUser($user);
       $comment->setClip($clip);
 
-      if ($user->getVendor() && $user->getVendor()->getPseudo() == $clip->getVendor()->getPseudo()) {
+      if ($user->getVendor() && $user->getVendor()->getPseudo() === $clip->getVendor()->getPseudo()) {
         $comment->setIsVendor(true);
       }
       
@@ -85,11 +80,10 @@ class ClipAPIController extends AbstractController {
 	    return $this->json($clip, 200, [], [
 	    	'groups' => 'clip:read', 
 	    	'circular_reference_limit' => 1, 
-	    	'circular_reference_handler' => function ($object) {
-	    		return $object->getId();
-	    	} 
+	    	'circular_reference_handler' => fn($object) => $object->getId() 
 	    ]);
     }
+    return null;
   }
 
   /**
@@ -97,7 +91,7 @@ class ClipAPIController extends AbstractController {
    *
    * @Route("/user/api/clips/{id}/update/likes", name="user_api_clips_update_likes", methods={"PUT"})
    */
-  public function updateLikes(Clip $clip, Request $request, ObjectManager $manager, SerializerInterface $serializer) {
+  public function updateLikes(Clip $clip, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
     $clip->setTotalLikes($clip->getTotalLikes() + 1);
     $manager->flush();
 
@@ -110,7 +104,7 @@ class ClipAPIController extends AbstractController {
    *
    * @Route("/user/api/clips/{id}/delete", name="user_api_clips_delete", methods={"GET"})
    */
-  public function delete(Clip $clip, Request $request, ObjectManager $manager, ClipRepository $clipRepo) {
+  public function delete(Clip $clip, Request $request, ObjectManager $manager, ClipRepository $clipRepo): JsonResponse {
   	$live = $clip->getLive();
   	$comments = $clip->getComments();
 
@@ -124,7 +118,7 @@ class ClipAPIController extends AbstractController {
     $manager->remove($clip);
     $manager->flush();
 
-  	if (!sizeof($live->getClips())) {
+  	if (count($live->getClips()) === 0) {
       $liveProducts = $live->getLiveProducts();
   		$comments = $live->getComments();
 
@@ -149,9 +143,7 @@ class ClipAPIController extends AbstractController {
     return $this->json($this->getUser(), 200, [], [
       'groups' => 'user:read', 
       'circular_reference_limit' => 1, 
-      'circular_reference_handler' => function ($object) {
-        return $object->getId();
-      } 
+      'circular_reference_handler' => fn($object) => $object->getId() 
     ]);
   }
 }
