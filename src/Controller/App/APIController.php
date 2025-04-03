@@ -16,8 +16,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use App\Service\FirebaseMessagingService;
-use App\Service\VideoProcessor;
 use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
 

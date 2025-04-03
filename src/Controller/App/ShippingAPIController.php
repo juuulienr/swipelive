@@ -2,26 +2,15 @@
 
 namespace App\Controller\App;
 
-use App\Entity\Clip;
-use App\Entity\Live;
 use App\Entity\User;
-use App\Entity\Vendor;
-use App\Entity\Message;
-use App\Entity\Product;
-use App\Entity\Category;
 use App\Entity\Order;
 use App\Entity\OrderStatus;
-use App\Entity\LineItem;
 use App\Entity\ShippingAddress;
-use App\Repository\ClipRepository;
-use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
-use App\Repository\LiveRepository;
 use App\Repository\VariantRepository;
 use App\Repository\OrderRepository;
 use App\Repository\ShippingAddressRepository;
 use App\Repository\VendorRepository;
-use App\Repository\LiveProductsRepository;
 use App\Repository\OrderStatusRepository;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
