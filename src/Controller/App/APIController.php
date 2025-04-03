@@ -2,37 +2,23 @@
 
 namespace App\Controller\App;
 
-use App\Entity\Clip;
-use App\Entity\Live;
 use App\Entity\User;
-use App\Entity\Promotion;
 use App\Entity\Vendor;
-use App\Entity\Message;
-use App\Entity\Product;
-use App\Entity\Category;
 use App\Repository\ClipRepository;
 use App\Repository\CategoryRepository;
-use App\Repository\PromotionRepository;
 use App\Repository\ProductRepository;
 use App\Repository\LiveRepository;
 use App\Repository\UserRepository;
-use App\Repository\LiveProductsRepository;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\HttpFoundation\Response;
 use App\Service\FirebaseMessagingService;
 use App\Service\VideoProcessor;
 use Cloudinary\Configuration\Configuration;
 use Cloudinary\Api\Upload\UploadApi;
-use Cloudinary\Api\Admin\AdminApi;
-use Cloudinary\Cloudinary;
 
 
 class APIController extends AbstractController {

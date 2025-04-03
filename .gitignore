@@ -7,6 +7,17 @@
 /var/
 /vendor/
 
+###> OS generated files ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+**/.DS_Store
+###< OS generated files ###
+
 ###> symfony/webpack-encore-pack ###
 /node_modules/
 /public/uploads/

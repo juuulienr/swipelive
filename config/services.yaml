@@ -65,7 +65,9 @@ services:
     Doctrine\Persistence\ObjectManager: '@doctrine.orm.default_entity_manager'
 
     App\Service\FirebaseMessagingService:
-        arguments: []
+        arguments:
+            $messaging: '@Kreait\Firebase\Contract\Messaging'
+            $params: '@parameter_bag'
         
     Bugsnag\Client: '@bugsnag'
 
@@ -80,6 +82,9 @@ services:
 
     Kreait\Firebase\Messaging:
         factory: ['@Kreait\Firebase\Factory', 'createMessaging']
+
+    # Add alias for the Messaging interface
+    Kreait\Firebase\Contract\Messaging: '@Kreait\Firebase\Messaging'
 
     App\Service\VideoProcessor:
         arguments:
