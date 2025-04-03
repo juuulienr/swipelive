@@ -147,7 +147,7 @@ SwipeLive était une application mobile innovante de live shopping, permettant a
 ```mermaid
 graph TD
     A[Client Mobile] -->|API Requests| B[API Symfony]
-    B -->|Authentication| C[Firebase]
+    B -->|Push Notifications| C[Firebase]
     B -->|Media Storage| D[AWS S3]
     B -->|Image Processing| E[Cloudinary]
     B -->|Real-time Events| F[Pusher]
@@ -166,21 +166,6 @@ src/
 └── EventListener/  # Listeners d'événements
 ```
 
-## 👥 Contribution
-
-Les contributions sont les bienvenues ! Pour contribuer :
-
-1. Forkez le projet
-2. Créez une branche pour votre fonctionnalité (`git checkout -b feature/AmazingFeature`)
-3. Committez vos changements (`git commit -m 'Add some AmazingFeature'`)
-4. Poussez vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrez une Pull Request
-
-## 📬 Contact
-
-Julien - [@VotreTwitter](https://twitter.com/VotreTwitter)
-
-Lien du projet : [https://github.com/votre-username/swipelive](https://github.com/votre-username/swipelive)
 
 ## 📝 License
 
