@@ -1,33 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\LiveProductsRepository;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=LiveProductsRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=LiveProductsRepository::class)
+ */
 class LiveProducts
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("live:read")
    */
   private $id;
 
   /**
    * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="liveProducts")
+   *
    * @ORM\JoinColumn(nullable=false)
+   *
    * @Groups("live:read")
    */
   private $product;
 
   /**
    * @ORM\Column(type="integer")
+   *
    * @Groups("live:read")
    */
   private $priority;

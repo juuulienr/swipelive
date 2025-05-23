@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
@@ -9,14 +11,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=ProductRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=ProductRepository::class)
+ */
 class Product
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("product:read")
    * @Groups("user:read")
    * @Groups("clip:read")
@@ -29,6 +34,7 @@ class Product
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("product:read")
    * @Groups("clip:read")
    * @Groups("category:read")
@@ -40,7 +46,9 @@ class Product
 
   /**
    * @ORM\ManyToOne(targetEntity=Category::class, inversedBy="products", cascade={"persist"})
+   *
    * @ORM\JoinColumn(nullable=false)
+   *
    * @Groups("product:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -49,7 +57,9 @@ class Product
 
   /**
    * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="products")
+   *
    * @ORM\JoinColumn(nullable=false)
+   *
    * @Groups("product:read")
    * @Groups("category:read")
    * @Groups("clip:read")
@@ -59,6 +69,7 @@ class Product
 
   /**
    * @ORM\Column(type="text")
+   *
    * @Groups("product:read")
    * @Groups("live:read")
    * @Groups("clip:read")
@@ -69,6 +80,7 @@ class Product
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2)
+   *
    * @Groups("product:read")
    * @Groups("clip:read")
    * @Groups("category:read")
@@ -79,6 +91,7 @@ class Product
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+   *
    * @Groups("product:read")
    * @Groups("clip:read")
    * @Groups("category:read")
@@ -89,6 +102,7 @@ class Product
 
   /**
    * @ORM\Column(type="integer")
+   *
    * @Groups("product:read")
    * @Groups("live:read")
    * @Groups("clip:read")
@@ -98,6 +112,7 @@ class Product
 
   /**
    * @ORM\OneToMany(targetEntity=Upload::class, mappedBy="product", cascade={"persist"})
+   *
    * @Groups("product:read")
    * @Groups("clip:read")
    * @Groups("category:read")
@@ -119,6 +134,7 @@ class Product
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+   *
    * @Groups("product:read")
    * @Groups("clip:read")
    * @Groups("category:read")
@@ -129,17 +145,20 @@ class Product
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("product:read")
    * @Groups("clip:read")
    * @Groups("category:read")
    * @Groups("live:read")
    * @Groups("favoris:read")
    */
-  private $weightUnit = "kg";
+  private $weightUnit = 'kg';
 
   /**
    * @ORM\OneToMany(targetEntity=Option::class, mappedBy="product", cascade={"persist"})
-   * @ORM\OrderBy({"position" = "ASC"})
+   *
+   * @ORM\OrderBy({"position": "ASC"})
+   *
    * @Groups("product:read")
    * @Groups("clip:read")
    * @Groups("category:read")
@@ -151,6 +170,7 @@ class Product
 
   /**
    * @ORM\OneToMany(targetEntity=Variant::class, mappedBy="product", cascade={"persist"})
+   *
    * @Groups("product:read")
    * @Groups("clip:read")
    * @Groups("category:read")
@@ -169,16 +189,16 @@ class Product
    * @ORM\OneToMany(targetEntity=Favoris::class, mappedBy="product", orphanRemoval=true)
    */
   private $favoris;
-  
 
-  public function __construct() {
-    $this->uploads = new ArrayCollection();
-    $this->clips = new ArrayCollection();
+  public function __construct()
+  {
+    $this->uploads      = new ArrayCollection();
+    $this->clips        = new ArrayCollection();
     $this->liveProducts = new ArrayCollection();
-    $this->options = new ArrayCollection();
-    $this->variants = new ArrayCollection();
-    $this->lineItems = new ArrayCollection();
-    $this->favoris = new ArrayCollection();
+    $this->options      = new ArrayCollection();
+    $this->variants     = new ArrayCollection();
+    $this->lineItems    = new ArrayCollection();
+    $this->favoris      = new ArrayCollection();
   }
 
   public function getId(): ?int
@@ -292,7 +312,7 @@ class Product
   {
     // set the owning side to null (unless already changed)
     if ($this->uploads->removeElement($upload) && $upload->getProduct() === $this) {
-          $upload->setProduct(null);
+      $upload->setProduct(null);
     }
 
     return $this;
@@ -320,7 +340,7 @@ class Product
   {
     // set the owning side to null (unless already changed)
     if ($this->clips->removeElement($clip) && $clip->getProduct() === $this) {
-          $clip->setProduct(null);
+      $clip->setProduct(null);
     }
 
     return $this;
@@ -348,7 +368,7 @@ class Product
   {
     // set the owning side to null (unless already changed)
     if ($this->liveProducts->removeElement($liveProduct) && $liveProduct->getProduct() === $this) {
-          $liveProduct->setProduct(null);
+      $liveProduct->setProduct(null);
     }
 
     return $this;
@@ -376,7 +396,7 @@ class Product
   {
     // set the owning side to null (unless already changed)
     if ($this->options->removeElement($option) && $option->getProduct() === $this) {
-          $option->setProduct(null);
+      $option->setProduct(null);
     }
 
     return $this;
@@ -404,7 +424,7 @@ class Product
   {
     // set the owning side to null (unless already changed)
     if ($this->variants->removeElement($variant) && $variant->getProduct() === $this) {
-          $variant->setProduct(null);
+      $variant->setProduct(null);
     }
 
     return $this;
@@ -432,7 +452,7 @@ class Product
   {
     // set the owning side to null (unless already changed)
     if ($this->lineItems->removeElement($lineItem) && $lineItem->getProduct() === $this) {
-          $lineItem->setProduct(null);
+      $lineItem->setProduct(null);
     }
 
     return $this;
@@ -484,7 +504,7 @@ class Product
   {
     // set the owning side to null (unless already changed)
     if ($this->favoris->removeElement($favori) && $favori->getProduct() === $this) {
-          $favori->setProduct(null);
+      $favori->setProduct(null);
     }
 
     return $this;

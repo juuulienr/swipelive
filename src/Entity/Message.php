@@ -1,20 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\MessageRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=MessageRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=MessageRepository::class)
+ */
 class Message
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("discussion:read")
    * @Groups("user:read")
    */
@@ -22,6 +29,7 @@ class Message
 
   /**
    * @ORM\Column(type="integer")
+   *
    * @Groups("discussion:read")
    * @Groups("user:read")
    */
@@ -29,7 +37,9 @@ class Message
 
   /**
    * @ORM\Column(type="datetime")
-   * @ORM\OrderBy({"createdAt" = "ASC"})
+   *
+   * @ORM\OrderBy({"createdAt": "ASC"})
+   *
    * @Groups("discussion:read")
    * @Groups("user:read")
    */
@@ -37,12 +47,14 @@ class Message
 
   /**
    * @ORM\ManyToOne(targetEntity=Discussion::class, inversedBy="messages")
+   *
    * @ORM\JoinColumn(nullable=false)
    */
   private $discussion;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("discussion:read")
    * @Groups("user:read")
    */
@@ -50,6 +62,7 @@ class Message
 
   /**
    * @ORM\Column(type="text", nullable=true)
+   *
    * @Groups("discussion:read")
    * @Groups("user:read")
    */
@@ -57,6 +70,7 @@ class Message
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("discussion:read")
    * @Groups("user:read")
    */
@@ -64,17 +78,16 @@ class Message
 
   /**
    * @ORM\Column(type="boolean", nullable=true)
+   *
    * @Groups("discussion:read")
    * @Groups("user:read")
    */
   private $loading = false;
 
-  
   public function __construct()
   {
-    $this->createdAt = new \DateTime('now', timezone_open('UTC'));
+    $this->createdAt = new DateTime('now', \timezone_open('UTC'));
   }
-  
 
   public function getId(): ?int
   {
@@ -93,12 +106,12 @@ class Message
     return $this;
   }
 
-  public function getCreatedAt(): ?\DateTimeInterface
+  public function getCreatedAt(): ?DateTimeInterface
   {
     return $this->createdAt;
   }
 
-  public function setCreatedAt(\DateTimeInterface $createdAt): self
+  public function setCreatedAt(DateTimeInterface $createdAt): self
   {
     $this->createdAt = $createdAt;
 

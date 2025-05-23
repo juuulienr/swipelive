@@ -1,20 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\LineItemRepository;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=LineItemRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=LineItemRepository::class)
+ */
 class LineItem
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("order:read")
    * @Groups("user:read")
    */
@@ -22,6 +27,7 @@ class LineItem
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("order:read")
    * @Groups("user:read")
    */
@@ -29,6 +35,7 @@ class LineItem
 
   /**
    * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="lineItems")
+   *
    * @Groups("order:read")
    * @Groups("user:read")
    */
@@ -36,6 +43,7 @@ class LineItem
 
   /**
    * @ORM\ManyToOne(targetEntity=Variant::class, inversedBy="lineItems")
+   *
    * @Groups("order:read")
    * @Groups("user:read")
    */
@@ -43,6 +51,7 @@ class LineItem
 
   /**
    * @ORM\Column(type="integer")
+   *
    * @Groups("order:read")
    * @Groups("user:read")
    */
@@ -50,6 +59,7 @@ class LineItem
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2)
+   *
    * @Groups("order:read")
    * @Groups("user:read")
    */
@@ -57,6 +67,7 @@ class LineItem
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2)
+   *
    * @Groups("order:read")
    * @Groups("user:read")
    */
@@ -64,6 +75,7 @@ class LineItem
 
   /**
    * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="lineItems")
+   *
    * @ORM\JoinColumn(nullable=false)
    */
   private $orderId;

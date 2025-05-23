@@ -1,51 +1,48 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\App;
 
-use App\Entity\User;
-use App\Entity\Variant;
 use App\Entity\Product;
 use App\Entity\Upload;
-use App\Repository\LiveProductsRepository;
-use App\Repository\LineItemRepository;
+use App\Entity\User;
+use App\Entity\Variant;
 use App\Repository\ClipRepository;
+use App\Repository\LineItemRepository;
+use App\Repository\LiveProductsRepository;
 use App\Repository\ProductRepository;
-use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Cloudinary\Configuration\Configuration;
-use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Api\Admin\AdminApi;
-use Cloudinary\Cloudinary;
+use Cloudinary\Api\Upload\UploadApi;
+use Cloudinary\Configuration\Configuration;
+use Doctrine\Persistence\ObjectManager;
+use Exception;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\SerializerInterface;
 
-
-class ProductAPIController extends AbstractController {
-
+class ProductAPIController extends AbstractController
+{
   public function getUser(): ?User
   {
-      return parent::getUser();
+    return parent::getUser();
   }
-
 
   /**
    * Récupérer les produits
    *
    * @Route("/user/api/products", name="user_api_products", methods={"GET"})
    */
-  public function products(Request $request, ObjectManager $manager, ProductRepository $productRepo): JsonResponse {
+  public function products(Request $request, ObjectManager $manager, ProductRepository $productRepo): JsonResponse
+  {
     $products = $productRepo->findByVendor($this->getUser()->getVendor());
 
     return $this->json($products, 200, [], ['groups' => 'product:read']);
   }
-
 
   /**
    * Récupérer un produit
@@ -57,15 +54,15 @@ class ProductAPIController extends AbstractController {
     return $this->json($product, 200, [], ['groups' => 'product:read']);
   }
 
-
   /**
    * Ajouter un produit
    *
    * @Route("/user/api/product/add", name="user_api_product_add", methods={"POST"})
    */
-  public function addProduct(Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
+  public function addProduct(Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse
+  {
     if ($json = $request->getContent()) {
-      $product = $serializer->deserialize($json, Product::class, "json");
+      $product = $serializer->deserialize($json, Product::class, 'json');
       $product->setVendor($this->getUser()->getVendor());
 
       foreach ($product->getUploads() as $key => $upload) {
@@ -78,22 +75,22 @@ class ProductAPIController extends AbstractController {
       return $this->json([
         'success' => true,
         'message' => 'Product created successfully',
-        'product' => $product
+        'product' => $product,
       ], Response::HTTP_CREATED);
     }
 
-    return $this->json("Une erreur est survenue", 404);
+    return $this->json('Une erreur est survenue', 404);
   }
-
 
   /**
    * Editer un produit
    *
    * @Route("/user/api/product/edit/{id}", name="user_api_product_edit", methods={"PUT"})
    */
-  public function editProduct(Product $product, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
+  public function editProduct(Product $product, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse
+  {
     if ($json = $request->getContent()) {
-      $serializer->deserialize($json, Product::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $product]);
+      $serializer->deserialize($json, Product::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $product]);
 
       foreach ($product->getUploads() as $key => $upload) {
         $upload->setPosition($key + 1);
@@ -104,27 +101,27 @@ class ProductAPIController extends AbstractController {
       return $this->json([
         'success' => true,
         'message' => 'Product updated successfully',
-        'product' => $product
+        'product' => $product,
       ], Response::HTTP_OK);
     }
 
-    return $this->json("Une erreur est survenue", 404);
+    return $this->json('Une erreur est survenue', 404);
   }
-
 
   /**
    * Supprimer un produit
    *
    * @Route("/user/api/product/delete/{id}", name="user_api_product_delete", methods={"GET"})
    */
-  public function deleteProduct(Product $product, Request $request, LiveProductsRepository $liveProductRepo, ClipRepository $clipRepo, LineItemRepository $lineItemRepo, ObjectManager $manager): JsonResponse {
+  public function deleteProduct(Product $product, Request $request, LiveProductsRepository $liveProductRepo, ClipRepository $clipRepo, LineItemRepository $lineItemRepo, ObjectManager $manager): JsonResponse
+  {
     if ($product) {
       $clips = $clipRepo->findByProduct($product);
-      $env = $this->getParameter('environment');
+      $env   = $this->getParameter('environment');
 
       if ($clips) {
         foreach ($clips as $clip) {
-          $live = $clip->getLive();
+          $live     = $clip->getLive();
           $comments = $clip->getComments();
 
           if ($comments) {
@@ -137,9 +134,9 @@ class ProductAPIController extends AbstractController {
           $manager->remove($clip);
           $manager->flush();
 
-          if (count($live->getClips()) === 0) {
+          if (0 === \count($live->getClips())) {
             $liveProducts = $live->getLiveProducts();
-            $comments = $live->getComments();
+            $comments     = $live->getComments();
 
             if ($liveProducts) {
               foreach ($liveProducts as $liveProduct) {
@@ -162,6 +159,7 @@ class ProductAPIController extends AbstractController {
       }
 
       $liveProducts = $liveProductRepo->findByProduct($product);
+
       if ($liveProducts) {
         foreach ($liveProducts as $liveProduct) {
           $manager->remove($liveProduct);
@@ -175,6 +173,7 @@ class ProductAPIController extends AbstractController {
 
 
       $lineItems = $lineItemRepo->findByProduct($product);
+
       if ($lineItems) {
         foreach ($lineItems as $lineItem) {
           $lineItem->setProduct(null);
@@ -197,9 +196,9 @@ class ProductAPIController extends AbstractController {
 
       foreach ($product->getUploads()->toArray() as $upload) {
         try {
-          $filename = explode(".", (string) $upload->getFilename());
-          $result = (new AdminApi())->deleteAssets($filename[0], []);
-        } catch (\Exception $e) {
+          $filename = \explode('.', (string) $upload->getFilename());
+          $result   = (new AdminApi())->deleteAssets($filename[0], []);
+        } catch (Exception $e) {
           return $this->json($e->getMessage(), 404);
         }
 
@@ -211,83 +210,83 @@ class ProductAPIController extends AbstractController {
       $manager->flush();
 
       return $this->json($this->getUser(), 200, [], [
-        'groups' => 'user:read', 
-        'circular_reference_limit' => 1, 
-        'circular_reference_handler' => fn($object) => $object->getId() 
+        'groups'                     => 'user:read',
+        'circular_reference_limit'   => 1,
+        'circular_reference_handler' => fn ($object) => $object->getId(),
       ]);
     }
 
-    return $this->json("Le produit est introuvable", 404);
+    return $this->json('Le produit est introuvable', 404);
   }
-
 
   /**
    * Editer un variant
    *
    * @Route("/user/api/variant/edit/{id}", name="user_api_variant_edit", methods={"POST"})
    */
-  public function editVariant(Variant $variant, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
+  public function editVariant(Variant $variant, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse
+  {
     if ($json = $request->getContent()) {
-      $serializer->deserialize($json, Variant::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $variant]);
+      $serializer->deserialize($json, Variant::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $variant]);
       $manager->flush();
 
       return $this->json($variant, 200, [], ['groups' => 'variant:read']);
     }
 
-    return $this->json("Une erreur est survenue", 404);
+    return $this->json('Une erreur est survenue', 404);
   }
-
 
   /**
    * Supprimer un variant
    *
    * @Route("/user/api/variant/delete/{id}", name="user_api_variant_delete", methods={"GET"})
    */
-  public function deleteVariant(Variant $variant, Request $request, ObjectManager $manager): JsonResponse {
+  public function deleteVariant(Variant $variant, Request $request, ObjectManager $manager): JsonResponse
+  {
     if ($variant) {
       $manager->remove($variant);
       $manager->flush();
-      
+
       return $this->json(true, 200);
     }
 
-    return $this->json("Le variant est introuvable", 404);
+    return $this->json('Le variant est introuvable', 404);
   }
-
 
   /**
    * Ajouter une image
    *
    * @Route("/user/api/product/upload", name="user_api__product_upload", methods={"POST"})
    */
-  public function addPicture(Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
-    $file = json_decode($request->getContent(), true);
+  public function addPicture(Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse
+  {
+    $file = \json_decode($request->getContent(), true);
 
-    if ($file && array_key_exists("picture", $file)) {
-        $file = $file["picture"];
-        $extension = 'jpg';
+    if ($file && \array_key_exists('picture', $file)) {
+      $file      = $file['picture'];
+      $extension = 'jpg';
     } elseif ($request->files->get('picture')) {
-        $file = $request->files->get('picture');
-        $extension = $file->guessExtension();
+      $file      = $request->files->get('picture');
+      $extension = $file->guessExtension();
     } else {
       return $this->json("L'image est introuvable !", 404);
     }
 
-    $filename = md5(time().uniqid()); 
-    $fullname = $filename . "." . $extension; 
+    $filename = \md5(\time() . \uniqid());
+    $fullname = $filename . '.' . $extension;
     $file->move($this->getParameter('uploads_directory'), $fullname);
     $file = $this->getParameter('uploads_directory') . '/' . $fullname;
 
     try {
       Configuration::instance($this->getParameter('cloudinary'));
       $result = (new UploadApi())->upload($file, [
-        'public_id' => $filename,
-        'use_filename' => TRUE,
-        "height" => 750, 
-        "width" => 750, 
-        "crop" => "thumb"
+        'public_id'    => $filename,
+        'use_filename' => true,
+        'height'       => 750,
+        'width'        => 750,
+        'crop'         => 'thumb',
       ]);
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
       return $this->json($e->getMessage(), 404);
     }
 
@@ -298,25 +297,25 @@ class ProductAPIController extends AbstractController {
     $manager->flush();
 
     return $this->json($upload, 200, [], [
-      'groups' => 'upload:read',
-      'circular_reference_limit' => 1, 
-      'circular_reference_handler' => fn($object) => $object->getId() 
+      'groups'                     => 'upload:read',
+      'circular_reference_limit'   => 1,
+      'circular_reference_handler' => fn ($object) => $object->getId(),
     ]);
   }
-
 
   /**
    * Supprimer une image
    *
    * @Route("/user/api/product/upload/delete/{id}", name="user_api_upload_delete", methods={"GET"})
    */
-  public function deleteUpload(Upload $upload, Request $request, ObjectManager $manager): JsonResponse {
+  public function deleteUpload(Upload $upload, Request $request, ObjectManager $manager): JsonResponse
+  {
     if ($upload->getFilename()) {
-      $oldFilename = explode(".", $upload->getFilename());
+      $oldFilename = \explode('.', $upload->getFilename());
 
       try {
         $result = (new AdminApi())->deleteAssets($oldFilename[0], []);
-      } catch (\Exception $e) {
+      } catch (Exception $e) {
         return $this->json($e->getMessage(), 404);
       }
 
@@ -328,5 +327,4 @@ class ProductAPIController extends AbstractController {
 
     return $this->json("L'image n'existe pas !", 404);
   }
-
 }

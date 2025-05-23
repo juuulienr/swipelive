@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\OptionRepository;
@@ -7,20 +9,24 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=OptionRepository::class)
-* @ORM\Table(name="`option`")
-*/
+ * @ORM\Entity(repositoryClass=OptionRepository::class)
+ *
+ * @ORM\Table(name="`option`")
+ */
 class Option
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
    */
   private $id;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("product:read")
    * @Groups("user:read")
    * @Groups("clip:read")
@@ -32,6 +38,7 @@ class Option
 
   /**
    * @ORM\Column(type="array")
+   *
    * @Groups("product:read")
    * @Groups("user:read")
    * @Groups("clip:read")
@@ -43,6 +50,7 @@ class Option
 
   /**
    * @ORM\Column(type="integer")
+   *
    * @Groups("product:read")
    * @Groups("user:read")
    * @Groups("clip:read")

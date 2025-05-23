@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\BankAccountRepository;
@@ -7,13 +9,15 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=BankAccountRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=BankAccountRepository::class)
+ */
 class BankAccount
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
    */
   private $id;
@@ -25,42 +29,49 @@ class BankAccount
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
   private $currency;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
   private $number;
 
   /**
    * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="bankAccounts")
+   *
    * @ORM\JoinColumn(nullable=false)
    */
   private $vendor;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
   private $last4;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $businessName;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
   private $countryCode;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $holderName;

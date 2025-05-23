@@ -1,38 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\App;
 
-use App\Entity\User;
 use App\Entity\Order;
 use App\Entity\OrderStatus;
 use App\Entity\ShippingAddress;
-use App\Repository\ProductRepository;
-use App\Repository\VariantRepository;
+use App\Entity\User;
 use App\Repository\OrderRepository;
-use App\Repository\ShippingAddressRepository;
-use App\Repository\VendorRepository;
 use App\Repository\OrderStatusRepository;
+use App\Repository\ProductRepository;
+use App\Repository\ShippingAddressRepository;
+use App\Repository\VariantRepository;
+use App\Repository\VendorRepository;
+use Cloudinary\Api\Upload\UploadApi;
+use Cloudinary\Configuration\Configuration;
+use DateTime;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Cloudinary\Configuration\Configuration;
-use Cloudinary\Api\Upload\UploadApi;
-use Cloudinary\Api\Admin\AdminApi;
-use Cloudinary\Cloudinary;
+use Symfony\Component\Serializer\SerializerInterface;
 
-
-class ShippingAPIController extends AbstractController {
-
+class ShippingAPIController extends AbstractController
+{
   public function getUser(): ?User
   {
-      return parent::getUser();
+    return parent::getUser();
   }
 
   /**
@@ -40,42 +38,44 @@ class ShippingAPIController extends AbstractController {
    *
    * @Route("/user/api/shipping/price", name="user_api_shipping_price")
    */
-  public function shippingPrice(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, ShippingAddressRepository $shippingAddressRepo, VendorRepository $vendorRepo): JsonResponse {
+  public function shippingPrice(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, ShippingAddressRepository $shippingAddressRepo, VendorRepository $vendorRepo): JsonResponse
+  {
     // Initialize variables
-    $array = [];
+    $array  = [];
     $vendor = null;
-    
+
     if ($json = $request->getContent()) {
-	    $param = json_decode($json, true);
+      $param = \json_decode($json, true);
 
-	    if ($param) {
+      if ($param) {
         $shippingAddress = $shippingAddressRepo->findOneByUser($this->getUser());
-        $now = new \DateTime('now', timezone_open('UTC'));
-        $lineItems = $param["lineItems"];
-        $identifier = "Order_" . time();
-        $totalWeight = 0;
+        $now             = new DateTime('now', \timezone_open('UTC'));
+        $lineItems       = $param['lineItems'];
+        $identifier      = 'Order_' . \time();
+        $totalWeight     = 0;
 
-	      if (!$lineItems) {
-	        return $this->json("Un produit est obligatoire !", 404); 
-	      }
+        if (!$lineItems) {
+          return $this->json('Un produit est obligatoire !', 404);
+        }
 
         if (!$shippingAddress) {
-          return $this->json("Une adresse est obligatoire !", 404); 
+          return $this->json('Une adresse est obligatoire !', 404);
         }
 
         foreach ($lineItems as $lineItem) {
-          $vendor = $vendorRepo->findOneById($lineItem["vendor"]);
-          if ($lineItem["variant"]) {
-            $weightUnit = $lineItem["variant"]["weightUnit"];
-            $weight = $lineItem["variant"]["weight"];
-          } else {
-            $weightUnit = $lineItem["product"]["weightUnit"];
-            $weight = $lineItem["product"]["weight"];
-          }
-          $quantity = $lineItem["quantity"];
+          $vendor = $vendorRepo->findOneById($lineItem['vendor']);
 
-          if ($weightUnit == "g") {
-            $totalWeight += round($weight / 1000 * $quantity, 2);
+          if ($lineItem['variant']) {
+            $weightUnit = $lineItem['variant']['weightUnit'];
+            $weight     = $lineItem['variant']['weight'];
+          } else {
+            $weightUnit = $lineItem['product']['weightUnit'];
+            $weight     = $lineItem['product']['weight'];
+          }
+          $quantity = $lineItem['quantity'];
+
+          if ('g' === $weightUnit) {
+            $totalWeight += \round($weight / 1000 * $quantity, 2);
           } else {
             $totalWeight += $weight * $quantity;
           }
@@ -85,169 +85,170 @@ class ShippingAPIController extends AbstractController {
           $totalWeight = 0.1;
         }
 
-	      try {
+        try {
           $data = [
-            "order_id" => $identifier, 
-            "shipment" => [
-              "id" => 0, 
-              "type" => 2,
-              "shipment_date" => $now->format('Y-m-d')
-            ], 
-            "ship_from" => [
-              "postcode" => $vendor->getZip(), 
-              "city" => $vendor->getCity(), 
-              "country_code" => $vendor->getCountryCode()
-            ], 
-            "ship_to" => [
-              "postcode" => $shippingAddress->getZip(), 
-              "city" => $shippingAddress->getCity(), 
-              "country_code" => $shippingAddress->getCountryCode()
-            ], 
-            "parcels" => [[
-              "number" => 1,
-              "weight" => $totalWeight, 
-              "volumetric_weight" => $totalWeight, 
-              "x" => 10, 
-              "y" => 10, 
-              "z" => 10 
-            ]] 
-          ]; 
+            'order_id' => $identifier,
+            'shipment' => [
+              'id'            => 0,
+              'type'          => 2,
+              'shipment_date' => $now->format('Y-m-d'),
+            ],
+            'ship_from' => [
+              'postcode'     => $vendor->getZip(),
+              'city'         => $vendor->getCity(),
+              'country_code' => $vendor->getCountryCode(),
+            ],
+            'ship_to' => [
+              'postcode'     => $shippingAddress->getZip(),
+              'city'         => $shippingAddress->getCity(),
+              'country_code' => $shippingAddress->getCountryCode(),
+            ],
+            'parcels' => [[
+              'number'            => 1,
+              'weight'            => $totalWeight,
+              'volumetric_weight' => $totalWeight,
+              'x'                 => 10,
+              'y'                 => 10,
+              'z'                 => 10,
+            ]],
+          ];
 
-          $ch = curl_init();
-          curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
-          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-          curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-          curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-          curl_setopt($ch, CURLOPT_URL, "https://www.upelgo.com/api/carrier/multi-rate");
+          $ch = \curl_init();
+          \curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json', 'Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu']);
+          \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+          \curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+          \curl_setopt($ch, CURLOPT_POSTFIELDS, \json_encode($data));
+          \curl_setopt($ch, CURLOPT_URL, 'https://www.upelgo.com/api/carrier/multi-rate');
 
-          $result = curl_exec($ch);
-          $result = json_decode($result);
-          curl_close($ch);
+          $result = \curl_exec($ch);
+          $result = \json_decode($result);
+          \curl_close($ch);
 
-          if ($result->success == true) {
+          if (true === $result->success) {
             foreach ($result->offers as $value) {
               $data = [
-                "identifier" => $identifier,
-                "carrier_id" => $value->carrier_id,
-                "carrier_name" => $value->carrier_name,
-                "carrier_logo" => $value->carrier_logo,
-                "service_id" => $value->service_id,
-                "service_name" => $value->service_name,
-                "service_code" => $value->service_code,
-                "expectedDelivery" => $value->delivery_date,
-                "currency" => $value->currency,
-                "price" => (string) $value->price_te
+                'identifier'       => $identifier,
+                'carrier_id'       => $value->carrier_id,
+                'carrier_name'     => $value->carrier_name,
+                'carrier_logo'     => $value->carrier_logo,
+                'service_id'       => $value->service_id,
+                'service_name'     => $value->service_name,
+                'service_code'     => $value->service_code,
+                'expectedDelivery' => $value->delivery_date,
+                'currency'         => $value->currency,
+                'price'            => (string) $value->price_te,
               ];
 
               // pour la France, check pour les autres pays
-              if ($shippingAddress->getCountryCode() == "FR" && $vendor->getCountryCode() == "FR") {
-                if (($value->service_id == '78cb1adc-1b18-40d7-85f0-28e2a4b1753d' && $value->service_name == 'Shop2Shop') || ($value->service_id == 'bd644fe6-a77a-4045-bf97-ee1049033f0e' && $value->service_name == 'Mondial Relay')) {
-                    if ($value->delivery_to_collection_point == true) {
-                      $array["service_point"][] = $data;
-                    }
-                } elseif ($value->service_id == '40bb5845-6a62-4198-8297-153a9bfc95fb' && $value->service_name == 'Colissimo sans signature') {
-                    $array["domicile"][] = $data;
+              if ('FR' === $shippingAddress->getCountryCode() && 'FR' === $vendor->getCountryCode()) {
+                if (('78cb1adc-1b18-40d7-85f0-28e2a4b1753d' === $value->service_id && 'Shop2Shop' === $value->service_name) || ('bd644fe6-a77a-4045-bf97-ee1049033f0e' === $value->service_id && 'Mondial Relay' === $value->service_name)) {
+                  if (true === $value->delivery_to_collection_point) {
+                    $array['service_point'][] = $data;
+                  }
+                } elseif ('40bb5845-6a62-4198-8297-153a9bfc95fb' === $value->service_id && 'Colissimo sans signature' === $value->service_name) {
+                  $array['domicile'][] = $data;
                 }
               } else {
-                return $this->json("Livraison indisponible dans ce pays", 404);
+                return $this->json('Livraison indisponible dans ce pays', 404);
               }
             }
 
-            if (array_key_exists('service_point', $array)) {
-              $price = array_column($array["service_point"], 'price');
-              array_multisort($price, SORT_ASC, $array["service_point"]);
+            if (\array_key_exists('service_point', $array)) {
+              $price = \array_column($array['service_point'], 'price');
+              \array_multisort($price, SORT_ASC, $array['service_point']);
             } else {
-              $array["service_point"] = [];
+              $array['service_point'] = [];
             }
 
-            if (!array_key_exists('domicile', $array)) {
-              $array["domicile"] = [];
+            if (!\array_key_exists('domicile', $array)) {
+              $array['domicile'] = [];
             }
 
             return $this->json($array, 200);
           }
-	      } catch (Exception $e) {
-	      	return $this->json($e, 500);
-	      }
-			}
-		}
-    
-    return $this->json("Un erreur est survenue", 404);
-  }
+        } catch (Exception $e) {
+          return $this->json($e, 500);
+        }
+      }
+    }
 
+    return $this->json('Un erreur est survenue', 404);
+  }
 
   /**
    * Récupérer les points relais
    *
    * @Route("/user/api/dropoff-locations", name="user_api_dropoff_locations")
    */
-  public function dropoffLocations(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, ShippingAddressRepository $shippingAddressRepo, VendorRepository $vendorRepo): JsonResponse {
+  public function dropoffLocations(Request $request, ObjectManager $manager, VariantRepository $variantRepo, ProductRepository $productRepo, OrderRepository $orderRepo, ShippingAddressRepository $shippingAddressRepo, VendorRepository $vendorRepo): JsonResponse
+  {
     if ($json = $request->getContent()) {
-      $param = json_decode($json, true);
+      $param = \json_decode($json, true);
 
       if ($param) {
-        $servicePoints = $param["service_point"];
+        $servicePoints   = $param['service_point'];
         $shippingAddress = $shippingAddressRepo->findOneByUser($this->getUser());
-        $array = [];
-    
+        $array           = [];
+
         if (!$shippingAddress) {
-          return $this->json("Une adresse est obligatoire !", 404); 
+          return $this->json('Une adresse est obligatoire !', 404);
         }
 
         foreach ($servicePoints as $point) {
           try {
-            $url = "https://www.upelgo.com/api/carrier/" . $point["carrier_id"] . "/dropoff-locations";
+            $url  = 'https://www.upelgo.com/api/carrier/' . $point['carrier_id'] . '/dropoff-locations';
             $data = [
-              "address" => $shippingAddress->getAddress(), 
-              "postcode" => $shippingAddress->getZip(), 
-              "city" => $shippingAddress->getCity(), 
-              "country_code" => $shippingAddress->getCountryCode()
-            ]; 
+              'address'      => $shippingAddress->getAddress(),
+              'postcode'     => $shippingAddress->getZip(),
+              'city'         => $shippingAddress->getCity(),
+              'country_code' => $shippingAddress->getCountryCode(),
+            ];
 
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-            curl_setopt($ch, CURLOPT_URL, $url);
+            $ch = \curl_init();
+            \curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json', 'Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu']);
+            \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            \curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+            \curl_setopt($ch, CURLOPT_POSTFIELDS, \json_encode($data));
+            \curl_setopt($ch, CURLOPT_URL, $url);
 
-            $result = curl_exec($ch);
-            $result = json_decode($result);
-            curl_close($ch);
+            $result = \curl_exec($ch);
+            $result = \json_decode($result);
+            \curl_close($ch);
 
-            if ($result->success == true) {
+            if (true === $result->success) {
               foreach ($result->locations as $value) {
                 $opening = [];
+
                 foreach ($value->hours as $hour) {
-                  $opening[] = [ 
-                    "day" => $hour->day, 
-                    "opening_hours" => $hour->opening_hours
+                  $opening[] = [
+                    'day'           => $hour->day,
+                    'opening_hours' => $hour->opening_hours,
                   ];
                 }
 
-                if ($point["carrier_id"] == "b139ac1f-bbb9-4235-b87e-aedcb3c32132") {
-                  $distance = round($value->distance * 1000, 2);
+                if ('b139ac1f-bbb9-4235-b87e-aedcb3c32132' === $point['carrier_id']) {
+                  $distance = \round($value->distance * 1000, 2);
                 } else {
                   $distance = $value->distance;
                 }
 
                 $array[] = [
-                  "carrier_id" => $point["carrier_id"],
-                  "carrier_name" => $point["carrier_name"],
-                  "location_id" => $value->location_id,
-                  "name" => trim((string) $value->name),
-                  "address1" => trim((string) $value->address1),
-                  "address2" => trim((string) $value->address2),
-                  "postcode" => $value->postcode,
-                  "city" => trim((string) $value->city),
-                  "country_code" => $value->country_code,
-                  "latitude" => $value->latitude,
-                  "longitude" => $value->longitude,
-                  "distance" => $distance,
-                  "hours" => $opening,
-                  "dropoff_location_id" => $value->dropoff_location_id,
-                  "image_url" => $value->image_url,
-                  "number" => $value->number,
+                  'carrier_id'          => $point['carrier_id'],
+                  'carrier_name'        => $point['carrier_name'],
+                  'location_id'         => $value->location_id,
+                  'name'                => \trim((string) $value->name),
+                  'address1'            => \trim((string) $value->address1),
+                  'address2'            => \trim((string) $value->address2),
+                  'postcode'            => $value->postcode,
+                  'city'                => \trim((string) $value->city),
+                  'country_code'        => $value->country_code,
+                  'latitude'            => $value->latitude,
+                  'longitude'           => $value->longitude,
+                  'distance'            => $distance,
+                  'hours'               => $opening,
+                  'dropoff_location_id' => $value->dropoff_location_id,
+                  'image_url'           => $value->image_url,
+                  'number'              => $value->number,
                 ];
               }
             }
@@ -256,95 +257,95 @@ class ShippingAPIController extends AbstractController {
           }
         }
 
-        $distance = array_column($array, 'distance');
-        array_multisort($distance, SORT_ASC, $array);
+        $distance = \array_column($array, 'distance');
+        \array_multisort($distance, SORT_ASC, $array);
 
         return $this->json($array, 200);
       }
     }
-    
+
     return $this->json(false, 404);
   }
-
 
   /**
    * Créer l'étiquette pour envoyer un colis
    *
    * @Route("/user/api/shipping/create/{id}", name="user_api_create")
    */
-  public function shipping(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo): JsonResponse {
-  	$shippingAddress = $order->getShippingAddress();
-  	$vendor = $order->getVendor();
+  public function shipping(Order $order, Request $request, ObjectManager $manager, OrderStatusRepository $statusRepo): JsonResponse
+  {
+    $shippingAddress = $order->getShippingAddress();
+    $vendor          = $order->getVendor();
 
     try {
       $data = [
-        "order_id" => $order->getIdentifier(), 
-        "shipment" => [
-          "id" => 0, 
-          "type" => 2, 
-          "dropoff" => (bool) $order->getDropoffName(),
-          "service_id" => $order->getShippingServiceId(), 
-          "delivery_type" => $order->getDropoffName() ? "DELIVERY_TO_COLLECTION_POINT" : "HOME_DELIVERY",
-          "label_format" => "PDF", 
-        ], 
-        "ship_from" => [
-          "address1" => $vendor->getAddress(), 
-          "lastname" => $vendor->getUser()->getFullName(), 
-          "email" => $vendor->getUser()->getEmail(), 
-          "phone" => $vendor->getUser()->getPhone(), 
-          "company" => $vendor->getBusinessType() === "company" ? $vendor->getCompany() : $vendor->getUser()->getFullName(),
-          "pro" => $vendor->getBusinessType() === "company"
-        ], 
-        "ship_to" => [
-          "address1" => $shippingAddress->getHouseNumber() . " " . $shippingAddress->getAddress(),
-          "lastname" => $shippingAddress->getName(), 
-          "company" => $shippingAddress->getName(),
-          "phone" => $shippingAddress->getPhone(), 
-          "email" => $order->getBuyer()->getEmail()
+        'order_id' => $order->getIdentifier(),
+        'shipment' => [
+          'id'            => 0,
+          'type'          => 2,
+          'dropoff'       => (bool) $order->getDropoffName(),
+          'service_id'    => $order->getShippingServiceId(),
+          'delivery_type' => $order->getDropoffName() ? 'DELIVERY_TO_COLLECTION_POINT' : 'HOME_DELIVERY',
+          'label_format'  => 'PDF',
         ],
-      ]; 
+        'ship_from' => [
+          'address1' => $vendor->getAddress(),
+          'lastname' => $vendor->getUser()->getFullName(),
+          'email'    => $vendor->getUser()->getEmail(),
+          'phone'    => $vendor->getUser()->getPhone(),
+          'company'  => 'company' === $vendor->getBusinessType() ? $vendor->getCompany() : $vendor->getUser()->getFullName(),
+          'pro'      => 'company' === $vendor->getBusinessType(),
+        ],
+        'ship_to' => [
+          'address1' => $shippingAddress->getHouseNumber() . ' ' . $shippingAddress->getAddress(),
+          'lastname' => $shippingAddress->getName(),
+          'company'  => $shippingAddress->getName(),
+          'phone'    => $shippingAddress->getPhone(),
+          'email'    => $order->getBuyer()->getEmail(),
+        ],
+      ];
 
       if ($order->getDropoffName()) {
-        $data["dropoff_to"] = [
-          "country_code" => $order->getDropoffCountryCode(),
-          "postcode" => $order->getDropoffPostcode(),
-          "lastname" => $order->getDropoffName(),
-          "dropoff_location_id" => $order->getDropoffLocationId()
+        $data['dropoff_to'] = [
+          'country_code'        => $order->getDropoffCountryCode(),
+          'postcode'            => $order->getDropoffPostcode(),
+          'lastname'            => $order->getDropoffName(),
+          'dropoff_location_id' => $order->getDropoffLocationId(),
         ];
       }
 
-      $ch = curl_init();
-      curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-      curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-      curl_setopt($ch, CURLOPT_URL, "https://www.upelgo.com/api/carrier/ship");
+      $ch = \curl_init();
+      \curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json', 'Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu']);
+      \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      \curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+      \curl_setopt($ch, CURLOPT_POSTFIELDS, \json_encode($data));
+      \curl_setopt($ch, CURLOPT_URL, 'https://www.upelgo.com/api/carrier/ship');
 
-      $result = curl_exec($ch);
-      $result = json_decode($result);
-      curl_close($ch);
+      $result = \curl_exec($ch);
+      $result = \json_decode($result);
+      \curl_close($ch);
 
       if ($result->success) {
-        $filename = md5(time().uniqid()); 
-        $fullname = $filename. ".pdf"; 
+        $filename = \md5(\time() . \uniqid());
+        $fullname = $filename . '.pdf';
         $filepath = $this->getParameter('uploads_directory') . '/' . $fullname;
-        file_put_contents($filepath, base64_decode((string) $result->waybills[0]));
+        \file_put_contents($filepath, \base64_decode((string) $result->waybills[0], true));
 
         try {
           Configuration::instance($this->getParameter('cloudinary'));
           (new UploadApi())->upload($filepath, [
-            'public_id' => $filename,
-            'use_filename' => TRUE,
+            'public_id'    => $filename,
+            'use_filename' => true,
           ]);
 
-          unlink($filepath);
+          \unlink($filepath);
         } catch (\Exception $e) {
           return $this->json($e->getMessage(), 404);
         }
 
         $order->setTrackingNumber($result->tracking_numbers[0]);
         $order->setPdf($filename);
-        $order->setShippingStatus("open");
+        $order->setShippingStatus('open');
         $manager->flush();
       } else {
         return $this->json($result->error, 404);
@@ -352,31 +353,31 @@ class ShippingAPIController extends AbstractController {
 
 
       try {
-        $url = "https://www.upelgo.com/api/carrier/" . $order->getShippingCarrierId() . "/track";
+        $url  = 'https://www.upelgo.com/api/carrier/' . $order->getShippingCarrierId() . '/track';
         $data = [
-          "tracking_number" => $order->getTrackingNumber()
-        ]; 
+          'tracking_number' => $order->getTrackingNumber(),
+        ];
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json", "Accept: application/json", "Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu"]);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_URL, $url);
+        $ch = \curl_init();
+        \curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json', 'Authorization: Bearer JDJ5JDEzJGdLZWxFYS5TNjh3R2V4UmU3TE9nak9nWE43U3RZR0pGS0pnODRiYWowTXlnTXAuY3hScmgu']);
+        \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        \curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        \curl_setopt($ch, CURLOPT_POSTFIELDS, \json_encode($data));
+        \curl_setopt($ch, CURLOPT_URL, $url);
 
-        $result = curl_exec($ch);
-        $result = json_decode($result);
-        curl_close($ch);
+        $result = \curl_exec($ch);
+        $result = \json_decode($result);
+        \curl_close($ch);
 
         if ($result->success) {
           $order->setDelivered($result->delivered);
 
-          if ($result->incident_date != "") {
-            $order->setIncidentDate(new \Datetime($result->incident_date));
+          if ('' !== $result->incident_date) {
+            $order->setIncidentDate(new DateTime($result->incident_date));
           }
 
-          if ($result->delivery_date != "") {
-            $order->setDeliveryDate(new \Datetime($result->delivery_date));
+          if ('' !== $result->delivery_date) {
+            $order->setDeliveryDate(new DateTime($result->delivery_date));
           }
 
           // update orderStatus
@@ -386,7 +387,7 @@ class ShippingAPIController extends AbstractController {
 
               if (!$orderStatus && $event->date) {
                 $orderStatus = new OrderStatus();
-                $orderStatus->setDate(new \Datetime($event->date_unformatted));
+                $orderStatus->setDate(new DateTime($event->date_unformatted));
                 $orderStatus->setDescription($event->description);
                 $orderStatus->setCode($event->code);
                 $orderStatus->setShipping($order);
@@ -399,7 +400,7 @@ class ShippingAPIController extends AbstractController {
                   }
                 }
 
-                $order->setUpdatedAt(new \DateTime('now', timezone_open('Europe/Paris')));
+                $order->setUpdatedAt(new DateTime('now', \timezone_open('Europe/Paris')));
                 $manager->persist($orderStatus);
                 $manager->flush();
               }
@@ -409,15 +410,16 @@ class ShippingAPIController extends AbstractController {
           $manager->flush();
 
           return $this->json($order, 200, [], [
-            'groups' => 'order:read', 
+            'groups' => 'order:read',
           ]);
         }
+
         return $this->json($order, 200, [], [
-          'groups' => 'order:read', 
+          'groups' => 'order:read',
         ]);
       } catch (\Exception $e) {
         return $this->json($order, 200, [], [
-          'groups' => 'order:read', 
+          'groups' => 'order:read',
         ]);
       }
     } catch (\Exception $e) {
@@ -427,47 +429,48 @@ class ShippingAPIController extends AbstractController {
     return $this->json(false, 404);
   }
 
-
   /**
    * Ajouter une adresse
    *
    * @Route("/user/api/shipping/address", name="user_api_shipping_address", methods={"POST"})
    */
-  public function addShippingAddress(Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
+  public function addShippingAddress(Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse
+  {
     if ($json = $request->getContent()) {
-      $shippingAddress = $serializer->deserialize($json, ShippingAddress::class, "json");
+      $shippingAddress = $serializer->deserialize($json, ShippingAddress::class, 'json');
       $shippingAddress->setUser($this->getUser());
 
       $manager->persist($shippingAddress);
       $manager->flush();
-      
+
       return $this->json($this->getUser(), 200, [], [
-        'groups' => 'user:read', 
-        'circular_reference_limit' => 1, 
-        'circular_reference_handler' => fn($object) => $object->getId() 
+        'groups'                     => 'user:read',
+        'circular_reference_limit'   => 1,
+        'circular_reference_handler' => fn ($object) => $object->getId(),
       ]);
     }
-    return $this->json("Une erreur est survenue", 404);
-  }
 
+    return $this->json('Une erreur est survenue', 404);
+  }
 
   /**
    * Editer une adresse
    *
    * @Route("/user/api/shipping/address/edit/{id}", name="user_api_shipping_address_edit", methods={"POST"})
    */
-  public function editShippingAddress(ShippingAddress $shippingAddress, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
+  public function editShippingAddress(ShippingAddress $shippingAddress, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse
+  {
     if ($json = $request->getContent()) {
-      $serializer->deserialize($json, ShippingAddress::class, "json", [AbstractNormalizer::OBJECT_TO_POPULATE => $shippingAddress]);
+      $serializer->deserialize($json, ShippingAddress::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $shippingAddress]);
       $manager->flush();
 
       return $this->json($this->getUser(), 200, [], [
-        'groups' => 'user:read', 
-        'circular_reference_limit' => 1, 
-        'circular_reference_handler' => fn($object) => $object->getId() 
+        'groups'                     => 'user:read',
+        'circular_reference_limit'   => 1,
+        'circular_reference_handler' => fn ($object) => $object->getId(),
       ]);
     }
-    return $this->json("Une erreur est survenue", 404);
-  }
 
+    return $this->json('Une erreur est survenue', 404);
+  }
 }

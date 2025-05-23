@@ -1,20 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\FavorisRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=FavorisRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=FavorisRepository::class)
+ */
 class Favoris
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("user:read")
    * @Groups("favoris:read")
    */
@@ -22,7 +27,9 @@ class Favoris
 
   /**
    * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="favoris")
+   *
    * @ORM\JoinColumn(nullable=false)
+   *
    * @Groups("favoris:read")
    * @Groups("user:read")
    */
@@ -30,6 +37,7 @@ class Favoris
 
   /**
    * @ORM\ManyToOne(targetEntity=User::class, inversedBy="favoris")
+   *
    * @ORM\JoinColumn(nullable=false)
    */
   private $user;

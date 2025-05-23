@@ -1,19 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\WithdrawRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=WithdrawRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=WithdrawRepository::class)
+ */
 class Withdraw
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
    */
   private $id;
@@ -30,32 +36,35 @@ class Withdraw
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2)
+   *
    * @Groups("user:read")
    */
   private $amount;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
   private $status;
 
   /**
    * @ORM\Column(type="datetime")
+   *
    * @Groups("user:read")
    */
   private $createdAt;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
   private $last4;
 
-  
   public function __construct()
   {
-    $this->createdAt = new \DateTime('now', timezone_open('UTC'));
+    $this->createdAt = new DateTime('now', \timezone_open('UTC'));
   }
 
   public function getId(): ?int
@@ -111,12 +120,12 @@ class Withdraw
     return $this;
   }
 
-  public function getCreatedAt(): ?\DateTimeInterface
+  public function getCreatedAt(): ?DateTimeInterface
   {
     return $this->createdAt;
   }
 
-  public function setCreatedAt(\DateTimeInterface $createdAt): self
+  public function setCreatedAt(DateTimeInterface $createdAt): self
   {
     $this->createdAt = $createdAt;
 

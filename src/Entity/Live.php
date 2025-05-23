@@ -1,22 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\LiveRepository;
-use Symfony\Component\Serializer\Annotation\Groups;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=LiveRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=LiveRepository::class)
+ */
 class Live
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("live:read")
    * @Groups("user:read")
    */
@@ -24,10 +31,11 @@ class Live
 
   /**
    * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="lives")
+   *
    * @Groups("live:read")
    */
   private $vendor;
-  
+
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
    */
@@ -35,79 +43,93 @@ class Live
 
   /**
    * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="live", orphanRemoval=true)
+   *
    * @Groups("live:read")
    */
   private $clips;
 
   /**
    * @ORM\OneToMany(targetEntity=LiveProducts::class, mappedBy="live", cascade={"persist"})
-   * @ORM\OrderBy({"priority" = "ASC"})
+   *
+   * @ORM\OrderBy({"priority": "ASC"})
+   *
    * @Groups("live:read")
    */
   private $liveProducts;
 
   /**
    * @ORM\Column(type="integer", nullable=true)
+   *
    * @Groups("live:read")
    */
   private $status = 0;
 
   /**
    * @ORM\Column(type="integer", nullable=true)
+   *
    * @Groups("live:read")
    */
   private $reason;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("live:read")
    */
   private $channel;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("live:read")
    */
   private $event;
 
   /**
    * @ORM\Column(type="integer", nullable=true)
+   *
    * @Groups("live:read")
    */
   private $display = 1;
 
   /**
    * @ORM\Column(type="text", nullable=true)
+   *
    * @Groups("live:read")
    */
   private $resourceId;
 
   /**
    * @ORM\Column(type="text", nullable=true)
+   *
    * @Groups("live:read")
    */
   private $fileList;
 
   /**
    * @ORM\Column(type="text", nullable=true)
+   *
    * @Groups("live:read")
    */
   private $sid;
 
   /**
    * @ORM\Column(type="text", nullable=true)
+   *
    * @Groups("live:read")
    */
   private $cname;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("live:read")
    */
   private $preview;
 
   /**
    * @ORM\Column(type="datetime", nullable=true)
+   *
    * @Groups("live:read")
    */
   private $createdAt;
@@ -129,7 +151,9 @@ class Live
 
   /**
    * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="live")
-   * @ORM\OrderBy({"createdAt" = "ASC"})
+   *
+   * @ORM\OrderBy({"createdAt": "ASC"})
+   *
    * @Groups("live:read")
    * @Groups("clip:read")
    */
@@ -137,6 +161,7 @@ class Live
 
   /**
    * @ORM\Column(type="integer", nullable=true)
+   *
    * @Groups("live:read")
    */
   private $totalLikes = 0;
@@ -156,15 +181,13 @@ class Live
    */
   private $postUrl;
 
-  
   public function __construct()
   {
-    $this->createdAt = new \DateTime('now', timezone_open('UTC'));
-    $this->clips = new ArrayCollection();
+    $this->createdAt    = new DateTime('now', \timezone_open('UTC'));
+    $this->clips        = new ArrayCollection();
     $this->liveProducts = new ArrayCollection();
-    $this->comments = new ArrayCollection();
+    $this->comments     = new ArrayCollection();
   }
-
 
   public function getId(): ?int
   {
@@ -205,7 +228,7 @@ class Live
   {
     // set the owning side to null (unless already changed)
     if ($this->clips->removeElement($clip) && $clip->getLive() === $this) {
-          $clip->setLive(null);
+      $clip->setLive(null);
     }
 
     return $this;
@@ -233,7 +256,7 @@ class Live
   {
     // set the owning side to null (unless already changed)
     if ($this->liveProducts->removeElement($liveProduct) && $liveProduct->getLive() === $this) {
-          $liveProduct->setLive(null);
+      $liveProduct->setLive(null);
     }
 
     return $this;
@@ -347,12 +370,12 @@ class Live
     return $this;
   }
 
-  public function getCreatedAt(): ?\DateTimeInterface
+  public function getCreatedAt(): ?DateTimeInterface
   {
     return $this->createdAt;
   }
 
-  public function setCreatedAt(?\DateTimeInterface $createdAt): self
+  public function setCreatedAt(?DateTimeInterface $createdAt): self
   {
     $this->createdAt = $createdAt;
 
@@ -429,7 +452,7 @@ class Live
   {
     // set the owning side to null (unless already changed)
     if ($this->comments->removeElement($comment) && $comment->getLive() === $this) {
-          $comment->setLive(null);
+      $comment->setLive(null);
     }
 
     return $this;
@@ -494,5 +517,4 @@ class Live
 
     return $this;
   }
-
 }

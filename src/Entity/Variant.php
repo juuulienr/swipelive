@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\VariantRepository;
@@ -9,14 +11,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=VariantRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=VariantRepository::class)
+ */
 class Variant
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("product:read")
    * @Groups("user:read")
    * @Groups("clip:read")
@@ -29,6 +34,7 @@ class Variant
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("product:read")
    * @Groups("user:read")
    * @Groups("clip:read")
@@ -41,6 +47,7 @@ class Variant
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2)
+   *
    * @Groups("product:read")
    * @Groups("user:read")
    * @Groups("clip:read")
@@ -53,6 +60,7 @@ class Variant
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+   *
    * @Groups("product:read")
    * @Groups("user:read")
    * @Groups("clip:read")
@@ -65,6 +73,7 @@ class Variant
 
   /**
    * @ORM\Column(type="integer")
+   *
    * @Groups("product:read")
    * @Groups("user:read")
    * @Groups("clip:read")
@@ -77,6 +86,7 @@ class Variant
 
   /**
    * @ORM\Column(type="integer")
+   *
    * @Groups("product:read")
    * @Groups("user:read")
    * @Groups("clip:read")
@@ -89,6 +99,7 @@ class Variant
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("product:read")
    * @Groups("user:read")
    * @Groups("clip:read")
@@ -101,6 +112,7 @@ class Variant
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("product:read")
    * @Groups("user:read")
    * @Groups("clip:read")
@@ -123,6 +135,7 @@ class Variant
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+   *
    * @Groups("product:read")
    * @Groups("user:read")
    * @Groups("clip:read")
@@ -135,6 +148,7 @@ class Variant
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("product:read")
    * @Groups("user:read")
    * @Groups("clip:read")
@@ -143,7 +157,7 @@ class Variant
    * @Groups("order:read")
    * @Groups("favoris:read")
    */
-  private $weightUnit = "kg";
+  private $weightUnit = 'kg';
 
   public function __construct()
   {
@@ -273,7 +287,7 @@ class Variant
   {
     // set the owning side to null (unless already changed)
     if ($this->lineItems->removeElement($lineItem) && $lineItem->getVariant() === $this) {
-          $lineItem->setVariant(null);
+      $lineItem->setVariant(null);
     }
 
     return $this;

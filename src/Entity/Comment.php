@@ -1,21 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use App\Repository\LiveRepository;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=CommentRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=CommentRepository::class)
+ */
 class Comment
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
    */
   private $id;
@@ -27,7 +30,9 @@ class Comment
 
   /**
    * @ORM\ManyToOne(targetEntity=User::class, inversedBy="comments")
+   *
    * @ORM\JoinColumn(nullable=false)
+   *
    * @Groups("live:read")
    * @Groups("clip:read")
    */
@@ -35,6 +40,7 @@ class Comment
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("live:read")
    * @Groups("clip:read")
    */
@@ -57,7 +63,7 @@ class Comment
 
   public function __construct()
   {
-    $this->createdAt = new \DateTime('now', timezone_open('UTC'));
+    $this->createdAt = new DateTime('now', \timezone_open('UTC'));
   }
 
   public function getId(): ?int
@@ -113,12 +119,12 @@ class Comment
     return $this;
   }
 
-  public function getCreatedAt(): ?\DateTimeInterface
+  public function getCreatedAt(): ?DateTimeInterface
   {
     return $this->createdAt;
   }
 
-  public function setCreatedAt(\DateTimeInterface $createdAt): self
+  public function setCreatedAt(DateTimeInterface $createdAt): self
   {
     $this->createdAt = $createdAt;
 
@@ -133,6 +139,7 @@ class Comment
   public function setIsVendor(?bool $isVendor): self
   {
     $this->isVendor = $isVendor;
+
     return $this;
   }
 }

@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Clip;
+use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use App\Entity\Product;
 
 /**
  * @extends ServiceEntityRepository<Clip>
  *
  * @method Clip|null find($id, $lockMode = null, $lockVersion = null)
  * @method Clip|null findOneBy(array $criteria, array $orderBy = null)
- * @method Clip[]    findAll()
- * @method Clip[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- * @method Clip[]    findByProduct(Product $product)
+ * @method Clip[] findAll()
+ * @method Clip[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Clip[] findByProduct(Product $product)
  */
 class ClipRepository extends ServiceEntityRepository
 {
@@ -23,8 +25,8 @@ class ClipRepository extends ServiceEntityRepository
     parent::__construct($registry, Clip::class);
   }
 
-
-  public function findByClip($vendor){
+  public function findByClip($vendor)
+  {
     $query = $this->createQueryBuilder('c')
     ->join('c.vendor', 'v')
     ->andWhere('c.status = :status')
@@ -35,18 +37,18 @@ class ClipRepository extends ServiceEntityRepository
       ->setParameter('vendor', $vendor);
     }
 
-    return $query->setParameter('status', "available")
+    return $query->setParameter('status', 'available')
     ->orderBy('RAND()')
     ->getQuery()
     ->getResult();
   }
 
-
-  public function findTrendingClips($vendor){
+  public function findTrendingClips($vendor)
+  {
     $query = $this->createQueryBuilder('c')
     ->join('c.vendor', 'v')
     ->andWhere('c.status = :status')
-    ->setParameter('status', "available");
+    ->setParameter('status', 'available');
 
     if ($vendor) {
       $query->andWhere('v.id != :vendor')
@@ -59,46 +61,46 @@ class ClipRepository extends ServiceEntityRepository
     ->getResult();
   }
 
-
-  public function retrieveClips($vendor){
+  public function retrieveClips($vendor)
+  {
     return $this->createQueryBuilder('c')
     ->join('c.vendor', 'v')
     ->andWhere('v.id = :vendor')
     ->andWhere('c.status = :status')
     ->setParameter('vendor', $vendor)
-    ->setParameter('status', "available")
+    ->setParameter('status', 'available')
     ->getQuery()
     ->getResult();
   }
 
 
 
-    // /**
-    //  * @return Clip[] Returns an array of Clip objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Clip
-    {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+  // /**
+  //  * @return Clip[] Returns an array of Clip objects
+  //  */
+  /*
+  public function findByExampleField($value)
+  {
+      return $this->createQueryBuilder('c')
+          ->andWhere('c.exampleField = :val')
+          ->setParameter('val', $value)
+          ->orderBy('c.id', 'ASC')
+          ->setMaxResults(10)
+          ->getQuery()
+          ->getResult()
+      ;
   }
+  */
+
+  /*
+  public function findOneBySomeField($value): ?Clip
+  {
+      return $this->createQueryBuilder('c')
+          ->andWhere('c.exampleField = :val')
+          ->setParameter('val', $value)
+          ->getQuery()
+          ->getOneOrNullResult()
+      ;
+  }
+  */
+}

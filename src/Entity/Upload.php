@@ -1,22 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\UploadRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Serializer\Annotation\Groups;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=UploadRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=UploadRepository::class)
+ */
 class Upload
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("upload:read")
    * @Groups("product:read")
    * @Groups("user:read")
@@ -29,6 +33,7 @@ class Upload
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("upload:read")
    * @Groups("product:read")
    * @Groups("user:read")
@@ -42,6 +47,7 @@ class Upload
 
   /**
    * @ORM\Column(type="integer", nullable=true)
+   *
    * @Groups("upload:read")
    * @Groups("product:read")
    * @Groups("user:read")
@@ -56,17 +62,16 @@ class Upload
   /**
    * @ORM\Column(type="datetime")
    */
-  private \DateTime $createdAt;
+  private DateTime $createdAt;
 
   /**
    * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="uploads")
    */
   private $product;
 
-  
   public function __construct()
   {
-    $this->createdAt = new \DateTime('now', timezone_open('UTC'));
+    $this->createdAt = new DateTime('now', \timezone_open('UTC'));
   }
 
   public function getId(): ?int
@@ -86,12 +91,12 @@ class Upload
     return $this;
   }
 
-  public function getCreatedAt(): ?\DateTime
+  public function getCreatedAt(): ?DateTime
   {
     return $this->createdAt;
   }
 
-  public function setCreatedAt(\DateTime $createdAt): self
+  public function setCreatedAt(DateTime $createdAt): self
   {
     $this->createdAt = $createdAt;
 

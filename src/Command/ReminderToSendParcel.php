@@ -1,16 +1,21 @@
-<?php 
+<?php
+
+declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Repository\OrderRepository;
+use App\Service\FirebaseMessagingService;
 use Bugsnag\Client;
+use DateTimeImmutable;
+use DateTimeZone;
+use Doctrine\ORM\EntityManagerInterface;
+use Exception;
+use Psr\Log\LoggerInterface;
 use Stripe\StripeClient;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Service\FirebaseMessagingService;
-use App\Repository\OrderRepository;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ReminderToSendParcel extends Command
@@ -36,11 +41,12 @@ class ReminderToSendParcel extends Command
   protected function execute(InputInterface $input, OutputInterface $output): int
   {
     $orders = $this->orderRepo->findSucceededOrders();
-    $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+    $now    = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
     foreach ($orders as $order) {
       if ($this->shouldRemindOrCancel($order)) {
         $createdAt = $order->getCreatedAt();
+
         if ($createdAt->modify('+7 days') < $now) {
           $this->cancelOrder($order);
         }
@@ -52,9 +58,9 @@ class ReminderToSendParcel extends Command
 
   private function shouldRemindOrCancel($order): bool
   {
-    return $order->getShippingStatus() !== 'cancelled' 
-    && $order->getStatus() !== 'cancelled'
-    && !$order->getTrackingNumber() 
+    return 'cancelled' !== $order->getShippingStatus()
+    && 'cancelled'     !== $order->getStatus()
+    && !$order->getTrackingNumber()
     && !$order->getPdf();
   }
 
@@ -83,33 +89,31 @@ class ReminderToSendParcel extends Command
   {
     try {
       $stripeSecretKey = $this->parameterBag->get('stripe_sk');
-      $stripe = new StripeClient($stripeSecretKey);
+      $stripe          = new StripeClient($stripeSecretKey);
       $stripe->refunds->create([
         'payment_intent' => $order->getPaymentId(),
       ]);
-    } catch (\Exception $error) {
+    } catch (Exception $error) {
       $this->logger->error('Failed to refund order ID: ' . $order->getId(), ['exception' => $error]);
       $this->bugsnag->notifyException($error);
     }
   }
-
 
   private function sendPushNotification(?string $pushToken, string $message, $order): void
   {
     if ($pushToken) {
       try {
         $data = [
-          'route' => 'ListOrders',
+          'route'   => 'ListOrders',
           'isOrder' => true,
-          'orderId' => $order->getId()
+          'orderId' => $order->getId(),
         ];
 
         $this->firebaseMessagingService->sendNotification('SWIPE LIVE', $message, $pushToken, $data);
-      } catch (\Exception $error) {
+      } catch (Exception $error) {
         $this->logger->error('Failed to send push notification', ['exception' => $error]);
         $this->bugsnag->notifyException($error);
       }
     }
   }
 }
-

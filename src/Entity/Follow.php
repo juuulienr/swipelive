@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\FollowRepository;
@@ -7,14 +9,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=FollowRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=FollowRepository::class)
+ */
 class Follow
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("user:read")
    * @Groups("user:follow")
    * @Groups("clip:read")
@@ -24,16 +29,17 @@ class Follow
 
   /**
    * @ORM\ManyToOne(targetEntity=User::class, inversedBy="followers")
+   *
    * @ORM\JoinColumn(nullable=false)
    */
   private $following;
 
   /**
    * @ORM\ManyToOne(targetEntity=User::class, inversedBy="following")
+   *
    * @ORM\JoinColumn(nullable=false)
    */
   private $follower;
-
 
   public function getId(): ?int
   {

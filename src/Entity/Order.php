@@ -1,23 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\OrderRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=OrderRepository::class)
-* @ORM\Table(name="`order`")
-*/
+ * @ORM\Entity(repositoryClass=OrderRepository::class)
+ *
+ * @ORM\Table(name="`order`")
+ */
 class Order
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("discussion:read")
    * @Groups("order:read")
    */
@@ -30,74 +38,88 @@ class Order
 
   /**
    * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="sales")
+   *
    * @ORM\JoinColumn(nullable=false)
+   *
    * @Groups("order:read")
    */
   private $vendor;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("order:read")
    */
   private $status;
 
   /**
    * @ORM\Column(type="datetime")
+   *
    * @Groups("order:read")
    */
   private $createdAt;
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2)
+   *
    * @Groups("order:read")
    */
   private $subTotal;
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2)
+   *
    * @Groups("order:read")
    */
   private $total;
 
   /**
    * @ORM\OneToMany(targetEntity=LineItem::class, mappedBy="orderId")
+   *
    * @Groups("order:read")
    */
   private $lineItems;
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2)
+   *
    * @Groups("order:read")
    */
   private $fees;
 
   /**
    * @ORM\Column(type="datetime", nullable=true)
+   *
    * @Groups("order:read")
    */
   private $updatedAt;
 
   /**
    * @ORM\ManyToOne(targetEntity=User::class, inversedBy="purchases")
+   *
    * @ORM\JoinColumn(nullable=false)
+   *
    * @Groups("order:read")
    */
   private $buyer;
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2)
+   *
    * @Groups("order:read")
    */
   private $shippingPrice;
 
   /**
    * @ORM\Column(type="integer", nullable=true)
+   *
    * @Groups("order:read")
    */
   private $number;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("order:read")
    */
   private $trackingNumber;
@@ -109,31 +131,37 @@ class Order
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+   *
    * @Groups("order:read")
    */
   private $weight;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("order:read")
    */
   private $pdf;
 
   /**
    * @ORM\Column(type="datetime", nullable=true)
+   *
    * @Groups("order:read")
    */
   private $expectedDelivery;
 
   /**
    * @ORM\OneToMany(targetEntity=OrderStatus::class, mappedBy="shipping")
-   * @ORM\OrderBy({"date" = "ASC"})
+   *
+   * @ORM\OrderBy({"date": "ASC"})
+   *
    * @Groups("order:read")
    */
   private $orderStatuses;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("order:read")
    */
   private $shippingStatus;
@@ -145,78 +173,91 @@ class Order
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("order:read")
    */
   private $identifier;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("order:read")
    */
   private $shippingCarrierId;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("order:read")
    */
   private $shippingCarrierName;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("order:read")
    */
   private $shippingServiceId;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("order:read")
    */
   private $shippingServiceName;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("order:read")
    */
   private $shippingServiceCode;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("order:read")
    */
   private $dropoffLocationId;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("order:read")
    */
   private $dropoffCountryCode;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("order:read")
    */
   private $dropoffPostcode;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("order:read")
    */
   private $dropoffName;
 
   /**
    * @ORM\Column(type="boolean", nullable=true)
+   *
    * @Groups("order:read")
    */
   private $delivered;
 
   /**
    * @ORM\Column(type="datetime", nullable=true)
+   *
    * @Groups("order:read")
    */
   private $incidentDate;
 
   /**
    * @ORM\Column(type="datetime", nullable=true)
+   *
    * @Groups("order:read")
    */
   private $deliveryDate;
@@ -228,6 +269,7 @@ class Order
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+   *
    * @Groups("order:read")
    */
   private $promotionAmount;
@@ -237,13 +279,12 @@ class Order
    */
   private $promotion;
 
-
   public function __construct()
   {
-    $this->lineItems = new ArrayCollection();
-    $this->createdAt = new \DateTime('now', timezone_open('UTC'));
+    $this->lineItems     = new ArrayCollection();
+    $this->createdAt     = new DateTime('now', \timezone_open('UTC'));
     $this->orderStatuses = new ArrayCollection();
-    $this->discussions = new ArrayCollection();
+    $this->discussions   = new ArrayCollection();
   }
 
   public function getId(): ?int
@@ -299,12 +340,12 @@ class Order
     return $this;
   }
 
-  public function getCreatedAt(): ?\DateTimeInterface
+  public function getCreatedAt(): ?DateTimeInterface
   {
     return $this->createdAt;
   }
 
-  public function setCreatedAt(\DateTimeInterface $createdAt): self
+  public function setCreatedAt(DateTimeInterface $createdAt): self
   {
     $this->createdAt = $createdAt;
 
@@ -357,7 +398,7 @@ class Order
   {
     // set the owning side to null (unless already changed)
     if ($this->lineItems->removeElement($lineItem) && $lineItem->getOrderId() === $this) {
-          $lineItem->setOrderId(null);
+      $lineItem->setOrderId(null);
     }
 
     return $this;
@@ -375,12 +416,12 @@ class Order
     return $this;
   }
 
-  public function getUpdatedAt(): ?\DateTimeInterface
+  public function getUpdatedAt(): ?DateTimeInterface
   {
     return $this->updatedAt;
   }
 
-  public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+  public function setUpdatedAt(?DateTimeInterface $updatedAt): self
   {
     $this->updatedAt = $updatedAt;
 
@@ -459,12 +500,12 @@ class Order
     return $this;
   }
 
-  public function getExpectedDelivery(): ?\DateTimeInterface
+  public function getExpectedDelivery(): ?DateTimeInterface
   {
     return $this->expectedDelivery;
   }
 
-  public function setExpectedDelivery(?\DateTimeInterface $expectedDelivery): self
+  public function setExpectedDelivery(?DateTimeInterface $expectedDelivery): self
   {
     $this->expectedDelivery = $expectedDelivery;
 
@@ -493,7 +534,7 @@ class Order
   {
     // set the owning side to null (unless already changed)
     if ($this->orderStatuses->removeElement($orderStatus) && $orderStatus->getShipping() === $this) {
-          $orderStatus->setShipping(null);
+      $orderStatus->setShipping(null);
     }
 
     return $this;
@@ -521,7 +562,7 @@ class Order
   {
     // set the owning side to null (unless already changed)
     if ($this->discussions->removeElement($discussion) && $discussion->getPurchase() === $this) {
-          $discussion->setPurchase(null);
+      $discussion->setPurchase(null);
     }
 
     return $this;
@@ -671,24 +712,24 @@ class Order
     return $this;
   }
 
-  public function getIncidentDate(): ?\DateTimeInterface
+  public function getIncidentDate(): ?DateTimeInterface
   {
     return $this->incidentDate;
   }
 
-  public function setIncidentDate(\DateTimeInterface $incidentDate): self
+  public function setIncidentDate(DateTimeInterface $incidentDate): self
   {
     $this->incidentDate = $incidentDate;
 
     return $this;
   }
 
-  public function getDeliveryDate(): ?\DateTimeInterface
+  public function getDeliveryDate(): ?DateTimeInterface
   {
     return $this->deliveryDate;
   }
 
-  public function setDeliveryDate(\DateTimeInterface $deliveryDate): self
+  public function setDeliveryDate(DateTimeInterface $deliveryDate): self
   {
     $this->deliveryDate = $deliveryDate;
 

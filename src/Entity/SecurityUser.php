@@ -1,31 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\SecurityUserRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=SecurityUserRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=SecurityUserRepository::class)
+ */
 class SecurityUser
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
    */
   private $id;
 
   /**
    * @ORM\Column(type="datetime")
+   *
    * @Groups("user:read")
    */
   private $createdAt;
 
   /**
    * @ORM\Column(type="datetime")
+   *
    * @Groups("user:read")
    * @Groups("discussion:read")
    */
@@ -33,6 +41,7 @@ class SecurityUser
 
   /**
    * @ORM\ManyToOne(targetEntity=User::class, inversedBy="securityUsers")
+   *
    * @ORM\JoinColumn(nullable=false)
    */
   private $user;
@@ -59,6 +68,7 @@ class SecurityUser
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $platform;
@@ -85,21 +95,22 @@ class SecurityUser
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $timezone;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $locale;
 
-
   public function __construct()
   {
-    $this->createdAt = new \DateTime('now', timezone_open('UTC'));
-    $this->connectedAt = new \DateTime('now', timezone_open('UTC'));
+    $this->createdAt   = new DateTime('now', \timezone_open('UTC'));
+    $this->connectedAt = new DateTime('now', \timezone_open('UTC'));
   }
 
   public function getId(): ?int
@@ -107,24 +118,24 @@ class SecurityUser
     return $this->id;
   }
 
-  public function getCreatedAt(): ?\DateTimeInterface
+  public function getCreatedAt(): ?DateTimeInterface
   {
     return $this->createdAt;
   }
 
-  public function setCreatedAt(\DateTimeInterface $createdAt): self
+  public function setCreatedAt(DateTimeInterface $createdAt): self
   {
     $this->createdAt = $createdAt;
 
     return $this;
   }
 
-  public function getConnectedAt(): ?\DateTimeInterface
+  public function getConnectedAt(): ?DateTimeInterface
   {
     return $this->connectedAt;
   }
 
-  public function setConnectedAt(\DateTimeInterface $connectedAt): self
+  public function setConnectedAt(DateTimeInterface $connectedAt): self
   {
     $this->connectedAt = $connectedAt;
 

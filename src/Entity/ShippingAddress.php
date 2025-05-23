@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\ShippingAddressRepository;
@@ -7,80 +9,94 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=ShippingAddressRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=ShippingAddressRepository::class)
+ */
 class ShippingAddress
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("user:read")
    */
   private $id;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
   private $address;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $houseNumber;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
   private $city;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
   private $zip;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
   private $country;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
   private $countryCode;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $phone;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
   private $name;
 
   /**
    * @ORM\ManyToOne(targetEntity=User::class, inversedBy="shippingAddresses")
+   *
    * @ORM\JoinColumn(nullable=false)
    */
   private $user;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
   private $latitude;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
   private $longitude;

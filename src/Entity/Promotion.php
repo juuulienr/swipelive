@@ -1,22 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
+use App\Repository\PromotionRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Serializer\Annotation\Groups;
-use App\Repository\PromotionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=PromotionRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=PromotionRepository::class)
+ */
 class Promotion
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("promotion:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -26,6 +33,7 @@ class Promotion
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("promotion:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -35,6 +43,7 @@ class Promotion
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("promotion:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -44,6 +53,7 @@ class Promotion
 
   /**
    * @ORM\Column(type="integer")
+   *
    * @Groups("promotion:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -53,6 +63,7 @@ class Promotion
 
   /**
    * @ORM\Column(type="boolean")
+   *
    * @Groups("promotion:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -62,6 +73,7 @@ class Promotion
 
   /**
    * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="promotions")
+   *
    * @ORM\JoinColumn(nullable=true)
    */
   private $vendor;
@@ -76,11 +88,10 @@ class Promotion
    */
   private $orders;
 
-
   public function __construct()
   {
-    $this->createdAt = new \DateTime('now', timezone_open('UTC'));
-    $this->orders = new ArrayCollection();
+    $this->createdAt = new DateTime('now', \timezone_open('UTC'));
+    $this->orders    = new ArrayCollection();
   }
 
   public function getId(): ?int
@@ -148,12 +159,12 @@ class Promotion
     return $this;
   }
 
-  public function getCreatedAt(): ?\DateTimeInterface
+  public function getCreatedAt(): ?DateTimeInterface
   {
     return $this->createdAt;
   }
 
-  public function setCreatedAt(\DateTimeInterface $createdAt): self
+  public function setCreatedAt(DateTimeInterface $createdAt): self
   {
     $this->createdAt = $createdAt;
 
@@ -182,7 +193,7 @@ class Promotion
   {
     // set the owning side to null (unless already changed)
     if ($this->orders->removeElement($order) && $order->getPromotion() === $this) {
-          $order->setPromotion(null);
+      $order->setPromotion(null);
     }
 
     return $this;

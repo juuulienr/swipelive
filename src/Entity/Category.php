@@ -1,22 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=CategoryRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=CategoryRepository::class)
+ */
 class Category
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("product:read")
    * @Groups("category:read")
    * @Groups("user:read")
@@ -25,6 +30,7 @@ class Category
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("category:read")
    * @Groups("product:read")
    * @Groups("user:read")
@@ -40,6 +46,7 @@ class Category
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("category:read")
    */
   private $picture;
@@ -88,7 +95,7 @@ class Category
   {
     // set the owning side to null (unless already changed)
     if ($this->products->removeElement($product) && $product->getCategory() === $this) {
-          $product->setCategory(null);
+      $product->setCategory(null);
     }
 
     return $this;

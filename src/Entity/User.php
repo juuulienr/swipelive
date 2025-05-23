@@ -1,30 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use App\Entity\Role;
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
 /**
-* @ORM\Entity(repositoryClass="App\Repository\UserRepository")
-* @ORM\HasLifecycleCallbacks()
-* @UniqueEntity(
-*  fields={"email"},
-*  message="L'adresse mail est indisponible"
-* )
-*/
+ * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ *
+ * @ORM\HasLifecycleCallbacks
+ *
+ * @UniqueEntity(
+ *     fields={"email"},
+ *     message="L'adresse mail est indisponible"
+ * )
+ */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("user:follow")
    * @Groups("user:read")
    * @Groups("clip:read")
@@ -51,7 +60,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Assert\Email(message="L'adresse mail est invalide !")
+   *
    * @Groups("user:read")
    * @Groups("order:read")
    */
@@ -59,6 +70,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -70,6 +82,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -81,6 +94,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -92,6 +106,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   /**
    * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="following", orphanRemoval=true)
+   *
    * @Groups("user:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -101,6 +116,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   /**
    * @ORM\OneToMany(targetEntity=Follow::class, mappedBy="follower", orphanRemoval=true)
+   *
    * @Groups("user:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -109,9 +125,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("user:read")
    */
-  private $type = "user";
+  private $type = 'user';
 
   /**
    * @ORM\OneToMany(targetEntity=Order::class, mappedBy="buyer")
@@ -120,6 +137,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   /**
    * @ORM\OneToOne(targetEntity=Vendor::class, cascade={"persist", "remove"})
+   *
    * @Groups("user:read")
    * @Groups("live:read")
    * @Groups("clip:read")
@@ -135,48 +153,56 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   /**
    * @ORM\OneToMany(targetEntity=ShippingAddress::class, mappedBy="user", orphanRemoval=true)
+   *
    * @Groups("user:read")
    */
   private $shippingAddresses;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $phone;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $day;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $month;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $year;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $facebookId;
 
   /**
    * @ORM\OneToMany(targetEntity=Discussion::class, mappedBy="user")
+   *
    * @Groups("user:read")
    */
   private $discussions;
 
   /**
    * @ORM\OneToMany(targetEntity=SecurityUser::class, mappedBy="user", orphanRemoval=true)
+   *
    * @Groups("discussion:read")
    * @Groups("user:read")
    */
@@ -184,6 +210,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
   /**
    * @ORM\OneToMany(targetEntity=Favoris::class, mappedBy="user", orphanRemoval=true)
+   *
    * @Groups("user:read")
    */
   private $favoris;
@@ -203,21 +230,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
    */
   private $googleId;
 
-
   public function __construct()
   {
-    $this->followers = new ArrayCollection();
-    $this->following = new ArrayCollection();
-    $this->purchases = new ArrayCollection();
-    $this->comments = new ArrayCollection();
-    $this->createdAt = new \DateTime('now', timezone_open('UTC'));
+    $this->followers         = new ArrayCollection();
+    $this->following         = new ArrayCollection();
+    $this->purchases         = new ArrayCollection();
+    $this->comments          = new ArrayCollection();
+    $this->createdAt         = new DateTime('now', \timezone_open('UTC'));
     $this->shippingAddresses = new ArrayCollection();
-    $this->discussions = new ArrayCollection();
-    $this->securityUsers = new ArrayCollection();
-    $this->favoris = new ArrayCollection();
+    $this->discussions       = new ArrayCollection();
+    $this->securityUsers     = new ArrayCollection();
+    $this->favoris           = new ArrayCollection();
   }
 
-  public function getFullName(): string {
+  public function getFullName(): string
+  {
     return "{$this->firstname} {$this->lastname}";
   }
 
@@ -248,26 +275,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     $this->hash = $hash;
 
     return $this;
-  }    
+  }
 
-  public function getRoles(): array {
+  public function getRoles(): array
+  {
     return ['ROLE_USER'];
   }
 
   public function getPassword(): ?string
   {
-      return $this->hash;
+    return $this->hash;
   }
-
 
   // Remplacer getUsername par getUserIdentifier
   public function getUserIdentifier(): string
   {
-      return $this->email;  // ou une autre propriété qui représente l'identifiant unique de l'utilisateur
+    return $this->email;  // ou une autre propriété qui représente l'identifiant unique de l'utilisateur
   }
 
-  public function eraseCredentials() {}
-
+  public function eraseCredentials(): void
+  {
+  }
 
   public function getPushToken(): ?string
   {
@@ -281,12 +309,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     return $this;
   }
 
-  public function getCreatedAt(): ?\DateTimeInterface
+  public function getCreatedAt(): ?DateTimeInterface
   {
     return $this->createdAt;
   }
 
-  public function setCreatedAt(\DateTimeInterface $createdAt): self
+  public function setCreatedAt(DateTimeInterface $createdAt): self
   {
     $this->createdAt = $createdAt;
 
@@ -329,7 +357,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     return $this;
   }
 
-
   /**
    * @return Collection|Follow[]
    */
@@ -352,7 +379,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   {
     // set the owning side to null (unless already changed)
     if ($this->followers->removeElement($follower) && $follower->getFollowing() === $this) {
-          $follower->setFollowing(null);
+      $follower->setFollowing(null);
     }
 
     return $this;
@@ -380,7 +407,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   {
     // set the owning side to null (unless already changed)
     if ($this->following->removeElement($following) && $following->getFollower() === $this) {
-          $following->setFollower(null);
+      $following->setFollower(null);
     }
 
     return $this;
@@ -420,7 +447,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   {
     // set the owning side to null (unless already changed)
     if ($this->purchases->removeElement($purchase) && $purchase->getBuyer() === $this) {
-          $purchase->setBuyer(null);
+      $purchase->setBuyer(null);
     }
 
     return $this;
@@ -460,7 +487,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   {
     // set the owning side to null (unless already changed)
     if ($this->comments->removeElement($comment) && $comment->getUser() === $this) {
-          $comment->setUser(null);
+      $comment->setUser(null);
     }
 
     return $this;
@@ -488,7 +515,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   {
     // set the owning side to null (unless already changed)
     if ($this->shippingAddresses->removeElement($shippingAddress) && $shippingAddress->getUser() === $this) {
-          $shippingAddress->setUser(null);
+      $shippingAddress->setUser(null);
     }
 
     return $this;
@@ -576,7 +603,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   {
     // set the owning side to null (unless already changed)
     if ($this->discussions->removeElement($discussion) && $discussion->getUser() === $this) {
-          $discussion->setUser(null);
+      $discussion->setUser(null);
     }
 
     return $this;
@@ -604,7 +631,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   {
     // set the owning side to null (unless already changed)
     if ($this->securityUsers->removeElement($securityUser) && $securityUser->getUser() === $this) {
-          $securityUser->setUser(null);
+      $securityUser->setUser(null);
     }
 
     return $this;
@@ -632,7 +659,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   {
     // set the owning side to null (unless already changed)
     if ($this->favoris->removeElement($favori) && $favori->getUser() === $this) {
-          $favori->setUser(null);
+      $favori->setUser(null);
     }
 
     return $this;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Variant;
@@ -11,43 +13,43 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @method Variant|null find($id, $lockMode = null, $lockVersion = null)
  * @method Variant|null findOneBy(array $criteria, array $orderBy = null)
- * @method Variant[]    findAll()
- * @method Variant[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Variant[] findAll()
+ * @method Variant[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  * @method Variant|null findOneById(int $id)
  */
 class VariantRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Variant::class);
-    }
+  public function __construct(ManagerRegistry $registry)
+  {
+    parent::__construct($registry, Variant::class);
+  }
 
-    // /**
-    //  * @return Variant[] Returns an array of Variant objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('v')
-            ->andWhere('v.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('v.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+  // /**
+  //  * @return Variant[] Returns an array of Variant objects
+  //  */
+  /*
+  public function findByExampleField($value)
+  {
+      return $this->createQueryBuilder('v')
+          ->andWhere('v.exampleField = :val')
+          ->setParameter('val', $value)
+          ->orderBy('v.id', 'ASC')
+          ->setMaxResults(10)
+          ->getQuery()
+          ->getResult()
+      ;
+  }
+  */
 
-    /*
-    public function findOneBySomeField($value): ?Variant
-    {
-        return $this->createQueryBuilder('v')
-            ->andWhere('v.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+  /*
+  public function findOneBySomeField($value): ?Variant
+  {
+      return $this->createQueryBuilder('v')
+          ->andWhere('v.exampleField = :val')
+          ->setParameter('val', $value)
+          ->getQuery()
+          ->getOneOrNullResult()
+      ;
+  }
+  */
 }

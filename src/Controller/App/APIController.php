@@ -1,34 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\App;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Entity\User;
 use App\Entity\Vendor;
-use App\Repository\ClipRepository;
 use App\Repository\CategoryRepository;
-use App\Repository\ProductRepository;
+use App\Repository\ClipRepository;
 use App\Repository\LiveRepository;
+use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
+use Cloudinary\Api\Upload\UploadApi;
+use Cloudinary\Configuration\Configuration;
 use Doctrine\Persistence\ObjectManager;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Config\Definition\Exception\Exception;
-use Cloudinary\Configuration\Configuration;
-use Cloudinary\Api\Upload\UploadApi;
 
-
-class APIController extends AbstractController {
-
+class APIController extends AbstractController
+{
   public function __construct()
   {
   }
 
   public function getUser(): ?User
   {
-      return parent::getUser();
+    return parent::getUser();
   }
 
   /**
@@ -36,36 +36,35 @@ class APIController extends AbstractController {
    *
    * @Route("/user/api/feed", name="api_feed", methods={"GET"})
    */
-  public function feed(Request $request, ObjectManager $manager, ClipRepository $clipRepo, LiveRepository $liveRepo, SerializerInterface $serializer): JsonResponse {
+  public function feed(Request $request, ObjectManager $manager, ClipRepository $clipRepo, LiveRepository $liveRepo, SerializerInterface $serializer): JsonResponse
+  {
     $vendor = $this->getUser()->getVendor();
-    $lives = $liveRepo->findByLive($vendor);
-    $clips = $clipRepo->findByClip($vendor);
-    $array = [];
+    $lives  = $liveRepo->findByLive($vendor);
+    $clips  = $clipRepo->findByClip($vendor);
+    $array  = [];
 
     if ($lives) {
-    	foreach ($lives as $live) {
-    		$array[] = [ "type" => "live", "value" => $serializer->serialize($live, "json", [
-    			'groups' => 'live:read', 
-    			'circular_reference_limit' => 1, 
-    			'circular_reference_handler' => fn($object) => $object->getId() 
-    		])];
-    	}
+      foreach ($lives as $live) {
+        $array[] = ['type' => 'live', 'value' => $serializer->serialize($live, 'json', [
+          'groups'                     => 'live:read',
+          'circular_reference_limit'   => 1,
+          'circular_reference_handler' => fn ($object) => $object->getId(),
+        ])];
+      }
     }
 
     if ($clips) {
-    	foreach ($clips as $clip) {
-    		$array[] = [ "type" => "clip", "value" => $serializer->serialize($clip, "json", [
-    			'groups' => 'clip:read', 
-    			'circular_reference_limit' => 1, 
-    			'circular_reference_handler' => fn($object) => $object->getId() 
-    		])];
-    	} 
+      foreach ($clips as $clip) {
+        $array[] = ['type' => 'clip', 'value' => $serializer->serialize($clip, 'json', [
+          'groups'                     => 'clip:read',
+          'circular_reference_limit'   => 1,
+          'circular_reference_handler' => fn ($object) => $object->getId(),
+        ])];
+      }
     }
 
     return $this->json($array);
   }
-
-
 
   /**
    * Afficher clips tendances
@@ -77,13 +76,11 @@ class APIController extends AbstractController {
     $clips = $clipRepo->findTrendingClips($this->getUser()->getVendor());
 
     return $this->json($clips, 200, [], [
-      'groups' => 'clip:read', 
-      'circular_reference_limit' => 1, 
-      'circular_reference_handler' => fn($object) => $object->getId() 
+      'groups'                     => 'clip:read',
+      'circular_reference_limit'   => 1,
+      'circular_reference_handler' => fn ($object) => $object->getId(),
     ]);
   }
-
-
 
   /**
    * Afficher les produits tendance
@@ -95,16 +92,14 @@ class APIController extends AbstractController {
     $products = $productRepo->findTrendingProducts($this->getUser()->getVendor());
 
     return $this->json($products, 200, [], [
-      'groups' => 'product:read', 
-      'circular_reference_limit' => 1, 
-      'circular_reference_handler' => fn($object) => $object->getId() 
+      'groups'                     => 'product:read',
+      'circular_reference_limit'   => 1,
+      'circular_reference_handler' => fn ($object) => $object->getId(),
     ]);
   }
 
-
-
   /**
-   * Afficher les produits 
+   * Afficher les produits
    *
    * @Route("/user/api/products/all", name="api_products_all", methods={"GET"})
    */
@@ -113,13 +108,11 @@ class APIController extends AbstractController {
     $products = $productRepo->findProductsNotCreatedByVendor($this->getUser()->getVendor());
 
     return $this->json($products, 200, [], [
-      'groups' => 'product:read', 
-      'circular_reference_limit' => 1, 
-      'circular_reference_handler' => fn($object) => $object->getId() 
+      'groups'                     => 'product:read',
+      'circular_reference_limit'   => 1,
+      'circular_reference_handler' => fn ($object) => $object->getId(),
     ]);
   }
-
-
 
   /**
    * Afficher les produits d'un vendeur
@@ -131,13 +124,11 @@ class APIController extends AbstractController {
     $products = $productRepo->findByVendor($vendor);
 
     return $this->json($products, 200, [], [
-      'groups' => 'product:read', 
-      'circular_reference_limit' => 1, 
-      'circular_reference_handler' => fn($object) => $object->getId() 
+      'groups'                     => 'product:read',
+      'circular_reference_limit'   => 1,
+      'circular_reference_handler' => fn ($object) => $object->getId(),
     ]);
   }
-
-
 
   /**
    * Afficher le profil
@@ -147,29 +138,27 @@ class APIController extends AbstractController {
   public function profile(User $user, Request $request, ObjectManager $manager): JsonResponse
   {
     return $this->json($user, 200, [], [
-    	'groups' => 'user:read', 
-    	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => fn($object) => $object->getId() 
+      'groups'                     => 'user:read',
+      'circular_reference_limit'   => 1,
+      'circular_reference_handler' => fn ($object) => $object->getId(),
     ]);
   }
-
 
   /**
    * Récupérer les clips d'un profil
    *
    * @Route("/api/profile/{id}/clips", name="api_profile_clips", methods={"GET"})
    */
-  public function profileClips(User $user, Request $request, ObjectManager $manager, ClipRepository $clipRepo, SerializerInterface $serializer): JsonResponse {
+  public function profileClips(User $user, Request $request, ObjectManager $manager, ClipRepository $clipRepo, SerializerInterface $serializer): JsonResponse
+  {
     $clips = $clipRepo->retrieveClips($user->getVendor());
 
     return $this->json($clips, 200, [], [
-      'groups' => 'clip:read', 
-      'circular_reference_limit' => 1, 
-      'circular_reference_handler' => fn($object) => $object->getId() 
+      'groups'                     => 'clip:read',
+      'circular_reference_limit'   => 1,
+      'circular_reference_handler' => fn ($object) => $object->getId(),
     ]);
   }
-
-
 
   /**
    * Récupérer les produits d'un profil
@@ -181,69 +170,65 @@ class APIController extends AbstractController {
     $products = $productRepo->findByVendor($user->getVendor());
 
     return $this->json($products, 200, [], [
-      'groups' => 'product:read', 
-      'circular_reference_limit' => 1, 
-      'circular_reference_handler' => fn($object) => $object->getId() 
+      'groups'                     => 'product:read',
+      'circular_reference_limit'   => 1,
+      'circular_reference_handler' => fn ($object) => $object->getId(),
     ]);
   }
-
-
 
   /**
    * Afficher les catégories
    *
    * @Route("/api/categories", name="api_categories", methods={"GET"})
    */
-  public function categories(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo): JsonResponse {
+  public function categories(Request $request, ObjectManager $manager, CategoryRepository $categoryRepo): JsonResponse
+  {
     $categories = $categoryRepo->findAll();
 
     return $this->json($categories, 200, [], ['groups' => 'category:read']);
   }
-
-
 
   /**
    * Modifier image du profil
    *
    * @Route("/api/registration/picture", name="api_registration_picture")
    */
-  public function registrationPicture(Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse {
-    $file = json_decode($request->getContent(), true);
+  public function registrationPicture(Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse
+  {
+    $file = \json_decode($request->getContent(), true);
 
-    if ($file && array_key_exists("picture", $file)) {
-        $file = $file["picture"];
-        $content = $file;
-        $extension = 'jpg';
+    if ($file && \array_key_exists('picture', $file)) {
+      $file      = $file['picture'];
+      $content   = $file;
+      $extension = 'jpg';
     } elseif ($request->files->get('picture')) {
-        $file = $request->files->get('picture');
-        $content = file_get_contents($file);
-        $extension = $file->guessExtension();
+      $file      = $request->files->get('picture');
+      $content   = \file_get_contents($file);
+      $extension = $file->guessExtension();
     } else {
       return $this->json("L'image est introuvable !", 404);
     }
 
-    $filename = md5(time().uniqid()); 
-    $fullname = $filename . "." . $extension; 
+    $filename = \md5(\time() . \uniqid());
+    $fullname = $filename . '.' . $extension;
     $file->move($this->getParameter('uploads_directory'), $fullname);
     $file = $this->getParameter('uploads_directory') . '/' . $fullname;
 
     try {
       Configuration::instance($this->getParameter('cloudinary'));
       $result = (new UploadApi())->upload($file, [
-        'public_id' => $filename,
-        'use_filename' => TRUE,
-        "height" => 256, 
-        "width" => 256, 
-        "crop" => "thumb"
+        'public_id'    => $filename,
+        'use_filename' => true,
+        'height'       => 256,
+        'width'        => 256,
+        'crop'         => 'thumb',
       ]);
-
     } catch (\Exception $e) {
       return $this->json($e->getMessage(), 404);
     }
 
     return $this->json($fullname, 200);
   }
-
 
   /**
    * Rechercher un vendeur
@@ -253,12 +238,12 @@ class APIController extends AbstractController {
   public function search(Request $request, UserRepository $repo, ObjectManager $manager): JsonResponse
   {
     $search = $request->query->get('search');
-    $users = $repo->findUserBySearch($search, $this->getUser()->getVendor());
+    $users  = $repo->findUserBySearch($search, $this->getUser()->getVendor());
 
     return $this->json($users, 200, [], [
-    	'groups' => 'user:follow', 
-    	'circular_reference_limit' => 1, 
-    	'circular_reference_handler' => fn($object) => $object->getId() 
+      'groups'                     => 'user:follow',
+      'circular_reference_limit'   => 1,
+      'circular_reference_handler' => fn ($object) => $object->getId(),
     ]);
   }
 }

@@ -1,12 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\DiscussionRepository;
-use Symfony\Component\Serializer\Annotation\Groups;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=DiscussionRepository::class)
@@ -15,8 +19,11 @@ class Discussion
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("discussion:read")
    * @Groups("user:read")
    */
@@ -24,64 +31,72 @@ class Discussion
 
   /**
    * @ORM\Column(type="text")
+   *
    * @Groups("discussion:read")
    */
   private $preview;
 
   /**
    * @ORM\Column(type="datetime")
+   *
    * @Groups("discussion:read")
    */
   private $createdAt;
 
   /**
    * @ORM\Column(type="datetime", nullable=true)
+   *
    * @Groups("discussion:read")
    */
   private $updatedAt;
 
   /**
    * @ORM\OneToMany(targetEntity=Message::class, mappedBy="discussion", cascade={"persist"}), orphanRemoval=true)
+   *
    * @Groups("discussion:read")
    */
   private $messages;
 
   /**
    * @ORM\Column(type="boolean", nullable=true)
+   *
    * @Groups("discussion:read")
    */
   private $unseen;
 
   /**
    * @ORM\Column(type="boolean", nullable=true)
+   *
    * @Groups("discussion:read")
    */
   private $unseenVendor;
 
   /**
    * @ORM\ManyToOne(targetEntity=User::class, inversedBy="discussions")
+   *
    * @Groups("discussion:read")
    */
   private $user;
 
   /**
    * @ORM\ManyToOne(targetEntity=User::class, inversedBy="discussions")
+   *
    * @Groups("discussion:read")
    */
   private $vendor;
 
   /**
    * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="discussions")
+   *
    * @Groups("discussion:read")
    */
   private $purchase;
 
-
   public function __construct()
   {
-    $this->messages = new ArrayCollection();
-    $this->createdAt = new \DateTime('now', timezone_open('UTC'));
-    $this->updatedAt = new \DateTime('now', timezone_open('UTC'));
+    $this->messages  = new ArrayCollection();
+    $this->createdAt = new DateTime('now', \timezone_open('UTC'));
+    $this->updatedAt = new DateTime('now', \timezone_open('UTC'));
   }
 
   public function getId(): ?int
@@ -101,24 +116,24 @@ class Discussion
     return $this;
   }
 
-  public function getCreatedAt(): ?\DateTimeInterface
+  public function getCreatedAt(): ?DateTimeInterface
   {
     return $this->createdAt;
   }
 
-  public function setCreatedAt(\DateTimeInterface $createdAt): self
+  public function setCreatedAt(DateTimeInterface $createdAt): self
   {
     $this->createdAt = $createdAt;
 
     return $this;
   }
 
-  public function getUpdatedAt(): ?\DateTimeInterface
+  public function getUpdatedAt(): ?DateTimeInterface
   {
     return $this->updatedAt;
   }
 
-  public function setUpdatedAt(\DateTimeInterface $updatedAt): self
+  public function setUpdatedAt(DateTimeInterface $updatedAt): self
   {
     $this->updatedAt = $updatedAt;
 
@@ -147,7 +162,7 @@ class Discussion
   {
     // set the owning side to null (unless already changed)
     if ($this->messages->removeElement($message) && $message->getDiscussion() === $this) {
-          $message->setDiscussion(null);
+      $message->setDiscussion(null);
     }
 
     return $this;

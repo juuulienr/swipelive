@@ -1,26 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\OrderStatusRepository;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=OrderStatusRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=OrderStatusRepository::class)
+ */
 class OrderStatus
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("order:read")
    */
   private $id;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("order:read")
    */
   private $code;
@@ -32,30 +39,35 @@ class OrderStatus
 
   /**
    * @ORM\Column(type="datetime")
+   *
    * @Groups("order:read")
    */
   private $date;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("order:read")
    */
   private $location;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("order:read")
    */
   private $city;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("order:read")
    */
   private $postcode;
 
   /**
    * @ORM\Column(type="string", length=255)
+   *
    * @Groups("order:read")
    */
   private $description;
@@ -89,12 +101,12 @@ class OrderStatus
     return $this;
   }
 
-  public function getDate(): ?\DateTimeInterface
+  public function getDate(): ?DateTimeInterface
   {
     return $this->date;
   }
 
-  public function setDate(\DateTimeInterface $date): self
+  public function setDate(DateTimeInterface $date): self
   {
     $this->date = $date;
 

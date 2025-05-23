@@ -1,29 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use App\Entity\Role;
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass="App\Repository\VendorRepository")
-* @UniqueEntity(
-*  fields={"pseudo"},
-*  message="Le pseudo est indisponible"
-* )
-*/
+ * @ORM\Entity(repositoryClass="App\Repository\VendorRepository")
+ *
+ * @UniqueEntity(
+ *     fields={"pseudo"},
+ *     message="Le pseudo est indisponible"
+ * )
+ */
 class Vendor
 {
   /**
-   * @ORM\Id()
-   * @ORM\GeneratedValue()
+   * @ORM\Id
+   *
+   * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("user:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -41,12 +44,14 @@ class Vendor
 
   /**
    * @ORM\OneToMany(targetEntity=Clip::class, mappedBy="vendor")
+   *
    * @Groups("user:read")
    */
   private $clips;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -57,6 +62,7 @@ class Vendor
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -66,13 +72,16 @@ class Vendor
 
   /**
    * @ORM\OneToMany(targetEntity=Product::class, mappedBy="vendor")
-   * @ORM\OrderBy({"title" = "ASC"})
+   *
+   * @ORM\OrderBy({"title": "ASC"})
+   *
    * @Groups("user:read")
    */
   private $products;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    * @Groups("product:read")
    * @Groups("clip:read")
@@ -83,6 +92,7 @@ class Vendor
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -95,67 +105,79 @@ class Vendor
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $siren;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $address;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $city;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $zip;
 
   /**
    * @ORM\OneToMany(targetEntity=Order::class, mappedBy="vendor")
-   * @ORM\OrderBy({"createdAt" = "DESC"})
+   *
+   * @ORM\OrderBy({"createdAt": "DESC"})
    */
   private $sales;
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+   *
    * @Groups("user:read")
    */
-  private $pending = "0.00";
+  private $pending = '0.00';
 
   /**
    * @ORM\Column(type="decimal", precision=8, scale=2, nullable=true)
+   *
    * @Groups("user:read")
    */
-  private $available = "0.00";
+  private $available = '0.00';
 
   /**
    * @ORM\OneToMany(targetEntity=Withdraw::class, mappedBy="vendor")
-   * @ORM\OrderBy({"createdAt" = "DESC"})
+   *
+   * @ORM\OrderBy({"createdAt": "DESC"})
+   *
    * @Groups("user:read")
    */
   private $withdraws;
 
   /**
    * @ORM\OneToMany(targetEntity=BankAccount::class, mappedBy="vendor")
+   *
    * @Groups("user:read")
    */
   private $bankAccounts;
 
   /**
    * @ORM\Column(type="boolean", nullable=true)
+   *
    * @Groups("user:read")
    */
   private $verified = false;
 
   /**
    * @ORM\OneToOne(targetEntity=User::class, mappedBy="vendor", cascade={"persist", "remove"})
+   *
    * @Groups("clip:read")
    * @Groups("live:read")
    * @Groups("order:read")
@@ -165,19 +187,23 @@ class Vendor
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
   private $country;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("user:read")
    */
-  private $countryCode = "FR";
+  private $countryCode = 'FR';
 
   /**
    * @ORM\OneToMany(targetEntity=Promotion::class, mappedBy="vendor", orphanRemoval=true)
-   * @ORM\OrderBy({"createdAt" = "DESC"})
+   *
+   * @ORM\OrderBy({"createdAt": "DESC"})
+   *
    * @Groups("user:read")
    * @Groups("clip:read")
    * @Groups("live:read")
@@ -194,24 +220,22 @@ class Vendor
    */
   private $personId;
 
-  
   public function __construct()
   {
-    $this->lives = new ArrayCollection();
-    $this->clips = new ArrayCollection();
-    $this->products = new ArrayCollection();
-    $this->sales = new ArrayCollection();
-    $this->withdraws = new ArrayCollection();
+    $this->lives        = new ArrayCollection();
+    $this->clips        = new ArrayCollection();
+    $this->products     = new ArrayCollection();
+    $this->sales        = new ArrayCollection();
+    $this->withdraws    = new ArrayCollection();
     $this->bankAccounts = new ArrayCollection();
-    $this->promotions = new ArrayCollection();
+    $this->promotions   = new ArrayCollection();
   }
-  
 
   public function getId()
   {
     return $this->id;
   }
-  
+
   /**
    * @return Collection|Live[]
    */
@@ -234,12 +258,11 @@ class Vendor
   {
     // set the owning side to null (unless already changed)
     if ($this->lives->removeElement($live) && $live->getVendor() === $this) {
-          $live->setVendor(null);
+      $live->setVendor(null);
     }
 
     return $this;
   }
-
 
   /**
    * @return Collection|Clip[]
@@ -263,7 +286,7 @@ class Vendor
   {
     // set the owning side to null (unless already changed)
     if ($this->clips->removeElement($clip) && $clip->getVendor() === $this) {
-          $clip->setVendor(null);
+      $clip->setVendor(null);
     }
 
     return $this;
@@ -281,7 +304,6 @@ class Vendor
     return $this;
   }
 
-  
   public function getSummary(): ?string
   {
     return $this->summary;
@@ -316,12 +338,11 @@ class Vendor
   {
     // set the owning side to null (unless already changed)
     if ($this->products->removeElement($product) && $product->getVendor() === $this) {
-          $product->setVendor(null);
+      $product->setVendor(null);
     }
 
     return $this;
   }
-
 
   public function getBusinessType(): ?string
   {
@@ -382,7 +403,7 @@ class Vendor
 
     return $this;
   }
-  
+
   /**
    * @return Collection|Order[]
    */
@@ -405,7 +426,7 @@ class Vendor
   {
     // set the owning side to null (unless already changed)
     if ($this->sales->removeElement($sale) && $sale->getVendor() === $this) {
-          $sale->setVendor(null);
+      $sale->setVendor(null);
     }
 
     return $this;
@@ -469,7 +490,7 @@ class Vendor
   {
     // set the owning side to null (unless already changed)
     if ($this->withdraws->removeElement($withdraw) && $withdraw->getVendor() === $this) {
-          $withdraw->setVendor(null);
+      $withdraw->setVendor(null);
     }
 
     return $this;
@@ -497,7 +518,7 @@ class Vendor
   {
     // set the owning side to null (unless already changed)
     if ($this->bankAccounts->removeElement($bankAccount) && $bankAccount->getVendor() === $this) {
-          $bankAccount->setVendor(null);
+      $bankAccount->setVendor(null);
     }
 
     return $this;
@@ -522,12 +543,12 @@ class Vendor
 
   public function setUser(?User $user): self
   {
-      // unset the owning side of the relation if necessary
-    if (!$user instanceof User && $this->user !== null) {
+    // unset the owning side of the relation if necessary
+    if (!$user instanceof User && null !== $this->user) {
       $this->user->setVendor(null);
     }
 
-      // set the owning side of the relation if necessary
+    // set the owning side of the relation if necessary
     if ($user instanceof User && $user->getVendor() !== $this) {
       $user->setVendor($this);
     }
@@ -583,7 +604,7 @@ class Vendor
   {
     // set the owning side to null (unless already changed)
     if ($this->promotions->removeElement($promotion) && $promotion->getVendor() === $this) {
-          $promotion->setVendor(null);
+      $promotion->setVendor(null);
     }
 
     return $this;

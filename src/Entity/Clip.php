@@ -1,22 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\ClipRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
-* @ORM\Entity(repositoryClass=ClipRepository::class)
-*/
+ * @ORM\Entity(repositoryClass=ClipRepository::class)
+ */
 class Clip
 {
   /**
    * @ORM\Id
+   *
    * @ORM\GeneratedValue
+   *
    * @ORM\Column(type="integer")
+   *
    * @Groups("clip:read")
    * @Groups("user:read")
    */
@@ -24,74 +31,88 @@ class Clip
 
   /**
    * @ORM\ManyToOne(targetEntity=Vendor::class, inversedBy="clips")
+   *
    * @Groups("clip:read")
    */
   private $vendor;
 
   /**
    * @ORM\ManyToOne(targetEntity=Live::class, inversedBy="clips")
+   *
    * @ORM\JoinColumn(nullable=false)
    */
   private $live;
 
   /**
    * @ORM\Column(type="integer")
+   *
    * @Groups("clip:read")
    */
   private $start;
 
   /**
    * @ORM\Column(type="integer")
+   *
    * @Groups("clip:read")
    */
   private $end;
 
   /**
    * @ORM\Column(type="integer")
+   *
    * @Groups("clip:read")
    */
   private $duration;
 
   /**
    * @ORM\Column(type="text", nullable=true)
+   *
    * @Groups("clip:read")
    */
   private $fileList;
 
   /**
    * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="clips")
+   *
    * @ORM\JoinColumn(nullable=false)
+   *
    * @Groups("clip:read")
    */
   private $product;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("clip:read")
    */
   private $preview;
 
   /**
    * @ORM\Column(type="string", length=255, nullable=true)
+   *
    * @Groups("clip:read")
    */
-  private $status = "waiting";
+  private $status = 'waiting';
 
   /**
    * @ORM\Column(type="datetime", nullable=true)
+   *
    * @Groups("clip:read")
    */
   private $createdAt;
 
   /**
    * @ORM\OneToMany(targetEntity=Comment::class, mappedBy="clip")
-   * @ORM\OrderBy({"createdAt" = "ASC"})
+   *
+   * @ORM\OrderBy({"createdAt": "ASC"})
+   *
    * @Groups("clip:read")
    */
   private $comments;
 
   /**
    * @ORM\Column(type="integer", nullable=true)
+   *
    * @Groups("clip:read")
    */
   private $totalLikes;
@@ -101,14 +122,12 @@ class Clip
    */
   private $jobId;
 
-  
   public function __construct()
   {
-    $this->createdAt = new \DateTime('now', timezone_open('UTC'));
-    $this->comments = new ArrayCollection();
-    $this->totalLikes = random_int(10, 200);
+    $this->createdAt  = new DateTime('now', \timezone_open('UTC'));
+    $this->comments   = new ArrayCollection();
+    $this->totalLikes = \random_int(10, 200);
   }
-
 
   public function getId(): ?int
   {
@@ -223,18 +242,17 @@ class Clip
     return $this;
   }
 
-  public function getCreatedAt(): ?\DateTimeInterface
+  public function getCreatedAt(): ?DateTimeInterface
   {
     return $this->createdAt;
   }
 
-  public function setCreatedAt(?\DateTimeInterface $createdAt): self
+  public function setCreatedAt(?DateTimeInterface $createdAt): self
   {
     $this->createdAt = $createdAt;
 
     return $this;
   }
-
 
   /**
    * @return Collection|Comment[]
@@ -258,7 +276,7 @@ class Clip
   {
     // set the owning side to null (unless already changed)
     if ($this->comments->removeElement($comment) && $comment->getClip() === $this) {
-          $comment->setClip(null);
+      $comment->setClip(null);
     }
 
     return $this;
@@ -278,13 +296,13 @@ class Clip
 
   public function setJobId(string $jobId): self
   {
-      $this->jobId = $jobId;
-      return $this;
+    $this->jobId = $jobId;
+
+    return $this;
   }
 
   public function getJobId(): ?string
   {
-      return $this->jobId;
+    return $this->jobId;
   }
-
 }
