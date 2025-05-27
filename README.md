@@ -6,13 +6,15 @@
 
 ## 📱 À propos
 
-SwipeLive était une application mobile innovante de live shopping, permettant aux vendeurs de présenter leurs produits en direct et aux acheteurs d'interagir et d'acheter en temps réel. Le projet combinait l'expérience immersive du streaming en direct avec la simplicité du commerce électronique.
+SwipeLive était une application mobile innovante de live shopping, permettant aux vendeurs de présenter leurs produits en direct et aux acheteurs d'interagir et d'acheter en temps réel. 
+Le projet combinait l'expérience immersive du streaming en direct avec la simplicité du commerce électronique.
 
-**État du projet :** Le développement a été arrêté suite à l'arrivée de TikTok Shop en France.
+**État du projet :** Application fonctionnelle, levée de fonds signée (250k €), projet arrêté stratégiquement avant l'utilisation des fonds suite à l'arrivée de TikTok Shop en France. 
+
 
 ### Composants du projet :
-- **Backend :** API REST développée avec Symfony 6.4 (ce dépôt)
-- **Frontend mobile :** Application développée avec Capacitor et Vue.js 3 (Me contacter si intéressé)
+- **Backend :** API RESTful & WebSocket développée avec Symfony 6.4 ([github.com/juuulienr/swipelive](https://github.com/juuulienr/swipelive))
+- **Frontend mobile :** Application développée avec Capacitor et Vue.js 3 ([github.com/juuulienr/swipelive-app](https://github.com/juuulienr/swipelive-app))
 
 ## 🚀 Fonctionnalités
 
@@ -68,7 +70,6 @@ SwipeLive était une application mobile innovante de live shopping, permettant a
 - Composer
 - MySQL/MariaDB
 - FFmpeg
-- Node.js et npm/yarn (pour les assets)
 
 ## 🚀 Installation
 
@@ -166,6 +167,66 @@ src/
 └── EventListener/  # Listeners d'événements
 ```
 
+## 🔄 Améliorations Architecturales Potentielles
+
+Cette section présente les améliorations architecturales qui auraient pu être implémentées avec le recul pour rendre le projet plus robuste, plus performant et maintenable.
+
+### Domain-Driven Design (DDD)
+- Implémentation d'une architecture en couches (Layered Architecture)
+  ```
+  src/
+  ├── Domain/          # Entités, Value Objects, Events
+  ├── Application/     # Use Cases, Services applicatifs
+  ├── Infrastructure/  # Persistence, External Services
+  └── Presentation/   # Controllers, DTOs
+  ```
+- Définition de Bounded Contexts clairs (ex: Streaming, Marketplace, Authentication)
+- Utilisation d'Aggregates pour maintenir la cohérence des données
+- Implémentation d'Event Sourcing pour le suivi des changements d'état
+
+### Clean Architecture
+- Séparation stricte des responsabilités avec le principe des cercles concentriques
+- Inversion des dépendances (interfaces dans le domaine)
+- Use Cases isolés et testables
+- Mappers dédiés entre les couches
+
+### Microservices
+Décomposition potentielle en services autonomes :
+- Service de Streaming (Agora)
+- Service de Paiement (Stripe)
+- Service de Gestion des Produits
+- Service de Chat
+- Service de Notification
+- Service d'Authentication
+
+### Améliorations Techniques
+- **Tests**
+  - Tests unitaires plus exhaustifs
+  - Tests d'intégration avec TestContainers
+  - Tests de performance avec K6
+  - Tests E2E avec Cypress
+  - Fixtures plus complètes avec Alice
+
+- **Patterns & Pratiques**
+  - Command Query Responsibility Segregation (CQRS)
+  - Implementation du pattern Mediator (ex: symfony/messenger)
+  - Circuit Breaker pour les appels aux services externes
+  - Cache distribué avec Redis
+  - File d'attente avec RabbitMQ pour les opérations asynchrones
+
+- **Monitoring & Observabilité**
+  - Distributed Tracing avec Jaeger
+  - Métriques détaillées avec Prometheus
+  - Dashboards Grafana
+  - Log aggregation avec ELK Stack
+
+- **CI/CD**
+  - Pipeline de déploiement blue/green
+  - Tests de sécurité automatisés
+  - Quality Gates avec SonarQube
+  - Analyse statique du code plus poussée
+
+Ces améliorations démontrent une compréhension approfondie des pratiques modernes de développement et d'architecture logicielle, tout en maintenant un équilibre entre complexité et maintenabilité.
 
 ## 📝 License
 
