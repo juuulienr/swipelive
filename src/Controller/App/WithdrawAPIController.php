@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Entity\Withdraw;
 use App\Repository\BankAccountRepository;
 use Doctrine\Persistence\ObjectManager;
+use Exception;
 use Stripe\StripeClient;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,6 +21,7 @@ class WithdrawAPIController extends AbstractController
   public function getUser(): ?User
   {
     $user = parent::getUser();
+
     return $user instanceof User ? $user : null;
   }
 
@@ -71,7 +73,7 @@ class WithdrawAPIController extends AbstractController
 
           $bank->setBankId((string) $stripeBank->id);
           $manager->flush();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
           return $this->json($e->getMessage(), 404);
         }
 
@@ -126,7 +128,7 @@ class WithdrawAPIController extends AbstractController
                 'circular_reference_limit'   => 1,
                 'circular_reference_handler' => fn ($object) => $object->getId(),
               ]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
               return $this->json($e->getMessage(), 404);
             }
           } else {
@@ -154,7 +156,7 @@ class WithdrawAPIController extends AbstractController
           $stripe->accounts->updatePerson($vendor->getStripeAcc(), $vendor->getPersonId(), ['person_token' => $param['person_token']]);
 
           return $this->json(true, 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
           return $this->json($e->getMessage(), 404);
         }
       }
@@ -178,7 +180,7 @@ class WithdrawAPIController extends AbstractController
           $update = $stripe->accounts->updatePerson($vendor->getStripeAcc(), $vendor->getPersonId(), ['person_token' => $param['person_token']]);
 
           return $this->json(true, 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
           return $this->json($e->getMessage(), 404);
         }
       }
@@ -193,7 +195,7 @@ class WithdrawAPIController extends AbstractController
   public function verifCompany(Request $request, ObjectManager $manager): JsonResponse
   {
     $file = $request->files->get('document');
-    
+
     if (!$file) {
       return $this->json('Le document est introuvable !', 404);
     }

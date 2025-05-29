@@ -14,6 +14,7 @@ use App\Repository\UserRepository;
 use Cloudinary\Api\Upload\UploadApi;
 use Cloudinary\Configuration\Configuration;
 use Doctrine\Persistence\ObjectManager;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +30,7 @@ class APIController extends AbstractController
   public function getUser(): ?User
   {
     $user = parent::getUser();
+
     return $user instanceof User ? $user : null;
   }
 
@@ -224,7 +226,7 @@ class APIController extends AbstractController
         'width'        => 256,
         'crop'         => 'thumb',
       ]);
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
       return $this->json($e->getMessage(), 404);
     }
 

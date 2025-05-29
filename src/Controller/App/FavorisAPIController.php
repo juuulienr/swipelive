@@ -19,6 +19,7 @@ class FavorisAPIController extends AbstractController
   public function getUser(): ?User
   {
     $user = parent::getUser();
+
     return $user instanceof User ? $user : null;
   }
 

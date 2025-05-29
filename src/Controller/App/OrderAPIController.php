@@ -36,6 +36,7 @@ class OrderAPIController extends AbstractController
   public function getUser(): ?User
   {
     $user = parent::getUser();
+
     return $user instanceof User ? $user : null;
   }
 
@@ -149,6 +150,7 @@ class OrderAPIController extends AbstractController
 
                 if (!$itemSoldOut) {
                   $hasValidItems = true;
+
                   if ('g' === $weightUnit) {
                     $totalWeight += \round($weight / 1000, 2);
                   } else {
@@ -221,7 +223,7 @@ class OrderAPIController extends AbstractController
               $stripe         = new StripeClient($this->getParameter('stripe_sk'));
               $stripeCustomer = $stripe->customers->create([
                 'email' => $buyer->getEmail(),
-                'name'  => \ucwords((string) $buyer->getFullName()),
+                'name'  => \ucwords($buyer->getFullName()),
               ]);
 
               $buyer->setStripeCustomer($stripeCustomer->id);

@@ -30,6 +30,7 @@ class ProductAPIController extends AbstractController
   public function getUser(): ?User
   {
     $user = parent::getUser();
+
     return $user instanceof User ? $user : null;
   }
 
@@ -117,7 +118,7 @@ class ProductAPIController extends AbstractController
   public function deleteProduct(Product $product, Request $request, LiveProductsRepository $liveProductRepo, ClipRepository $clipRepo, LineItemRepository $lineItemRepo, ObjectManager $manager): JsonResponse
   {
     $clips = $clipRepo->findByProduct($product);
-    $env   = $this->getParameter('environment');
+    $this->getParameter('environment');
 
     if ($clips) {
       foreach ($clips as $clip) {
@@ -223,6 +224,7 @@ class ProductAPIController extends AbstractController
   public function editVariant(Variant $variant, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse
   {
     $json = $request->getContent();
+
     if (!$json) {
       return $this->json('Une erreur est survenue', 404);
     }

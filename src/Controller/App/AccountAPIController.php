@@ -40,6 +40,7 @@ class AccountAPIController extends AbstractController
   public function getUser(): ?User
   {
     $user = parent::getUser();
+
     return $user instanceof User ? $user : null;
   }
 
@@ -238,9 +239,8 @@ class AccountAPIController extends AbstractController
             $manager->flush();
 
             return $this->json(true, 200);
-          } else {
-            return $this->json(false, 200);
           }
+          return $this->json(false, 200);
         } catch (Exception $e) {
           return $this->json($e, 404);
         }
@@ -351,9 +351,8 @@ class AccountAPIController extends AbstractController
           $manager->flush();
 
           return $this->json(true, 200);
-        } else {
-          return $this->json(false, 200);
         }
+        return $this->json(false, 200);
       }
     }
 
@@ -460,9 +459,8 @@ class AccountAPIController extends AbstractController
           $manager->flush();
 
           return $this->json(true, 200);
-        } else {
-          return $this->json(false, 200);
         }
+        return $this->json(false, 200);
       }
     }
 
