@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-php-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-dev --no-scripts --optimize-autoloader
+        run: composer install --prefer-dist --no-progress --no-scripts --optimize-autoloader
 
       - name: Check PHP CS Fixer (Code Style)
         run: vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff
