@@ -170,9 +170,6 @@
     "nikic/php-parser": {
         "version": "v4.0.3"
     },
-    "paragonie/random_compat": {
-        "version": "v9.99.100"
-    },
     "paragonie/sodium_compat": {
         "version": "v1.17.0"
     },

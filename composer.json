@@ -1,11 +1,13 @@
 {
+  "name": "swipelive/app",
+  "description": "SwipeLive",
   "type": "project",
   "license": "proprietary",
   "require": {
     "php": "^8.2",
     "ext-iconv": "*",
     "ext-pgsql": "*",
-    "aws/aws-sdk-php": "*",
+    "aws/aws-sdk-php": "^3.0",
     "boogiefromzk/agora-token": "^1.0",
     "bugsnag/bugsnag-symfony": "^1.13",
     "cloudinary/cloudinary_php": "^2.11",
