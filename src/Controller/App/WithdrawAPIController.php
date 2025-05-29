@@ -110,7 +110,7 @@ class WithdrawAPIController extends AbstractController
                 ['stripe_account' => $vendor->getStripeAcc()]
               );
 
-              $vendor->setAvailable($vendor->getAvailable() - $withdrawAmount);
+              $vendor->setAvailable((string) ($vendor->getAvailable() - $withdrawAmount));
 
               // check amount payout
               $withdraw = new Withdraw();
