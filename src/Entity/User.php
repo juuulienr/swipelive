@@ -136,7 +136,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   private $purchases;
 
   /**
-   * @ORM\OneToOne(targetEntity=Vendor::class, cascade={"persist", "remove"})
+   * @ORM\OneToOne(targetEntity=Vendor::class, inversedBy="user", cascade={"persist", "remove"})
    *
    * @Groups("user:read")
    * @Groups("live:read")
@@ -201,6 +201,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   private $discussions;
 
   /**
+   * @ORM\OneToMany(targetEntity=Discussion::class, mappedBy="vendor")
+   */
+  private $vendorDiscussions;
+
+  /**
    * @ORM\OneToMany(targetEntity=SecurityUser::class, mappedBy="user", orphanRemoval=true)
    *
    * @Groups("discussion:read")
@@ -239,6 +244,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     $this->createdAt         = new DateTime('now', \timezone_open('UTC'));
     $this->shippingAddresses = new ArrayCollection();
     $this->discussions       = new ArrayCollection();
+    $this->vendorDiscussions = new ArrayCollection();
     $this->securityUsers     = new ArrayCollection();
     $this->favoris           = new ArrayCollection();
   }
@@ -697,6 +703,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
   public function setGoogleId(?string $googleId): self
   {
     $this->googleId = $googleId;
+
+    return $this;
+  }
+
+  /**
+   * @return Collection|Discussion[]
+   */
+  public function getVendorDiscussions(): Collection
+  {
+    return $this->vendorDiscussions;
+  }
+
+  public function addVendorDiscussion(Discussion $vendorDiscussion): self
+  {
+    if (!$this->vendorDiscussions->contains($vendorDiscussion)) {
+      $this->vendorDiscussions[] = $vendorDiscussion;
+      $vendorDiscussion->setVendor($this);
+    }
+
+    return $this;
+  }
+
+  public function removeVendorDiscussion(Discussion $vendorDiscussion): self
+  {
+    // set the owning side to null (unless already changed)
+    if ($this->vendorDiscussions->removeElement($vendorDiscussion) && $vendorDiscussion->getVendor() === $this) {
+      $vendorDiscussion->setVendor(null);
+    }
 
     return $this;
   }

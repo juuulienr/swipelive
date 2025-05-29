@@ -79,7 +79,7 @@ class Discussion
   private $user;
 
   /**
-   * @ORM\ManyToOne(targetEntity=User::class, inversedBy="discussions")
+   * @ORM\ManyToOne(targetEntity=User::class, inversedBy="vendorDiscussions")
    *
    * @Groups("discussion:read")
    */
