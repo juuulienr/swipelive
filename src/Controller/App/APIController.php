@@ -28,7 +28,8 @@ class APIController extends AbstractController
 
   public function getUser(): ?User
   {
-    return parent::getUser();
+    $user = parent::getUser();
+    return $user instanceof User ? $user : null;
   }
 
   /**

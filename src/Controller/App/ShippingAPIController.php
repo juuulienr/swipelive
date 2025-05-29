@@ -30,7 +30,8 @@ class ShippingAPIController extends AbstractController
 {
   public function getUser(): ?User
   {
-    return parent::getUser();
+    $user = parent::getUser();
+    return $user instanceof User ? $user : null;
   }
 
   /**
@@ -351,7 +352,6 @@ class ShippingAPIController extends AbstractController
         return $this->json($result->error, 404);
       }
 
-
       try {
         $url  = 'https://www.upelgo.com/api/carrier/' . $order->getShippingCarrierId() . '/track';
         $data = [
@@ -425,8 +425,6 @@ class ShippingAPIController extends AbstractController
     } catch (\Exception $e) {
       return $this->json($e->getMessage(), 404);
     }
-
-    return $this->json(false, 404);
   }
 
   /**

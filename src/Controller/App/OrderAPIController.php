@@ -35,7 +35,8 @@ class OrderAPIController extends AbstractController
 
   public function getUser(): ?User
   {
-    return parent::getUser();
+    $user = parent::getUser();
+    return $user instanceof User ? $user : null;
   }
 
   /**
@@ -103,6 +104,7 @@ class OrderAPIController extends AbstractController
         $soldOut             = false;
         $totalWeight         = 0;
         $subTotal            = 0;
+        $hasValidItems       = false;
 
         $order = new Order();
         $order->setBuyer($buyer);
@@ -113,7 +115,7 @@ class OrderAPIController extends AbstractController
             $productItem = $item['product'];
             $variantItem = $item['variant'];
             $lineItem    = new LineItem();
-            $soldOut     = false;
+            $itemSoldOut = false;
 
             if ($productItem) {
               $product = $productRepo->findOneById($productItem['id']);
@@ -132,9 +134,9 @@ class OrderAPIController extends AbstractController
 
                     $lineItem->setVariant($variant);
                   } else {
-                    $soldOut = true;
+                    $itemSoldOut = true;
                   }
-                } elseif ($product && $product->getQuantity() > 0) {
+                } elseif ($product->getQuantity() > 0) {
                   $weightUnit = $product->getWeightUnit();
                   $weight     = $product->getWeight();
                   $title      = $product->getTitle();
@@ -142,10 +144,11 @@ class OrderAPIController extends AbstractController
                   $lineTotal  = $product->getPrice() * $quantity;
                   $subTotal += $lineTotal;
                 } else {
-                  $soldOut = true;
+                  $itemSoldOut = true;
                 }
 
-                if (!$soldOut) {
+                if (!$itemSoldOut) {
+                  $hasValidItems = true;
                   if ('g' === $weightUnit) {
                     $totalWeight += \round($weight / 1000, 2);
                   } else {
@@ -154,14 +157,16 @@ class OrderAPIController extends AbstractController
 
                   $lineItem->setQuantity($quantity);
                   $lineItem->setProduct($product);
-                  $lineItem->setPrice($price);
-                  $lineItem->setTotal($lineTotal);
+                  $lineItem->setPrice((string) $price);
+                  $lineItem->setTotal((string) $lineTotal);
                   $lineItem->setTitle($title);
                   $lineItem->setOrderId($order);
                   $manager->persist($lineItem);
 
                   $vendor = $product->getVendor();
                   $order->setVendor($vendor);
+                } else {
+                  $soldOut = true;
                 }
               }
             } else {
@@ -169,7 +174,7 @@ class OrderAPIController extends AbstractController
             }
           }
 
-          if ($soldOut && 1 === \count($lineItems)) {
+          if (!$hasValidItems) {
             return $this->json('Le produit est en rupture de stock', 404);
           }
 
@@ -191,7 +196,7 @@ class OrderAPIController extends AbstractController
           $fees  = ($subTotal - $promotionAmount) * 0.08; // commission
           $total = $subTotal - $promotionAmount + $shippingPrice;
 
-          $order->setWeight((string) $weight);
+          $order->setWeight((string) $totalWeight);
           $order->setShippingPrice($shippingPrice);
           $order->setShippingCarrierId($shippingCarrierId);
           $order->setShippingCarrierName($shippingCarrierName);

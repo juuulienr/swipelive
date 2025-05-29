@@ -19,7 +19,8 @@ class ClipAPIController extends AbstractController
 {
   public function getUser(): ?User
   {
-    return parent::getUser();
+    $user = parent::getUser();
+    return $user instanceof User ? $user : null;
   }
 
   /**
@@ -98,7 +99,7 @@ class ClipAPIController extends AbstractController
     $live     = $clip->getLive();
     $comments = $clip->getComments();
 
-    if ($comments) {
+    if (!$comments->isEmpty()) {
       foreach ($comments as $comment) {
         $manager->remove($comment);
       }
@@ -112,14 +113,14 @@ class ClipAPIController extends AbstractController
       $liveProducts = $live->getLiveProducts();
       $comments     = $live->getComments();
 
-      if ($liveProducts) {
+      if (!$liveProducts->isEmpty()) {
         foreach ($liveProducts as $liveProduct) {
           $manager->remove($liveProduct);
         }
         $manager->flush();
       }
 
-      if ($comments) {
+      if (!$comments->isEmpty()) {
         foreach ($comments as $comment) {
           $manager->remove($comment);
         }

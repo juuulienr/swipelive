@@ -30,7 +30,8 @@ class DiscussionAPIController extends AbstractController
 
   public function getUser(): ?User
   {
-    return parent::getUser();
+    $user = parent::getUser();
+    return $user instanceof User ? $user : null;
   }
 
   /**
@@ -59,33 +60,31 @@ class DiscussionAPIController extends AbstractController
     if ($json = $request->getContent()) {
       $discussion = $serializer->deserialize($json, Discussion::class, 'json');
 
-      if ($discussion) {
-        $exist = $discussionRepo->findOneBy(['user' => $discussion->getUser(), 'vendor' => $discussion->getVendor()]);
+      $exist = $discussionRepo->findOneBy(['user' => $discussion->getUser(), 'vendor' => $discussion->getVendor()]);
 
-        if (!$exist) {
-          $exist = $discussionRepo->findOneBy(['user' => $discussion->getVendor(), 'vendor' => $discussion->getUser()]);
-        }
+      if (!$exist) {
+        $exist = $discussionRepo->findOneBy(['user' => $discussion->getVendor(), 'vendor' => $discussion->getUser()]);
+      }
 
-        if (!$exist) {
-          $manager->persist($discussion);
-          $manager->flush();
+      if (!$exist) {
+        $manager->persist($discussion);
+        $manager->flush();
+      } else {
+        $message = $discussion->getMessages()[0];
+        $message->setDiscussion($exist);
+
+        $manager->persist($message);
+        $manager->flush();
+
+
+        // update discussion
+        $exist->setPreview($message->getText());
+        $exist->setUpdatedAt(new DateTime('now', \timezone_open('UTC')));
+
+        if ($exist->getUser()->getId() === $this->getUser()->getId()) {
+          $exist->setUnseenVendor(true);
         } else {
-          $message = $discussion->getMessages()[0];
-          $message->setDiscussion($exist);
-
-          $manager->persist($message);
-          $manager->flush();
-
-
-          // update discussion
-          $exist->setPreview($message->getText());
-          $exist->setUpdatedAt(new DateTime('now', \timezone_open('UTC')));
-
-          if ($exist->getUser()->getId() === $this->getUser()->getId()) {
-            $exist->setUnseenVendor(true);
-          } else {
-            $exist->setUnseen(true);
-          }
+          $exist->setUnseen(true);
         }
       }
 

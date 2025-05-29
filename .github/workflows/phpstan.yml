@@ -1,0 +1,47 @@
+name: Code Quality Analysis
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: iconv, pgsql
+          coverage: none
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest --no-dev --optimize-autoloader
+
+      - name: Check PHP CS Fixer (Code Style)
+        run: vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff
+
+      - name: Run PHPStan (Static Analysis)
+        run: vendor/bin/phpstan analyse --configuration=phpstan.dist.neon --no-progress
+
+      - name: Check Rector (Code Modernization)
+        run: vendor/bin/rector process --dry-run 

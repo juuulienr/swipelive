@@ -19,7 +19,8 @@ class WithdrawAPIController extends AbstractController
 {
   public function getUser(): ?User
   {
-    return parent::getUser();
+    $user = parent::getUser();
+    return $user instanceof User ? $user : null;
   }
 
   /**
@@ -68,7 +69,7 @@ class WithdrawAPIController extends AbstractController
             ],
           ]);
 
-          $bank->setBankId($stripeBank->id);
+          $bank->setBankId((string) $stripeBank->id);
           $manager->flush();
         } catch (\Exception $e) {
           return $this->json($e->getMessage(), 404);
@@ -103,7 +104,7 @@ class WithdrawAPIController extends AbstractController
             try {
               $stripe = new StripeClient($this->getParameter('stripe_sk'));
               $payout = $stripe->payouts->create(
-                ['amount' => $withdrawAmount * 100, 'currency' => $bank->getCurrency()],
+                ['amount' => (int) ($withdrawAmount * 100), 'currency' => $bank->getCurrency()],
                 ['stripe_account' => $vendor->getStripeAcc()]
               );
 
@@ -114,7 +115,7 @@ class WithdrawAPIController extends AbstractController
               $withdraw->setAmount($withdrawAmount);
               $withdraw->setStatus('succeeded');
               $withdraw->setLast4($bank->getLast4());
-              $withdraw->setPayoutId($payout->id);
+              $withdraw->setPayoutId((string) $payout->id);
               $withdraw->setVendor($vendor);
 
               $manager->persist($withdraw);
@@ -191,25 +192,21 @@ class WithdrawAPIController extends AbstractController
    */
   public function verifCompany(Request $request, ObjectManager $manager): JsonResponse
   {
-    if ($request->files->get('document')) {
-      $file = $request->files->get('document');
-
-      if (!$file) {
-        return $this->json('Le document est introuvable !', 404);
-      }
-
-      // Code commenté pour le moment
-      // $filename = md5(time().uniqid()). "." . $file->guessExtension();
-      // $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
-      // file_put_contents($filepath, file_get_contents($file));
-      // $upload = new Upload();
-      // $upload->setFilename($filename);
-      // $manager->persist($upload);
-      // $manager->flush();
-
-      return $this->json(true, 200);
+    $file = $request->files->get('document');
+    
+    if (!$file) {
+      return $this->json('Le document est introuvable !', 404);
     }
 
-    return $this->json('Le document est introuvable !', 404);
+    // Code commenté pour le moment
+    // $filename = md5(time().uniqid()). "." . $file->guessExtension();
+    // $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
+    // file_put_contents($filepath, file_get_contents($file));
+    // $upload = new Upload();
+    // $upload->setFilename($filename);
+    // $manager->persist($upload);
+    // $manager->flush();
+
+    return $this->json(true, 200);
   }
 }

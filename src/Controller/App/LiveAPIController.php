@@ -41,7 +41,8 @@ class LiveAPIController extends AbstractController
 
   public function getUser(): ?User
   {
-    return parent::getUser();
+    $user = parent::getUser();
+    return $user instanceof User ? $user : null;
   }
 
   /**
@@ -230,7 +231,7 @@ class LiveAPIController extends AbstractController
           'body'    => $body,
         ]);
 
-        $result = \json_decode($response->getBody(), true);
+        $result = \json_decode((string) $response->getBody(), true);
 
         if ($result) {
           $fbStreamId     = $result['id'];
@@ -413,7 +414,7 @@ class LiveAPIController extends AbstractController
           'body'    => $bodyStop,
         ]);
 
-        $stopData = \json_decode($resStop->getBody(), true);
+        $stopData = \json_decode((string) $resStop->getBody(), true);
 
         if (isset($stopData['serverResponse']['fileList'])) {
           $fileList = $stopData['serverResponse']['fileList'];

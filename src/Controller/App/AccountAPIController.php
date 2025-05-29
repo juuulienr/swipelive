@@ -39,7 +39,8 @@ class AccountAPIController extends AbstractController
    */
   public function getUser(): ?User
   {
-    return parent::getUser();
+    $user = parent::getUser();
+    return $user instanceof User ? $user : null;
   }
 
   /**
@@ -71,7 +72,7 @@ class AccountAPIController extends AbstractController
           $security->setTimezone($param['timezone']);
           $security->setLocale($param['locale']);
 
-          if ($param['device'] && null !== $param['device']) {
+          if (isset($param['device'])) {
             $security->setModel($param['device']['model']);
             $security->setPlatform($param['device']['platform']);
             $security->setUuid($param['device']['uuid']);
@@ -225,7 +226,7 @@ class AccountAPIController extends AbstractController
             $security->setTimezone($param['timezone']);
             $security->setLocale($param['locale']);
 
-            if ($param['device'] && null !== $param['device']) {
+            if (isset($param['device'])) {
               $security->setModel($param['device']['model']);
               $security->setPlatform($param['device']['platform']);
               $security->setUuid($param['device']['uuid']);
@@ -338,7 +339,7 @@ class AccountAPIController extends AbstractController
           $security->setTimezone($param['timezone']);
           $security->setLocale($param['locale']);
 
-          if ($param['device'] && null !== $param['device']) {
+          if (isset($param['device'])) {
             $security->setModel($param['device']['model']);
             $security->setPlatform($param['device']['platform']);
             $security->setUuid($param['device']['uuid']);
@@ -447,7 +448,7 @@ class AccountAPIController extends AbstractController
           $security->setTimezone($param['timezone']);
           $security->setLocale($param['locale']);
 
-          if ($param['device'] && null !== $param['device']) {
+          if (isset($param['device'])) {
             $security->setModel($param['device']['model']);
             $security->setPlatform($param['device']['platform']);
             $security->setUuid($param['device']['uuid']);

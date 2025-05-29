@@ -29,7 +29,8 @@ class ProductAPIController extends AbstractController
 {
   public function getUser(): ?User
   {
-    return parent::getUser();
+    $user = parent::getUser();
+    return $user instanceof User ? $user : null;
   }
 
   /**
@@ -115,108 +116,103 @@ class ProductAPIController extends AbstractController
    */
   public function deleteProduct(Product $product, Request $request, LiveProductsRepository $liveProductRepo, ClipRepository $clipRepo, LineItemRepository $lineItemRepo, ObjectManager $manager): JsonResponse
   {
-    if ($product) {
-      $clips = $clipRepo->findByProduct($product);
-      $env   = $this->getParameter('environment');
+    $clips = $clipRepo->findByProduct($product);
+    $env   = $this->getParameter('environment');
 
-      if ($clips) {
-        foreach ($clips as $clip) {
-          $live     = $clip->getLive();
-          $comments = $clip->getComments();
+    if ($clips) {
+      foreach ($clips as $clip) {
+        $live     = $clip->getLive();
+        $comments = $clip->getComments();
 
-          if ($comments) {
+        if ($comments->count() > 0) {
+          foreach ($comments as $comment) {
+            $manager->remove($comment);
+          }
+          $manager->flush();
+        }
+
+        $manager->remove($clip);
+        $manager->flush();
+
+        if (0 === \count($live->getClips())) {
+          $liveProducts = $live->getLiveProducts();
+          $comments     = $live->getComments();
+
+          if ($liveProducts->count() > 0) {
+            foreach ($liveProducts as $liveProduct) {
+              $manager->remove($liveProduct);
+            }
+            $manager->flush();
+          }
+
+          if ($comments->count() > 0) {
             foreach ($comments as $comment) {
               $manager->remove($comment);
             }
             $manager->flush();
           }
 
-          $manager->remove($clip);
+          $manager->remove($live);
           $manager->flush();
-
-          if (0 === \count($live->getClips())) {
-            $liveProducts = $live->getLiveProducts();
-            $comments     = $live->getComments();
-
-            if ($liveProducts) {
-              foreach ($liveProducts as $liveProduct) {
-                $manager->remove($liveProduct);
-              }
-              $manager->flush();
-            }
-
-            if ($comments) {
-              foreach ($comments as $comment) {
-                $manager->remove($comment);
-              }
-              $manager->flush();
-            }
-
-            $manager->remove($live);
-            $manager->flush();
-          }
         }
       }
-
-      $liveProducts = $liveProductRepo->findByProduct($product);
-
-      if ($liveProducts) {
-        foreach ($liveProducts as $liveProduct) {
-          $manager->remove($liveProduct);
-        }
-        $manager->flush();
-      }
-
-      foreach ($product->getOptions()->toArray() as $option) {
-        $manager->remove($option);
-      }
-
-
-      $lineItems = $lineItemRepo->findByProduct($product);
-
-      if ($lineItems) {
-        foreach ($lineItems as $lineItem) {
-          $lineItem->setProduct(null);
-
-          foreach ($product->getVariants()->toArray() as $variant) {
-            $lineItems2 = $lineItemRepo->findByVariant($variant);
-
-            foreach ($lineItems2 as $lineItem2) {
-              $lineItem2->setVariant(null);
-            }
-            $manager->flush();
-          }
-        }
-        $manager->flush();
-      }
-
-      foreach ($product->getVariants()->toArray() as $variant) {
-        $manager->remove($variant);
-      }
-
-      foreach ($product->getUploads()->toArray() as $upload) {
-        try {
-          $filename = \explode('.', (string) $upload->getFilename());
-          $result   = (new AdminApi())->deleteAssets($filename[0], []);
-        } catch (Exception $e) {
-          return $this->json($e->getMessage(), 404);
-        }
-
-        $manager->remove($upload);
-      }
-
-      $manager->flush();
-      $manager->remove($product);
-      $manager->flush();
-
-      return $this->json($this->getUser(), 200, [], [
-        'groups'                     => 'user:read',
-        'circular_reference_limit'   => 1,
-        'circular_reference_handler' => fn ($object) => $object->getId(),
-      ]);
     }
 
-    return $this->json('Le produit est introuvable', 404);
+    $liveProducts = $liveProductRepo->findByProduct($product);
+
+    if ($liveProducts) {
+      foreach ($liveProducts as $liveProduct) {
+        $manager->remove($liveProduct);
+      }
+      $manager->flush();
+    }
+
+    foreach ($product->getOptions()->toArray() as $option) {
+      $manager->remove($option);
+    }
+
+    $lineItems = $lineItemRepo->findByProduct($product);
+
+    if ($lineItems) {
+      foreach ($lineItems as $lineItem) {
+        $lineItem->setProduct(null);
+
+        foreach ($product->getVariants()->toArray() as $variant) {
+          $lineItems2 = $lineItemRepo->findByVariant($variant);
+
+          foreach ($lineItems2 as $lineItem2) {
+            $lineItem2->setVariant(null);
+          }
+          $manager->flush();
+        }
+      }
+      $manager->flush();
+    }
+
+    foreach ($product->getVariants()->toArray() as $variant) {
+      $manager->remove($variant);
+    }
+
+    foreach ($product->getUploads()->toArray() as $upload) {
+      try {
+        $filename = \explode('.', (string) $upload->getFilename());
+        $result   = (new AdminApi())->deleteAssets($filename[0], []);
+      } catch (Exception $e) {
+        return $this->json($e->getMessage(), 404);
+      }
+
+      $manager->remove($upload);
+    }
+
+    $manager->flush();
+    $manager->remove($product);
+    $manager->flush();
+
+    return $this->json($this->getUser(), 200, [], [
+      'groups'                     => 'user:read',
+      'circular_reference_limit'   => 1,
+      'circular_reference_handler' => fn ($object) => $object->getId(),
+    ]);
   }
 
   /**
@@ -226,14 +222,15 @@ class ProductAPIController extends AbstractController
    */
   public function editVariant(Variant $variant, Request $request, ObjectManager $manager, SerializerInterface $serializer): JsonResponse
   {
-    if ($json = $request->getContent()) {
-      $serializer->deserialize($json, Variant::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $variant]);
-      $manager->flush();
-
-      return $this->json($variant, 200, [], ['groups' => 'variant:read']);
+    $json = $request->getContent();
+    if (!$json) {
+      return $this->json('Une erreur est survenue', 404);
     }
 
-    return $this->json('Une erreur est survenue', 404);
+    $serializer->deserialize($json, Variant::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $variant]);
+    $manager->flush();
+
+    return $this->json($variant, 200, [], ['groups' => 'variant:read']);
   }
 
   /**
@@ -243,14 +240,10 @@ class ProductAPIController extends AbstractController
    */
   public function deleteVariant(Variant $variant, Request $request, ObjectManager $manager): JsonResponse
   {
-    if ($variant) {
-      $manager->remove($variant);
-      $manager->flush();
+    $manager->remove($variant);
+    $manager->flush();
 
-      return $this->json(true, 200);
-    }
-
-    return $this->json('Le variant est introuvable', 404);
+    return $this->json(true, 200);
   }
 
   /**

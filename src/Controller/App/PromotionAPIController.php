@@ -19,7 +19,8 @@ class PromotionAPIController extends AbstractController
 {
   public function getUser(): ?User
   {
-    return parent::getUser();
+    $user = parent::getUser();
+    return $user instanceof User ? $user : null;
   }
 
   /**
@@ -57,16 +58,14 @@ class PromotionAPIController extends AbstractController
    */
   public function deletePromotion(Promotion $promotion, ObjectManager $manager, PromotionRepository $promotionRepo, SerializerInterface $serializer): JsonResponse
   {
-    if ($promotion) {
-      if ($promotion->getOrders()) {
-        foreach ($promotion->getOrders() as $order) {
-          $promotion->removeOrder($order);
-        }
+    if ($promotion->getOrders()->count() > 0) {
+      foreach ($promotion->getOrders() as $order) {
+        $promotion->removeOrder($order);
       }
-
-      $manager->remove($promotion);
-      $manager->flush();
     }
+
+    $manager->remove($promotion);
+    $manager->flush();
 
     return $this->json($this->getUser(), 200, [], [
       'groups'                     => 'user:read',
