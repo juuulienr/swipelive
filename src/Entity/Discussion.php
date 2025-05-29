@@ -159,9 +159,7 @@ class Discussion
   }
 
   public function removeMessage(Message $message): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->messages->removeElement($message) && $message->getDiscussion() === $this) {
+  {if ($this->messages->removeElement($message) && $message->getDiscussion() === $this) {
       $message->setDiscussion(null);
     }
 

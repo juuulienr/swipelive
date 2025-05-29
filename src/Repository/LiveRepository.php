@@ -50,35 +50,4 @@ class LiveRepository extends ServiceEntityRepository
 
     return $query->getQuery()
     ->getResult();
-  }
-
-
-  // /**
-  //  * @return Live[] Returns an array of Live objects
-  //  */
-  /*
-  public function findByExampleField($value)
-  {
-      return $this->createQueryBuilder('l')
-          ->andWhere('l.exampleField = :val')
-          ->setParameter('val', $value)
-          ->orderBy('l.id', 'ASC')
-          ->setMaxResults(10)
-          ->getQuery()
-          ->getResult()
-      ;
-  }
-  */
-
-  /*
-  public function findOneBySomeField($value): ?Live
-  {
-      return $this->createQueryBuilder('l')
-          ->andWhere('l.exampleField = :val')
-          ->setParameter('val', $value)
-          ->getQuery()
-          ->getOneOrNullResult()
-      ;
-  }
-  */
-}
+  }}

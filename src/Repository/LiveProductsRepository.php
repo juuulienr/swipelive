@@ -23,34 +23,4 @@ class LiveProductsRepository extends ServiceEntityRepository
   public function __construct(ManagerRegistry $registry)
   {
     parent::__construct($registry, LiveProducts::class);
-  }
-
-  // /**
-  //  * @return LiveProducts[] Returns an array of LiveProducts objects
-  //  */
-  /*
-  public function findByExampleField($value)
-  {
-      return $this->createQueryBuilder('l')
-          ->andWhere('l.exampleField = :val')
-          ->setParameter('val', $value)
-          ->orderBy('l.id', 'ASC')
-          ->setMaxResults(10)
-          ->getQuery()
-          ->getResult()
-      ;
-  }
-  */
-
-  /*
-  public function findOneBySomeField($value): ?LiveProducts
-  {
-      return $this->createQueryBuilder('l')
-          ->andWhere('l.exampleField = :val')
-          ->setParameter('val', $value)
-          ->getQuery()
-          ->getOneOrNullResult()
-      ;
-  }
-  */
-}
+  }}

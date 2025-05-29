@@ -200,15 +200,6 @@ class WithdrawAPIController extends AbstractController
       return $this->json('Le document est introuvable !', 404);
     }
 
-    // Code commenté pour le moment
-    // $filename = md5(time().uniqid()). "." . $file->guessExtension();
-    // $filepath = $this->getParameter('uploads_directory') . '/' . $filename;
-    // file_put_contents($filepath, file_get_contents($file));
-    // $upload = new Upload();
-    // $upload->setFilename($filename);
-    // $manager->persist($upload);
-    // $manager->flush();
-
     return $this->json(true, 200);
   }
 }

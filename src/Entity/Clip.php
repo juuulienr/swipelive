@@ -273,9 +273,7 @@ class Clip
   }
 
   public function removeComment(Comment $comment): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->comments->removeElement($comment) && $comment->getClip() === $this) {
+  {if ($this->comments->removeElement($comment) && $comment->getClip() === $this) {
       $comment->setClip(null);
     }
 

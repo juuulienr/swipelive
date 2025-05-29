@@ -225,9 +225,7 @@ class Live
   }
 
   public function removeClip(Clip $clip): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->clips->removeElement($clip) && $clip->getLive() === $this) {
+  {if ($this->clips->removeElement($clip) && $clip->getLive() === $this) {
       $clip->setLive(null);
     }
 
@@ -253,9 +251,7 @@ class Live
   }
 
   public function removeLiveProduct(LiveProducts $liveProduct): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->liveProducts->removeElement($liveProduct) && $liveProduct->getLive() === $this) {
+  {if ($this->liveProducts->removeElement($liveProduct) && $liveProduct->getLive() === $this) {
       $liveProduct->setLive(null);
     }
 
@@ -449,9 +445,7 @@ class Live
   }
 
   public function removeComment(Comment $comment): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->comments->removeElement($comment) && $comment->getLive() === $this) {
+  {if ($this->comments->removeElement($comment) && $comment->getLive() === $this) {
       $comment->setLive(null);
     }
 

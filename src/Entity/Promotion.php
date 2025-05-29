@@ -190,9 +190,7 @@ class Promotion
   }
 
   public function removeOrder(Order $order): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->orders->removeElement($order) && $order->getPromotion() === $this) {
+  {if ($this->orders->removeElement($order) && $order->getPromotion() === $this) {
       $order->setPromotion(null);
     }
 

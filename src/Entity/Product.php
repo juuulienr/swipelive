@@ -309,9 +309,7 @@ class Product
   }
 
   public function removeUpload(Upload $upload): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->uploads->removeElement($upload) && $upload->getProduct() === $this) {
+  {if ($this->uploads->removeElement($upload) && $upload->getProduct() === $this) {
       $upload->setProduct(null);
     }
 
@@ -337,9 +335,7 @@ class Product
   }
 
   public function removeClip(Clip $clip): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->clips->removeElement($clip) && $clip->getProduct() === $this) {
+  {if ($this->clips->removeElement($clip) && $clip->getProduct() === $this) {
       $clip->setProduct(null);
     }
 
@@ -365,9 +361,7 @@ class Product
   }
 
   public function removeLiveProduct(LiveProducts $liveProduct): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->liveProducts->removeElement($liveProduct) && $liveProduct->getProduct() === $this) {
+  {if ($this->liveProducts->removeElement($liveProduct) && $liveProduct->getProduct() === $this) {
       $liveProduct->setProduct(null);
     }
 
@@ -393,9 +387,7 @@ class Product
   }
 
   public function removeOption(Option $option): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->options->removeElement($option) && $option->getProduct() === $this) {
+  {if ($this->options->removeElement($option) && $option->getProduct() === $this) {
       $option->setProduct(null);
     }
 
@@ -421,9 +413,7 @@ class Product
   }
 
   public function removeVariant(Variant $variant): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->variants->removeElement($variant) && $variant->getProduct() === $this) {
+  {if ($this->variants->removeElement($variant) && $variant->getProduct() === $this) {
       $variant->setProduct(null);
     }
 
@@ -449,9 +439,7 @@ class Product
   }
 
   public function removeLineItem(LineItem $lineItem): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->lineItems->removeElement($lineItem) && $lineItem->getProduct() === $this) {
+  {if ($this->lineItems->removeElement($lineItem) && $lineItem->getProduct() === $this) {
       $lineItem->setProduct(null);
     }
 
@@ -501,9 +489,7 @@ class Product
   }
 
   public function removeFavori(Favoris $favori): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->favoris->removeElement($favori) && $favori->getProduct() === $this) {
+  {if ($this->favoris->removeElement($favori) && $favori->getProduct() === $this) {
       $favori->setProduct(null);
     }
 

@@ -284,9 +284,7 @@ class Variant
   }
 
   public function removeLineItem(LineItem $lineItem): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->lineItems->removeElement($lineItem) && $lineItem->getVariant() === $this) {
+  {if ($this->lineItems->removeElement($lineItem) && $lineItem->getVariant() === $this) {
       $lineItem->setVariant(null);
     }
 

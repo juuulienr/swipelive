@@ -305,27 +305,6 @@ class OrderAPIController extends AbstractController
     $order->setStatus('closed');
     $manager->flush();
 
-    // payer le vendeur
-    // pending -> available
-
-    // Litiges : blocage des fond + Ouverture du chat directement ( amiable ) + problème résolu ? Oui Non
-    // Si oui : clôturer le chat + déblocage des fonds soit pour le client soit pour le vendeur.
-    // Si non : transfert du litige vers nous
-    // Exemple de litige : Colis non reçu, colis non conforme, Contrefaçon….
-
-    // if ($order->getVendor()->getUser()->getPushToken()) {
-    //   try {
-    // $data = [
-    //   'route' => "ListOrders",
-    //   'isOrder' => true,
-    //   'orderId' => $order->getId()
-    // ];
-    //     $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "La commande a été cloturée !", $order->getVendor()->getUser()->getPushToken());
-    //   } catch (\Exception $error) {
-    //     $this->bugsnag->notifyException($error);
-    //   }
-    // }
-
     return $this->json($order, 200, [], [
       'groups' => 'order:read',
     ]);
@@ -362,27 +341,10 @@ class OrderAPIController extends AbstractController
       $order->setShippingStatus('cancelled');
       $manager->flush();
 
-
-      // refund customer
       $stripe = new StripeClient($this->getParameter('stripe_sk'));
       $stripe->refunds->create([
         'payment_intent' => $order->getPaymentId(),
       ]);
-
-      // send notif push to buyer/vendor
-      // if ($order->getBuyer->getPushToken()) {
-      //   try {
-      // $data = [
-      //   'route' => "ListOrders",
-      //   'isOrder' => true,
-      //   'orderId' => $order->getId()
-      // ];
-
-      //     $this->firebaseMessagingService->sendNotification("SWIPE LIVE", "La commande a été annulée ", $order->getBuyer->getPushToken(), $data);
-      //   } catch (\Exception $error) {
-      //     $this->bugsnag->notifyException($error);
-      //   }
-      // }
 
       return $this->json($order, 200, [], [
         'groups' => 'order:read',

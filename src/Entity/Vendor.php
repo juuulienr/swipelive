@@ -255,9 +255,7 @@ class Vendor
   }
 
   public function removeLive(Live $live): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->lives->removeElement($live) && $live->getVendor() === $this) {
+  {if ($this->lives->removeElement($live) && $live->getVendor() === $this) {
       $live->setVendor(null);
     }
 
@@ -283,9 +281,7 @@ class Vendor
   }
 
   public function removeClip(Clip $clip): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->clips->removeElement($clip) && $clip->getVendor() === $this) {
+  {if ($this->clips->removeElement($clip) && $clip->getVendor() === $this) {
       $clip->setVendor(null);
     }
 
@@ -335,9 +331,7 @@ class Vendor
   }
 
   public function removeProduct(Product $product): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->products->removeElement($product) && $product->getVendor() === $this) {
+  {if ($this->products->removeElement($product) && $product->getVendor() === $this) {
       $product->setVendor(null);
     }
 
@@ -423,9 +417,7 @@ class Vendor
   }
 
   public function removeSale(Order $sale): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->sales->removeElement($sale) && $sale->getVendor() === $this) {
+  {if ($this->sales->removeElement($sale) && $sale->getVendor() === $this) {
       $sale->setVendor(null);
     }
 
@@ -487,9 +479,7 @@ class Vendor
   }
 
   public function removeWithdraw(Withdraw $withdraw): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->withdraws->removeElement($withdraw) && $withdraw->getVendor() === $this) {
+  {if ($this->withdraws->removeElement($withdraw) && $withdraw->getVendor() === $this) {
       $withdraw->setVendor(null);
     }
 
@@ -515,9 +505,7 @@ class Vendor
   }
 
   public function removeBankAccount(BankAccount $bankAccount): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->bankAccounts->removeElement($bankAccount) && $bankAccount->getVendor() === $this) {
+  {if ($this->bankAccounts->removeElement($bankAccount) && $bankAccount->getVendor() === $this) {
       $bankAccount->setVendor(null);
     }
 
@@ -542,14 +530,9 @@ class Vendor
   }
 
   public function setUser(?User $user): self
-  {
-    // unset the owning side of the relation if necessary
-    if (!$user instanceof User && null !== $this->user) {
+  {if (!$user instanceof User && null !== $this->user) {
       $this->user->setVendor(null);
-    }
-
-    // set the owning side of the relation if necessary
-    if ($user instanceof User && $user->getVendor() !== $this) {
+    }if ($user instanceof User && $user->getVendor() !== $this) {
       $user->setVendor($this);
     }
 
@@ -601,9 +584,7 @@ class Vendor
   }
 
   public function removePromotion(Promotion $promotion): self
-  {
-    // set the owning side to null (unless already changed)
-    if ($this->promotions->removeElement($promotion) && $promotion->getVendor() === $this) {
+  {if ($this->promotions->removeElement($promotion) && $promotion->getVendor() === $this) {
       $promotion->setVendor(null);
     }
 

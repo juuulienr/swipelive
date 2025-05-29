@@ -22,34 +22,4 @@ class VariantRepository extends ServiceEntityRepository
   public function __construct(ManagerRegistry $registry)
   {
     parent::__construct($registry, Variant::class);
-  }
-
-  // /**
-  //  * @return Variant[] Returns an array of Variant objects
-  //  */
-  /*
-  public function findByExampleField($value)
-  {
-      return $this->createQueryBuilder('v')
-          ->andWhere('v.exampleField = :val')
-          ->setParameter('val', $value)
-          ->orderBy('v.id', 'ASC')
-          ->setMaxResults(10)
-          ->getQuery()
-          ->getResult()
-      ;
-  }
-  */
-
-  /*
-  public function findOneBySomeField($value): ?Variant
-  {
-      return $this->createQueryBuilder('v')
-          ->andWhere('v.exampleField = :val')
-          ->setParameter('val', $value)
-          ->getQuery()
-          ->getOneOrNullResult()
-      ;
-  }
-  */
-}
+  }}
