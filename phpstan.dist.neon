@@ -5,3 +5,7 @@ parameters:
         - config/
         - public/
         - src/
+    ignoreErrors:
+        # Ignore Doctrine entity ID properties that are auto-generated
+        - identifier: property.onlyRead
+          message: '#Property .+::\$id is never written, only read\.#'
