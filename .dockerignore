@@ -1,0 +1,48 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Development
+README.md
+LICENSE
+
+# Cache and logs
+var/cache/*
+var/log/*
+!var/cache/.gitkeep
+!var/log/.gitkeep
+
+# Tests
+tests/
+
+# Node modules
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# PHP CS Fixer
+.php-cs-fixer.cache
+
+# PHPStan
+phpstan.neon 

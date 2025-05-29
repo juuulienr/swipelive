@@ -9,7 +9,7 @@
 SwipeLive était une application mobile innovante de live shopping, permettant aux vendeurs de présenter leurs produits en direct et aux acheteurs d'interagir et d'acheter en temps réel. 
 Le projet combinait l'expérience immersive du streaming en direct avec la simplicité du commerce électronique.
 
-**État du projet :** Application fonctionnelle, levée de fonds signée (250k €), projet arrêté stratégiquement avant l'utilisation des fonds suite à l'arrivée de TikTok Shop en France. 
+**État du projet :** Application fonctionnelle, levée de fonds signée (250k €), projet arrêté stratégiquement avant l'utilisation des fonds suite à l'arrivée de TikTok Shop en France. 
 
 
 ### Composants du projet :
@@ -50,7 +50,7 @@ Le projet combinait l'expérience immersive du streaming en direct avec la simpl
   - PHP 8.2
   - Doctrine ORM
   - JWT Authentication
-  - MySQL/MariaDB
+  - PostgreSQL
 
 - **Services Cloud**
   - AWS S3 pour le stockage
@@ -66,12 +66,73 @@ Le projet combinait l'expérience immersive du streaming en direct avec la simpl
 
 ## 📋 Prérequis
 
+### Installation Classique
 - PHP 8.2 ou supérieur
 - Composer
-- MySQL/MariaDB
+- PostgreSQL
 - FFmpeg
 
+### Installation avec Docker (Recommandée)
+- Docker
+- Docker Compose
+
 ## 🚀 Installation
+
+### Option 1 : Installation avec Docker (Recommandée)
+
+1. **Cloner le projet**
+   ```bash
+   git clone https://github.com/votre-username/swipelive.git
+   cd swipelive
+   ```
+
+2. **Créer le fichier d'environnement**
+   ```bash
+   # Créez un fichier .env avec la configuration suivante :
+   DATABASE_URL="postgresql://symfony:symfony@database:5432/swipelive?serverVersion=15&charset=utf8"
+   APP_ENV=dev
+   APP_SECRET=your-secret-key-here
+   ```
+
+3. **Lancer les conteneurs Docker**
+   ```bash
+   docker-compose up -d --build
+   ```
+
+4. **Installer les dépendances**
+   ```bash
+   docker-compose exec app composer install
+   ```
+
+5. **Créer la base de données et exécuter les migrations**
+   ```bash
+   docker-compose exec app php bin/console doctrine:database:create
+   docker-compose exec app php bin/console doctrine:migrations:migrate
+   ```
+
+6. **Accéder à l'application**
+   - **Site web** : http://localhost:8000
+   - **Base de données PostgreSQL** : localhost:5432
+
+#### Commandes Docker utiles
+```bash
+# Voir les logs en temps réel
+docker-compose logs -f
+
+# Accéder au conteneur de l'application
+docker-compose exec app bash
+
+# Exécuter des commandes Symfony
+docker-compose exec app php bin/console [commande]
+
+# Arrêter les conteneurs
+docker-compose down
+
+# Redémarrer les conteneurs
+docker-compose up -d
+```
+
+### Option 2 : Installation Classique
 
 1. **Cloner le projet**
    ```bash

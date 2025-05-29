@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: swipelive_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    environment:
+      - DATABASE_URL=postgresql://symfony:symfony@database:5432/swipelive?serverVersion=15&charset=utf8
+    networks:
+      - swipelive
+    depends_on:
+      - database
+
+  webserver:
+    image: nginx:alpine
+    container_name: swipelive_webserver
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - swipelive
+    depends_on:
+      - app
+
+  database:
+    image: postgres:15-alpine
+    container_name: swipelive_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: swipelive
+      POSTGRES_USER: symfony
+      POSTGRES_PASSWORD: symfony
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - swipelive
+
+volumes:
+  postgres_data:
+
+networks:
+  swipelive:
+    driver: bridge 
