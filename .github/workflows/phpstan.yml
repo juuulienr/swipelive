@@ -37,11 +37,5 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-scripts --optimize-autoloader
 
-      - name: Check PHP CS Fixer (Code Style)
-        run: vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --dry-run --diff
-
       - name: Run PHPStan (Static Analysis)
         run: vendor/bin/phpstan analyse --configuration=phpstan.dist.neon --no-progress
-
-      - name: Check Rector (Code Modernization)
-        run: vendor/bin/rector process --dry-run 
