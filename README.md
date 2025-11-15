@@ -9,7 +9,7 @@
 SwipeLive était une application mobile innovante de live shopping, permettant aux vendeurs de présenter leurs produits en direct et aux acheteurs d'interagir et d'acheter en temps réel. 
 Le projet combinait l'expérience immersive du streaming en direct avec la simplicité du commerce électronique.
 
-**État du projet :** Application fonctionnelle, levée de fonds signée (250k €), projet arrêté stratégiquement avant l'utilisation des fonds suite à l'arrivée de TikTok Shop en France. 
+**État du projet :** Application fonctionnelle, levée de fonds signée (250k €), arrêt du projet avec l'arrivée de TikTok Shop en France. 
 
 
 ### Composants du projet :
