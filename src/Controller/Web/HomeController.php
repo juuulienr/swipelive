@@ -10,19 +10,19 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class HomeController extends AbstractController
 {
-  /**
-   * @Route("/", name="landing")
-   */
-  public function landing(): Response
-  {
-    return $this->render('web/landing.html.twig');
-  }
+    /**
+     * @Route("/", name="landing")
+     */
+    public function landing(): Response
+    {
+        return $this->render('web/landing.html.twig');
+    }
 
-  /**
-   * @Route("/regles-communaute", name="rules")
-   */
-  public function rules(): Response
-  {
-    return $this->render('web/rules.html.twig');
-  }
+    /**
+     * @Route("/regles-communaute", name="rules")
+     */
+    public function rules(): Response
+    {
+        return $this->render('web/rules.html.twig');
+    }
 }

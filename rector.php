@@ -9,7 +9,7 @@ use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRec
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
-        __DIR__ . '/src',
+        __DIR__.'/src',
     ]);
 
     // Règles pour PHP 8.2
@@ -30,6 +30,6 @@ return static function (RectorConfig $rectorConfig): void {
 
     // Ignorer certains dossiers
     $rectorConfig->skip([
-        __DIR__ . '/src/Migrations',
+        __DIR__.'/src/Migrations',
     ]);
-}; 
+};

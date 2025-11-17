@@ -13,13 +13,14 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @method Variant|null find($id, $lockMode = null, $lockVersion = null)
  * @method Variant|null findOneBy(array $criteria, array $orderBy = null)
- * @method Variant[] findAll()
- * @method Variant[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Variant[]    findAll()
+ * @method Variant[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  * @method Variant|null findOneById(int $id)
  */
 class VariantRepository extends ServiceEntityRepository
 {
-  public function __construct(ManagerRegistry $registry)
-  {
-    parent::__construct($registry, Variant::class);
-  }}
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Variant::class);
+    }
+}

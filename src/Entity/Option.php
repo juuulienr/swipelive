@@ -15,106 +15,106 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class Option
 {
-  /**
-   * @ORM\Id
-   *
-   * @ORM\GeneratedValue
-   *
-   * @ORM\Column(type="integer")
-   */
-  private $id;
+    /**
+     * @ORM\Id
+     *
+     * @ORM\GeneratedValue
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $id;
 
-  /**
-   * @ORM\Column(type="string", length=255)
-   *
-   * @Groups("product:read")
-   * @Groups("user:read")
-   * @Groups("clip:read")
-   * @Groups("category:read")
-   * @Groups("live:read")
-   * @Groups("order:read")
-   */
-  private $name;
+    /**
+     * @ORM\Column(type="string", length=255)
+     *
+     * @Groups("product:read")
+     * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("order:read")
+     */
+    private $name;
 
-  /**
-   * @ORM\Column(type="array")
-   *
-   * @Groups("product:read")
-   * @Groups("user:read")
-   * @Groups("clip:read")
-   * @Groups("category:read")
-   * @Groups("live:read")
-   * @Groups("order:read")
-   */
-  private $data = [];
+    /**
+     * @ORM\Column(type="array")
+     *
+     * @Groups("product:read")
+     * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("order:read")
+     */
+    private $data = [];
 
-  /**
-   * @ORM\Column(type="integer")
-   *
-   * @Groups("product:read")
-   * @Groups("user:read")
-   * @Groups("clip:read")
-   * @Groups("category:read")
-   * @Groups("live:read")
-   * @Groups("order:read")
-   */
-  private $position;
+    /**
+     * @ORM\Column(type="integer")
+     *
+     * @Groups("product:read")
+     * @Groups("user:read")
+     * @Groups("clip:read")
+     * @Groups("category:read")
+     * @Groups("live:read")
+     * @Groups("order:read")
+     */
+    private $position;
 
-  /**
-   * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="options")
-   */
-  private $product;
+    /**
+     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="options")
+     */
+    private $product;
 
-  public function getId(): ?int
-  {
-    return $this->id;
-  }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-  public function getName(): ?string
-  {
-    return $this->name;
-  }
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
 
-  public function setName(string $name): self
-  {
-    $this->name = $name;
+    public function setName(string $name): self
+    {
+        $this->name = $name;
 
-    return $this;
-  }
+        return $this;
+    }
 
-  public function getData(): ?array
-  {
-    return $this->data;
-  }
+    public function getData(): ?array
+    {
+        return $this->data;
+    }
 
-  public function setData(array $data): self
-  {
-    $this->data = $data;
+    public function setData(array $data): self
+    {
+        $this->data = $data;
 
-    return $this;
-  }
+        return $this;
+    }
 
-  public function getProduct(): ?Product
-  {
-    return $this->product;
-  }
+    public function getProduct(): ?Product
+    {
+        return $this->product;
+    }
 
-  public function setProduct(?Product $product): self
-  {
-    $this->product = $product;
+    public function setProduct(?Product $product): self
+    {
+        $this->product = $product;
 
-    return $this;
-  }
+        return $this;
+    }
 
-  public function getPosition(): ?int
-  {
-    return $this->position;
-  }
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
 
-  public function setPosition(int $position): self
-  {
-    $this->position = $position;
+    public function setPosition(int $position): self
+    {
+        $this->position = $position;
 
-    return $this;
-  }
+        return $this;
+    }
 }

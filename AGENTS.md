@@ -267,3 +267,4 @@ src/
 - Ne pas hardcoder les clés API dans le code
 - Utiliser des mocks pour les tests unitaires quand c'est possible
 
+

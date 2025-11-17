@@ -14,14 +14,14 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @method Favoris|null find($id, $lockMode = null, $lockVersion = null)
  * @method Favoris|null findOneBy(array $criteria, array $orderBy = null)
- * @method Favoris[] findAll()
- * @method Favoris[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- * @method Favoris[] findByUser(User $user)
+ * @method Favoris[]    findAll()
+ * @method Favoris[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Favoris[]    findByUser(User $user)
  */
 class FavorisRepository extends ServiceEntityRepository
 {
-  public function __construct(ManagerRegistry $registry)
-  {
-    parent::__construct($registry, Favoris::class);
-  }
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Favoris::class);
+    }
 }

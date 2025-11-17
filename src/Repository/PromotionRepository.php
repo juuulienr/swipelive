@@ -14,14 +14,15 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @method Promotion|null find($id, $lockMode = null, $lockVersion = null)
  * @method Promotion|null findOneBy(array $criteria, array $orderBy = null)
- * @method Promotion[] findAll()
- * @method Promotion[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- * @method Promotion[] findByVendor(Vendor $vendor)
+ * @method Promotion[]    findAll()
+ * @method Promotion[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Promotion[]    findByVendor(Vendor $vendor)
  * @method Promotion|null findOneById(int $id)
  */
 class PromotionRepository extends ServiceEntityRepository
 {
-  public function __construct(ManagerRegistry $registry)
-  {
-    parent::__construct($registry, Promotion::class);
-  }}
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Promotion::class);
+    }
+}

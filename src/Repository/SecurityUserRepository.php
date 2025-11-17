@@ -14,13 +14,14 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @method SecurityUser|null find($id, $lockMode = null, $lockVersion = null)
  * @method SecurityUser|null findOneBy(array $criteria, array $orderBy = null)
- * @method SecurityUser[] findAll()
- * @method SecurityUser[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method SecurityUser[]    findAll()
+ * @method SecurityUser[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  * @method SecurityUser|null findOneByUser(User $user)
  */
 class SecurityUserRepository extends ServiceEntityRepository
 {
-  public function __construct(ManagerRegistry $registry)
-  {
-    parent::__construct($registry, SecurityUser::class);
-  }}
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, SecurityUser::class);
+    }
+}

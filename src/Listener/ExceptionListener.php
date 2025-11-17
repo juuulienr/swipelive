@@ -11,29 +11,29 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class ExceptionListener
 {
-  public function onKernelException(ExceptionEvent $event): void
-  {
-    $request   = $event->getRequest();
-    $exception = $event->getThrowable();
+    public function onKernelException(ExceptionEvent $event): void
+    {
+        $request = $event->getRequest();
+        $exception = $event->getThrowable();
 
-    if ($this->isApiRequest($request)) {
-      $response = new JsonResponse([
-        'error'   => true,
-        'message' => $exception->getMessage(),
-      ]);
+        if ($this->isApiRequest($request)) {
+            $response = new JsonResponse([
+                'error' => true,
+                'message' => $exception->getMessage(),
+            ]);
 
-      if ($exception instanceof HttpExceptionInterface) {
-        $response->setStatusCode($exception->getStatusCode());
-      } else {
-        $response->setStatusCode(500);
-      }
+            if ($exception instanceof HttpExceptionInterface) {
+                $response->setStatusCode($exception->getStatusCode());
+            } else {
+                $response->setStatusCode(500);
+            }
 
-      $event->setResponse($response);
+            $event->setResponse($response);
+        }
     }
-  }
 
-  private function isApiRequest(Request $request): bool
-  {
-    return \str_starts_with($request->getPathInfo(), '/api') || \str_starts_with($request->getPathInfo(), '/user/api');
-  }
+    private function isApiRequest(Request $request): bool
+    {
+        return \str_starts_with($request->getPathInfo(), '/api') || \str_starts_with($request->getPathInfo(), '/user/api');
+    }
 }

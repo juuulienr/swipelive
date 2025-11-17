@@ -11,60 +11,63 @@ use Doctrine\Persistence\ManagerRegistry;
 /**
  * @method Product|null find($id, $lockMode = null, $lockVersion = null)
  * @method Product|null findOneBy(array $criteria, array $orderBy = null)
- * @method Product[] findAll()
- * @method Product[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Product[]    findAll()
+ * @method Product[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class ProductRepository extends ServiceEntityRepository
 {
-  public function __construct(ManagerRegistry $registry)
-  {
-    parent::__construct($registry, Product::class);
-  }
-
-  public function findTrendingProducts($vendor)
-  {
-    $query = $this->createQueryBuilder('p')
-    ->join('p.vendor', 'v');
-
-    if ($vendor) {
-      $query->andWhere('v.id != :vendor')
-      ->setParameter('vendor', $vendor);
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Product::class);
     }
 
-    return $query->getQuery()
-    ->setMaxResults(18)
-    ->getResult();
-  }
+    public function findTrendingProducts($vendor)
+    {
+        $query = $this->createQueryBuilder('p')
+        ->join('p.vendor', 'v');
 
-  public function findProductsNotCreatedByVendor($vendor)
-  {
-    $query = $this->createQueryBuilder('p')
-    ->join('p.vendor', 'v');
+        if ($vendor) {
+            $query->andWhere('v.id != :vendor')
+            ->setParameter('vendor', $vendor);
+        }
 
-    if ($vendor) {
-      $query->andWhere('v.id != :vendor')
-      ->setParameter('vendor', $vendor);
+        return $query->getQuery()
+        ->setMaxResults(18)
+        ->getResult();
     }
 
-    return $query->getQuery()
-    ->setMaxResults(100)
-    ->getResult();
-  }public function findOneById($id): ?Product
-  {
-    return $this->createQueryBuilder('p')
-        ->andWhere('p.id = :id')
-        ->setParameter('id', $id)
-        ->getQuery()
-        ->getOneOrNullResult()
-    ;
-  }
+    public function findProductsNotCreatedByVendor($vendor)
+    {
+        $query = $this->createQueryBuilder('p')
+        ->join('p.vendor', 'v');
 
-  public function findByVendor($vendor)
-  {
-    return $this->createQueryBuilder('p')
-        ->andWhere('p.vendor = :vendor')
-        ->setParameter('vendor', $vendor)
-        ->getQuery()
-        ->getResult()
-    ;
-  }}
+        if ($vendor) {
+            $query->andWhere('v.id != :vendor')
+            ->setParameter('vendor', $vendor);
+        }
+
+        return $query->getQuery()
+        ->setMaxResults(100)
+        ->getResult();
+    }
+
+    public function findOneById($id): ?Product
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function findByVendor($vendor)
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.vendor = :vendor')
+            ->setParameter('vendor', $vendor)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+}

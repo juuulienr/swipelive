@@ -14,13 +14,14 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @method LiveProducts|null find($id, $lockMode = null, $lockVersion = null)
  * @method LiveProducts|null findOneBy(array $criteria, array $orderBy = null)
- * @method LiveProducts[] findAll()
- * @method LiveProducts[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- * @method LiveProducts[] findByProduct(Product $product)
+ * @method LiveProducts[]    findAll()
+ * @method LiveProducts[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method LiveProducts[]    findByProduct(Product $product)
  */
 class LiveProductsRepository extends ServiceEntityRepository
 {
-  public function __construct(ManagerRegistry $registry)
-  {
-    parent::__construct($registry, LiveProducts::class);
-  }}
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, LiveProducts::class);
+    }
+}

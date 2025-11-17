@@ -13,159 +13,159 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 class LineItem
 {
-  /**
-   * @ORM\Id
-   *
-   * @ORM\GeneratedValue
-   *
-   * @ORM\Column(type="integer")
-   *
-   * @Groups("order:read")
-   * @Groups("user:read")
-   */
-  private $id;
+    /**
+     * @ORM\Id
+     *
+     * @ORM\GeneratedValue
+     *
+     * @ORM\Column(type="integer")
+     *
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $id;
 
-  /**
-   * @ORM\Column(type="string", length=255)
-   *
-   * @Groups("order:read")
-   * @Groups("user:read")
-   */
-  private $title;
+    /**
+     * @ORM\Column(type="string", length=255)
+     *
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $title;
 
-  /**
-   * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="lineItems")
-   *
-   * @Groups("order:read")
-   * @Groups("user:read")
-   */
-  private $product;
+    /**
+     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="lineItems")
+     *
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $product;
 
-  /**
-   * @ORM\ManyToOne(targetEntity=Variant::class, inversedBy="lineItems")
-   *
-   * @Groups("order:read")
-   * @Groups("user:read")
-   */
-  private $variant;
+    /**
+     * @ORM\ManyToOne(targetEntity=Variant::class, inversedBy="lineItems")
+     *
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $variant;
 
-  /**
-   * @ORM\Column(type="integer")
-   *
-   * @Groups("order:read")
-   * @Groups("user:read")
-   */
-  private $quantity;
+    /**
+     * @ORM\Column(type="integer")
+     *
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $quantity;
 
-  /**
-   * @ORM\Column(type="decimal", precision=8, scale=2)
-   *
-   * @Groups("order:read")
-   * @Groups("user:read")
-   */
-  private $price;
+    /**
+     * @ORM\Column(type="decimal", precision=8, scale=2)
+     *
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $price;
 
-  /**
-   * @ORM\Column(type="decimal", precision=8, scale=2)
-   *
-   * @Groups("order:read")
-   * @Groups("user:read")
-   */
-  private $total;
+    /**
+     * @ORM\Column(type="decimal", precision=8, scale=2)
+     *
+     * @Groups("order:read")
+     * @Groups("user:read")
+     */
+    private $total;
 
-  /**
-   * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="lineItems")
-   *
-   * @ORM\JoinColumn(nullable=false)
-   */
-  private $orderId;
+    /**
+     * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="lineItems")
+     *
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $orderId;
 
-  public function getId(): ?int
-  {
-    return $this->id;
-  }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-  public function getTitle(): ?string
-  {
-    return $this->title;
-  }
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
 
-  public function setTitle(string $title): self
-  {
-    $this->title = $title;
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
 
-    return $this;
-  }
+        return $this;
+    }
 
-  public function getProduct(): ?Product
-  {
-    return $this->product;
-  }
+    public function getProduct(): ?Product
+    {
+        return $this->product;
+    }
 
-  public function setProduct(?Product $product): self
-  {
-    $this->product = $product;
+    public function setProduct(?Product $product): self
+    {
+        $this->product = $product;
 
-    return $this;
-  }
+        return $this;
+    }
 
-  public function getVariant(): ?Variant
-  {
-    return $this->variant;
-  }
+    public function getVariant(): ?Variant
+    {
+        return $this->variant;
+    }
 
-  public function setVariant(?Variant $variant): self
-  {
-    $this->variant = $variant;
+    public function setVariant(?Variant $variant): self
+    {
+        $this->variant = $variant;
 
-    return $this;
-  }
+        return $this;
+    }
 
-  public function getQuantity(): ?int
-  {
-    return $this->quantity;
-  }
+    public function getQuantity(): ?int
+    {
+        return $this->quantity;
+    }
 
-  public function setQuantity(int $quantity): self
-  {
-    $this->quantity = $quantity;
+    public function setQuantity(int $quantity): self
+    {
+        $this->quantity = $quantity;
 
-    return $this;
-  }
+        return $this;
+    }
 
-  public function getPrice(): ?string
-  {
-    return $this->price;
-  }
+    public function getPrice(): ?string
+    {
+        return $this->price;
+    }
 
-  public function setPrice(string $price): self
-  {
-    $this->price = $price;
+    public function setPrice(string $price): self
+    {
+        $this->price = $price;
 
-    return $this;
-  }
+        return $this;
+    }
 
-  public function getTotal(): ?string
-  {
-    return $this->total;
-  }
+    public function getTotal(): ?string
+    {
+        return $this->total;
+    }
 
-  public function setTotal(string $total): self
-  {
-    $this->total = $total;
+    public function setTotal(string $total): self
+    {
+        $this->total = $total;
 
-    return $this;
-  }
+        return $this;
+    }
 
-  public function getOrderId(): ?Order
-  {
-    return $this->orderId;
-  }
+    public function getOrderId(): ?Order
+    {
+        return $this->orderId;
+    }
 
-  public function setOrderId(?Order $orderId): self
-  {
-    $this->orderId = $orderId;
+    public function setOrderId(?Order $orderId): self
+    {
+        $this->orderId = $orderId;
 
-    return $this;
-  }
+        return $this;
+    }
 }

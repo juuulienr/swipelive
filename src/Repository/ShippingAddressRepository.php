@@ -14,13 +14,14 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @method ShippingAddress|null find($id, $lockMode = null, $lockVersion = null)
  * @method ShippingAddress|null findOneBy(array $criteria, array $orderBy = null)
- * @method ShippingAddress[] findAll()
- * @method ShippingAddress[] findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ShippingAddress[]    findAll()
+ * @method ShippingAddress[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  * @method ShippingAddress|null findOneByUser(User $user)
  */
 class ShippingAddressRepository extends ServiceEntityRepository
 {
-  public function __construct(ManagerRegistry $registry)
-  {
-    parent::__construct($registry, ShippingAddress::class);
-  }}
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, ShippingAddress::class);
+    }
+}
