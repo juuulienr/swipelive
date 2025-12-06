@@ -50,6 +50,11 @@ yarn-error.log
 firebase-credentials.json
 ###< Firebase ###
 
+###> SSL ###
+/docker/nginx/ssl/*.crt
+/docker/nginx/ssl/*.key
+###< SSL ###
+
 ###> IDE and System files ###
 .idea/
 .vscode/
