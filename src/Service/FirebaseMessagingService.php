@@ -7,19 +7,14 @@ namespace App\Service;
 use Kreait\Firebase\Contract\Messaging;
 use Kreait\Firebase\Exception\FirebaseException;
 use Kreait\Firebase\Exception\MessagingException;
-use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\AndroidConfig;
 use Kreait\Firebase\Messaging\ApnsConfig;
 use Kreait\Firebase\Messaging\CloudMessage;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class FirebaseMessagingService
 {
-    public function __construct(private readonly Messaging $messaging, ParameterBagInterface $params)
+    public function __construct(private readonly ?Messaging $messaging = null)
     {
-        $firebaseCredentialsPath = $params->get('firebase_credentials_path');
-        (new Factory())
-        ->withServiceAccount($firebaseCredentialsPath);
     }
 
     /**
@@ -32,6 +27,10 @@ class FirebaseMessagingService
      */
     public function sendNotification(string $title, string $body, string $token, array $data = [], int $attempt = 1): ?string
     {
+        if (null === $this->messaging) {
+            return 'Firebase messaging désactivé (credentials manquants en dev/test).';
+        }
+
         try {
             if (isset($data['type']) && 'vente' === $data['type']) {
                 $apnsConfig = ApnsConfig::new()->withSound('sales.wav');
@@ -50,7 +49,7 @@ class FirebaseMessagingService
             ->withApnsConfig($apnsConfig)
             ->withAndroidConfig($androidConfig);
 
-            $test = $this->messaging->send($message);
+            $this->messaging->send($message);
 
             return 'Notification envoyée avec succès';
         } catch (MessagingException $e) {

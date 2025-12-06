@@ -94,25 +94,35 @@ Le projet combinait l'expérience immersive du streaming en direct avec la simpl
    APP_SECRET=your-secret-key-here
    ```
 
-3. **Lancer les conteneurs Docker**
+3. **Générer les certificats SSL (pour HTTPS)**
+   ```bash
+   cd docker/nginx/ssl
+   ./generate-ssl.sh
+   cd ../../..
+   ```
+
+4. **Lancer les conteneurs Docker**
    ```bash
    docker-compose up -d --build
    ```
 
-4. **Installer les dépendances**
+5. **Installer les dépendances**
    ```bash
    docker-compose exec app composer install
    ```
 
-5. **Créer la base de données et exécuter les migrations**
+6. **Créer la base de données et exécuter les migrations**
    ```bash
    docker-compose exec app php bin/console doctrine:database:create
    docker-compose exec app php bin/console doctrine:migrations:migrate
    ```
 
-6. **Accéder à l'application**
-   - **Site web** : http://localhost:8000
-   - **Base de données PostgreSQL** : localhost:5432
+7. **Accéder à l'application**
+   - **Site web HTTPS** : https://127.0.0.1:8000 (recommandé pour les requêtes API)
+   - **Site web HTTP** : http://localhost:8080 (redirigé vers HTTPS)
+   - **Base de données PostgreSQL** : localhost:5433
+   
+   **Note** : Les certificats SSL sont auto-signés. Lors de la première connexion HTTPS, vous devrez accepter l'avertissement de sécurité dans votre navigateur ou votre client HTTP.
 
 #### Commandes Docker utiles
 ```bash

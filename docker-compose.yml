@@ -23,10 +23,12 @@ services:
     container_name: swipelive_webserver
     restart: unless-stopped
     ports:
-      - "8000:80"
+      - "8080:80"
+      - "8000:443"
     volumes:
       - ./:/var/www
       - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+      - ./docker/nginx/ssl/:/etc/nginx/ssl/
     networks:
       - swipelive
     depends_on:
@@ -43,7 +45,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - swipelive
 

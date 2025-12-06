@@ -6,21 +6,36 @@ Ce fichier fournit des instructions et du contexte spécifiques pour aider les a
 
 ### Installation avec Docker (Recommandée)
 
-1. **Lancer les conteneurs Docker**
+1. **Générer les certificats SSL (pour HTTPS)**
+   ```bash
+   cd docker/nginx/ssl
+   ./generate-ssl.sh
+   cd ../../..
+   ```
+   
+   **Note** : Les certificats SSL auto-signés sont nécessaires pour permettre les requêtes HTTPS depuis le client. Ils sont valides pour `127.0.0.1` et `localhost`.
+
+2. **Lancer les conteneurs Docker**
    ```bash
    docker-compose up -d --build
    ```
 
-2. **Installer les dépendances**
+3. **Installer les dépendances**
    ```bash
    docker-compose exec app composer install
    ```
 
-3. **Créer la base de données et exécuter les migrations**
+4. **Créer la base de données et exécuter les migrations**
    ```bash
    docker-compose exec app php bin/console doctrine:database:create
    docker-compose exec app php bin/console doctrine:migrations:migrate
    ```
+
+5. **URLs d'accès**
+   - **API HTTPS** : https://127.0.0.1:8000 (recommandé pour les requêtes API depuis le client)
+   - **Site web HTTP** : http://localhost:8080 (redirigé automatiquement vers HTTPS)
+   
+   **Important** : Les certificats SSL sont auto-signés. Le client devra accepter l'avertissement de sécurité lors de la première connexion.
 
 4. **Commandes Docker utiles**
    ```bash
@@ -266,5 +281,6 @@ src/
 - Pour les tests nécessitant des services externes (Stripe, Firebase, etc.), utiliser des variables d'environnement de test
 - Ne pas hardcoder les clés API dans le code
 - Utiliser des mocks pour les tests unitaires quand c'est possible
+
 
 
