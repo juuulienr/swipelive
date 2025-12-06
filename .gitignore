@@ -52,7 +52,7 @@ firebase-credentials.json
 
 ###> SSL ###
 /docker/nginx/ssl/*.crt
-/docker/nginx/ssl/*.key
+/docker/nginx/ssl/*.key 
 ###< SSL ###
 
 ###> IDE and System files ###
