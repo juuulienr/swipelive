@@ -7,7 +7,7 @@
     "php": "^8.2",
     "ext-iconv": "*",
     "ext-pgsql": "*",
-    "aws/aws-sdk-php": "^3.0",
+    "aws/aws-sdk-php": "^3.368",
     "boogiefromzk/agora-token": "^1.0",
     "bugsnag/bugsnag-symfony": "^1.13",
     "cloudinary/cloudinary_php": "^2.11",
